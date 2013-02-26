@@ -1,0 +1,7 @@
+# Required python modules for this project.
+# To install all requirement, run
+#    pip install -r requirements.txt
+pyes>=0.19.1
+tornado>=2.4.1
+
+
