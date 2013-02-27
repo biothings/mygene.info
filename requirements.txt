@@ -2,6 +2,5 @@
 # To install all requirement, run
 #    pip install -r requirements.txt
 pyes>=0.19.1
+thrift>=0.9.0
 tornado>=2.4.1
-
-
