@@ -70,3 +70,20 @@ class BaseHandler(tornado.web.RequestHandler):
 
     def options(self, *args, **kwargs):
         self.support_cors()
+
+
+def add_apps(prefix='', app_list=[]):
+    '''
+    Add prefix to each url handler specified in app_list.
+
+    add_apps('test', [('/', testhandler,
+                      ('/test2', test2handler)])
+
+    will return:
+                     [('/test/', testhandler,
+                      ('/test/test2', test2handler)])
+    '''
+    if prefix:
+        return [('/'+prefix+url, handler) for url, handler in app_list]
+    else:
+        return app_list
