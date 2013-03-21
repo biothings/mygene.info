@@ -61,6 +61,12 @@ class StatusCheckHandler(tornado.web.RequestHandler):
         self.head()
         self.write('OK')
 
+
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render('templates/index.html')
+
+
 """
 class MetaDataHandler(tornado.web.RequestHandler):
     '''Return db metadata in json string.'''
@@ -166,6 +172,7 @@ class IntervalQueryHandler(tornado.web.RequestHandler):
 
 
 APP_LIST = [
+        (r"/", MainHandler),
         (r"/status", StatusCheckHandler),
 #        (r"/metadata", MetaDataHandler),
         (r"/gene/([\w\-\.]+)/?", GeneHandler),   #for get request
