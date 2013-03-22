@@ -23,6 +23,7 @@ if src_path not in sys.path:
     sys.path.append(src_path)
 from utils.es import ESQuery
 from helper import add_apps
+from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
 
 __USE_WSGI__ = False
@@ -93,6 +94,7 @@ APP_LIST = [
 
 APP_LIST += add_apps('', api_v2_app_list)
 APP_LIST += add_apps('api/v2', api_v2_app_list)
+APP_LIST += add_apps('api/v1', api_v1_app_list)
 
 
 settings = {}
