@@ -235,6 +235,29 @@ class ESQuery:
         print 'Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0))
 
 
+    def metadata(self, raw=False):
+        '''return metadata about the index.'''
+        mapping = self.conn.indices.get_mapping(self._doc_type, self._index)
+        if raw:
+            return mapping
+
+        def get_fields(properties):
+            for k, v in properties.items():
+                if 'properties' in v:
+                    for f in get_fields(v['properties']):
+                        yield f
+                else:
+                    if v.get('index', None) == 'no':
+                        continue
+                    f = v.get('index_name', k)
+                    yield f
+
+        field_set = set(get_fields(mapping[self._doc_type]['properties']))
+        metadata = {
+            'SEARCHABLE_FIELDS': sorted(field_set)
+        }
+        return metadata
+
 
 def test2(q):
     esq = ESQuery()

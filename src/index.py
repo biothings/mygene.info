@@ -10,6 +10,7 @@ Currently available URLs:
 import sys
 import os.path
 import subprocess
+import json
 
 import tornado.httpserver
 import tornado.ioloop
@@ -67,16 +68,16 @@ class MainHandler(tornado.web.RequestHandler):
         self.render('templates/index.html')
 
 
-"""
+
 class MetaDataHandler(tornado.web.RequestHandler):
     '''Return db metadata in json string.'''
     def get(self):
-        bs = BoCServiceLayer()
+        esq = ESQuery()
+        metadata = esq.metadata()
+        metadata["app_revision"] = __revision__
+        metadata = json.dumps(metadata, indent=4)
         self.set_header("Content-Type", "application/json; charset=UTF-8")
-        metadata = bs.get_metadata(raw=True)
-        metadata = '{"app_revision": "%s",' % __revision__ + metadata[1:]
         self.write(metadata)
-"""
 
 
 
@@ -84,7 +85,7 @@ class MetaDataHandler(tornado.web.RequestHandler):
 APP_LIST = [
         (r"/", MainHandler),
         (r"/status", StatusCheckHandler),
-#        (r"/metadata", MetaDataHandler),
+        (r"/metadata", MetaDataHandler),
 
         # (r"/gene/([\w\-\.]+)/?", GeneHandler),   #for get request
         # (r"/gene/?", GeneHandler),               #for post request
