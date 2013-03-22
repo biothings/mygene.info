@@ -87,10 +87,6 @@ APP_LIST = [
         (r"/status", StatusCheckHandler),
         (r"/metadata", MetaDataHandler),
 
-        # (r"/gene/([\w\-\.]+)/?", GeneHandler),   #for get request
-        # (r"/gene/?", GeneHandler),               #for post request
-        # (r"/query/?", QueryHandler),
-        # (r"/interval/?", IntervalQueryHandler),
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)

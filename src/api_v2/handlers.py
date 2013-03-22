@@ -99,7 +99,7 @@ class QueryHandler(BaseHandler):
 
 
 
-class IntervalQueryHandler(tornado.web.RequestHandler):
+class IntervalQueryHandler(BaseHandler):
     def get(self):
         #/interval?interval=chr12:56350553-56367568&taxid=9606
         interval = self.get_argument('interval', None)
@@ -125,9 +125,7 @@ class IntervalQueryHandler(tornado.web.RequestHandler):
             #sample = self.get_argument('sample', None) == 'true'
             esq = ESQuery()
             res = esq.query_interval(**kwargs)
-            _json_data = json.dumps(res)
-            self.set_header("Content-Type", "application/json; charset=UTF-8")
-            self.write(_json_data)
+            self.return_json(res)
 
 
 APP_LIST = [
