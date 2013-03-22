@@ -59,8 +59,11 @@ class ESQuery:
             doc.setdefault('_version', hit['_version'])
         return doc
 
-    def _cleaned_res(self, res, empty=[],single_hit=False):
+    def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False):
         '''res is the dictionary returned from a query.'''
+        if 'error' in res:
+            return error
+
         hits = res['hits']
         total = hits['total']
         if total == 0:
