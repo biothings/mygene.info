@@ -76,7 +76,10 @@ class QueryHandler(BaseHandler):
                 res = self.esq.query_sample(q, **kwargs)
             else:
                 res = self.esq.query(q, **kwargs)
-            self.return_json(res)
+        else:
+            res = {'success': False, 'error': "Missing required parameters."}
+
+        self.return_json(res)
 
 
     def post(self):
@@ -95,7 +98,10 @@ class QueryHandler(BaseHandler):
                 scopes = [x.strip() for x in scopes.split(',')]
             fields = kwargs.pop('fields', None)
             res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
-            self.return_json(res)
+        else:
+            res = {'success': False, 'error': "Missing required parameters."}
+
+        self.return_json(res)
 
 
 
