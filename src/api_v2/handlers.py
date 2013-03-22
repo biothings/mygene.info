@@ -48,6 +48,17 @@ class QueryHandler(BaseHandler):
     esq = ESQuery()
 
     def get(self):
+        '''
+        parameters:
+            q
+            fields
+            from
+            size
+            sort
+
+            explain
+            sample
+        '''
         kwargs = self.get_query_params()
         q = kwargs.pop('q', None)
         if q:
@@ -66,6 +77,26 @@ class QueryHandler(BaseHandler):
             else:
                 res = self.esq.query(q, **kwargs)
             self.return_json(res)
+
+
+    def post(self):
+        '''
+        parameters:
+            q
+            scopes
+            fields
+        '''
+        kwargs = self.get_query_params()
+        q = kwargs.pop('q', None)
+        if q:
+            ids = re.split('[\s\r\n+|,]+', q)
+            scopes = kwargs.pop('scopes', None)
+            if scopes:
+                scopes = [x.strip() for x in scopes.split(',')]
+            fields = kwargs.pop('fields', None)
+            res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
+            self.return_json(res)
+
 
 
 class IntervalQueryHandler(tornado.web.RequestHandler):
