@@ -9,6 +9,7 @@ import types
 import json
 import re
 import time
+import copy
 
 from pyes import ES
 from pyes.exceptions import NotFoundException
@@ -43,6 +44,7 @@ class ESQuery:
         self._doc_type = ES_INDEX_TYPE
 
         #self._doc_type = 'gene_sample'
+        self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene', 'ensemblgene']
 
     def _search(self, q):
         #return self.conn0.search(q, index=self._index, doc_type=self._doc_type)
@@ -137,7 +139,7 @@ class ESQuery:
         res = self._msearch(_q)
         return [_res if raw else self._cleaned_res(_res, empty=None, single_hit=True) for _res in res['responses']]
 
-    def query(self, q, fields=['symbol','name','taxid'], **kwargs):
+    def query(self, q, fields=['symbol','name','taxid','entrezgene', 'ensemblgene'], **kwargs):
         if fields:
             fields = self._formated_fields(fields)
         mode = int(kwargs.pop('mode', 1))
@@ -267,7 +269,7 @@ def test2(q):
 class ESQueryBuilder():
     def __init__(self, **query_options):
         """You can pass these options:
-            fields     default ['name', 'symbol', 'taxid']
+            fields     default ['name', 'symbol', 'taxid', 'entrezgene', 'ensemblgene']
             from       default 0
             size       default 10
             sort       e.g. sort='entrezgene,-symbol'
@@ -278,6 +280,13 @@ class ESQueryBuilder():
         self._allowed_options = ['fields', 'start', 'from', 'size', 'sort', 'explain', 'version']
         for key in set(self.options) - set(self._allowed_options):
                 del self.options[key]
+
+        #this is a fake query to make sure to return empty hits
+        self._nohits_query = {
+                            "match": {
+                                'non_exist_field': ''
+                            }
+                        }
 
     def _parse_sort_option(self, options):
         sort = options.get('sort', None)
@@ -483,9 +492,10 @@ class ESQueryBuilder():
         return _q
 
     def build_id_query(self, id, scopes=None):
+        id_is_int = is_int(id)
         if scopes is None:
             #by default search three fields ['entrezgene', 'ensemblgene', 'retired']
-            if is_int(id):
+            if id_is_int:
                 _query = {
                     "multi_match": {
                         "query": id,
@@ -501,18 +511,59 @@ class ESQueryBuilder():
         else:
             if type(scopes) in types.StringTypes:
                 _field = scopes
-                _query = {
-                    "match": {
-                        _field: "%s" % id
+                if _field in ['entrezgene', 'retired']:
+                    if id_is_int:
+                        _query = {
+                            "match": {
+                                _field: id
+                            }
+                        }
+                    else:
+                        #raise ValueError('fields "%s" requires an integer id to query' % _field)
+                        #using a fake query here to make sure return empty hits
+                        _query = self._nohits_query
+                else:
+                    _query = {
+                        "match": {
+                            _field: "%s" % id
+                        }
                     }
-                }
             elif type(scopes) in (types.ListType, types.TupleType):
-                _query = {
-                    "multi_match": {
-                        "query": "%s" % id,
-                        "fields": scopes
+                int_fields = []
+                str_fields = copy.copy(scopes)
+                if 'entrezgene' in str_fields:
+                    int_fields.append('entrezgene')
+                    str_fields.remove('entrezgene')
+                if 'retired' in str_fields:
+                    int_fields.append('retired')
+                    str_fields.remove('retired')
+
+                if id_is_int:
+                    if len(int_fields) == 1:
+                        _query = {
+                            "match": {
+                                int_fields[0]: id
+                            }
+                        }
+                    elif len(int_fields) == 2:
+                        _query = {
+                            "multi_match": {
+                                "query": id,
+                                "fields": int_fields
+                            }
+                        }
+                    else:
+                        _query = self._nohits_query
+                elif str_fields:
+                    _query = {
+                        "multi_match": {
+                            "query": "%s" % id,
+                            "fields": str_fields
+                        }
                     }
-                }
+                else:
+                    _query = self._nohits_query
+
             else:
                 raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 

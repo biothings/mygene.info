@@ -13,8 +13,8 @@ class GeneHandler(BaseHandler):
         '''/gene/<geneid>
            geneid can be entrezgene, ensemblgene, retired entrezgene ids.
            /gene/1017
-           /gene/1017?filter=symbol,name
-           /gene/1017?filter=symbol,name,reporter.HG-U133_Plus_2
+           /gene/1017?fields=symbol,name
+           /gene/1017?fields=symbol,name,reporter.HG-U133_Plus_2
         '''
         if geneid:
             kwargs = self.get_query_params()
