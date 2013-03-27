@@ -54,6 +54,29 @@ class ESQuery:
         path = make_path((self._index, self._doc_type, '_msearch'))
         return self.conn._send_request('GET', path, body=q)
 
+    def _search_async(self, q, callback=None):
+        import tornado.httpclient
+        import tornado.ioloop
+        tornado.httpclient.AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
+        http = tornado.httpclient.AsyncHTTPClient()
+        path = make_path((self._index, self._doc_type, '_search'))
+        uri = ES_HOST + path
+        body = json.dumps(q)
+        loop = tornado.ioloop.IOLoop.instance()
+        def es_query_callback(response):
+            if response.error:
+                print "Error:", response.error
+                response.rethrow()
+            else:
+                print "Success"
+                res = tornado.escape.json_decode(response.body)
+                callback(res)
+                loop.stop()
+        print uri
+        print body
+        response = http.fetch(uri, es_query_callback, method="POST", body=body)
+        loop.start()
+
     def _get_genedoc(self, hit):
         doc = hit.get('_source', hit.get('fields'))
         doc.setdefault('_id', hit['_id'])
@@ -258,6 +281,8 @@ class ESQuery:
         metadata = {
             'SEARCHABLE_FIELDS': sorted(field_set)
         }
+        if '_meta' in mapping[self._doc_type]:
+            metadata.update(mapping[self._doc_type]['_meta'])
         return metadata
 
 
