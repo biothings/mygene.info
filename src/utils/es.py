@@ -279,7 +279,7 @@ class ESQuery:
 
         field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
-            'SEARCHABLE_FIELDS': sorted(field_set)
+            'available_fields': sorted(field_set)
         }
         if '_meta' in mapping[self._doc_type]:
             metadata.update(mapping[self._doc_type]['_meta'])
