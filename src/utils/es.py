@@ -146,9 +146,14 @@ class ESQuery:
         if fields:
             fields = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
+        rawquery = kwargs.pop('rawquery', None)
         scopes = kwargs.pop('scopes', None)
+        if scopes:
+            scopes = self._formated_fields(scopes)
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         _q = qbdr.build_id_query(geneid, scopes)
+        if rawquery:
+            return _q
         res =  self._search(_q)
         return res if raw else self._cleaned_res(res, empty=None, single_hit=True)
 
@@ -156,9 +161,14 @@ class ESQuery:
         if fields:
             fields = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
+        rawquery = kwargs.pop('rawquery', None)
         scopes = kwargs.pop('scopes', None)
+        if scopes:
+            scopes = self._formated_fields(scopes)
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         _q = qbdr.build_multiple_id_query(geneid_list, scopes)
+        if rawquery:
+            return _q
         res = self._msearch(_q)
         return [_res if raw else self._cleaned_res(_res, empty=None, single_hit=True) for _res in res['responses']]
 
@@ -167,6 +177,7 @@ class ESQuery:
             fields = self._formated_fields(fields)
         mode = int(kwargs.pop('mode', 1))
         raw = kwargs.pop('raw', False)
+        rawquery = kwargs.pop('rawquery', None)
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         _q = None
         # Check if special interval query pattern exists
@@ -185,6 +196,9 @@ class ESQuery:
         # normal text query
             _q = qbdr.build(q, mode)
         if _q:
+            if rawquery:
+                return _q
+
             res = self._search(_q)
             if not raw:
                 _res = res['hits']
@@ -302,9 +316,14 @@ class ESQueryBuilder():
         """
         self.options = query_options
         self._parse_sort_option(self.options)
-        self._allowed_options = ['fields', 'start', 'from', 'size', 'sort', 'explain', 'version']
+        self._allowed_options = ['fields', 'start', 'from', 'size', 'sort', 'explain', 'version', 'species']
         for key in set(self.options) - set(self._allowed_options):
                 del self.options[key]
+
+        self._default_species = [9606, 10090, 10116, 7227, 6239]  #human, mouse, rat, fruitfly, celegan
+        self.species = self.options.pop('species', self._default_species)
+        if type(self.species) is types.IntType:
+            self.species = [self.species]
 
         #this is a fake query to make sure to return empty hits
         self._nohits_query = {
@@ -461,7 +480,7 @@ class ESQueryBuilder():
                 'query': _query,
                 'filter' : {
                     "terms" : {
-                        "taxid" : [9606, 10090, 10116, 7227, 6239]
+                        "taxid" : self.species
                     }
                 }
             }
@@ -592,6 +611,7 @@ class ESQueryBuilder():
             else:
                 raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 
+        _query = self.add_species_filter(_query)
         _q = {"query": _query}
         if self.options:
             _q.update(self.options)

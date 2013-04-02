@@ -1,6 +1,7 @@
 import types
 import json
 import tornado.web
+from utils.common import is_int
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -16,6 +17,29 @@ class BaseHandler(tornado.web.RequestHandler):
             kwargs['fields'] = [x.strip() for x in kwargs['fields'].split(',')]
         return kwargs
 
+    def _check_species_param(self, kwargs):
+        taxid_d = { 'human': 9606,
+                    'mouse': 10090,
+                    'rat':   10116,
+                    'fruitfly': 7227,
+                    'nematode':   6239,
+                    'zebrafish':   7955,
+                    'thale-cress':   3702,
+                    'frog':   8364,
+                    'pig': 9823,
+                   }
+        if 'species' in kwargs:
+            species_li = []
+            for x in kwargs['species'].split(','):
+                x = x.strip().lower()
+                if is_int(x):
+                    species_li.append(int(x))
+                elif x in taxid_d:
+                    species_li.append(taxid_d[x])
+            if species_li:
+                kwargs['species'] = species_li
+        return kwargs
+
     def get_query_params(self):
         _args = {}
         for k in self.request.arguments:
@@ -26,6 +50,7 @@ class BaseHandler(tornado.web.RequestHandler):
                 _args[k] = v
         _args.pop(self.jsonp_parameter, None)   #exclude jsonp parameter if passed.
         self._check_fields_param(_args)
+        self._check_species_param(_args)
         return _args
 
     # def get_current_user(self):

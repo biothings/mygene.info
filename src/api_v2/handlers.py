@@ -27,12 +27,29 @@ class GeneHandler(BaseHandler):
         '''
            post to /gene
 
+           parameters:
+                ids
+                fields
+                scopes
+                species
+
            with parameters of
             {'ids': '1017,1018',
-             'filter': 'symbol,name'}
+             'fields': 'symbol,name'}
 
             {'ids': '1017',
-             'filter': 'symbol,name,reporter.HG-U133_Plus_2'}
+             'fields': 'symbol,name,reporter.HG-U133_Plus_2'}
+
+            {'ids': 'NM_006445',
+             'scopes': 'refseq',
+             'fields': 'symbol,name,reporter.HG-U133_Plus_2'}
+
+            {'ids': 'CDK2',
+             'scopes': 'symbol',
+             'species': '9606',
+             'fields': 'symbol,name,reporter.HG-U133_Plus_2'}
+
+
         '''
         kwargs = self.get_query_params()
         geneids = kwargs.pop('ids', None)
@@ -88,6 +105,7 @@ class QueryHandler(BaseHandler):
             q
             scopes
             fields
+            species
         '''
         kwargs = self.get_query_params()
         q = kwargs.pop('q', None)
