@@ -225,8 +225,11 @@ class ESQuery:
 
     def query_interval(self, taxid, chr,  gstart, gend, **kwargs):
         kwargs.setdefault('fields', ['symbol','name','taxid'])
+        rawquery = kwargs.pop('rawquery', None)
         qbdr = ESQueryBuilder(**kwargs)
         _q = qbdr.build_genomic_pos_query(taxid, chr,  gstart, gend)
+        if rawquery:
+            return _q
         return self._search(_q)
 
     def doc_feeder(self, step=1000, s=None, e=None, inbatch=False, query=None, **kwargs):
@@ -629,6 +632,8 @@ class ESQueryBuilder():
         taxid = int(taxid)
         gstart = int(gstart)
         gend = int(gend)
+        if chr.lower().startswith('chr'):
+            chr = chr[3:]
         _query = {
                    "nested" : {
                        "path" : "genomic_pos",
@@ -639,10 +644,10 @@ class ESQueryBuilder():
                                         "term" : {"genomic_pos.chr" : chr}
                                     },
                                     {
-                                        "range" : {"genomic_pos.start" : {"gte" : gstart}}
+                                        "range" : {"genomic_pos.start" : {"lte" : gend}}
                                     },
                                     {
-                                        "range" : {"genomic_pos.end" : {"lte" : gend}}
+                                        "range" : {"genomic_pos.end" : {"gte" : gstart}}
                                     }
                                 ]
                             }
