@@ -1,4 +1,5 @@
 import time
+import types
 
 
 #===============================================================================
@@ -55,4 +56,20 @@ def is_int(s):
         return True
     except ValueError:
         return False
+
+def safe_genome_pos(s):
+    '''
+       >>> safe_genome_pos(1000) = 1000
+       >>> safe_genome_pos('1000') = 1000
+       >>> safe_genome_pos('10,000') = 100000
+    '''
+    s_type = type(s)
+    if s_type is types.IntType:
+        return s
+    elif s_type in types.StringTypes:
+        return int(s.replace(',',''))
+    else:
+        raise ValueError('invalid type "%s" for "save_genome_pos"' % s_type)
+
+
 

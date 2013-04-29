@@ -17,7 +17,7 @@ from pyes.utils import make_path
 from pyes.query import MatchAllQuery, StringQuery
 
 from config import ES_HOST, ES_INDEX_NAME, ES_INDEX_TYPE
-from utils.common import is_int, timesofar
+from utils.common import is_int, timesofar, safe_genome_pos
 
 
 def get_es():
@@ -635,8 +635,8 @@ class ESQueryBuilder():
 
     def build_genomic_pos_query(self, taxid, chr, gstart, gend):
         taxid = int(taxid)
-        gstart = int(gstart)
-        gend = int(gend)
+        gstart = safe_genome_pos(gstart)
+        gend = safe_genome_pos(gend)
         if chr.lower().startswith('chr'):
             chr = chr[3:]
         _query = {
