@@ -325,6 +325,7 @@ class ESQueryBuilder():
 
         self._default_species = [9606, 10090, 10116, 7227, 6239]  #human, mouse, rat, fruitfly, celegan
         self.species = self.options.pop('species', self._default_species)
+        #if self.species == 'all': do not apply species filter, all species is included.
         if type(self.species) is types.IntType:
             self.species = [self.species]
 
@@ -478,6 +479,10 @@ class ESQueryBuilder():
         return _query
 
     def add_species_filter(self, _query):
+        if self.species == 'all':
+            #do not apply species filter
+            return _query
+
         _query = {
             'filtered': {
                 'query': _query,
