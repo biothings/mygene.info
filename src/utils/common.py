@@ -72,4 +72,16 @@ def safe_genome_pos(s):
         raise ValueError('invalid type "%s" for "save_genome_pos"' % s_type)
 
 
-
+#===============================================================================
+# Misc. Metadata
+#===============================================================================
+taxid_d = {'human': 9606,
+           'mouse': 10090,
+           'rat':   10116,
+           'fruitfly': 7227,
+           'nematode':   6239,
+           'zebrafish':   7955,
+           'thale-cress':   3702,
+           'frog':   8364,
+           'pig': 9823,
+           }

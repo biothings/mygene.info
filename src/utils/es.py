@@ -17,7 +17,7 @@ from pyes.utils import make_path
 from pyes.query import MatchAllQuery, StringQuery
 
 from config import ES_HOST, ES_INDEX_NAME, ES_INDEX_TYPE
-from utils.common import is_int, timesofar, safe_genome_pos
+from utils.common import is_int, timesofar, safe_genome_pos, taxid_d
 
 
 def get_es():
@@ -184,10 +184,11 @@ class ESQuery:
         interval_query = self._parse_interval_query(q)
         if interval_query:
             #should also passing a "taxid" along with interval.
-            taxid = kwargs.pop('taxid', None)
-            if taxid:
-                interval_query['taxid'] = taxid
-                _q = qbdr.build_genomic_pos_query(**interval_query)
+            if qbdr.species != 'all':
+                taxid = qbdr.species[0]
+                if taxid:
+                    interval_query['taxid'] = taxid
+                    _q = qbdr.build_genomic_pos_query(**interval_query)
 
         # Check if wildchar/fielded/boolean query, excluding special goid query
         elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
@@ -324,10 +325,7 @@ class ESQueryBuilder():
                 del self.options[key]
 
         self._default_species = [9606, 10090, 10116, 7227, 6239]  #human, mouse, rat, fruitfly, celegan
-        self.species = self.options.pop('species', self._default_species)
-        #if self.species == 'all': do not apply species filter, all species is included.
-        if type(self.species) is types.IntType:
-            self.species = [self.species]
+        self.species = self._get_cleaned_species(self.options.pop('species', None))
 
         #this is a fake query to make sure to return empty hits
         self._nohits_query = {
@@ -335,6 +333,24 @@ class ESQueryBuilder():
                                 'non_exist_field': ''
                             }
                         }
+
+    def _get_cleaned_species(self, species):
+        if species is None:
+            #set to default_species
+            return self._default_species
+        if species == 'all':
+            #if self.species == 'all': do not apply species filter, all species is included.
+            return species
+
+        _species = []
+        if type(species) is not types.ListType:
+            species = [species]
+        for s in species:
+            if type(s) is types.IntType:
+                _species.append(s)
+            elif s in taxid_d:
+                _species.append(taxid_d[s])
+        return _species
 
     def _parse_sort_option(self, options):
         sort = options.get('sort', None)
