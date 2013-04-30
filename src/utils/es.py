@@ -143,6 +143,7 @@ class ESQuery:
         return res if raw else [self._get_genedoc(doc) for doc in res]
 
     def get_gene2(self, geneid, fields=None, **kwargs):
+        '''for /gene/<geneid>'''
         if fields:
             fields = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
@@ -158,6 +159,7 @@ class ESQuery:
         return res if raw else self._cleaned_res(res, empty=None, single_hit=True)
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
+        '''for /query post request'''
         if fields:
             fields = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
@@ -169,10 +171,28 @@ class ESQuery:
         _q = qbdr.build_multiple_id_query(geneid_list, scopes)
         if rawquery:
             return _q
-        res = self._msearch(_q)
-        return [_res if raw else self._cleaned_res(_res, empty=None, single_hit=True) for _res in res['responses']]
+        res = self._msearch(_q)['responses']
+        if raw:
+            return res
+
+        assert len(res) == len(geneid_list)
+        _res = []
+        for i in range(len(res)):
+            hits = res[i]
+            qterm = geneid_list[i]
+            hits = self._cleaned_res(hits, empty=[], single_hit=False)
+            if len(hits) == 0:
+                _res.append({u'query': qterm,
+                             u'notfound': True})
+            else:
+                for hit in hits:
+                    hit[u'query'] = qterm
+                    _res.append(hit)
+        return _res
+        #return [_res if raw else self._cleaned_res(_res, empty=None, single_hit=True) for _res in res['responses']]
 
     def query(self, q, fields=['symbol','name','taxid','entrezgene', 'ensemblgene'], **kwargs):
+        '''for /query?q=<query>'''
         if fields:
             fields = self._formated_fields(fields)
         mode = int(kwargs.pop('mode', 1))
@@ -216,12 +236,6 @@ class ESQuery:
         else:
             res = {'error': "Invalid query. Please check parameters."}
 
-        return res
-
-    def query_sample(self, q, **kwargs):
-        self._doc_type = 'gene_sample'
-        res = self.query(q, **kwargs)
-        self._doc_type = 'gene'
         return res
 
     def query_interval(self, taxid, chr,  gstart, gend, **kwargs):
@@ -302,11 +316,6 @@ class ESQuery:
         if '_meta' in mapping[self._doc_type]:
             metadata.update(mapping[self._doc_type]['_meta'])
         return metadata
-
-
-def test2(q):
-    esq = ESQuery()
-    return esq.query(q)
 
 
 class ESQueryBuilder():
