@@ -645,6 +645,7 @@ class ESQueryBuilder():
                 raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 
         _query = self.add_species_filter(_query)
+        _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
         if self.options:
             _q.update(self.options)
