@@ -184,6 +184,9 @@ class ESQuery:
             if len(hits) == 0:
                 _res.append({u'query': qterm,
                              u'notfound': True})
+            elif 'error' in hits:
+                _res.append({u'query': qterm,
+                             u'error': True})
             else:
                 for hit in hits:
                     hit[u'query'] = qterm
@@ -585,6 +588,12 @@ class ESQueryBuilder():
                         "ensemblgene": "%s" % id
                     }
                 }
+                # _query = {
+                #     "query_string": {
+                #         "query": "%s" % id,
+                #     }
+                # }
+
         else:
             if type(scopes) in types.StringTypes:
                 _field = scopes
@@ -659,6 +668,19 @@ class ESQueryBuilder():
         _q.append('')
         return '\n'.join(_q)
 
+    def build_multiple_id_query2(self, id_list, scopes=None):
+        _query = {
+            "terms": {
+                ("%s" % scopes): id_list,
+            }
+        }
+        _query = self.add_species_filter(_query)
+        _query = self.add_species_custom_filters_score(_query)
+        _q = {"query": _query}
+        if self.options:
+            _q.update(self.options)
+        return _q
+
     def build_genomic_pos_query(self, taxid, chr, gstart, gend):
         taxid = int(taxid)
         gstart = safe_genome_pos(gstart)
@@ -672,7 +694,7 @@ class ESQueryBuilder():
                             "bool" : {
                                 "must" : [
                                     {
-                                        "term" : {"genomic_pos.chr" : chr}
+                                        "term" : {"genomic_pos.chr" : chr.lower()}
                                     },
                                     {
                                         "range" : {"genomic_pos.start" : {"lte" : gend}}
