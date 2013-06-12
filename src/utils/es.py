@@ -122,6 +122,8 @@ class ESQuery:
         for v in ["*", "?", ':',' AND ', ' OR ']:
             if query.find(v) != -1:
                 return True
+        if query.startswith('"') and query.endswith('"'):
+            return True
         return False
 
     def get_gene(self, geneid, fields=None, **kwargs):
@@ -202,6 +204,7 @@ class ESQuery:
         raw = kwargs.pop('raw', False)
         rawquery = kwargs.pop('rawquery', None)
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
+        q = q.strip()
         _q = None
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
@@ -503,7 +506,7 @@ class ESQueryBuilder():
             }
         }
         _query = json.dumps(_query)
-        _query = json.loads(_query % {'q': q})
+        _query = json.loads(_query % {'q': q.replace('"', '\\"')})
         return _query
 
     def add_species_filter(self, _query):
