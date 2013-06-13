@@ -117,9 +117,13 @@ class ESQuery:
             if mat:
                 return mat.groupdict()
 
+    def _is_wildcard_query(self, query):
+        '''Return True if input query is a wildcard query.'''
+        return query.find('*') != -1 or query.find('?') != -1
+
     def _is_raw_string_query(self, query):
         '''Return True if input query is a wildchar/fielded/boolean query.'''
-        for v in ["*", "?", ':',' AND ', ' OR ']:
+        for v in [':',' AND ', ' OR ']:
             if query.find(v) != -1:
                 return True
         if query.startswith('"') and query.endswith('"'):
@@ -216,9 +220,13 @@ class ESQuery:
                     interval_query['taxid'] = taxid
                     _q = qbdr.build_genomic_pos_query(**interval_query)
 
-        # Check if wildchar/fielded/boolean query, excluding special goid query
+        # Check if fielded/boolean query, excluding special goid query
+        # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
+        # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
         elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
             _q = qbdr.build(q, mode=3)   #raw string query
+        elif self._is_wildcard_query(q):
+            _q = qbdr.build(q, mode=2)   #wildcard query
         else:
         # normal text query
             _q = qbdr.build(q, mode)
@@ -482,6 +490,55 @@ class ESQueryBuilder():
 
         return _query
 
+    def wildcard_query(self, q):
+        '''q should contains either * or ?, but not the first character.'''
+        _query = {
+            "dis_max" : {
+                "tie_breaker" : 0,
+                "boost" : 1,
+                "queries" : [
+                    {
+                    "custom_boost_factor": {
+                        "query" : {
+                            "wildcard" : { "symbol" : {
+                                            "value": "%(q)s",
+                                            "boost": 5.0,
+                                            }
+                            },
+                        },
+                    }
+                    },
+                    {
+                    "custom_boost_factor": {
+                        "query" : {
+                            "wildcard" : { "name" : {
+                                           "value": "%(q)s",
+                                           "boost": 1.1,
+                                            }
+                            },
+                        }
+                    }
+                    },
+                    {
+                    "custom_boost_factor": {
+                        "query" : {
+                            "wildcard" : { "summary" : {
+                                           "value": "%(q)s",
+                                           "boost": 0.5,
+                                            }
+                            },
+                        }
+                    }
+                    },
+
+                ]
+            }
+            }
+        _query = json.dumps(_query)
+        _query = json.loads(_query % {'q': q.lower()})
+
+        return _query
+
     def string_query(self, q):
         _query = {
             "query_string": {
@@ -557,15 +614,21 @@ class ESQueryBuilder():
         return _query
 
     def build(self, q, mode=1):
+        '''mode:
+                1    match query
+                2    wildcard query
+                3    raw_string query
+
+               else  string_query (for test)
+        '''
         if mode == 1:
             _query = self.dis_max_query(q)
-            print 'dis_max'
         elif mode == 2:
-            _query = self.string_query(q)
-            print 'string'
-        else:
+            _query = self.wildcard_query(q)
+        elif mode == 3:
             _query = self.raw_string_query(q)
-            print 'raw_string'
+        else:
+            _query = self.string_query(q)
 
         _query = self.add_species_filter(_query)
         _query = self.add_species_custom_filters_score(_query)
