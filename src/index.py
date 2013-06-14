@@ -90,9 +90,8 @@ APP_LIST = [
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)
-APP_LIST += add_apps('api/v2', api_v2_app_list)
-APP_LIST += add_apps('api/v1', api_v1_app_list)
-
+APP_LIST += add_apps('v2', api_v2_app_list)
+APP_LIST += add_apps('v1', api_v1_app_list)
 
 settings = {}
 # if options.debug:
