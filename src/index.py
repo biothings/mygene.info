@@ -86,6 +86,7 @@ APP_LIST = [
         (r"/", MainHandler),
         (r"/status", StatusCheckHandler),
         (r"/metadata", MetaDataHandler),
+        (r"/v2/metadata", MetaDataHandler),
 
 ]
 
