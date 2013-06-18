@@ -23,6 +23,9 @@ class GeneHandler(BaseHandler):
             gene = self.esq.get_gene2(geneid, **kwargs)
             if gene:
                 self.return_json(gene)
+                self.ga_track(event={'category': 'v2_api',
+                                     'action': 'gene_get',
+                                     'value': gene['_id']})
             else:
                 raise tornado.web.HTTPError(404)
         else:
@@ -59,6 +62,8 @@ class QueryHandler(BaseHandler):
             res = {'success': False, 'error': "Missing required parameters."}
 
         self.return_json(res)
+        self.ga_track(event={'category': 'v2_api',
+                             'action': 'query_get'})
 
 
     def post(self):
@@ -82,6 +87,8 @@ class QueryHandler(BaseHandler):
             res = {'success': False, 'error': "Missing required parameters."}
 
         self.return_json(res)
+        self.ga_track(event={'category': 'v2_api',
+                             'action': 'query_post'})
 
 
 APP_LIST = [

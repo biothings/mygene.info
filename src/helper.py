@@ -2,9 +2,9 @@ import types
 import json
 import tornado.web
 from utils.common import is_int
+from utils.ga import GAMixIn
 
-
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter='callback'
 
     def _check_fields_param(self, kwargs):
