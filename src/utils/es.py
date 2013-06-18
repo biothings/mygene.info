@@ -393,6 +393,8 @@ class ESQueryBuilder():
         return options
 
     def dis_max_query(self, q):
+        #remove '"' and '\' from q, they will break json decoder.
+        q = q.replace('"','').replace('\\', '')
         _query = {
             "dis_max" : {
                 "tie_breaker" : 0,
