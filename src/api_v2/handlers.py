@@ -24,8 +24,7 @@ class GeneHandler(BaseHandler):
             if gene:
                 self.return_json(gene)
                 self.ga_track(event={'category': 'v2_api',
-                                     'action': 'gene_get',
-                                     'value': gene['_id']})
+                                     'action': 'gene_get'})
             else:
                 raise tornado.web.HTTPError(404)
         else:
@@ -63,7 +62,9 @@ class QueryHandler(BaseHandler):
 
         self.return_json(res)
         self.ga_track(event={'category': 'v2_api',
-                             'action': 'query_get'})
+                             'action': 'query_get',
+                             'label': 'qsize',
+                             'value': len(q)})
 
 
     def post(self):
@@ -88,7 +89,9 @@ class QueryHandler(BaseHandler):
 
         self.return_json(res)
         self.ga_track(event={'category': 'v2_api',
-                             'action': 'query_post'})
+                             'action': 'query_post',
+                             'label': 'qsize',
+                             'value': len(q)})
 
 
 APP_LIST = [
