@@ -598,7 +598,7 @@ class ESQueryBuilder():
 
                 {
                     "filter" : { "term" : { "taxid" : 9606 } },
-                    "boost" : "1.5"
+                    "boost" : "1.55"
                 },
                 {
                     "filter" : { "term" : { "taxid" : 10090 } },
