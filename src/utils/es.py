@@ -78,7 +78,7 @@ class ESQuery:
         loop.start()
 
     def _get_genedoc(self, hit):
-        doc = hit.get('_source', hit.get('fields'))
+        doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
         if '_version' in hit:
             doc.setdefault('_version', hit['_version'])
