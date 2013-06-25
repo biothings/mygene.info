@@ -16,12 +16,12 @@ from pyes.exceptions import NotFoundException
 from pyes.utils import make_path
 from pyes.query import MatchAllQuery, StringQuery
 
-from config import ES_HOST, ES_INDEX_NAME, ES_INDEX_TYPE
+from config import ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL, ES_INDEX_TYPE
 from utils.common import is_int, timesofar, safe_genome_pos, taxid_d
 
 
 def get_es():
-    conn = ES(ES_HOST, default_indices=[ES_INDEX_NAME],
+    conn = ES(ES_HOST, default_indices=[ES_INDEX_NAME_ALL],
               timeout=120.0, max_retries=10)
     return conn
 
@@ -40,22 +40,34 @@ class ESQuery:
         # self._index = 'genedoc_mygene'
         # self._index = 'genedoc_mygene_allspecies'
         # self._doc_type = 'gene'
-        self._index = ES_INDEX_NAME
+        self._index = ES_INDEX_NAME_ALL
         self._doc_type = ES_INDEX_TYPE
 
         #self._doc_type = 'gene_sample'
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene', 'ensemblgene']
         #self._default_species = [9606, 10090, 10116, 7227, 6239]  #human, mouse, rat, fruitfly, celegan
         self._default_species = [9606, 10090, 10116]              #human, mouse, rat
+        self._tier_1_species = set(taxid_d.values())
 
+    def _search(self, q, species='all'):
+        self._set_index(species)
+        res = self.conn.search_raw(q, indices=self._index, doc_types=self._doc_type)
+        self._index = ES_INDEX_NAME_ALL     #reset self._index
+        return res
 
-    def _search(self, q):
-        #return self.conn0.search(q, index=self._index, doc_type=self._doc_type)
-        return self.conn.search_raw(q, indices=self._index, doc_types=self._doc_type)
-
-    def _msearch(self, q):
+    def _msearch(self, q, species='all'):
+        self._set_index(species)
         path = make_path((self._index, self._doc_type, '_msearch'))
-        return self.conn._send_request('GET', path, body=q)
+        res = self.conn._send_request('GET', path, body=q)
+        self._index = ES_INDEX_NAME_ALL     #reset self._index
+        return res
+
+    def _set_index(self, species):
+        '''set proper index for given species parameter.'''
+        if species == 'all' or len(set(species)-self._tier_1_species) > 0:
+            self._index = ES_INDEX_NAME_ALL
+        else:
+            self._index = ES_INDEX_NAME_TIER1
 
     def _search_async(self, q, callback=None):
         import tornado.httpclient
@@ -207,7 +219,7 @@ class ESQuery:
         _q = qbdr.build_multiple_id_query(geneid_list, scopes)
         if rawquery:
             return _q
-        res = self._msearch(_q)['responses']
+        res = self._msearch(_q, kwargs['species'])['responses']
         if raw:
             return res
 
@@ -264,7 +276,7 @@ class ESQuery:
             if rawquery:
                 return _q
 
-            res = self._search(_q)
+            res = self._search(_q, species=kwargs['species'])
             if not raw:
                 _res = res['hits']
                 _res['took'] = res['took']
@@ -283,6 +295,7 @@ class ESQuery:
         return res
 
     def query_interval(self, taxid, chr,  gstart, gend, **kwargs):
+        '''deprecated! Use query method with interval query string.'''
         kwargs.setdefault('fields', ['symbol','name','taxid'])
         rawquery = kwargs.pop('rawquery', None)
         qbdr = ESQueryBuilder(**kwargs)

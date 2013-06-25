@@ -1,5 +1,7 @@
 ES_HOST = 'localhost:9500'
-ES_INDEX_NAME = 'genedoc_mygene_allspecies'
+#ES_INDEX_NAME = 'genedoc_mygene_allspecies'
+ES_INDEX_NAME_TIER1 = 'genedoc_mygene'
+ES_INDEX_NAME_ALL = 'genedoc_mygene_allspecies'
 ES_INDEX_TYPE = 'gene'
 
 #relevant for running in prod

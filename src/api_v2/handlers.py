@@ -64,7 +64,7 @@ class QueryHandler(BaseHandler):
         self.ga_track(event={'category': 'v2_api',
                              'action': 'query_get',
                              'label': 'qsize',
-                             'value': len(q)})
+                             'value': len(q) if q else 0})
 
 
     def post(self):
