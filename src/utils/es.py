@@ -45,6 +45,9 @@ class ESQuery:
 
         #self._doc_type = 'gene_sample'
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene', 'ensemblgene']
+        #self._default_species = [9606, 10090, 10116, 7227, 6239]  #human, mouse, rat, fruitfly, celegan
+        self._default_species = [9606, 10090, 10116]              #human, mouse, rat
+
 
     def _search(self, q):
         #return self.conn0.search(q, index=self._index, doc_type=self._doc_type)
@@ -98,7 +101,10 @@ class ESQuery:
         else:
             return [self._get_genedoc(hit) for hit in hits['hits']]
 
-    def _formated_fields(self, fields):
+    def _cleaned_fields(self, fields):
+        '''return a cleaned fields parameter.
+            should be either None (return all fields) or a list fields.
+        '''
         if fields:
             if type(fields) in types.StringTypes:
                 if fields.lower() == 'all':
@@ -108,6 +114,27 @@ class ESQuery:
         else:
             fields = self._default_fields
         return fields
+
+    def _cleaned_species(self, species):
+        '''return a cleaned species parameter.
+           should be either "all" or a list of taxids.
+        '''
+        if species is None:
+            #set to default_species
+            return self._default_species
+        if species.lower() == 'all':
+            #if self.species == 'all': do not apply species filter, all species is included.
+            return species
+
+        _species = []
+        if type(species) in types.StringTypes:
+            species = [s.strip().lower() for s in species.split(',')]
+        for s in species:
+            if is_int(s):
+                _species.append(int(s))
+            elif s in taxid_d:
+                _species.append(taxid_d[s])
+        return _species
 
     def _parse_interval_query(self, query):
         '''Check if the input query string matches interval search regex,
@@ -137,7 +164,7 @@ class ESQuery:
         return False
 
     def get_gene(self, geneid, fields='all', **kwargs):
-        kwargs['fields'] = self._formated_fields(fields)
+        kwargs['fields'] = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
         #res = self.conn0.get(self._index, self._doc_type, geneid, **kwargs)
         try:
@@ -147,19 +174,19 @@ class ESQuery:
         return res if raw else self._get_genedoc(res)
 
     def mget_gene(self, geneid_list, fields=None, **kwargs):
-        kwargs['fields'] = self._formated_fields(fields)
+        kwargs['fields'] = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
         res = self.conn.mget(geneid_list, self._index, self._doc_type, **kwargs)
         return res if raw else [self._get_genedoc(doc) for doc in res]
 
     def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
-        fields = self._formated_fields(fields)
+        fields = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
         rawquery = kwargs.pop('rawquery', None)
         scopes = kwargs.pop('scopes', None)
         if scopes:
-            scopes = self._formated_fields(scopes)
+            scopes = self._cleaned_fields(scopes)
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         _q = qbdr.build_id_query(geneid, scopes)
         if rawquery:
@@ -169,12 +196,13 @@ class ESQuery:
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
         '''for /query post request'''
-        fields = self._formated_fields(fields)
+        fields = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
         rawquery = kwargs.pop('rawquery', None)
         scopes = kwargs.pop('scopes', None)
         if scopes:
-            scopes = self._formated_fields(scopes)
+            scopes = self._cleaned_fields(scopes)
+        kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         _q = qbdr.build_multiple_id_query(geneid_list, scopes)
         if rawquery:
@@ -204,10 +232,11 @@ class ESQuery:
 
     def query(self, q, fields=None, **kwargs):
         '''for /query?q=<query>'''
-        fields = self._formated_fields(fields)
+        fields = self._cleaned_fields(fields)
         mode = int(kwargs.pop('mode', 1))
         raw = kwargs.pop('raw', False)
         rawquery = kwargs.pop('rawquery', None)
+        kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         q = q.strip()
         _q = None
@@ -343,13 +372,11 @@ class ESQueryBuilder():
             explain    true or false
         """
         self.options = query_options
+        self.species = self.options.pop('species', 'all')   #species should be either 'all' or a list of taxids.
         self._parse_sort_option(self.options)
-        self._allowed_options = ['fields', 'start', 'from', 'size', 'sort', 'explain', 'version', 'species']
+        self._allowed_options = ['fields', 'start', 'from', 'size', 'sort', 'explain', 'version']
         for key in set(self.options) - set(self._allowed_options):
                 del self.options[key]
-
-        self._default_species = [9606, 10090, 10116, 7227, 6239]  #human, mouse, rat, fruitfly, celegan
-        self.species = self._get_cleaned_species(self.options.pop('species', None))
 
         #this is a fake query to make sure to return empty hits
         self._nohits_query = {
@@ -357,24 +384,6 @@ class ESQueryBuilder():
                                 'non_exist_field': ''
                             }
                         }
-
-    def _get_cleaned_species(self, species):
-        if species is None:
-            #set to default_species
-            return self._default_species
-        if species == 'all':
-            #if self.species == 'all': do not apply species filter, all species is included.
-            return species
-
-        _species = []
-        if type(species) is not types.ListType:
-            species = [species]
-        for s in species:
-            if type(s) is types.IntType:
-                _species.append(s)
-            elif s in taxid_d:
-                _species.append(taxid_d[s])
-        return _species
 
     def _parse_sort_option(self, options):
         sort = options.get('sort', None)
