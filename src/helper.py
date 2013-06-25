@@ -13,8 +13,8 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             #support filter as an alias of "fields" parameter (back compatibility)
             kwargs['fields'] = kwargs['filter']
             del kwargs['filter']
-        if 'fields' in kwargs:
-            kwargs['fields'] = [x.strip() for x in kwargs['fields'].split(',')]
+        # if 'fields' in kwargs:
+        #     kwargs['fields'] = [x.strip() for x in kwargs['fields'].split(',')]
         return kwargs
 
     def _check_species_param(self, kwargs):

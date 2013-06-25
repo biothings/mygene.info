@@ -99,8 +99,14 @@ class ESQuery:
             return [self._get_genedoc(hit) for hit in hits['hits']]
 
     def _formated_fields(self, fields):
-        if type(fields) in types.StringTypes:
-            fields = [x.strip() for x in fields.split(',')]
+        if fields:
+            if type(fields) in types.StringTypes:
+                if fields.lower() == 'all':
+                    fields = None     # all fields will be returned.
+                else:
+                    fields = [x.strip() for x in fields.split(',')]
+        else:
+            fields = self._default_fields
         return fields
 
     def _parse_interval_query(self, query):
@@ -130,9 +136,8 @@ class ESQuery:
             return True
         return False
 
-    def get_gene(self, geneid, fields=None, **kwargs):
-        if fields:
-            kwargs['fields'] = self._formated_fields(fields)
+    def get_gene(self, geneid, fields='all', **kwargs):
+        kwargs['fields'] = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
         #res = self.conn0.get(self._index, self._doc_type, geneid, **kwargs)
         try:
@@ -142,16 +147,14 @@ class ESQuery:
         return res if raw else self._get_genedoc(res)
 
     def mget_gene(self, geneid_list, fields=None, **kwargs):
-        if fields:
-            kwargs['fields'] = self._formated_fields(fields)
+        kwargs['fields'] = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
         res = self.conn.mget(geneid_list, self._index, self._doc_type, **kwargs)
         return res if raw else [self._get_genedoc(doc) for doc in res]
 
-    def get_gene2(self, geneid, fields=None, **kwargs):
+    def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
-        if fields:
-            fields = self._formated_fields(fields)
+        fields = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
         rawquery = kwargs.pop('rawquery', None)
         scopes = kwargs.pop('scopes', None)
@@ -166,8 +169,7 @@ class ESQuery:
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
         '''for /query post request'''
-        if fields:
-            fields = self._formated_fields(fields)
+        fields = self._formated_fields(fields)
         raw = kwargs.pop('raw', False)
         rawquery = kwargs.pop('rawquery', None)
         scopes = kwargs.pop('scopes', None)
@@ -200,10 +202,9 @@ class ESQuery:
         return _res
         #return [_res if raw else self._cleaned_res(_res, empty=None, single_hit=True) for _res in res['responses']]
 
-    def query(self, q, fields=['symbol','name','taxid','entrezgene', 'ensemblgene'], **kwargs):
+    def query(self, q, fields=None, **kwargs):
         '''for /query?q=<query>'''
-        if fields:
-            fields = self._formated_fields(fields)
+        fields = self._formated_fields(fields)
         mode = int(kwargs.pop('mode', 1))
         raw = kwargs.pop('raw', False)
         rawquery = kwargs.pop('rawquery', None)
