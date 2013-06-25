@@ -168,7 +168,7 @@ class ESQuery:
 
     def _is_raw_string_query(self, query):
         '''Return True if input query is a wildchar/fielded/boolean query.'''
-        for v in [':',' AND ', ' OR ']:
+        for v in [':','~', ' AND ', ' OR ', 'NOT ']:
             if query.find(v) != -1:
                 return True
         if query.startswith('"') and query.endswith('"'):
