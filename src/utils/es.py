@@ -259,6 +259,7 @@ class ESQuery:
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         q = q.strip()
+        q = re.sub(u'[\t\n\x0b\x0c\r]+', ' ', q)
         _q = None
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
