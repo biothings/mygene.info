@@ -134,6 +134,9 @@ class ESQuery:
         if species is None:
             #set to default_species
             return self._default_species
+        if type(species) is types.IntType:
+            return [species]
+
         if species.lower() == 'all':
             #if self.species == 'all': do not apply species filter, all species is included.
             return species
@@ -199,6 +202,7 @@ class ESQuery:
         scopes = kwargs.pop('scopes', None)
         if scopes:
             scopes = self._cleaned_fields(scopes)
+        kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
         _q = qbdr.build_id_query(geneid, scopes)
         if rawquery:
