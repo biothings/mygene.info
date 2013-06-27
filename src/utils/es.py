@@ -129,7 +129,7 @@ class ESQuery:
 
     def _cleaned_species(self, species):
         '''return a cleaned species parameter.
-           should be either "all" or a list of taxids.
+           should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
         '''
         if species is None:
             #set to default_species
@@ -137,13 +137,17 @@ class ESQuery:
         if type(species) is types.IntType:
             return [species]
 
-        if species.lower() == 'all':
-            #if self.species == 'all': do not apply species filter, all species is included.
-            return species
+        if type(species) in types.StringTypes:
+            if species.lower() == 'all':
+                #if self.species == 'all': do not apply species filter, all species is included.
+                return species.lower()
+            else:
+                species = [s.strip().lower() for s in species.split(',')]
+
+        if type(species) not in [types.ListType, types.TupleType]:
+            raise ValueError('"species" parameter must be a string, integer or a list/tuple, not "{}".'.format(type(species)))
 
         _species = []
-        if type(species) in types.StringTypes:
-            species = [s.strip().lower() for s in species.split(',')]
         for s in species:
             if is_int(s):
                 _species.append(int(s))
