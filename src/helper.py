@@ -13,8 +13,16 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             #support filter as an alias of "fields" parameter (back compatibility)
             kwargs['fields'] = kwargs['filter']
             del kwargs['filter']
-        # if 'fields' in kwargs:
-        #     kwargs['fields'] = [x.strip() for x in kwargs['fields'].split(',')]
+        return kwargs
+
+    def _check_paging_param(self, kwargs):
+        '''support paging parameters, limit and skip as the aliases of size and from.'''
+        if 'limit' in kwargs and 'size' not in kwargs:
+            kwargs['size'] = kwargs['limit']
+            del kwargs['limit']
+        if 'skip' in kwargs and 'from' not in kwargs:
+            kwargs['from'] = kwargs['skip']
+            del kwargs['skip']
         return kwargs
 
     def get_query_params(self):
@@ -27,6 +35,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
                 _args[k] = v
         _args.pop(self.jsonp_parameter, None)   #exclude jsonp parameter if passed.
         self._check_fields_param(_args)
+        self._check_paging_param(_args)
         return _args
 
     # def get_current_user(self):
