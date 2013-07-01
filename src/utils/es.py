@@ -31,6 +31,8 @@ es = get_es()
 
 dummy_model = lambda es, res: res
 
+class MGQueryError(Exception):
+    pass
 
 class ESQuery:
     def __init__(self):
@@ -224,7 +226,11 @@ class ESQuery:
             scopes = self._cleaned_fields(scopes)
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         qbdr = ESQueryBuilder(fields=fields, **kwargs)
-        _q = qbdr.build_multiple_id_query(geneid_list, scopes)
+        try:
+            _q = qbdr.build_multiple_id_query(geneid_list, scopes)
+        except MGQueryError as err:
+            return {'error': True,
+                    'reason': err.message}
         if rawquery:
             return _q
         res = self._msearch(_q, kwargs['species'])['responses']
@@ -263,24 +269,29 @@ class ESQuery:
         _q = None
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
-        if interval_query:
-            #should also passing a "taxid" along with interval.
-            if qbdr.species != 'all':
-                taxid = qbdr.species[0]
-                if taxid:
-                    interval_query['taxid'] = taxid
-                    _q = qbdr.build_genomic_pos_query(**interval_query)
+        try:
+            if interval_query:
+                #should also passing a "taxid" along with interval.
+                if qbdr.species != 'all':
+                    taxid = qbdr.species[0]
+                    if taxid:
+                        interval_query['taxid'] = taxid
+                        _q = qbdr.build_genomic_pos_query(**interval_query)
 
-        # Check if fielded/boolean query, excluding special goid query
-        # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
-        # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
-        elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
-            _q = qbdr.build(q, mode=3)   #raw string query
-        elif self._is_wildcard_query(q):
-            _q = qbdr.build(q, mode=2)   #wildcard query
-        else:
-        # normal text query
-            _q = qbdr.build(q, mode)
+            # Check if fielded/boolean query, excluding special goid query
+            # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
+            # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
+            elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
+                _q = qbdr.build(q, mode=3)   #raw string query
+            elif self._is_wildcard_query(q):
+                _q = qbdr.build(q, mode=2)   #wildcard query
+            else:
+            # normal text query
+                _q = qbdr.build(q, mode)
+        except MGQueryError as err:
+            return {'error': True,
+                    'reason': err.message}
+
         if _q:
             if rawquery:
                 return _q
@@ -597,7 +608,10 @@ class ESQueryBuilder():
             }
         }
         _query = json.dumps(_query)
-        _query = json.loads(_query % {'q': q.replace('"', '\\"')})
+        try:
+            _query = json.loads(_query % {'q': q.replace('"', '\\"')})
+        except ValueError:
+            raise MGQueryError("invalid query term.")
         return _query
 
     def add_species_filter(self, _query):
