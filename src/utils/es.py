@@ -229,8 +229,8 @@ class ESQuery:
         try:
             _q = qbdr.build_multiple_id_query(geneid_list, scopes)
         except MGQueryError as err:
-            return {'error': True,
-                    'reason': err.message}
+            return {'success': False,
+                    'error': err.message}
         if rawquery:
             return _q
         res = self._msearch(_q, kwargs['species'])['responses']
@@ -289,8 +289,8 @@ class ESQuery:
             # normal text query
                 _q = qbdr.build(q, mode)
         except MGQueryError as err:
-            return {'error': True,
-                    'reason': err.message}
+            return {'success': False,
+                    'error': err.message}
 
         if _q:
             if rawquery:
@@ -310,7 +310,7 @@ class ESQuery:
                             break
                 res = _res
         else:
-            res = {'error': "Invalid query. Please check parameters."}
+            res = {'success': False, 'error': "Invalid query. Please check parameters."}
 
         return res
 

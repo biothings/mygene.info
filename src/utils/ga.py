@@ -3,7 +3,7 @@ import config
 
 class GAMixIn:
     def ga_track(self, event={}):
-        if getattr(config, 'RUN_IN_PROD', False):
+        if getattr(config, 'RUN_IN_PROD', False) and hasattr(config, "GA_ACCOUNT"):
             _req = self.request
             remote_ip = _req.headers.get("X-Real-Ip",
                         _req.headers.get("X-Forwarded-For",
