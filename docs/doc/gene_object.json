@@ -1,0 +1,899 @@
+.. code-block :: json
+
+    {
+      "MIM": "116953",
+      "ipi": [
+        "IPI00031681",
+        "IPI00910650"
+      ],
+      "accession": {
+        "genomic": [
+          "ABBA01008397",
+          "AC025162",
+          "AC034102",
+          "AC_000144",
+          "AF512553",
+          "AMYH01004497",
+          "CH471054",
+          "NC_000012",
+          "NC_018923",
+          "NT_029419",
+          "NW_001838059",
+          "NW_004078075",
+          "U50730"
+        ],
+        "protein": [
+          "AAA35667",
+          "AAH03065",
+          "AAM34794",
+          "AAP35467",
+          "ABM84693",
+          "ABM92215",
+          "BAA32794",
+          "BAF84630",
+          "BAG56780",
+          "CAA43807",
+          "CAA43985",
+          "CAL38014",
+          "EAW96856",
+          "EAW96857",
+          "EAW96858",
+          "EAW96859",
+          "EAW96860",
+          "NP_001789",
+          "NP_439892",
+          "P24941"
+        ],
+        "rna": [
+          "AA810989",
+          "AB012305",
+          "AK291941",
+          "AK293246",
+          "AM393136",
+          "BC003065",
+          "BJ991087",
+          "BT006821",
+          "DQ890598",
+          "DQ893767",
+          "M68520",
+          "NM_001798",
+          "NM_052827",
+          "X61622",
+          "X62071"
+        ]
+      },
+      "ec": "2.7.11.22",
+      "go": {
+        "CC": [
+          {
+            "term": "cyclin-dependent protein kinase holoenzyme complex",
+            "id": "GO:0000307"
+          },
+          {
+            "term": "chromosome, telomeric region",
+            "id": "GO:0000781"
+          },
+          {
+            "term": "condensed chromosome",
+            "id": "GO:0000793"
+          },
+          {
+            "term": "X chromosome",
+            "id": "GO:0000805"
+          },
+          {
+            "term": "Y chromosome",
+            "id": "GO:0000806"
+          },
+          {
+            "term": "nucleus",
+            "id": "GO:0005634"
+          },
+          {
+            "term": "nucleoplasm",
+            "id": "GO:0005654"
+          },
+          {
+            "term": "transcription factor complex",
+            "id": "GO:0005667"
+          },
+          {
+            "term": "cytoplasm",
+            "id": "GO:0005737"
+          },
+          {
+            "term": "endosome",
+            "id": "GO:0005768"
+          },
+          {
+            "term": "centrosome",
+            "id": "GO:0005813"
+          },
+          {
+            "term": "cytosol",
+            "id": "GO:0005829"
+          },
+          {
+            "term": "Cajal body",
+            "id": "GO:0015030"
+          }
+        ],
+        "MF": [
+          {
+            "term": "cyclin-dependent protein serine/threonine kinase activity",
+            "id": "GO:0004693"
+          },
+          {
+            "term": "cyclin-dependent protein serine/threonine kinase activity",
+            "id": "GO:0004693"
+          },
+          {
+            "term": "protein binding",
+            "id": "GO:0005515"
+          },
+          {
+            "term": "ATP binding",
+            "id": "GO:0005524"
+          },
+          {
+            "term": "cyclin binding",
+            "id": "GO:0030332"
+          },
+          {
+            "term": "histone kinase activity",
+            "id": "GO:0035173"
+          },
+          {
+            "term": "metal ion binding",
+            "id": "GO:0046872"
+          }
+        ],
+        "BP": [
+          {
+            "term": "G1/S transition of mitotic cell cycle",
+            "id": "GO:0000082"
+          },
+          {
+            "term": "G2 phase of mitotic cell cycle",
+            "id": "GO:0000085"
+          },
+          {
+            "term": "G2/M transition of mitotic cell cycle",
+            "id": "GO:0000086"
+          },
+          {
+            "term": "mitotic cell cycle",
+            "id": "GO:0000278"
+          },
+          {
+            "term": "DNA replication",
+            "id": "GO:0006260"
+          },
+          {
+            "term": "DNA repair",
+            "id": "GO:0006281"
+          },
+          {
+            "term": "potassium ion transport",
+            "id": "GO:0006813"
+          },
+          {
+            "term": "DNA damage response, signal transduction by p53 class mediator resulting in cell cycle arrest",
+            "id": "GO:0006977"
+          },
+          {
+            "term": "mitosis",
+            "id": "GO:0007067"
+          },
+          {
+            "term": "meiosis",
+            "id": "GO:0007126"
+          },
+          {
+            "term": "Ras protein signal transduction",
+            "id": "GO:0007265"
+          },
+          {
+            "term": "blood coagulation",
+            "id": "GO:0007596"
+          },
+          {
+            "term": "positive regulation of cell proliferation",
+            "id": "GO:0008284"
+          },
+          {
+            "term": "histone phosphorylation",
+            "id": "GO:0016572"
+          },
+          {
+            "term": "anaphase-promoting complex-dependent proteasomal ubiquitin-dependent protein catabolic process",
+            "id": "GO:0031145"
+          },
+          {
+            "term": "mitotic G1 DNA damage checkpoint",
+            "id": "GO:0031571"
+          },
+          {
+            "term": "positive regulation of DNA-dependent DNA replication initiation",
+            "id": "GO:0032298"
+          },
+          {
+            "term": "positive regulation of transcription, DNA-dependent",
+            "id": "GO:0045893"
+          },
+          {
+            "term": "centrosome duplication",
+            "id": "GO:0051298"
+          },
+          {
+            "term": "cell division",
+            "id": "GO:0051301"
+          },
+          {
+            "term": "regulation of ubiquitin-protein ligase activity involved in mitotic cell cycle",
+            "id": "GO:0051439"
+          },
+          {
+            "term": "regulation of gene silencing",
+            "id": "GO:0060968"
+          },
+          {
+            "term": "cellular response to nitric oxide",
+            "id": "GO:0071732"
+          }
+        ]
+      },
+      "pir": "A41227",
+      "unigene": [
+        "Hs.19192",
+        "Hs.689624"
+      ],
+      "interpro": [
+        {
+          "short_desc": "Prot_kinase_cat_dom",
+          "id": "IPR000719",
+          "desc": "Protein kinase, catalytic domain"
+        },
+        {
+          "short_desc": "Kinase-like_dom",
+          "id": "IPR011009",
+          "desc": "Protein kinase-like domain"
+        },
+        {
+          "short_desc": "Ser-Thr/Tyr_kinase_cat_dom",
+          "id": "IPR001245",
+          "desc": "Serine-threonine/tyrosine-protein kinase catalytic domain"
+        },
+        {
+          "short_desc": "Ser/Thr_dual-sp_kinase_dom",
+          "id": "IPR002290",
+          "desc": "Serine/threonine- / dual specificity protein kinase, catalytic  domain"
+        },
+        {
+          "short_desc": "Tyr_kinase_cat_dom",
+          "id": "IPR020635",
+          "desc": "Tyrosine-protein kinase, catalytic domain"
+        }
+      ],
+      "pharmgkb": "PA101",
+      "HPRD": "00310",
+      "prosite": "PS50011",
+      "homologene": {
+        "genes": [
+          [
+            9606,
+            1017
+          ],
+          [
+            10090,
+            12566
+          ],
+          [
+            10116,
+            362817
+          ],
+          [
+            7227,
+            42453
+          ],
+          [
+            7955,
+            406715
+          ],
+          [
+            3702,
+            824036
+          ],
+          [
+            4530,
+            4328135
+          ],
+          [
+            4530,
+            4331415
+          ],
+          [
+            4896,
+            2539869
+          ],
+          [
+            4932,
+            852457
+          ],
+          [
+            5141,
+            3876264
+          ],
+          [
+            7165,
+            3291042
+          ],
+          [
+            9031,
+            100529062
+          ],
+          [
+            9544,
+            711002
+          ],
+          [
+            9598,
+            467032
+          ],
+          [
+            9615,
+            100855704
+          ],
+          [
+            9913,
+            519217
+          ],
+          [
+            28985,
+            2896999
+          ],
+          [
+            33169,
+            4620303
+          ],
+          [
+            318829,
+            2679140
+          ]
+        ],
+        "id": 74409
+      },
+      "reporter": {
+        "HG-U133_Plus_2": [
+          "204252_at",
+          "211803_at",
+          "211804_s_at"
+        ],
+        "HG-U95Av2": [
+          "1792_g_at",
+          "1833_at"
+        ]
+      },
+      "symbol": "CDK2",
+      "genomic_pos": {
+        "start": 56360553,
+        "chr": "12",
+        "end": 56366568,
+        "strand": 1
+      },
+      "reagent": {
+        "GNF_hs_LentiORF-HA-MYC": {
+          "id": "GNF282834",
+          "relationship": "is"
+        },
+        "GNF_hs-Origene": [
+          {
+            "id": "GNF035860",
+            "relationship": "similar to"
+          },
+          {
+            "id": "GNF037258",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF048982",
+            "relationship": "is"
+          }
+        ],
+        "GNF_hs-ORFeome1_1_reads": {
+          "id": "GNF161504",
+          "relationship": "is"
+        },
+        "GNF_hs-druggable_lenti-shRNA": [
+          {
+            "id": "GNF081385",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF081386",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF081387",
+            "relationship": "is"
+          }
+        ],
+        "NOVART_hs-genome_siRNA": [
+          {
+            "id": "GNF093028",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF132726",
+            "relationship": "is"
+          }
+        ],
+        "GNF_mm+hs-MGC": {
+          "id": "GNF002384",
+          "relationship": "is"
+        },
+        "GNF_hs-pkinase_IDT-siRNA": [
+          {
+            "id": "GNF166768",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF166769",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF166770",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF166771",
+            "relationship": "is"
+          }
+        ],
+        "GNF_hs_LentiORF-Jred": {
+          "id": "GNF283761",
+          "relationship": "is"
+        },
+        "GNF_hs-druggable_siRNA": [
+          {
+            "id": "GNF066537",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF066538",
+            "relationship": "is"
+          }
+        ],
+        "GNF_Qia_hs-genome_v1_siRNA": [
+          {
+            "id": "GNF247215",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF247216",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF247217",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF247218",
+            "relationship": "is"
+          }
+        ],
+        "GNF_hs-druggable_plasmid-shRNA": [
+          {
+            "id": "GNF051995",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF056761",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF061563",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF078683",
+            "relationship": "is"
+          }
+        ],
+        "Invitrogen_IVTHSSIPKv2": [
+          {
+            "id": "GNF324610",
+            "relationship": "is"
+          },
+          {
+            "id": "GNF324611",
+            "relationship": "is"
+          }
+        ],
+        "NIBRI_hs-Secretome_pDEST": {
+          "id": "GNF337962",
+          "relationship": "is"
+        }
+      },
+      "Vega": "OTTHUMG00000170575",
+      "refseq": {
+        "genomic": [
+          "AC_000144",
+          "NC_000012",
+          "NC_018923",
+          "NT_029419",
+          "NW_001838059",
+          "NW_004078075"
+        ],
+        "protein": [
+          "NP_001789",
+          "NP_439892"
+        ],
+        "rna": [
+          "NM_001798",
+          "NM_052827"
+        ]
+      },
+      "name": "cyclin-dependent kinase 2",
+      "taxid": 9606,
+      "summary": "The protein encoded by this gene is a member of the Ser/Thr protein kinase family. This protein kinase is highly similar to the gene products of S. cerevisiae cdc28, and S. pombe cdc2. It is a catalytic subunit of the cyclin-dependent protein kinase complex, whose activity is restricted to the G1-S phase, and essential for cell cycle G1/S phase transition. This protein associates with and regulated by the regulatory subunits of the complex including cyclin A or E, CDK inhibitor p21Cip1 (CDKN1A) and p27Kip1 (CDKN1B). Its activity is also regulated by its protein phosphorylation. Two alternatively spliced variants and multiple transcription initiation sites of this gene have been reported. [provided by RefSeq, Jul 2008].",
+      "alias": "p33(CDK2)",
+      "entrezgene": 1017,
+      "uniprot": {
+        "Swiss-Prot": "P24941",
+        "TrEMBL": [
+          "E7ESI2",
+          "G3V317",
+          "G3V5T9"
+        ]
+      },
+      "ensembl": {
+        "protein": [
+          "ENSP00000243067",
+          "ENSP00000266970",
+          "ENSP00000393605",
+          "ENSP00000450983",
+          "ENSP00000452138",
+          "ENSP00000452514"
+        ],
+        "gene": "ENSG00000123374",
+        "transcript": [
+          "ENST00000266970",
+          "ENST00000354056",
+          "ENST00000440311",
+          "ENST00000553376",
+          "ENST00000554545",
+          "ENST00000554619",
+          "ENST00000555357",
+          "ENST00000555408",
+          "ENST00000556146",
+          "ENST00000556276",
+          "ENST00000556464",
+          "ENST00000556656"
+        ]
+      },
+      "map_location": "12q13",
+      "_id": "1017",
+      "type_of_gene": "protein-coding",
+      "pdb": [
+        "1AQ1",
+        "1B38",
+        "1B39",
+        "1BUH",
+        "1CKP",
+        "1DI8",
+        "1DM2",
+        "1E1V",
+        "1E1X",
+        "1E9H",
+        "1F5Q",
+        "1FIN",
+        "1FQ1",
+        "1FVT",
+        "1FVV",
+        "1G5S",
+        "1GIH",
+        "1GII",
+        "1GIJ",
+        "1GY3",
+        "1GZ8",
+        "1H00",
+        "1H01",
+        "1H07",
+        "1H08",
+        "1H0V",
+        "1H0W",
+        "1H1P",
+        "1H1Q",
+        "1H1R",
+        "1H1S",
+        "1H24",
+        "1H25",
+        "1H26",
+        "1H27",
+        "1H28",
+        "1HCK",
+        "1HCL",
+        "1JST",
+        "1JSU",
+        "1JSV",
+        "1JVP",
+        "1KE5",
+        "1KE6",
+        "1KE7",
+        "1KE8",
+        "1KE9",
+        "1OGU",
+        "1OI9",
+        "1OIQ",
+        "1OIR",
+        "1OIT",
+        "1OIU",
+        "1OIY",
+        "1OKV",
+        "1OKW",
+        "1OL1",
+        "1OL2",
+        "1P2A",
+        "1P5E",
+        "1PF8",
+        "1PKD",
+        "1PW2",
+        "1PXI",
+        "1PXJ",
+        "1PXK",
+        "1PXL",
+        "1PXM",
+        "1PXN",
+        "1PXO",
+        "1PXP",
+        "1PYE",
+        "1QMZ",
+        "1R78",
+        "1URC",
+        "1URW",
+        "1V1K",
+        "1VYW",
+        "1VYZ",
+        "1W0X",
+        "1W8C",
+        "1W98",
+        "1WCC",
+        "1Y8Y",
+        "1Y91",
+        "1YKR",
+        "2A0C",
+        "2A4L",
+        "2B52",
+        "2B53",
+        "2B54",
+        "2B55",
+        "2BHE",
+        "2BHH",
+        "2BKZ",
+        "2BPM",
+        "2BTR",
+        "2BTS",
+        "2C4G",
+        "2C5N",
+        "2C5O",
+        "2C5V",
+        "2C5X",
+        "2C5Y",
+        "2C68",
+        "2C69",
+        "2C6I",
+        "2C6K",
+        "2C6L",
+        "2C6M",
+        "2C6O",
+        "2C6T",
+        "2CCH",
+        "2CCI",
+        "2CJM",
+        "2CLX",
+        "2DS1",
+        "2DUV",
+        "2EXM",
+        "2FVD",
+        "2G9X",
+        "2HIC",
+        "2I40",
+        "2IW6",
+        "2IW8",
+        "2IW9",
+        "2J9M",
+        "2JGZ",
+        "2R3F",
+        "2R3G",
+        "2R3H",
+        "2R3I",
+        "2R3J",
+        "2R3K",
+        "2R3L",
+        "2R3M",
+        "2R3N",
+        "2R3O",
+        "2R3P",
+        "2R3Q",
+        "2R3R",
+        "2R64",
+        "2UUE",
+        "2UZB",
+        "2UZD",
+        "2UZE",
+        "2UZL",
+        "2UZN",
+        "2UZO",
+        "2V0D",
+        "2V22",
+        "2VTA",
+        "2VTH",
+        "2VTI",
+        "2VTJ",
+        "2VTL",
+        "2VTM",
+        "2VTN",
+        "2VTO",
+        "2VTP",
+        "2VTQ",
+        "2VTR",
+        "2VTS",
+        "2VTT",
+        "2VU3",
+        "2VV9",
+        "2W05",
+        "2W06",
+        "2W17",
+        "2W1H",
+        "2WEV",
+        "2WFY",
+        "2WHB",
+        "2WIH",
+        "2WIP",
+        "2WMA",
+        "2WMB",
+        "2WPA",
+        "2WXV",
+        "2X1N",
+        "2XMY",
+        "2XNB",
+        "3BHT",
+        "3BHU",
+        "3BHV",
+        "3DDP",
+        "3DDQ",
+        "3DOG",
+        "3EID",
+        "3EJ1",
+        "3EOC",
+        "3EZR",
+        "3EZV",
+        "3F5X",
+        "3FZ1",
+        "3IG7",
+        "3IGG",
+        "3LE6",
+        "3LFN",
+        "3LFQ",
+        "3LFS",
+        "3MY5",
+        "3NS9",
+        "3PJ8",
+        "3PXF",
+        "3PXQ",
+        "3PXR",
+        "3PXY",
+        "3PXZ",
+        "3PY0",
+        "3PY1",
+        "3QHR",
+        "3QHW",
+        "3QL8",
+        "3QQF",
+        "3QQG",
+        "3QQH",
+        "3QQJ",
+        "3QQK",
+        "3QQL",
+        "3QRT",
+        "3QRU",
+        "3QTQ",
+        "3QTR",
+        "3QTS",
+        "3QTU",
+        "3QTW",
+        "3QTX",
+        "3QTZ",
+        "3QU0",
+        "3QWJ",
+        "3QWK",
+        "3QX2",
+        "3QX4",
+        "3QXO",
+        "3QXP",
+        "3QZF",
+        "3QZG",
+        "3QZH",
+        "3QZI",
+        "3R1Q",
+        "3R1S",
+        "3R1Y",
+        "3R28",
+        "3R6X",
+        "3R71",
+        "3R73",
+        "3R7E",
+        "3R7I",
+        "3R7U",
+        "3R7V",
+        "3R7Y",
+        "3R83",
+        "3R8L",
+        "3R8M",
+        "3R8P",
+        "3R8U",
+        "3R8V",
+        "3R8Z",
+        "3R9D",
+        "3R9H",
+        "3R9N",
+        "3R9O",
+        "3RAH",
+        "3RAI",
+        "3RAK",
+        "3RAL",
+        "3RJC",
+        "3RK5",
+        "3RK7",
+        "3RK9",
+        "3RKB",
+        "3RM6",
+        "3RM7",
+        "3RMF",
+        "3RNI",
+        "3ROY",
+        "3RPO",
+        "3RPR",
+        "3RPV",
+        "3RPY",
+        "3RZB",
+        "3S00",
+        "3S0O",
+        "3S1H",
+        "3S2P",
+        "3SQQ",
+        "3SW4",
+        "3SW7",
+        "3TI1",
+        "3TIY",
+        "3TIZ",
+        "3TNW",
+        "3UNJ",
+        "3UNK",
+        "4ACM",
+        "4BCK",
+        "4BCM",
+        "4BCN",
+        "4BCO",
+        "4BCQ",
+        "4EOI",
+        "4EOJ",
+        "4EOK",
+        "4EOL",
+        "4EOM",
+        "4EON",
+        "4EOO",
+        "4EOP",
+        "4EOQ",
+        "4EOR",
+        "4EOS",
+        "4ERW",
+        "4EZ3",
+        "4EZ7",
+        "4GCJ",
+        "4I3Z",
+        "4II5"
+      ],
+      "HGNC": "1771"
+    }
