@@ -30,6 +30,33 @@ class GeneHandler(BaseHandler):
         else:
             raise tornado.web.HTTPError(404)
 
+    def post(self, geneid=None):
+        '''
+           This is essentially the same as post request in QueryHandler, with different defaults.
+
+           parameters:
+            ids
+            fields
+            species
+        '''
+        kwargs = self.get_query_params()
+        ids = kwargs.pop('ids', None)
+        if ids:
+            ids = re.split('[\s\r\n+|,]+', ids)
+            scopes = 'entrezgene,ensemblgene,retired'
+            fields = kwargs.pop('fields', None)
+            res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
+        else:
+            res = {'success': False, 'error': "Missing required parameters."}
+
+        self.return_json(res)
+        self.ga_track(event={'category': 'v2_api',
+                             'action': 'gene_post',
+                             'label': 'qsize',
+                             'value': len(ids) if ids else 0})
+
+
+
 
 class QueryHandler(BaseHandler):
     esq = ESQuery()
@@ -91,12 +118,13 @@ class QueryHandler(BaseHandler):
         self.ga_track(event={'category': 'v2_api',
                              'action': 'query_post',
                              'label': 'qsize',
-                             'value': len(q)})
+                             'value': len(q) if q else 0})
 
 
 APP_LIST = [
 
-        (r"/gene/([\w\-\.]+)/?", GeneHandler),   #for get request
+        (r"/gene/([\w\-\.]+)/?", GeneHandler),   #for gene get request
+        (r"/gene/?$", GeneHandler),              #for gene post request
         (r"/query/?", QueryHandler),
 
 ]
