@@ -4,6 +4,9 @@ syntax: glob
 *.pyo
 src/config.py
 logs/*
+docs/_build
+docs/md_doc
+TODO.txt
 
 # use regexp syntax
 syntax: regexp
