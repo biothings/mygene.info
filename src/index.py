@@ -28,6 +28,9 @@ from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
 
 __USE_WSGI__ = False
+STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
+if not os.path.exists(STATIC_PATH):
+    raise IOError('Run "make html" to generate sphinx docs first.')
 
 define("port", default=8000, help="run on the given port", type=int)
 define("address", default="127.0.0.1", help="run on localhost")
@@ -65,8 +68,8 @@ class StatusCheckHandler(tornado.web.RequestHandler):
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render('templates/index.html')
-
+        #self.redirect('/index.html')
+        self.render(os.path.join(STATIC_PATH, 'index.html'))
 
 
 class MetaDataHandler(tornado.web.RequestHandler):
@@ -80,19 +83,22 @@ class MetaDataHandler(tornado.web.RequestHandler):
         self.write(metadata)
 
 
-
-
 APP_LIST = [
         (r"/", MainHandler),
         (r"/status", StatusCheckHandler),
         (r"/metadata", MetaDataHandler),
         (r"/v2/metadata", MetaDataHandler),
-
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)
 APP_LIST += add_apps('v2', api_v2_app_list)
 APP_LIST += add_apps('v1', api_v1_app_list)
+
+if options.debug:
+    APP_LIST += [
+            #this should be the last one
+            (r"/?(.*)", tornado.web.StaticFileHandler, {'path': STATIC_PATH}),
+    ]
 
 settings = {}
 # if options.debug:
@@ -103,7 +109,6 @@ settings = {}
 # #        "login_url": LOGIN_URL,
 # #        "xsrf_cookies": True,
 #     })
-
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)
