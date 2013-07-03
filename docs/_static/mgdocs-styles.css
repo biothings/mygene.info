@@ -22,8 +22,15 @@ blockquote p {
     border-color: #bce8f1;
 }
 
-.highlight-python pre {
+.highlight-python pre,
+.highlight-html pre,
+.highlight-json pre {
     font-family: 'Droid Sans Mono', sans-serif;
+}
+
+
+.highlight-python pre {
+    /*font-family: 'Droid Sans Mono', sans-serif;*/
     background-color: #FAFDBA;
     border-color: #D8DB8C;
 }
