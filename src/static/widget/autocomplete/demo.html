@@ -1,0 +1,53 @@
+<html>
+<head>
+</head>
+<body class="ui-widget">
+    <label for="gene_query">Enter a gene here: </label>
+    <input id="gene_query" style="width:250px" class="mygene_query_target">
+
+    <script src="http://mygene.info/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        //When a gene is selected from the autocomplete dropdown, this callback function will be called.
+        //Overwrite this function to define your own desired behavior.
+        //You can access the selected gene object as "ui.item".
+        mygene_query_select_callback = function(event, ui){
+                alert( ui.item ?
+                    "Selected: " + ui.item.label + '('+ui.item.id+')':
+                    "Nothing selected, input was " + this.value);
+        };
+    </script>
+
+<hr style="margin-top:100px">
+    <div>
+        <h2> Autocomplete widget for gene query</h2>
+        <p>This Autocomplete widget for gene query provides suggestions while you type a gene symbol or name into the field. Here the gene suggestions are displayed as "&lt;Symbol&gt;:&lt;Name&gt;", automatically triggered when at least two characters are entered into the field.</p>
+
+        <p>This widget is powered by "<a href="http://http://mygene.info">mygene.info</a>" web service. By default, the gene suggestions are limited to human genes only. We will enable more customization options to allow queries against other species soon.
+        </p>
+
+        <p>To use this widget in your own website is very easy, just following these three steps:</p>
+        <ol>
+            <li>Copy/paste this line into your html file.</li>
+            <pre>
+                &lt;script src="http://mygene.info/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"&gt;&lt;/script&gt;
+            </pre>
+            <li>Add "mygene_query_target" class to your target input element.</li>
+            <pre>
+                &lt;input id="gene_query" style="width:250px" class="mygene_query_target"&gt;
+            </pre>
+            <li>Define your own callback function, which is triggered after user selects a gene.</li>
+            <pre>
+                &lt;script type="text/javascript"&gt;
+                    mygene_query_select_callback = function(event, ui){
+                            alert( ui.item ?
+                                "Selected: " + ui.item.label + '('+ui.item._id+')':
+                                "Nothing selected, input was " + this.value);
+                    };
+                &lt;/script&gt;
+            </pre>
+        </ol>
+    </div>
+
+
+</body>
+</html>
