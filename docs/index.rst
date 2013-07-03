@@ -85,7 +85,7 @@ On top of ElasticSearch, we use `tornado <http://www.tornadoweb.org>`_, a lightw
 Is this project open-sourced?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Yes, this project is open-sourced under MIT license. The source code of `MyGene.info <http://mygene.info>`_ are hosted at `bitbucket <https://bitbucket.org/newgene/genedoc/src>`_
+Yes, this project is open-sourced under Apache license. The source code of `MyGene.info <http://mygene.info>`_ are hosted at `bitbucket <https://bitbucket.org/newgene/genedoc/src>`_
 
 
 Who is using MyGene.info?
