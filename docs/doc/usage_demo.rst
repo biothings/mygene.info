@@ -53,7 +53,7 @@ We implemented this demo in four ways:
 Example 1: using CGI
 ^^^^^^^^^^^^^^^^^^^^
 
- * `Download sample code here </static/demo/mygene_info_demo_cgi.py>`_.
+ * `Download sample code here </_static/demo/mygene_info_demo_cgi.py>`_.
 
  * It's a simple python CGI script. To run it, you just need to drop it to your favorite web server's cgi-bin folder (make sure your python, v2.6 up, is in the path).
 
@@ -91,8 +91,7 @@ Example 4: using CORS
  * `See it in action here </_static/demo/mygene_info_demo_cors.html>`_
 
 
-
-
+.. include :: autocomplete.rst
 
 
 .. raw:: html
