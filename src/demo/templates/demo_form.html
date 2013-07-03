@@ -1,0 +1,31 @@
+<html>
+<form action="", method="GET">
+<p style="text-align:left"><label>Search for genes:</label>
+<input type="text" name="q" style="width:200px"></input>
+<input type="hidden" name="limit" value="100" /><input type="submit"></input></p>
+</form>
+{% if error %}
+<p>Error:<pre>&nbsp;{{error}}</pre></p>
+{% end %}
+
+{% if gene_list is not None %}
+    <h3>Found {{len(gene_list)}} matched mouse gene(s).</h3>
+    {% if len(gene_list) > 0 %}
+        <table>
+        <tr><td>Symbol</td><td>Name</td></tr>
+        {% for gene in gene_list %}
+            <tr><td><a href="?showgene={{gene['id']}}">{{gene['symbol']}}</a></td><td>{{gene['name']}}</td></tr>
+        {% end %}
+        </table>    
+    {% end %}
+{% end %}
+
+{% if ps_list %}
+    {%for ps in ps_list %}
+    <img src="http://biogps.org/dataset/4/chart/{{ps}}">
+    {% end %}
+{% elif ps_list == [] %}
+    <p>No data available for this gene.</p>   
+{% end %}
+
+</html>
