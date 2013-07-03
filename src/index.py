@@ -26,11 +26,13 @@ from utils.es import ESQuery
 from helper import add_apps
 from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
+from demo.handlers import APP_LIST as demo_app_list
 
 __USE_WSGI__ = False
-STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
-if not os.path.exists(STATIC_PATH):
+DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
+if not os.path.exists(DOCS_STATIC_PATH):
     raise IOError('Run "make html" to generate sphinx docs first.')
+STATIC_PATH = os.path.join(src_path, 'src/static')
 
 define("port", default=8000, help="run on the given port", type=int)
 define("address", default="127.0.0.1", help="run on localhost")
@@ -69,7 +71,7 @@ class StatusCheckHandler(tornado.web.RequestHandler):
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         #self.redirect('/index.html')
-        self.render(os.path.join(STATIC_PATH, 'index.html'))
+        self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
 
 
 class MetaDataHandler(tornado.web.RequestHandler):
@@ -93,22 +95,25 @@ APP_LIST = [
 APP_LIST += add_apps('', api_v2_app_list)
 APP_LIST += add_apps('v2', api_v2_app_list)
 APP_LIST += add_apps('v1', api_v1_app_list)
+APP_LIST += add_apps('demo', demo_app_list)
 
 if options.debug:
     APP_LIST += [
+            #/widget/* static path
+            (r"/widget/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(STATIC_PATH, 'widget')}),
             #this should be the last one
-            (r"/?(.*)", tornado.web.StaticFileHandler, {'path': STATIC_PATH}),
+            (r"/?(.*)", tornado.web.StaticFileHandler, {'path': DOCS_STATIC_PATH}),
     ]
 
 settings = {}
-# if options.debug:
+if options.debug:
 #     from config import STATIC_PATH
-#     settings.update({
-#         "static_path": STATIC_PATH,
+    settings.update({
+         "static_path": STATIC_PATH,
 # #        "cookie_secret": COOKIE_SECRET,
 # #        "login_url": LOGIN_URL,
 # #        "xsrf_cookies": True,
-#     })
+     })
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)
