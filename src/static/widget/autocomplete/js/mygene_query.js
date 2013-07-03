@@ -71,14 +71,14 @@ mygene.genequery = function(select_callback){
                         size:20
                     },
                     success: function( data ) {
-                        if (data.total_rows > 0){
-                            response( $.map( data.rows, function( item ) {
-                                return {
+                        if (data.total > 0){
+                            response( $.map( data.hits, function( item ) {
+                                return $.extend(item, {
                                     //label: item.symbol+': '+item.name+':'+item.sort_order[0],
                                     label: item.symbol+': '+item.name,
                                     id: item._id,
                                     value: item.symbol
-                                }
+                                });
                             }));
                         }else{
                             response([{label:'no matched gene found.', value:''}]);
