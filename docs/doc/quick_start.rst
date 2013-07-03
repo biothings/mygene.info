@@ -24,7 +24,7 @@ Examples
     http://mygene.info/v2/query?q=entrezgene:1017
     http://mygene.info/v2/query?q=ensemblgene:ENSG00000123374
 
-.. Tip:: View nicely formatted JSON result in your browser with this handy add-on: `JSON formater <https://chrome.google.com/webstore/detail/bcjindcccaagfpapjjmafapmmgkkhgoa>`_ for Chrome or `JSONView <https://addons.mozilla.org/en-US/firefox/addon/jsonview/>`_ for Firefox.
+.. Hint:: View nicely formatted JSON result in your browser with this handy add-on: `JSON formater <https://chrome.google.com/webstore/detail/bcjindcccaagfpapjjmafapmmgkkhgoa>`_ for Chrome or `JSONView <https://addons.mozilla.org/en-US/firefox/addon/jsonview/>`_ for Firefox.
 
 
 

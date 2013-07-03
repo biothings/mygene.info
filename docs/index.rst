@@ -14,7 +14,9 @@ MyGene.info : Gene Annotation Query as a Service
 .. image:: _static/logo.png
    :align: left
 
-`MyGene.info <http://mygene.info>`_ provides simple-to-use REST web services to query/retrieve gene annotation data. It's designed with **simplicity** and **performance** emphasized. A typical use case is to use it to power a web application which requires querying genes and obtaining common gene annotations. For example, `MyGene.info <http://mygene.info>`_ services are used to power `BioGPS <http://biogps.org>`_.
+.. cssclass:: head-paragraph
+
+  `MyGene.info <http://mygene.info>`_ provides simple-to-use REST web services to query/retrieve gene annotation data. It's designed with **simplicity** and **performance** emphasized. A typical use case is to use it to power a web application which requires querying genes and obtaining common gene annotations. For example, `MyGene.info <http://mygene.info>`_ services are used to power `BioGPS <http://biogps.org>`_.
 
 .. raw:: html
 

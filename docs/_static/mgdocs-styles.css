@@ -7,6 +7,10 @@
   src: local('Droid Sans Mono'), local('DroidSansMono'), url(http://themes.googleusercontent.com/static/fonts/droidsansmono/v4/ns-m2xQYezAtqh7ai59hJUYuTAAIFFn5GTWtryCmBQ4.woff) format('woff');
 }
 
+.head-paragraph {
+    margin-top: 25px;
+}
+
 p.admonition-title {
 
 }
@@ -31,17 +35,21 @@ blockquote p {
 
 .highlight-python pre {
     /*font-family: 'Droid Sans Mono', sans-serif;*/
-    background-color: #FAFDBA;
+    /*background-color: #FAFDBA;*/
+    background-color: #FCFDDC;
     border-color: #D8DB8C;
+
 }
 
+/*this should be after .highlight-python pre*/
 .mg-citation pre {
+    float: right;
+    overflow: hidden;
     color: #333344;
     background-color: #f5f5f5;
     border-color: #ccc;
     font-size: 12px;
 }
-
 
 .gene-object-containter pre {
     max-height: 500px;
