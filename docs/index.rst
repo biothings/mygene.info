@@ -39,6 +39,7 @@ What's new in v2 API
 * Fine-tuned query algorithm to return relevant gene hits first.
 * Our query backend is more scalable and extensible. Ready to expand more annotation data as we go.
 
+`Migration guide from v1 to v2 API <doc/migration_from_v1.html>`_
 
 .. include :: doc/quick_start.rst
 
@@ -50,6 +51,7 @@ Documentation
    :maxdepth: 3
 
    Try it live on interactive API page <http://mygene.info/v2/api>
+   doc/migration_from_v1
    doc/data
    doc/query_service
    doc/annotation_service
@@ -107,8 +109,3 @@ Your feedback to <help@mygene.info> is welcome.
 .. * :ref:`genindex`
 .. * :ref:`modindex`
 .. * :ref:`search`
-
-
-
-
-.. _a link: http://example.com/

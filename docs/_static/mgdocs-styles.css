@@ -74,3 +74,29 @@ blockquote p {
     text-align: center;
     font-size: 10px;
 }
+
+.v1_box {
+    float: left;
+    width: 50%;
+}
+
+.v2_box {
+    float: right;
+    width: 50%;
+}
+
+.v1_box pre,
+.v2_box pre {
+    width: 100%;
+}
+
+.v1_box p,
+.v2_box p {
+    text-align: center;
+}
+
+.v1_box table,
+.v2_box table {
+    width: 90% !important;
+}
+
