@@ -25,16 +25,16 @@ String.prototype.format = function (args) {
 $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
 
 	options: {
-        mygene_url: 'http://mygene.info/query',
+        mygene_url: 'http://mygene.info/v2/query',
         //exact match with symbol is boosted.
-        q: "(symbol:{term} OR symbol: {term}* OR name:{term}* OR summary:{term}*) AND species:human",
-        sort:'_score,_id',
+//        q: "(symbol:{term} OR symbol: {term}* OR name:{term}* OR summary:{term}*) AND species:human",
+        q: "{term}",
+        species: "human",
+        fields: "name,symbol,taxid,entrezgene",
         limit:20,
         gene_label: "{symbol}: {name}",
         value_attr: 'symbol',
-        return_attrs: ["symbol", "name"],
-        minLength: 2,
-        include_docs: false
+        minLength: 2
 	},
 
 	_create: function() {
@@ -47,26 +47,24 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
                 $.ajax({
                     url: _options.mygene_url,
                     dataType: "jsonp",
-                    jsonp: 'jsoncallback',
+                    jsonp: 'callback',
                     data: {
                         q: _options.q.format({term:request.term}),
                         sort:_options.sort,
                         limit:_options.limit,
+                        fields: _options.fields,
+                        species: _options.species,
                         include_docs: _options.include_docs,
                     },
                     success: function( data ) {
-                        if (data.total_rows > 0){
-                            response( $.map( data.rows, function( item ) {
+                        if (data.total > 0){
+                            response( $.map( data.hits, function( item ) {
                                 var obj = {
                                     label: _options.gene_label.format(item),
-                                    id: item.id,
+                                    id: item._id,
                                     value: item[_options.value_attr]
                                 }
-
-                                $.map(_options.return_attrs, function(attr){
-                                    var gene_doc = item.doc || item;
-                                    if (gene_doc[attr]) obj[attr]=gene_doc[attr];
-                                });
+                                $.extend(obj, item);
                                 return obj;
                             }));
                         }else{
