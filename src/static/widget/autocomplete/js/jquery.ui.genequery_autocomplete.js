@@ -4,7 +4,7 @@
  *  symbol or name into the field. By default the gene suggestions are displayed as
  *  "<Symbol>:<Name>", automatically triggered when at least two characters are entered
  *  into the field.
- *  Copyright (c) 2012 Chunlei Wu; Apache License, Version 2.0.
+ *  Copyright (c) 2013 Chunlei Wu; Apache License, Version 2.0.
  */
 
 
@@ -57,14 +57,26 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
                         include_docs: _options.include_docs,
                     },
                     success: function( data ) {
+                        var species_d = {3702: 'thale-cress',
+                                         6239: 'nematode',
+                                         7227: 'fruitfly',
+                                         7955: 'zebrafish',
+                                         8364: 'frog',
+                                         9606: 'human',
+                                         9823: 'pig',
+                                         10090: 'mouse',
+                                         10116: 'rat'};
                         if (data.total > 0){
                             response( $.map( data.hits, function( item ) {
                                 var obj = {
-                                    label: _options.gene_label.format(item),
                                     id: item._id,
                                     value: item[_options.value_attr]
                                 }
                                 $.extend(obj, item);
+                                if (species_d[obj.taxid]){
+                                    obj.species = species_d[obj.taxid];
+                                }
+                                obj.label = _options.gene_label.format(obj);
                                 return obj;
                             }));
                         }else{
