@@ -17,7 +17,7 @@ from pyes.utils import make_path
 from pyes.query import MatchAllQuery, StringQuery
 
 from config import ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL, ES_INDEX_TYPE
-from utils.common import is_int, timesofar, safe_genome_pos, taxid_d
+from utils.common import is_int, timesofar, safe_genome_pos, dotdict, taxid_d
 
 
 def get_es():
@@ -184,6 +184,19 @@ class ESQuery:
             return True
         return False
 
+    def _get_cleaned_query_options(self, fields, kwargs):
+        """common helper for processing fields, kwargs and other options passed to ESQueryBuilder."""
+        options = dotdict()
+        options.raw = kwargs.pop('raw', False)
+        options.rawquery = kwargs.pop('rawquery', False)
+        scopes = kwargs.pop('scopes', None)
+        if scopes:
+            options.scopes = self._cleaned_fields(scopes)
+        kwargs["fields"] = self._cleaned_fields(fields)
+        kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
+        options.kwargs = kwargs
+        return options
+
     def get_gene(self, geneid, fields='all', **kwargs):
         kwargs['fields'] = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
@@ -202,39 +215,27 @@ class ESQuery:
 
     def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
-        fields = self._cleaned_fields(fields)
-        raw = kwargs.pop('raw', False)
-        rawquery = kwargs.pop('rawquery', None)
-        scopes = kwargs.pop('scopes', None)
-        if scopes:
-            scopes = self._cleaned_fields(scopes)
-        kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
-        qbdr = ESQueryBuilder(fields=fields, **kwargs)
-        _q = qbdr.build_id_query(geneid, scopes)
-        if rawquery:
+        options = self._get_cleaned_query_options(fields, kwargs)
+        qbdr = ESQueryBuilder(**options.kwargs)
+        _q = qbdr.build_id_query(geneid, options.scopes)
+        if options.rawquery:
             return _q
         res =  self._search(_q)
-        return res if raw else self._cleaned_res(res, empty=None, single_hit=True)
+        return res if options.raw else self._cleaned_res(res, empty=None, single_hit=True)
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
         '''for /query post request'''
-        fields = self._cleaned_fields(fields)
-        raw = kwargs.pop('raw', False)
-        rawquery = kwargs.pop('rawquery', None)
-        scopes = kwargs.pop('scopes', None)
-        if scopes:
-            scopes = self._cleaned_fields(scopes)
-        kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
-        qbdr = ESQueryBuilder(fields=fields, **kwargs)
+        options = self._get_cleaned_query_options(fields, kwargs)
+        qbdr = ESQueryBuilder(**options.kwargs)
         try:
-            _q = qbdr.build_multiple_id_query(geneid_list, scopes)
+            _q = qbdr.build_multiple_id_query(geneid_list, options.scopes)
         except MGQueryError as err:
             return {'success': False,
                     'error': err.message}
-        if rawquery:
+        if options.rawquery:
             return _q
         res = self._msearch(_q, kwargs['species'])['responses']
-        if raw:
+        if options.raw:
             return res
 
         assert len(res) == len(geneid_list)
@@ -258,12 +259,8 @@ class ESQuery:
 
     def query(self, q, fields=None, **kwargs):
         '''for /query?q=<query>'''
-        fields = self._cleaned_fields(fields)
-        mode = int(kwargs.pop('mode', 1))
-        raw = kwargs.pop('raw', False)
-        rawquery = kwargs.pop('rawquery', None)
-        kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
-        qbdr = ESQueryBuilder(fields=fields, **kwargs)
+        options = self._get_cleaned_query_options(fields, kwargs)
+        qbdr = ESQueryBuilder(**options.kwargs)
         q = q.strip()
         q = re.sub(u'[\t\n\x0b\x0c\r]+', ' ', q)
         _q = None
@@ -287,17 +284,17 @@ class ESQuery:
                 _q = qbdr.build(q, mode=2)   #wildcard query
             else:
             # normal text query
-                _q = qbdr.build(q, mode)
+                _q = qbdr.build(q, mode=1)
         except MGQueryError as err:
             return {'success': False,
                     'error': err.message}
 
         if _q:
-            if rawquery:
+            if options.rawquery:
                 return _q
 
             res = self._search(_q, species=kwargs['species'])
-            if not raw:
+            if not options.raw:
                 _res = res['hits']
                 _res['took'] = res['took']
                 for v in _res['hits']:

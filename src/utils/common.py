@@ -57,6 +57,7 @@ def is_int(s):
     except ValueError:
         return False
 
+
 def safe_genome_pos(s):
     '''
        >>> safe_genome_pos(1000) = 1000
@@ -70,6 +71,17 @@ def safe_genome_pos(s):
         return int(s.replace(',',''))
     else:
         raise ValueError('invalid type "%s" for "save_genome_pos"' % s_type)
+
+
+class dotdict(dict):
+    def __getattr__(self, attr):
+        value = self.get(attr, None)
+        if type(value) is types.DictType:
+            return dotdict(value)
+        else:
+            return value
+    __setattr__= dict.__setitem__
+    __delattr__= dict.__delitem__
 
 
 #===============================================================================
