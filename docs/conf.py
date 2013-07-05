@@ -247,11 +247,14 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
 
-
-import sphinx_bootstrap_theme
-html_theme = 'bootstrap'
-html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
-html_theme_options = {
-'bootswatch_theme': "simplex",
-'navbar_site_name': "Index",
-}
+try:
+    import sphinx_bootstrap_theme
+    html_theme = 'bootstrap'
+    html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+    html_theme_options = {
+    'bootswatch_theme': "simplex",
+    'navbar_site_name': "Index",
+    }
+except ImportError:
+    print 'Warning: "sphinx_bootstrap_theme" is not installed, fall back to default theme.'
+    pass

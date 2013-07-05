@@ -45,7 +45,7 @@ so that we know which input field to enable autocomplete.
     <script type="text/javascript">
         mygene_query_select_callback = function(event, ui){
                 alert( ui.item ?
-                    "Selected: " + ui.item.label + '('+ui.item.id+')':
+                    "Selected: " + ui.item.label + '('+ui.item.entrezgene+')':
                     "Nothing selected, input was " + this.value);
         };
     </script>
