@@ -132,6 +132,7 @@ class ESQuery:
     def _cleaned_species(self, species):
         '''return a cleaned species parameter.
            should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
+           returned species is always a list of taxids (even when only one species)
         '''
         if species is None:
             #set to default_species
@@ -270,10 +271,11 @@ class ESQuery:
             if interval_query:
                 #should also passing a "taxid" along with interval.
                 if qbdr.species != 'all':
-                    taxid = qbdr.species[0]
-                    if taxid:
-                        interval_query['taxid'] = taxid
-                        _q = qbdr.build_genomic_pos_query(**interval_query)
+                    qbdr.species = [qbdr.species[0]]
+                    _q = qbdr.build_genomic_pos_query(**interval_query)
+                else:
+                    return {'success': False,
+                            'error': 'genomic interval query cannot be combined with "species=all" parameter. Specify a single species.'}
 
             # Check if fielded/boolean query, excluding special goid query
             # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
@@ -400,11 +402,18 @@ class ESQueryBuilder():
             size       default 10
             sort       e.g. sort='entrezgene,-symbol'
             explain    true or false
+
+            entrezonly  default false
+            ensemblonly default false
+
         """
         self.options = query_options
         self.species = self.options.pop('species', 'all')   #species should be either 'all' or a list of taxids.
+        self.entrezonly = self.options.pop('entrezonly', False)
+        self.ensemblonly = self.options.pop('ensemblonly', False)
         self._parse_sort_option(self.options)
-        self._allowed_options = ['fields', 'start', 'from', 'size', 'sort', 'explain', 'version']
+        self._allowed_options = ['fields', 'start', 'from', 'size',
+                                 'sort', 'explain', 'version']
         for key in set(self.options) - set(self._allowed_options):
                 del self.options[key]
 
@@ -612,6 +621,7 @@ class ESQueryBuilder():
         return _query
 
     def add_species_filter(self, _query):
+        """deprecated! replaced by add_filters"""
         if self.species == 'all':
             #do not apply species filter
             return _query
@@ -624,6 +634,48 @@ class ESQueryBuilder():
                         "taxid" : self.species
                     }
                 }
+            }
+        }
+        return _query
+
+    def get_filters(self):
+        filters = []
+        #species filter
+        if self.species and self.species != 'all':
+            if len(self.species) == 1:
+                filters.append({
+                     "term" : {"taxid" : self.species[0] }
+                    })
+            else:
+                filters.append({
+                     "terms" : {"taxid" : self.species }
+                    })
+        if self.entrezonly:
+            filters.append({
+                 "exists" : { "field" : "entrezgene" }
+                })
+        if self.ensemblonly:
+            filters.append({
+                 "exists" : { "field" : "ensemblgene" }
+                })
+        if filters:
+            if len(filters) == 1:
+                filters = filters[0]
+            else:
+                #concatenate multiple filters with "and" filter
+                filters = {"and": filters}
+            
+        return filters
+
+    def add_filters(self, _query):
+        filters = self.get_filters()
+        if not filters:
+            return _query
+
+        _query = {
+            'filtered': {
+                'query': _query,
+                'filter' : filters
             }
         }
         return _query
@@ -675,7 +727,8 @@ class ESQueryBuilder():
         else:
             _query = self.string_query(q)
 
-        _query = self.add_species_filter(_query)
+        #_query = self.add_species_filter(_query)
+        _query = self.add_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {'query': _query}
         if self.options:
@@ -764,7 +817,8 @@ class ESQueryBuilder():
             else:
                 raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 
-        _query = self.add_species_filter(_query)
+        #_query = self.add_species_filter(_query)
+        _query = self.add_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
         if self.options:
@@ -785,15 +839,15 @@ class ESQueryBuilder():
                 ("%s" % scopes): id_list,
             }
         }
-        _query = self.add_species_filter(_query)
+        #_query = self.add_species_filter(_query)
+        _query = self.add_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
         if self.options:
             _q.update(self.options)
         return _q
 
-    def build_genomic_pos_query(self, taxid, chr, gstart, gend):
-        taxid = int(taxid)
+    def build_genomic_pos_query(self, chr, gstart, gend):
         gstart = safe_genome_pos(gstart)
         gend = safe_genome_pos(gend)
         if chr.lower().startswith('chr'):
@@ -818,14 +872,15 @@ class ESQueryBuilder():
                         }
                     }
                 }
-        _query = {
-            'filtered': {
-                'query': _query,
-                'filter' : {
-                    "term" : {"taxid" : taxid}
-                }
-            }
-        }
+        # _query = {
+        #     'filtered': {
+        #         'query': _query,
+        #         'filter' : {
+        #             "term" : {"taxid" : taxid}
+        #         }
+        #     }
+        # }
+        _query = self.add_filters(_query)
         _q = {'query': _query}
         if self.options:
             _q.update(self.options)
