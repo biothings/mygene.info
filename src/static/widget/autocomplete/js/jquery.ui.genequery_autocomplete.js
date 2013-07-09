@@ -28,7 +28,7 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
         mygene_url: 'http://mygene.info/v2/query',
         //exact match with symbol is boosted.
 //        q: "(symbol:{term} OR symbol: {term}* OR name:{term}* OR summary:{term}*) AND species:human",
-        q: "{term}",
+        q: "{term}*",
         species: "human",
         fields: "name,symbol,taxid,entrezgene",
         limit:20,
