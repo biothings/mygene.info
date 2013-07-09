@@ -23,7 +23,7 @@ src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 if src_path not in sys.path:
     sys.path.append(src_path)
 from utils.es import ESQuery
-from helper import add_apps
+from helper import add_apps, BaseHandler
 from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
 from demo.handlers import APP_LIST as demo_app_list
@@ -74,15 +74,13 @@ class MainHandler(tornado.web.RequestHandler):
         self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
 
 
-class MetaDataHandler(tornado.web.RequestHandler):
+class MetaDataHandler(BaseHandler):
     '''Return db metadata in json string.'''
     def get(self):
         esq = ESQuery()
         metadata = esq.metadata()
         metadata["app_revision"] = __revision__
-        metadata = json.dumps(metadata, indent=4)
-        self.set_header("Content-Type", "application/json; charset=UTF-8")
-        self.write(metadata)
+        self.return_json(metadata)
 
 
 APP_LIST = [
