@@ -43,6 +43,8 @@ What's new in v2 API
 
 `Migration guide from v1 to v2 API <doc/migration_from_v1.html>`_
 
+Still want to stick with v1 API for a while? It's still there: `v1 API </v1/doc>`_, but annotation data there won't updated any more.
+
 .. include :: doc/quick_start.rst
 
 
@@ -58,6 +60,8 @@ Documentation
    doc/query_service
    doc/annotation_service
    doc/usage_demo
+   doc/packages
+   terms
 
 
 FAQ
