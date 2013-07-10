@@ -1,6 +1,9 @@
 Autocomplete widget for gene query
 ===================================
+
 When you build a web application to have users to query for their favorite genes, the autocomplete widget is very useful, as it provides suggestions while users start to type into the field.
+
+.. Note:: The autocomplete widget below is a simple demo application. You may also want to have a look at `this more sophisticated autocomplete widget <packages.html#mygene-autocomplete-widget>`_, which comes with a lot more customization options.
 
 
 Try it live first
@@ -19,7 +22,7 @@ About this widget
 
 This autocomplete widget for gene query provides suggestions while you type a gene symbol or name into the field. Here the gene suggestions are displayed as "<Symbol>:<Name>", automatically triggered when at least two characters are entered into the field.
 
-At the backend, this widget is powered by `the gene query web service </doc/query_service.html>`_ from `MyGene.info <http://mygene.info>`_. By default, the gene suggestions display human genes only. We will enable additional customization options soon to allow queries against other species and more.
+At the backend, this widget is powered by `the gene query web service </doc/query_service.html>`_ from `MyGene.info <http://mygene.info>`_. By default, the gene suggestions display human genes only.
 
 
 Use it in your website
