@@ -116,5 +116,5 @@ domready(function () {
       if (el) el.innerHTML = status_text;
     }
   };
-  myConn.connect("/metadata", "GET", "", update_status);
+  myConn.connect("/v1/metadata", "GET", "", update_status);
 })
