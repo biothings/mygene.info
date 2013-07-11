@@ -60,11 +60,11 @@ This autocomplete widget for gene query (built upon `JQueryUI's autocomplete wid
 
 See https://bitbucket.org/sulab/mygene.autocomplete/overview for more details.
 
-You can also play with it with this `jsFiddle <http://jsfiddle.net>`_ example:
+You can also play with it with this `jsFiddle <http://jsfiddle.net/frm3X/>`_ example:
 
 .. raw:: html
 
-    <iframe width="100%" height="400" src="http://jsfiddle.net/newgene/K5cEN/2/embedded/js,resources,html,result/presentation/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+    <iframe width="100%" height="400" src="http://jsfiddle.net/frm3X/embedded/js,resources,html,result/presentation/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
 .. raw:: html
