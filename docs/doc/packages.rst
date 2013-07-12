@@ -60,7 +60,7 @@ This autocomplete widget for gene query (built upon `JQueryUI's autocomplete wid
 
 See https://bitbucket.org/sulab/mygene.autocomplete/overview for more details.
 
-You can also play with it with this `jsFiddle <http://jsfiddle.net/frm3X/>`_ example:
+You can also play with this `jsFiddle <http://jsfiddle.net/frm3X/>`_ example:
 
 .. raw:: html
 
