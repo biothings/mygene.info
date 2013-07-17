@@ -12,7 +12,7 @@ import time
 import copy
 
 from pyes import ES
-from pyes.exceptions import NotFoundException
+from pyes.exceptions import NotFoundException, ElasticSearchException
 from pyes.utils import make_path
 from pyes.query import MatchAllQuery, StringQuery
 
@@ -295,7 +295,13 @@ class ESQuery:
             if options.rawquery:
                 return _q
 
-            res = self._search(_q, species=kwargs['species'])
+            try:
+                res = self._search(_q, species=kwargs['species'])
+            except ElasticSearchException as err:
+                err_msg = err.message if options.raw else "invalid query term."
+                return {'success': False,
+                        'error': err_msg}
+
             if not options.raw:
                 _res = res['hits']
                 _res['took'] = res['took']
@@ -664,7 +670,7 @@ class ESQueryBuilder():
             else:
                 #concatenate multiple filters with "and" filter
                 filters = {"and": filters}
-            
+
         return filters
 
     def add_filters(self, _query):

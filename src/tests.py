@@ -173,6 +173,8 @@ def test_query():
     res = json_ok(get_ok(api + '/query'), checkerror=False)
     assert 'error' in res
 
+    res = json_ok(get_ok(api + '/query?q=tRNA:Y1:85Ae'), checkerror=False)
+    assert 'error' in res
 
 def test_query_post():
     #/query via post
