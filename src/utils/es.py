@@ -72,29 +72,6 @@ class ESQuery:
         else:
             self._index = ES_INDEX_NAME_TIER1
 
-    def _search_async(self, q, callback=None):
-        import tornado.httpclient
-        import tornado.ioloop
-        tornado.httpclient.AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
-        http = tornado.httpclient.AsyncHTTPClient()
-        path = make_path((self._index, self._doc_type, '_search'))
-        uri = ES_HOST + path
-        body = json.dumps(q)
-        loop = tornado.ioloop.IOLoop.instance()
-        def es_query_callback(response):
-            if response.error:
-                print "Error:", response.error
-                response.rethrow()
-            else:
-                print "Success"
-                res = tornado.escape.json_decode(response.body)
-                callback(res)
-                loop.stop()
-        print uri
-        print body
-        response = http.fetch(uri, es_query_callback, method="POST", body=body)
-        loop.start()
-
     def _get_genedoc(self, hit, dotfield=True):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
@@ -755,6 +732,7 @@ class ESQueryBuilder():
         _query = self.add_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {'query': _query}
+        #_q['facets'] = {"taxid": {"terms": {"field": "taxid"}}}
         if self.options:
             _q.update(self.options)
         return _q

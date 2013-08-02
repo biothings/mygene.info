@@ -1,16 +1,16 @@
-import json
 import re
+
+from tornado.web import HTTPError
 from tornado.gen import coroutine, Task
 
 from helper import BaseHandler
-from utils.es import ESQuery
 from utils.es_async import ESQueryAsync
 
 
-
 class GeneHandler(BaseHandler):
-    esq = ESQuery()
+    esq = ESQueryAsync()
 
+    @coroutine
     def get(self, geneid=None):
         '''/gene/<geneid>
            geneid can be entrezgene, ensemblgene, retired entrezgene ids.
@@ -22,15 +22,15 @@ class GeneHandler(BaseHandler):
             kwargs = self.get_query_params()
             kwargs.setdefault('scopes', 'entrezgene,ensemblgene,retired')
             kwargs.setdefault('species', 'all')
-            gene = self.esq.get_gene2(geneid, **kwargs)
+            gene = yield Task(self.esq.get_gene2, geneid, **kwargs)
             if gene:
                 self.return_json(gene)
                 self.ga_track(event={'category': 'v2_api',
                                      'action': 'gene_get'})
             else:
-                raise tornado.web.HTTPError(404)
+                raise HTTPError(404)
         else:
-            raise tornado.web.HTTPError(404)
+            raise HTTPError(404)
 
     @coroutine
     def post(self, geneid=None):

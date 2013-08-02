@@ -1,4 +1,3 @@
-import json
 import re
 import tornado.web
 

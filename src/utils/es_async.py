@@ -29,6 +29,34 @@ class ESQueryAsync(ESQuery):
         self.es_connection.client.fetch(request=request_http, callback=callback)
         self._index = ES_INDEX_NAME_ALL     #reset self._index
 
+    def get_gene2(self, geneid, fields='all', **kwargs):
+        '''for /gene/<geneid>'''
+        callback = kwargs.pop('callback', None)
+        is_async = callback is not None
+
+        options = self._get_cleaned_query_options(fields, kwargs)
+        qbdr = ESQueryBuilder(**options.kwargs)
+        _q = qbdr.build_id_query(geneid, options.scopes)
+        if options.rawquery:
+            if is_async:
+                callback(_q)
+                return
+            else:
+                return _q
+        if is_async:
+            def inner_callback(response):
+                res = json.loads(response.body)
+                if not options.raw:
+                    res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
+                callback(res)
+            self._search_async(_q, callback=inner_callback)
+            return
+        else:
+            res =  self._search(_q)
+            if not options.raw:
+                res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
+            return res
+
     def _normalize_msearch_res(self, res, geneid_list, options):
         assert len(res) == len(geneid_list)
         _res = []
@@ -86,6 +114,10 @@ class ESQueryAsync(ESQuery):
 
     @staticmethod
     def _normalize_query_res(res):
+        if "error" in res:
+            return {'success': False,
+                    'error': "invalid query term."}
+
         _res = res['hits']
         _res['took'] = res['took']
         for v in _res['hits']:
