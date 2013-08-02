@@ -9,7 +9,7 @@ import tornadoes
 from utils.es import (ESQuery, ESQueryBuilder,
                       MGQueryError, ElasticSearchException,
                       ES_INDEX_NAME_ALL)
-
+from utils.dotfield import parse_dot_fields
 from config import ES_HOST
 
 class ESQueryAsync(ESQuery):
@@ -113,7 +113,7 @@ class ESQueryAsync(ESQuery):
 
 
     @staticmethod
-    def _normalize_query_res(res):
+    def _normalize_query_res(res, options):
         if "error" in res:
             return {'success': False,
                     'error': "invalid query term."}
@@ -128,6 +128,8 @@ class ESQueryAsync(ESQuery):
                     v.update(v[attr])
                     del v[attr]
                     break
+            if not options.dotfield:
+                parse_dot_fields(v)
         res = _res
         return res
 
@@ -189,7 +191,7 @@ class ESQueryAsync(ESQuery):
                 def inner_callback(response):
                     res = json.loads(response.body)
                     if not options.raw:
-                        res = self._normalize_query_res(res)
+                        res = self._normalize_query_res(res, options)
                     callback(res)
                 self._search_async(_q, species=kwargs['species'], callback=inner_callback)
                 return
@@ -197,7 +199,7 @@ class ESQueryAsync(ESQuery):
                 try:
                     res = self._search(_q, species=kwargs['species'])
                     if not options.raw:
-                        res = self._normalize_query_res(res)
+                        res = self._normalize_query_res(res, options)
                 except ElasticSearchException as err:
                     err_msg = err.message if options.raw else "invalid query term."
                     res = {'success': False,
