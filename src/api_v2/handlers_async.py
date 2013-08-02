@@ -1,6 +1,6 @@
 import json
 import re
-import tornado.web
+from tornado.gen import coroutine, Task
 
 from helper import BaseHandler
 from utils.es import ESQuery
@@ -32,6 +32,7 @@ class GeneHandler(BaseHandler):
         else:
             raise tornado.web.HTTPError(404)
 
+    @coroutine
     def post(self, geneid=None):
         '''
            This is essentially the same as post request in QueryHandler, with different defaults.
@@ -47,7 +48,7 @@ class GeneHandler(BaseHandler):
             ids = re.split('[\s\r\n+|,]+', ids)
             scopes = 'entrezgene,ensemblgene,retired'
             fields = kwargs.pop('fields', None)
-            res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
+            res = yield Task(self.esq.mget_gene2, ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
@@ -61,11 +62,7 @@ class GeneHandler(BaseHandler):
 class QueryHandler(BaseHandler):
     esq = ESQueryAsync()
 
-    def callback(self, res):
-        self.return_json(res)
-        self.finish()
-
-    @tornado.web.asynchronous
+    @coroutine
     def get(self):
         '''
         parameters:
@@ -88,19 +85,17 @@ class QueryHandler(BaseHandler):
                 value = kwargs.get(arg, None)
                 if value:
                     kwargs[arg] = int(value)
-            kwargs['callback'] = self.callback
-            self.esq.query(q, **kwargs)
-            return
+            res = yield Task(self.esq.query, q, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
-            self.callback(res)
 
-            # self.ga_track(event={'category': 'v2_api',
-            #                      'action': 'query_get',
-            #                      'label': 'qsize',
-            #                      'value': len(q) if q else 0})
+        self.return_json(res)
+        self.ga_track(event={'category': 'v2_api',
+                             'action': 'query_get',
+                             'label': 'qsize',
+                             'value': len(q) if q else 0})
 
-    @tornado.web.asynchronous
+    @coroutine
     def post(self):
         '''
         parameters:
@@ -117,17 +112,15 @@ class QueryHandler(BaseHandler):
             if scopes:
                 scopes = [x.strip() for x in scopes.split(',')]
             fields = kwargs.pop('fields', None)
-            kwargs['callback'] = self.callback
-            res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
-            return
+            res = yield Task(self.esq.mget_gene2, ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
-            self.callback(res)
 
-        # self.ga_track(event={'category': 'v2_api',
-        #                      'action': 'query_post',
-        #                      'label': 'qsize',
-        #                      'value': len(q) if q else 0})
+        self.return_json(res)
+        self.ga_track(event={'category': 'v2_api',
+                             'action': 'query_post',
+                             'label': 'qsize',
+                             'value': len(q) if q else 0})
 
 
 APP_LIST = [
