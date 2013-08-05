@@ -260,3 +260,10 @@ def test_metadata():
     get_ok(api + '/metadata')
 
 
+def test_query_facets():
+    res = json_ok(get_ok(api + '/query?q=cdk?&facets=taxid'))
+    ok_('facets' in res)
+    ok_('taxid' in res['facets'])
+    eq_(res['facets']['taxid']['total'], res['total'])
+    eq_(res['facets']['taxid']['other'], 0)
+    eq_(res['facets']['taxid']['missing'], 0)

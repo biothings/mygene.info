@@ -298,6 +298,7 @@ class ESQuery:
             if not options.raw:
                 _res = res['hits']
                 _res['took'] = res['took']
+                _res['facets'] = res['facets']
                 for v in _res['hits']:
                     del v['_type']
                     del v['_index']
@@ -403,6 +404,7 @@ class ESQueryBuilder():
             size       default 10
             sort       e.g. sort='entrezgene,-symbol'
             explain    true or false
+            facets     a field or a list of fields, default None
 
             entrezonly  default false
             ensemblonly default false
@@ -413,8 +415,9 @@ class ESQueryBuilder():
         self.entrezonly = self.options.pop('entrezonly', False)
         self.ensemblonly = self.options.pop('ensemblonly', False)
         self._parse_sort_option(self.options)
+        self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
-                                 'sort', 'explain', 'version']
+                                 'sort', 'explain', 'version', 'facets']
         for key in set(self.options) - set(self._allowed_options):
                 del self.options[key]
 
@@ -440,6 +443,15 @@ class ESQueryBuilder():
                     _f = {"%s" % field: "asc"}
                 _sort_array.append(_f)
             options["sort"] = _sort_array
+        return options
+
+    def _parse_facets_option(self, options):
+        facets = options.get('facets', None)
+        if facets:
+            _facets = {}
+            for field in facets.split(','):
+                _facets[field]= {"terms": {"field": field}}
+            options["facets"] = _facets
         return options
 
     def dis_max_query(self, q):
@@ -732,7 +744,6 @@ class ESQueryBuilder():
         _query = self.add_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {'query': _query}
-        #_q['facets'] = {"taxid": {"terms": {"field": "taxid"}}}
         if self.options:
             _q.update(self.options)
         return _q
