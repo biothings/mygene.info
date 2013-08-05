@@ -1,9 +1,15 @@
 # Required python modules for this project.
 # To install all requirement, run
 #    pip install -r requirements.txt
+#
+# also requires pycurl module, which is better installed globally using
+#
+# sudo apt-get install python-pycurl
+
 pyes>=0.19.1
 thrift>=0.9.0
-tornado>=2.4.1
+tornado>=3.1
+tornadoes>=1.4.0
 
 #for tracking API on Google Analytics
 pyga==2.4.2
