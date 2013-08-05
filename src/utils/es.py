@@ -18,6 +18,7 @@ from pyes.query import MatchAllQuery, StringQuery
 
 from config import ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL, ES_INDEX_TYPE
 from utils.common import is_int, timesofar, safe_genome_pos, dotdict, taxid_d
+from utils.dotfield import parse_dot_fields
 
 
 def get_es():
@@ -71,37 +72,16 @@ class ESQuery:
         else:
             self._index = ES_INDEX_NAME_TIER1
 
-    def _search_async(self, q, callback=None):
-        import tornado.httpclient
-        import tornado.ioloop
-        tornado.httpclient.AsyncHTTPClient.configure("tornado.curl_httpclient.CurlAsyncHTTPClient")
-        http = tornado.httpclient.AsyncHTTPClient()
-        path = make_path((self._index, self._doc_type, '_search'))
-        uri = ES_HOST + path
-        body = json.dumps(q)
-        loop = tornado.ioloop.IOLoop.instance()
-        def es_query_callback(response):
-            if response.error:
-                print "Error:", response.error
-                response.rethrow()
-            else:
-                print "Success"
-                res = tornado.escape.json_decode(response.body)
-                callback(res)
-                loop.stop()
-        print uri
-        print body
-        response = http.fetch(uri, es_query_callback, method="POST", body=body)
-        loop.start()
-
-    def _get_genedoc(self, hit):
+    def _get_genedoc(self, hit, dotfield=True):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
         if '_version' in hit:
             doc.setdefault('_version', hit['_version'])
+        if not dotfield:
+            doc = parse_dot_fields(doc)
         return doc
 
-    def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False):
+    def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=True):
         '''res is the dictionary returned from a query.'''
         if 'error' in res:
             return error
@@ -111,9 +91,9 @@ class ESQuery:
         if total == 0:
             return empty
         elif total == 1 and single_hit:
-            return self._get_genedoc(hits['hits'][0])
+            return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
         else:
-            return [self._get_genedoc(hit) for hit in hits['hits']]
+            return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
 
     def _cleaned_fields(self, fields):
         '''return a cleaned fields parameter.
@@ -190,10 +170,22 @@ class ESQuery:
         options = dotdict()
         options.raw = kwargs.pop('raw', False)
         options.rawquery = kwargs.pop('rawquery', False)
+        options.dotfield = kwargs.pop('dotfield', True) not in [False, 'false']
         scopes = kwargs.pop('scopes', None)
         if scopes:
             options.scopes = self._cleaned_fields(scopes)
         kwargs["fields"] = self._cleaned_fields(fields)
+        #if no dotfield in "fields", set dotfield always be True, i.e., no need to parse dotfield
+        if not options.dotfield:
+            _found_dotfield = False
+            if kwargs['fields']:
+                for _f in kwargs['fields']:
+                    if _f.find('.') != -1:
+                        _found_dotfield = True
+                        break
+            if not _found_dotfield:
+                options.dotfield = True
+
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         options.kwargs = kwargs
         return options
@@ -222,7 +214,9 @@ class ESQuery:
         if options.rawquery:
             return _q
         res =  self._search(_q)
-        return res if options.raw else self._cleaned_res(res, empty=None, single_hit=True)
+        if not options.raw:
+            res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
+        return res
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
         '''for /query post request'''
@@ -244,7 +238,7 @@ class ESQuery:
         for i in range(len(res)):
             hits = res[i]
             qterm = geneid_list[i]
-            hits = self._cleaned_res(hits, empty=[], single_hit=False)
+            hits = self._cleaned_res(hits, empty=[], single_hit=False, dotfield=options.dotfield)
             if len(hits) == 0:
                 _res.append({u'query': qterm,
                              u'notfound': True})
@@ -256,7 +250,6 @@ class ESQuery:
                     hit[u'query'] = qterm
                     _res.append(hit)
         return _res
-        #return [_res if raw else self._cleaned_res(_res, empty=None, single_hit=True) for _res in res['responses']]
 
     def query(self, q, fields=None, **kwargs):
         '''for /query?q=<query>'''
@@ -305,6 +298,7 @@ class ESQuery:
             if not options.raw:
                 _res = res['hits']
                 _res['took'] = res['took']
+                _res['facets'] = res['facets']
                 for v in _res['hits']:
                     del v['_type']
                     del v['_index']
@@ -313,6 +307,8 @@ class ESQuery:
                             v.update(v[attr])
                             del v[attr]
                             break
+                    if not options.dotfield:
+                        parse_dot_fields(v)
                 res = _res
         else:
             res = {'success': False, 'error': "Invalid query. Please check parameters."}
@@ -408,6 +404,7 @@ class ESQueryBuilder():
             size       default 10
             sort       e.g. sort='entrezgene,-symbol'
             explain    true or false
+            facets     a field or a list of fields, default None
 
             entrezonly  default false
             ensemblonly default false
@@ -418,8 +415,9 @@ class ESQueryBuilder():
         self.entrezonly = self.options.pop('entrezonly', False)
         self.ensemblonly = self.options.pop('ensemblonly', False)
         self._parse_sort_option(self.options)
+        self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
-                                 'sort', 'explain', 'version']
+                                 'sort', 'explain', 'version', 'facets']
         for key in set(self.options) - set(self._allowed_options):
                 del self.options[key]
 
@@ -445,6 +443,15 @@ class ESQueryBuilder():
                     _f = {"%s" % field: "asc"}
                 _sort_array.append(_f)
             options["sort"] = _sort_array
+        return options
+
+    def _parse_facets_option(self, options):
+        facets = options.get('facets', None)
+        if facets:
+            _facets = {}
+            for field in facets.split(','):
+                _facets[field]= {"terms": {"field": field}}
+            options["facets"] = _facets
         return options
 
     def dis_max_query(self, q):
@@ -932,4 +939,3 @@ def make_test_index():
     print conn.flush()
     print conn.refresh()
     print 'Done! - {} docs indexed.'.format(cnt)
-

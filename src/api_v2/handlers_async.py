@@ -1,13 +1,16 @@
 import re
-import tornado.web
+
+from tornado.web import HTTPError
+from tornado.gen import coroutine, Task
 
 from helper import BaseHandler
-from utils.es import ESQuery
+from utils.es_async import ESQueryAsync
 
 
 class GeneHandler(BaseHandler):
-    esq = ESQuery()
+    esq = ESQueryAsync()
 
+    @coroutine
     def get(self, geneid=None):
         '''/gene/<geneid>
            geneid can be entrezgene, ensemblgene, retired entrezgene ids.
@@ -19,16 +22,17 @@ class GeneHandler(BaseHandler):
             kwargs = self.get_query_params()
             kwargs.setdefault('scopes', 'entrezgene,ensemblgene,retired')
             kwargs.setdefault('species', 'all')
-            gene = self.esq.get_gene2(geneid, **kwargs)
+            gene = yield Task(self.esq.get_gene2, geneid, **kwargs)
             if gene:
                 self.return_json(gene)
                 self.ga_track(event={'category': 'v2_api',
                                      'action': 'gene_get'})
             else:
-                raise tornado.web.HTTPError(404)
+                raise HTTPError(404)
         else:
-            raise tornado.web.HTTPError(404)
+            raise HTTPError(404)
 
+    @coroutine
     def post(self, geneid=None):
         '''
            This is essentially the same as post request in QueryHandler, with different defaults.
@@ -44,7 +48,7 @@ class GeneHandler(BaseHandler):
             ids = re.split('[\s\r\n+|,]+', ids)
             scopes = 'entrezgene,ensemblgene,retired'
             fields = kwargs.pop('fields', None)
-            res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
+            res = yield Task(self.esq.mget_gene2, ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
@@ -55,11 +59,10 @@ class GeneHandler(BaseHandler):
                              'value': len(ids) if ids else 0})
 
 
-
-
 class QueryHandler(BaseHandler):
-    esq = ESQuery()
+    esq = ESQueryAsync()
 
+    @coroutine
     def get(self):
         '''
         parameters:
@@ -82,7 +85,7 @@ class QueryHandler(BaseHandler):
                 value = kwargs.get(arg, None)
                 if value:
                     kwargs[arg] = int(value)
-            res = self.esq.query(q, **kwargs)
+            res = yield Task(self.esq.query, q, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
@@ -92,7 +95,7 @@ class QueryHandler(BaseHandler):
                              'label': 'qsize',
                              'value': len(q) if q else 0})
 
-
+    @coroutine
     def post(self):
         '''
         parameters:
@@ -109,7 +112,7 @@ class QueryHandler(BaseHandler):
             if scopes:
                 scopes = [x.strip() for x in scopes.split(',')]
             fields = kwargs.pop('fields', None)
-            res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
+            res = yield Task(self.esq.mget_gene2, ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
