@@ -298,7 +298,8 @@ class ESQuery:
             if not options.raw:
                 _res = res['hits']
                 _res['took'] = res['took']
-                _res['facets'] = res['facets']
+                if "facets" in res:
+                    _res['facets'] = res['facets']
                 for v in _res['hits']:
                     del v['_type']
                     del v['_index']
