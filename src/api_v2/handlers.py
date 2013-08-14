@@ -74,6 +74,7 @@ class QueryHandler(BaseHandler):
         '''
         kwargs = self.get_query_params()
         q = kwargs.pop('q', None)
+        _has_error = False
         if q:
             explain = self.get_argument('explain', None)
             if explain and explain.lower()=='true':
@@ -81,8 +82,13 @@ class QueryHandler(BaseHandler):
             for arg in ['from', 'size', 'mode']:
                 value = kwargs.get(arg, None)
                 if value:
-                    kwargs[arg] = int(value)
-            res = self.esq.query(q, **kwargs)
+                    try:
+                        kwargs[arg] = int(value)
+                    except ValueError:
+                        res = {'success': False, 'error': 'Parameter "{}" must be an integer.'.format(arg)}
+                        _has_error = True
+            if not _has_error:
+                res = self.esq.query(q, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
