@@ -28,6 +28,7 @@ from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
 from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
 from demo.handlers import APP_LIST as demo_app_list
+#from auth.handlers import APP_LIST as auth_app_list
 
 __USE_WSGI__ = False
 DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
@@ -89,6 +90,7 @@ APP_LIST = [
         (r"/status", StatusCheckHandler),
         (r"/metadata", MetaDataHandler),
         (r"/v2/metadata", MetaDataHandler),
+        (r"/v2a/metadata", MetaDataHandler),
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)
@@ -97,6 +99,7 @@ APP_LIST += add_apps('v1', api_v1_app_list)
 APP_LIST += add_apps('demo', demo_app_list)
 
 APP_LIST += add_apps('v2a', api_v2_async_app_list)
+#APP_LIST += add_apps('auth', auth_app_list)
 if options.debug:
     APP_LIST += [
             #/widget/* static path
@@ -110,10 +113,9 @@ if options.debug:
 #     from config import STATIC_PATH
     settings.update({
          "static_path": STATIC_PATH,
-# #        "cookie_secret": COOKIE_SECRET,
-# #        "login_url": LOGIN_URL,
-# #        "xsrf_cookies": True,
      })
+#    from config import auth_settings
+#    settings.update(auth_settings)
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)
