@@ -17,7 +17,7 @@ from pyes.utils import make_path
 from pyes.query import MatchAllQuery, StringQuery
 
 from config import ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL, ES_INDEX_TYPE
-from utils.common import is_int, timesofar, safe_genome_pos, dotdict, taxid_d
+from utils.common import ask, is_int, timesofar, safe_genome_pos, dotdict, taxid_d
 from utils.dotfield import parse_dot_fields
 
 
@@ -409,12 +409,15 @@ class ESQueryBuilder():
 
             entrezonly  default false
             ensemblonly default false
+            userfilter  optional, provide the name of a saved user filter (in "userfilters" index)
 
         """
         self.options = query_options
         self.species = self.options.pop('species', 'all')   #species should be either 'all' or a list of taxids.
         self.entrezonly = self.options.pop('entrezonly', False)
         self.ensemblonly = self.options.pop('ensemblonly', False)
+        userfilter = self.options.pop('userfilter', None)
+        self.userfilter = userfilter.split(',') if userfilter else None
         self._parse_sort_option(self.options)
         self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
@@ -672,6 +675,15 @@ class ESQueryBuilder():
             filters.append({
                  "exists" : { "field" : "ensemblgene" }
                 })
+
+        if self.userfilter:
+            _uf = UserFilters()
+            for _fname in self.userfilter:
+                _filter = _uf.get(_fname)
+                if _filter:
+                    print _filter.keys()
+                    filters.append(_filter['filter'])
+
         if filters:
             if len(filters) == 1:
                 filters = filters[0]
@@ -899,6 +911,86 @@ class ESQueryBuilder():
         if self.options:
             _q.update(self.options)
         return _q
+
+class UserFilters:
+    def __init__(self):
+        self.conn = es
+        self.ES_INDEX_NAME = 'userfilters'
+        self.ES_INDEX_TYPE = 'filter'
+        self._MAPPING = {
+           "dynamic": False,
+           "properties": {}
+        }   #this mapping disables indexing completely since we don't need it.
+
+    def create(self):
+        print "Creating index...",
+        print self.conn.create_index(self.ES_INDEX_NAME)
+        print "Updating mapping...",
+        print self.conn.put_mapping(self.ES_INDEX_TYPE ,
+                                    self._MAPPING,
+                                    [self.ES_INDEX_NAME])
+
+    def add(self, name, id_list=[], id_field="entrezgene", raw_filter=None):
+        '''add a named filter.'''
+        _filter = None
+        if raw_filter:
+            _filter = raw_filter
+        elif id_list and id_field:
+            _filter = {
+                "terms": {id_field: id_list}
+                }
+        if _filter:
+            print 'Adding filter "{}"...'.format(name),
+            _doc = {'_id': name,
+                    'filter': _filter}
+            print self.conn.index(_doc, self.ES_INDEX_NAME,
+                                  self.ES_INDEX_TYPE,
+                                  id=_doc['_id'])
+        else:
+            print "No filter to add."
+
+    def get(self, name):
+        '''get a named filter.'''
+        try:
+            return self.conn.get(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name)['_source']
+        except NotFoundException:
+            return None
+
+    def count(self):
+        n = self.conn.count(None, self.ES_INDEX_NAME, self.ES_INDEX_TYPE)['count']
+        return n
+
+    def get_all(self, skip=0, size=1000):
+        '''get all named filter.'''
+        print '\ttotal filters: {}'.format(self.count())
+        q = {"query": {"match_all": {}}}
+        res = self.conn.search_raw(q, indices=self.ES_INDEX_NAME, doc_types=self.ES_INDEX_TYPE,
+                              **{"from": str(skip), "size": str(1000)})
+        return [hit['_source'] for hit in res.hits.hits]
+
+    def delete(self, name, noconfirm=False):
+        '''delete a named filter.'''
+        _filter = self.get(name)
+        if _filter:
+            msg = 'Found filter "{}". Continue to delete it?'.format(name)
+            if noconfirm or ask(msg) == 'Y':
+                print 'Deleting filter "{}"...'.format(name),
+                print self.conn.delete(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name)
+        else:
+            print 'Filter "{}" does not exist. Abort now.'.format(name)
+
+    def rename(self, name, newname):
+        '''"rename" a named filter.
+           Basically, this needs to create a new doc and delete the old one.
+        '''
+        _filter = self.get(name)
+        if _filter:
+            msg = 'Found filter "{}". Rename it to "{}"?'.format(name, newname)
+            if ask(msg) == 'Y':
+                self.add(newname, raw_filter=_filter['filter'])
+                self.delete(name, noconfirm=True)
+        else:
+            print 'Filter "{}" does not exist. Abort now.'.format(name)
 
 
 def make_test_index():
