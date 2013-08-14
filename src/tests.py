@@ -205,6 +205,26 @@ def test_query_interval():
     ok_('_id' in res['hits'][0])
 
 
+def test_query_size():
+    res = json_ok(get_ok(api + '/query?q=cdk?'))
+    eq_(len(res['hits']), 10)  #default is 10
+    ok_(res['total']>10)
+
+    res = json_ok(get_ok(api + '/query?q=cdk?&size=0'))
+    eq_(len(res['hits']), 0)
+
+    res = json_ok(get_ok(api + '/query?q=cdk?&limit=20'))
+    eq_(len(res['hits']), 20)
+
+    res1 = json_ok(get_ok(api + '/query?q=cdk?&from=0&size=20'))
+    res = json_ok(get_ok(api + '/query?q=cdk?&skip=10&size=20'))
+    eq_(len(res['hits']), 20)
+    eq_(res['hits'][0], res1['hits'][10])
+
+    res = json_ok(get_ok(api + '/query?q=cdk?&size=1a'), checkerror=False)  #invalid size parameter
+    assert 'error' in res
+
+
 def test_gene():
     res = json_ok(get_ok(api + '/gene/1017'))
     eq_(res['entrezgene'], 1017)
@@ -267,3 +287,12 @@ def test_query_facets():
     eq_(res['facets']['taxid']['total'], res['total'])
     eq_(res['facets']['taxid']['other'], 0)
     eq_(res['facets']['taxid']['missing'], 0)
+
+
+def test_query_userfilter():
+    res1 = json_ok(get_ok(api + '/query?q=cdk'))
+    res2 = json_ok(get_ok(api + '/query?q=cdk&userfilter=bgood_cure_griffith'))
+    ok_(res1['total'] > res2['total'])
+
+    res2 = json_ok(get_ok(api + '/query?q=cdk&userfilter=aaaa'))   #nonexisting user filter gets ignored.
+    eq_(res1['total'], res2['total'])
