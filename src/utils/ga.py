@@ -1,8 +1,11 @@
-from pyga.requests import Tracker, Page, Session, Visitor, Event
+from pyga.requests import Tracker, Page, Session, Visitor, Event, PageViewRequest, EventRequest
 import config
+
+from tornado.httpclient import HTTPRequest, AsyncHTTPClient
 
 class GAMixIn:
     def ga_track(self, event={}):
+        _req_list = []
         if getattr(config, 'RUN_IN_PROD', False) and hasattr(config, "GA_ACCOUNT"):
             _req = self.request
             remote_ip = _req.headers.get("X-Real-Ip",
@@ -19,7 +22,32 @@ class GAMixIn:
             session = Session()
             page = Page(_req.path)
             tracker = Tracker(config.GA_ACCOUNT, 'mygene.info')
-            tracker.track_pageview(page, session, visitor)
+            #tracker.track_pageview(page, session, visitor)  #this is non-async request
+            pvr=PageViewRequest(config=tracker.config,
+                                tracker=tracker,
+                                visitor=visitor,
+                                session=session,
+                                page=page)
+            r = pvr.build_http_request()
+            _req_list.append(HTTPRequest(r.get_full_url(),
+                                         "POST" if r.has_data() else "GET",
+                                         headers=r.headers,
+                                         body = r.data))
             if event:
                 evt = Event(**event)
-                tracker.track_event(evt, session, visitor)
+                #tracker.track_event(evt, session, visitor)  #this is non-async request
+                er = EventRequest(config=tracker.config,
+                                  tracker=tracker,
+                                  visitor=visitor,
+                                  session=session,
+                                  event=evt)
+                r = er.build_http_request()
+                _req_list.append(HTTPRequest(r.get_full_url(),
+                                             "POST" if r.has_data() else "GET",
+                                             headers=r.headers,
+                                             body = r.data))
+
+            #now send actual async requests
+            http_client = AsyncHTTPClient()
+            for _req in _req_list:
+                http_client.fetch(_req)
