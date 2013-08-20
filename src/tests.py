@@ -288,6 +288,11 @@ def test_query_facets():
     eq_(res['facets']['taxid']['other'], 0)
     eq_(res['facets']['taxid']['missing'], 0)
 
+    res2 = json_ok(get_ok(api + '/query?q=cdk?&facets=taxid&species_facet_filter=human'))
+    eq_(res2['facets']['taxid']['total'], res['total'])
+    eq_(res2['facets']['taxid'], res['facets']['taxid'])
+    eq_([x["count"] for x in res2['facets']['taxid']['terms'] if x["term"] == 9606][0], res2['total'])
+
 
 def test_query_userfilter():
     res1 = json_ok(get_ok(api + '/query?q=cdk'))

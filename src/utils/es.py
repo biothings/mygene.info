@@ -170,6 +170,7 @@ class ESQuery:
         options = dotdict()
         options.raw = kwargs.pop('raw', False)
         options.rawquery = kwargs.pop('rawquery', False)
+        #if dofield is false, returned fields contains dot notation will be restored as an object.
         options.dotfield = kwargs.pop('dotfield', True) not in [False, 'false']
         scopes = kwargs.pop('scopes', None)
         if scopes:
@@ -186,7 +187,12 @@ class ESQuery:
             if not _found_dotfield:
                 options.dotfield = True
 
+        #this species parameter is added to the query, thus will change facet counts.
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
+
+        #this parameter is to add species filter without changing facet counts.
+        kwargs['species_facet_filter'] = self._cleaned_species(kwargs.get('species_facet_filter', None))
+
         options.kwargs = kwargs
         return options
 
@@ -407,6 +413,8 @@ class ESQueryBuilder():
             explain    true or false
             facets     a field or a list of fields, default None
 
+            species
+            species_facet_filter
             entrezonly  default false
             ensemblonly default false
             userfilter  optional, provide the name of a saved user filter (in "userfilters" index)
@@ -414,6 +422,7 @@ class ESQueryBuilder():
         """
         self.options = query_options
         self.species = self.options.pop('species', 'all')   #species should be either 'all' or a list of taxids.
+        self.species_facet_filter = self.options.pop('species_facet_filter', None)
         self.entrezonly = self.options.pop('entrezonly', False)
         self.ensemblonly = self.options.pop('ensemblonly', False)
         userfilter = self.options.pop('userfilter', None)
@@ -638,7 +647,7 @@ class ESQueryBuilder():
         return _query
 
     def add_species_filter(self, _query):
-        """deprecated! replaced by add_filters"""
+        """deprecated! replaced by  """
         if self.species == 'all':
             #do not apply species filter
             return _query
@@ -655,7 +664,10 @@ class ESQueryBuilder():
         }
         return _query
 
-    def get_filters(self):
+    def get_query_filters(self):
+        '''filters added here will be applied in a filtered query,
+           thus will affect the facet counts.
+        '''
         filters = []
         #species filter
         if self.species and self.species != 'all':
@@ -681,7 +693,6 @@ class ESQueryBuilder():
             for _fname in self.userfilter:
                 _filter = _uf.get(_fname)
                 if _filter:
-                    print _filter.keys()
                     filters.append(_filter['filter'])
 
         if filters:
@@ -693,18 +704,52 @@ class ESQueryBuilder():
 
         return filters
 
-    def add_filters(self, _query):
-        filters = self.get_filters()
+    def add_query_filters(self, _query):
+        '''filters added here will be applied in a filtered query,
+           thus will affect the facet counts.
+        '''
+        filters = self.get_query_filters()
         if not filters:
             return _query
 
+        #add filters as filtered query
+        #this will apply to facet counts
         _query = {
             'filtered': {
                 'query': _query,
                 'filter' : filters
             }
         }
+
         return _query
+
+    def add_facet_filters(self, _query):
+        """To add filters (e.g. taxid) to restrict returned hits,
+            but does not change the scope for facet counts.
+        """
+        filters = []
+        #species_facet_filter
+        if self.species_facet_filter:
+            if len(self.species) == 1:
+                filters.append({
+                     "term" : {"taxid" : self.species_facet_filter[0] }
+                    })
+            else:
+                filters.append({
+                     "terms" : {"taxid" : self.species_facet_filter }
+                    })
+        if filters:
+            if len(filters) == 1:
+                filters = filters[0]
+            else:
+                #concatenate multiple filters with "and" filter
+                filters = {"and": filters}
+
+            #this will not change facet counts
+            _query["filter"] = filters
+
+        return _query
+
 
     def add_species_custom_filters_score(self, _query):
         _query = {
@@ -729,7 +774,6 @@ class ESQueryBuilder():
                     "filter" : { "term" : { "taxid" : 10116 } },
                     "boost" : "1.1"
                 },
-
             ],
             "score_mode" : "first"
             }
@@ -753,10 +797,10 @@ class ESQueryBuilder():
         else:
             _query = self.string_query(q)
 
-        #_query = self.add_species_filter(_query)
-        _query = self.add_filters(_query)
+        _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {'query': _query}
+        _q = self.add_facet_filters(_q)
         if self.options:
             _q.update(self.options)
         return _q
@@ -844,7 +888,7 @@ class ESQueryBuilder():
                 raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 
         #_query = self.add_species_filter(_query)
-        _query = self.add_filters(_query)
+        _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
         if self.options:
@@ -866,7 +910,7 @@ class ESQueryBuilder():
             }
         }
         #_query = self.add_species_filter(_query)
-        _query = self.add_filters(_query)
+        _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
         if self.options:
@@ -906,7 +950,7 @@ class ESQueryBuilder():
         #         }
         #     }
         # }
-        _query = self.add_filters(_query)
+        _query = self.add_query_filters(_query)
         _q = {'query': _query}
         if self.options:
             _q.update(self.options)
