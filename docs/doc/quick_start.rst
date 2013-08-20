@@ -18,7 +18,7 @@ Examples
 ::
 
     http://mygene.info/v2/query?q=cdk2
-    http://mygene.info/v2/query?q=cdk2&species:human
+    http://mygene.info/v2/query?q=cdk2&species=human
     http://mygene.info/v2/query?q=cdk?
     http://mygene.info/v2/query?q=IL*
     http://mygene.info/v2/query?q=entrezgene:1017
