@@ -86,7 +86,7 @@ blockquote p {
     width: 100%;
     display: block;
     text-align: center;
-    font-size: 10px;
+    font-weight: bold;
 }
 
 .v1_box {
