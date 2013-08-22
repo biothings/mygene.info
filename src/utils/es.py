@@ -109,14 +109,14 @@ class ESQuery:
             fields = self._default_fields
         return fields
 
-    def _cleaned_species(self, species):
+    def _cleaned_species(self, species, default_to_none=False):
         '''return a cleaned species parameter.
            should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
            returned species is always a list of taxids (even when only one species)
         '''
         if species is None:
             #set to default_species
-            return self._default_species
+            return None if default_to_none else self._default_species
         if type(species) is types.IntType:
             return [species]
 
@@ -191,7 +191,8 @@ class ESQuery:
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
 
         #this parameter is to add species filter without changing facet counts.
-        kwargs['species_facet_filter'] = self._cleaned_species(kwargs.get('species_facet_filter', None))
+        kwargs['species_facet_filter'] = self._cleaned_species(kwargs.get('species_facet_filter', None),
+                                                               default_to_none=True)
 
         options.kwargs = kwargs
         return options
