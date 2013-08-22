@@ -9,7 +9,10 @@
 pyes>=0.19.1
 thrift>=0.9.0
 tornado>=3.1
-tornadoes>=1.4.0
+tornadoes>=1.4.1
+#the following patched version has been merged into v1.4.1
+#-e git+git://github.com/newgene/tornado-es.git#egg=tornadoes   #this is a patched version of tornadoes
+
 
 #for tracking API on Google Analytics
 pyga==2.4.2
@@ -21,5 +24,3 @@ sphinx-bootstrap-theme==0.2.4
 #for nosetests
 nose>=1.3.0
 httplib2>=0.8
-
-
