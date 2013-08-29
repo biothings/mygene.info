@@ -19,7 +19,7 @@ pyga==2.4.2
 
 #for build sphinx docs
 Sphinx==1.2b1
-sphinx-bootstrap-theme==0.2.4
+sphinx-bootstrap-theme==0.2.7
 
 #for nosetests
 nose>=1.3.0
