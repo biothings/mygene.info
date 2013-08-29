@@ -253,7 +253,11 @@ try:
     html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
     html_theme_options = {
     'bootswatch_theme': "simplex",
-    'navbar_site_name': "Index",
+    'navbar_site_name': "Documentation",
+    'navbar_links': [('Home', '/', 1),
+                     ("Try API live!", 'http://mygene.info/v2/api', 1),
+                     ],
+    'source_link_position': 'footer',
     }
 except ImportError:
     print 'Warning: "sphinx_bootstrap_theme" is not installed, fall back to default theme.'
