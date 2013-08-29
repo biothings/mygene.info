@@ -6,7 +6,7 @@ import tornado.ioloop
 #an alternative:
 #watchmedo shell-command --pattern="*.rst;*.py" --recursive --command="make html" .
 
-included_ext = ['.py', '.rst', '.css']
+included_ext = ['.py', '.rst', '.css', '.html']
 
 def build():
     subprocess.call('make html'.split())
