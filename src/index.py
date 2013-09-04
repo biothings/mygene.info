@@ -78,6 +78,8 @@ class MainHandler(tornado.web.RequestHandler):
 
 class MetaDataHandler(BaseHandler):
     '''Return db metadata in json string.'''
+    disable_caching = True
+
     def get(self):
         esq = ESQuery()
         metadata = esq.metadata()

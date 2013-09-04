@@ -6,6 +6,8 @@ from utils.ga import GAMixIn
 
 class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter='callback'
+    cache_max_age=604800  # 7days
+    disable_caching=False
 
     def _check_fields_param(self, kwargs):
         '''support "filter" as an alias of "fields" parameter for back-compatability.'''
@@ -53,9 +55,10 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         _json_data = json.dumps(data) if encode else data
         self.set_header("Content-Type", "application/json; charset=UTF-8")
-        #get etag if data is a dictionary and has "etag" attribute.
-        etag = data.get('etag', None) if isinstance(data, dict) else None
-        self.set_cacheable(etag=etag)
+        if not self.disable_caching:
+            #get etag if data is a dictionary and has "etag" attribute.
+            etag = data.get('etag', None) if isinstance(data, dict) else None
+            self.set_cacheable(etag=etag)
         self.support_cors();
         if jsoncallback:
             self.write('%s(%s)' % (jsoncallback, _json_data))
@@ -66,7 +69,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
         '''set proper header to make the response cacheable.
            set etag if provided.
         '''
-        self.set_header("Cache-Control", "max-age=604800, public")  # 7days
+        self.set_header("Cache-Control", "max-age={}, public".format(self.cache_max_age))
         if etag:
             self.set_header('Etag', etag)
 
