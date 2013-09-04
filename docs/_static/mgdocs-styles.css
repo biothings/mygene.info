@@ -78,6 +78,11 @@ blockquote p {
     font-size: 12px;
 }
 
+#twitter-widget-0 {
+      width: 100% !important;
+      height: 150px !important;
+}
+
 .gene-object-containter pre {
     max-height: 500px;
     overflow:auto;

@@ -25,11 +25,18 @@ MyGene.info : Gene Annotation Query as a Service
     </p>
     <script type="text/javascript" src="_static/get_meta.js" charset="utf-8"></script>
 
+
 .. container:: mg-citation
 
     To cite MyGene.info::
 
         Wu C, MacLeod I, Su AI (2013) BioGPS and MyGene.info: organizing online, gene-centric information. Nucl. Acids Res. 41(D1): D561-D565.
+
+.. raw:: html
+
+    <a class="twitter-timeline" Width="100%" height="200px" data-chrome="noborders transparent noscrollbar" href="https://twitter.com/mygeneinfo" data-widget-id="372882575196299264">Tweets by @mygeneinfo</a>
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
 
 
 What's new in v2 API
@@ -102,7 +109,8 @@ Who is using MyGene.info?
 Contact us
 -------------------------
 
-Your feedback to <help@mygene.info> is welcome.
+* help@mygene.info
+* `@mygeneinfo <https://twitter.com/mygeneinfo>`_
 
 
 .. raw:: html
