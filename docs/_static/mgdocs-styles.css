@@ -29,6 +29,29 @@ h4 {
     font-size: 15px !important;
 }
 
+body{
+    font-size: 14px !important;
+}
+
+h1 {
+    font-size: 38px !important;
+    font-weight: boldx !important;
+}
+
+h2 {
+    font-size: 31px;
+    font-weight: boldx !important;
+}
+
+h3 {
+    font-weight: boldx !important;
+}
+
+.navbar-brand {
+    font-size: 20px !important;
+    font-weight: bold !important;
+}
+
 .navbar-search,
 .navbar-search .search-query {
     width: 120px !important;
@@ -80,7 +103,7 @@ blockquote p {
 
 #twitter-widget-0 {
       width: 100% !important;
-      height: 150px !important;
+      height: 180px !important;
 }
 
 .gene-object-containter pre {

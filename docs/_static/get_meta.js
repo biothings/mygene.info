@@ -110,9 +110,13 @@ domready(function () {
   if (!myConn) alert("XMLHTTP not available. Try a newer/better browser.");
   var update_status = function (oXML) {
     if (oXML.status == 200){
+      meta = eval('('+oXML.responseText+')');
+      var d = meta['src_version'];
+      d['total_genes'] = meta['stats']['total_genes'];
       //var status_text = 'Status: NCBI snapshot: %NCBI_SNAPSHOT%, ensembl release: %ENSEMBL_MART_VERSION%, NetAffy: %NETAFFY_RELEASE%, <a href="/metadata">view complete</a>.'
-      var status_text = 'Status: NCBI snapshot: %entrez%, Ensembl release: %ensembl%, UniProt: %uniprot%, NetAffy: %netaffy%, <a href="/v2/metadata">view complete</a>.'
-      var status_text = template(status_text, eval('('+oXML.responseText+')')['src_version'])
+      //var status_text = 'Stats: total genes: %total_genes% Status: NCBI snapshot: %entrez%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  NetAffy: %netaffy%,  <a href="/v2/metadata">view complete</a>.'
+      var status_text = 'Status: NCBI snapshot: %entrez%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  UCSC: %ucsc%, NetAffy: %netaffy%,  <a href="/v2/metadata">view complete</a>.'
+      var status_text = template(status_text, d)
       var el = document.getElementById('status_text')
       if (el) el.innerHTML = status_text;
     }
