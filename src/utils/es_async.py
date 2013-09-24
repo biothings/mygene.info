@@ -14,6 +14,7 @@ from config import ES_HOST
 
 class ESQueryAsync(ESQuery):
     es_connection = tornadoes.ESConnection(ES_HOST.split(':')[0])
+    es_connection.httprequest_kwargs = {'request_timeout': 30.}  #increase default timeout from 20 to 30s
 
     def _search_async(self, q, species='all', callback=None):
         self._set_index(species)
@@ -25,7 +26,8 @@ class ESQueryAsync(ESQuery):
     def _msearch_async(self, q, species='all', callback=None):
         self._set_index(species)
         path = '/'.join((self.es_connection.url, self._index, self._doc_type, '_msearch'))
-        request_http = tornadoes.HTTPRequest(path, method="POST", body=q)
+        request_http = tornadoes.HTTPRequest(path, method="POST", body=q,
+                                             **self.es_connection.httprequest_kwargs)
         self.es_connection.client.fetch(request=request_http, callback=callback)
         self._index = ES_INDEX_NAME_ALL     #reset self._index
 
@@ -101,9 +103,13 @@ class ESQueryAsync(ESQuery):
                 return _q
         if is_async:
             def inner_callback(response):
-                res = json.loads(response.body)['responses']
-                if not options.raw:
-                    res = self._normalize_msearch_res(res, geneid_list, options)
+                if response.code == 599 and response.body is None:
+                    res = {'success': False,
+                           'error': 'timeout'}
+                else:
+                    res = json.loads(response.body)['responses']
+                    if not options.raw:
+                        res = self._normalize_msearch_res(res, geneid_list, options)
                 callback(res)
             self._msearch_async(_q, species=kwargs['species'], callback=inner_callback)
             return
@@ -214,3 +220,4 @@ class ESQueryAsync(ESQuery):
             return
         else:
             return res
+
