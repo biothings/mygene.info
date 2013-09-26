@@ -102,7 +102,7 @@ def test_gene_object():
                'ec', 'ensembl', 'entrezgene', 'genomic_pos', 'go', 'homologene',
                'interpro', 'ipi', 'map_location', 'name', 'pdb', 'pharmgkb', 'pir',
                'prosite', 'reagent', 'refseq', 'reporter', 'summary', 'symbol',
-               'taxid', 'type_of_gene', 'unigene', 'uniprot']
+               'taxid', 'type_of_gene', 'unigene', 'uniprot', 'exons', 'generif']
     for attr in attr_li:
         assert res.get(attr, None) is not None, 'Missing field "{}" in gene "1017"'.format(attr)
 
@@ -152,16 +152,27 @@ def test_gene_object():
     assert res.get(attr, None) is not None, 'Missing field "{}" in gene "406881"'.format(attr)
 
 
+def has_hits(q):
+    d = json_ok(get_ok(api + '/query?q='+q))
+    ok_(d.get('total', 0) > 0 and len(d.get('hits', [])) > 0)
+
+
 def test_query():
     #public query api at /query via get
-    json_ok(get_ok(api + '/query?q=cdk2'))
-    json_ok(get_ok(api + '/query?q=GO:0004693'))
-    json_ok(get_ok(api + '/query?q=211803_at'))
+    # json_ok(get_ok(api + '/query?q=cdk2'))
+    # json_ok(get_ok(api + '/query?q=GO:0004693'))
+    # json_ok(get_ok(api + '/query?q=211803_at'))
+    has_hits('cdk2')
+    has_hits('GO:0004693')
+    has_hits('211803_at')
+    has_hits('IPR008351')
+    has_hits('hsa-mir-503')
+    has_hits('hsa-miR-503')
 
     #test fielded query
-    json_ok(get_ok(api + '/query?q=symbol:cdk2'))
+    has_hits('symbol:cdk2')
     #test interval query
-    json_ok(get_ok(api + '/query?q=chr1:151,073,054-151,383,976&species=human'))
+    has_hits('chr1:151,073,054-151,383,976&species=human')
 
     con = get_ok(api + '/query?q=cdk2&callback=mycallback')
     ok_(con.startswith('mycallback('))
@@ -217,10 +228,15 @@ def test_query_size():
     eq_(len(res['hits']), 20)
 
     res1 = json_ok(get_ok(api + '/query?q=cdk?&from=0&size=20'))
+    #res2 = json_ok(get_ok(api + '/query?q=cdk*&from=0&size=20'))
     res = json_ok(get_ok(api + '/query?q=cdk?&skip=10&size=20'))
+    #eq_([x['_id'] for x in res1['hits']],[x['_id'] for x in res2['hits']])
     eq_(len(res['hits']), 20)
+    #print res1['hits'].index(res['hits'][0])
+    #print [x['_id'] for x in res1['hits']]
     eq_(res['hits'][0], res1['hits'][10])
 
+    #assert 1==0
     res = json_ok(get_ok(api + '/query?q=cdk?&size=1a'), checkerror=False)  #invalid size parameter
     assert 'error' in res
 
