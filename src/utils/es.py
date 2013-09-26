@@ -533,13 +533,25 @@ class ESQueryBuilder():
                         "boost_factor": 1.1
                     }
                     },
+                    # {
+                    # "custom_boost_factor": {
+                    #     "query" : {
+                    #         "match" : { "_all" : {
+                    #                         "query": "%(q)s",
+                    #                         "analyzer": "whitespace_lowercase"
+                    #             }
+                    #         },
+                    #     },
+                    #     "boost_factor": 1
+                    # }
+                    # },
                     {
                     "custom_boost_factor": {
                         "query" : {
-                            "match" : { "_all" : {
+                            "query_string" : {
                                             "query": "%(q)s",
-                                            "analyzer": "whitespace_lowercase"
-                                }
+                                            "default_operator": "AND",
+                                            "auto_generate_phrase_queries": True
                             },
                         },
                         "boost_factor": 1
