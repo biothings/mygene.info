@@ -268,9 +268,8 @@ species
 
 fields
 """"""
-    Optional, can be a comma-separated fields to limit the fields returned from the matching hits.
-    If “fields=all”, all available fields will be returned.
-    Default: “symbol,name,taxid,entrezgene,ensemblgene”.
+    Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v2/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
+    "symbol,name,taxid,entrezgene,ensemblgene".
 
 Example code
 ------------
