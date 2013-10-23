@@ -1,12 +1,15 @@
-from pyga.requests import Tracker, Page, Session, Visitor, Event, PageViewRequest, EventRequest
+from tornado.httpclient import HTTPRequest, AsyncHTTPClient
+from pyga.requests import (Tracker, Page, Session, Visitor,
+                           Event, PageViewRequest, EventRequest)
 import config
 
-from tornado.httpclient import HTTPRequest, AsyncHTTPClient
 
 class GAMixIn:
     def ga_track(self, event={}):
         _req_list = []
-        if getattr(config, 'RUN_IN_PROD', False) and hasattr(config, "GA_ACCOUNT"):
+        no_tracking = self.get_argument('no_tracking', None)
+        is_prod = getattr(config, 'RUN_IN_PROD', False)
+        if not no_tracking and is_prod and hasattr(config, "GA_ACCOUNT"):
             _req = self.request
             remote_ip = _req.headers.get("X-Real-Ip",
                         _req.headers.get("X-Forwarded-For",
@@ -22,17 +25,17 @@ class GAMixIn:
             session = Session()
             page = Page(_req.path)
             tracker = Tracker(config.GA_ACCOUNT, 'mygene.info')
-            #tracker.track_pageview(page, session, visitor)  #this is non-async request
-            pvr=PageViewRequest(config=tracker.config,
-                                tracker=tracker,
-                                visitor=visitor,
-                                session=session,
-                                page=page)
+            # tracker.track_pageview(page, session, visitor)  #this is non-async request
+            pvr = PageViewRequest(config=tracker.config,
+                                  tracker=tracker,
+                                  visitor=visitor,
+                                  session=session,
+                                  page=page)
             r = pvr.build_http_request()
             _req_list.append(HTTPRequest(r.get_full_url(),
                                          "POST" if r.has_data() else "GET",
                                          headers=r.headers,
-                                         body = r.data))
+                                         body=r.data))
             if event:
                 evt = Event(**event)
                 #tracker.track_event(evt, session, visitor)  #this is non-async request
@@ -45,7 +48,7 @@ class GAMixIn:
                 _req_list.append(HTTPRequest(r.get_full_url(),
                                              "POST" if r.has_data() else "GET",
                                              headers=r.headers,
-                                             body = r.data))
+                                             body=r.data))
 
             #now send actual async requests
             http_client = AsyncHTTPClient()
