@@ -220,7 +220,7 @@ class ESQuery:
         _q = qbdr.build_id_query(geneid, options.scopes)
         if options.rawquery:
             return _q
-        res =  self._search(_q)
+        res =  self._search(_q, species=options.kwargs['species'])
         if not options.raw:
             res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
         return res

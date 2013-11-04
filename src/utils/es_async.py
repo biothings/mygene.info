@@ -51,7 +51,7 @@ class ESQueryAsync(ESQuery):
                 if not options.raw:
                     res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
                 callback(res)
-            self._search_async(_q, callback=inner_callback)
+            self._search_async(_q, species=options.kwargs['species'], callback=inner_callback)
             return
         else:
             res =  self._search(_q)
