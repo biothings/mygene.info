@@ -7,3 +7,4 @@ ES_INDEX_TYPE = 'gene'
 #relevant for running in prod
 GA_ACCOUNT = 'UA-xxxxxxxx-x'
 RUN_IN_PROD = False   # set to True in prod
+INCLUDE_DOCS = True   # if True, include the links to mygene.info docs

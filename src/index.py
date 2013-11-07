@@ -22,6 +22,7 @@ from tornado.options import define, options
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 if src_path not in sys.path:
     sys.path.append(src_path)
+from config import INCLUDE_DOCS
 from utils.es import ESQuery
 from helper import add_apps, BaseHandler
 from api_v1.handlers import APP_LIST as api_v1_app_list
@@ -32,7 +33,7 @@ from demo.handlers import APP_LIST as demo_app_list
 
 __USE_WSGI__ = False
 DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
-if not os.path.exists(DOCS_STATIC_PATH):
+if INCLUDE_DOCS and not os.path.exists(DOCS_STATIC_PATH):
     raise IOError('Run "make html" to generate sphinx docs first.')
 STATIC_PATH = os.path.join(src_path, 'src/static')
 
@@ -72,8 +73,8 @@ class StatusCheckHandler(tornado.web.RequestHandler):
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        #self.redirect('/index.html')
-        self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
+        if INCLUDE_DOCS:
+            self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
 
 
 class MetaDataHandler(BaseHandler):

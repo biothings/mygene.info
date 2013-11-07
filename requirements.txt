@@ -5,6 +5,11 @@
 # also requires pycurl module, which is better installed globally using
 #
 # sudo apt-get install python-pycurl
+#
+# or, alternatively,
+# sudo apt-get install libcurl4-gnutls-dev
+# pip install pycurl
+
 
 pyes>=0.19.1
 thrift>=0.9.0
