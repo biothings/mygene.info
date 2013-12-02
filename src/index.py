@@ -128,6 +128,9 @@ def main():
     if options.debug:
         tornado.autoreload.start(loop)
         logging.info('Server is running on "%s:%s"...' % (options.address, options.port))
+        import config
+        for attr in ['ES_HOST', 'ES_INDEX_NAME_TIER1', 'ES_INDEX_NAME_ALL']:
+            logging.info('\t{0:<20}: {1}'.format(attr, getattr(config, attr)))
 
     loop.start()
 
