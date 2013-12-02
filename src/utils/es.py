@@ -21,13 +21,34 @@ from utils.common import ask, is_int, timesofar, safe_genome_pos, dotdict, taxid
 from utils.dotfield import parse_dot_fields
 
 
-def get_es():
-    conn = ES(ES_HOST, default_indices=[ES_INDEX_NAME_ALL],
+def get_es(es_host=None):
+    es_host = es_host or ES_HOST
+    conn = ES(es_host, default_indices=[ES_INDEX_NAME_ALL],
               timeout=120.0, max_retries=10)
     return conn
 
 
 es = get_es()
+
+
+def get_lastest_indices(es_host=None):
+    conn = get_es(es_host)
+    index_li = conn.get_indices().keys()
+
+    latest_indices = []
+    for prefix in ('genedoc_mygene', 'genedoc_mygene_allspecies'):
+        pat = prefix + '_(\d{8})_\w{8}'
+        _li = []
+        for index in index_li:
+            mat = re.match(pat, index)
+            if mat:
+                _li.append((mat.group(1), index))
+        latest_indices.append(sorted(_li)[-1])
+    if latest_indices[0][0] != latest_indices[1][0]:
+        print "Warning: unmatched timestamp:"
+        print '\n'.join([x[1] for x in latest_indices])
+    latest_indices = [x[1] for x in latest_indices]
+    return latest_indices
 
 
 dummy_model = lambda es, res: res
