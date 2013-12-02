@@ -283,8 +283,8 @@ class ESQuery:
         '''for /query?q=<query>'''
         options = self._get_cleaned_query_options(fields, kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
+        q = re.sub(u'[\t\n\x0b\x0c\r\x00]+', ' ', q)
         q = q.strip()
-        q = re.sub(u'[\t\n\x0b\x0c\r]+', ' ', q)
         _q = None
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
