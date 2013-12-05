@@ -81,7 +81,7 @@ class QueryHandler(BaseHandler):
         _has_error = False
         if q:
             explain = self.get_argument('explain', None)
-            if explain and explain.lower()=='true':
+            if explain and explain.lower() == 'true':
                 kwargs['explain'] = True
             for arg in ['from', 'size', 'mode']:
                 value = kwargs.get(arg, None)
@@ -140,9 +140,7 @@ class QueryHandler(BaseHandler):
 
 
 APP_LIST = [
-
-        (r"/gene/([\w\-\.]+)/?", GeneHandler),   #for gene get request
-        (r"/gene/?$", GeneHandler),              #for gene post request
-        (r"/query/?", QueryHandler),
-
+    (r"/gene/([\w\-\.]+)/?", GeneHandler),   # for gene get request
+    (r"/gene/?$", GeneHandler),              # for gene post request
+    (r"/query/?", QueryHandler),
 ]
