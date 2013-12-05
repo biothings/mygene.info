@@ -3,6 +3,7 @@ import tornado.web
 
 from helper import BaseHandler
 from utils.es import ESQuery
+from utils.common import split_ids
 
 
 class GeneHandler(BaseHandler):
@@ -110,12 +111,18 @@ class QueryHandler(BaseHandler):
         kwargs = self.get_query_params()
         q = kwargs.pop('q', None)
         if q:
-            ids = re.split('[\s\r\n+|,]+', q)
-            scopes = kwargs.pop('scopes', None)
-            if scopes:
-                scopes = [x.strip() for x in scopes.split(',')]
-            fields = kwargs.pop('fields', None)
-            res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
+            # ids = re.split('[\s\r\n+|,]+', q)
+            try:
+                ids = split_ids(q)
+            except ValueError:
+                ids = None
+                res = {'success': False, 'error': 'Invalid input for "q" parameter.'}
+            if ids:
+                scopes = kwargs.pop('scopes', None)
+                if scopes:
+                    scopes = [x.strip() for x in scopes.split(',')]
+                fields = kwargs.pop('fields', None)
+                res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 
