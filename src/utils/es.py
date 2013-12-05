@@ -523,6 +523,7 @@ class ESQueryBuilder():
                         "query" : {
                             "match" : { "name" : {
                                             "query": "%(q)s",
+                                            "operator" : "and",
                                             "analyzer": "whitespace_lowercase"
                                             }
                                       },
