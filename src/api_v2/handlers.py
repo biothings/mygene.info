@@ -1,5 +1,6 @@
 import re
-import tornado.web
+
+from tornado.web import HTTPError
 
 from helper import BaseHandler
 from utils.es import ESQuery
@@ -26,9 +27,9 @@ class GeneHandler(BaseHandler):
                 self.ga_track(event={'category': 'v2_api',
                                      'action': 'gene_get'})
             else:
-                raise tornado.web.HTTPError(404)
+                raise HTTPError(404)
         else:
-            raise tornado.web.HTTPError(404)
+            raise HTTPError(404)
 
     def post(self, geneid=None):
         '''

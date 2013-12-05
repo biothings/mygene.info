@@ -121,9 +121,6 @@ class QueryHandler(BaseHandler):
                 ids = None
                 res = {'success': False, 'error': 'Invalid input for "q" parameter.'}
             if ids:
-                # print len(ids)   #########
-                # from pprint import pprint
-                # pprint(ids)
                 scopes = kwargs.pop('scopes', None)
                 if scopes:
                     scopes = [x.strip() for x in scopes.split(',')]
