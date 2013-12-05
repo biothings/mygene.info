@@ -12,9 +12,10 @@ from utils.es import (ESQuery, ESQueryBuilder,
 from utils.dotfield import parse_dot_fields
 from config import ES_HOST
 
+
 class ESQueryAsync(ESQuery):
     es_connection = tornadoes.ESConnection(ES_HOST.split(':')[0])
-    es_connection.httprequest_kwargs = {'request_timeout': 120.}  #increase default timeout from 20 to 120s
+    es_connection.httprequest_kwargs = {'request_timeout': 120.}  # increase default timeout from 20 to 120s
 
     def _search_async(self, q, species='all', callback=None):
         self._set_index(species)
@@ -29,7 +30,7 @@ class ESQueryAsync(ESQuery):
         request_http = tornadoes.HTTPRequest(path, method="POST", body=q,
                                              **self.es_connection.httprequest_kwargs)
         self.es_connection.client.fetch(request=request_http, callback=callback)
-        self._index = ES_INDEX_NAME_ALL     #reset self._index
+        self._index = ES_INDEX_NAME_ALL     # reset self._index
 
     def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
@@ -54,7 +55,7 @@ class ESQueryAsync(ESQuery):
             self._search_async(_q, species=options.kwargs['species'], callback=inner_callback)
             return
         else:
-            res =  self._search(_q)
+            res = self._search(_q)
             if not options.raw:
                 res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
             return res
@@ -117,7 +118,6 @@ class ESQueryAsync(ESQuery):
             res = self._msearch(_q, kwargs['species'])['responses']
             return res if options.raw else self._normalize_msearch_res(res, geneid_list, options)
 
-
     @staticmethod
     def _normalize_query_res(res, options):
         if "error" in res:
@@ -172,9 +172,9 @@ class ESQueryAsync(ESQuery):
             # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
             # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
             elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
-                _q = qbdr.build(q, mode=3)   #raw string query
+                _q = qbdr.build(q, mode=3)   # raw string query
             elif self._is_wildcard_query(q):
-                _q = qbdr.build(q, mode=2)   #wildcard query
+                _q = qbdr.build(q, mode=2)   # wildcard query
             else:
             # normal text query
                 _q = qbdr.build(q, mode=1)
@@ -220,4 +220,3 @@ class ESQueryAsync(ESQuery):
             return
         else:
             return res
-

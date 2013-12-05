@@ -53,8 +53,10 @@ def get_lastest_indices(es_host=None):
 
 dummy_model = lambda es, res: res
 
+
 class MGQueryError(Exception):
     pass
+
 
 class ESQuery:
     def __init__(self):
@@ -69,21 +71,21 @@ class ESQuery:
 
         #self._doc_type = 'gene_sample'
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene', 'ensemblgene']
-        #self._default_species = [9606, 10090, 10116, 7227, 6239]  #human, mouse, rat, fruitfly, celegan
-        self._default_species = [9606, 10090, 10116]              #human, mouse, rat
+        #self._default_species = [9606, 10090, 10116, 7227, 6239]  # human, mouse, rat, fruitfly, celegan
+        self._default_species = [9606, 10090, 10116]               # human, mouse, rat
         self._tier_1_species = set(taxid_d.values())
 
     def _search(self, q, species='all'):
         self._set_index(species)
         res = self.conn.search_raw(q, indices=self._index, doc_types=self._doc_type)
-        self._index = ES_INDEX_NAME_ALL     #reset self._index
+        self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
     def _msearch(self, q, species='all'):
         self._set_index(species)
         path = make_path((self._index, self._doc_type, '_msearch'))
         res = self.conn._send_request('GET', path, body=q)
-        self._index = ES_INDEX_NAME_ALL     #reset self._index
+        self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
     def _set_index(self, species):
@@ -138,7 +140,7 @@ class ESQuery:
         if species is None:
             #set to default_species
             return None if default_to_none else self._default_species
-        if type(species) is types.IntType:
+        if isinstance(species, int):
             return [species]
 
         if type(species) in types.StringTypes:
@@ -179,7 +181,7 @@ class ESQuery:
 
     def _is_raw_string_query(self, query):
         '''Return True if input query is a wildchar/fielded/boolean query.'''
-        for v in [':','~', ' AND ', ' OR ', 'NOT ']:
+        for v in [':', '~', ' AND ', ' OR ', 'NOT ']:
             if query.find(v) != -1:
                 return True
         if query.startswith('"') and query.endswith('"'):
@@ -241,7 +243,7 @@ class ESQuery:
         _q = qbdr.build_id_query(geneid, options.scopes)
         if options.rawquery:
             return _q
-        res =  self._search(_q, species=options.kwargs['species'])
+        res = self._search(_q, species=options.kwargs['species'])
         if not options.raw:
             res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
         return res
@@ -290,7 +292,7 @@ class ESQuery:
         interval_query = self._parse_interval_query(q)
         try:
             if interval_query:
-                #should also passing a "taxid" along with interval.
+                # should also passing a "taxid" along with interval.
                 if qbdr.species != 'all':
                     qbdr.species = [qbdr.species[0]]
                     _q = qbdr.build_genomic_pos_query(**interval_query)
@@ -302,9 +304,9 @@ class ESQuery:
             # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
             # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
             elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
-                _q = qbdr.build(q, mode=3)   #raw string query
+                _q = qbdr.build(q, mode=3)   # raw string query
             elif self._is_wildcard_query(q):
-                _q = qbdr.build(q, mode=2)   #wildcard query
+                _q = qbdr.build(q, mode=2)   # wildcard query
             else:
             # normal text query
                 _q = qbdr.build(q, mode=1)
@@ -346,7 +348,7 @@ class ESQuery:
 
     def query_interval(self, taxid, chr,  gstart, gend, **kwargs):
         '''deprecated! Use query method with interval query string.'''
-        kwargs.setdefault('fields', ['symbol','name','taxid'])
+        kwargs.setdefault('fields', ['symbol', 'name', 'taxid'])
         rawquery = kwargs.pop('rawquery', None)
         qbdr = ESQueryBuilder(**kwargs)
         _q = qbdr.build_genomic_pos_query(taxid, chr,  gstart, gend)
@@ -373,7 +375,8 @@ class ESQuery:
             t1 = time.time()
             if raw_res is None:
                 raw_res = self.conn.search_raw(q, self._index, self._doc_type,
-                      start=s, size=step, scan=True, scroll='5m', **kwargs)
+                                               start=s, size=step, scan=True,
+                                               scroll='5m', **kwargs)
                 n = raw_res['hits']['total']
                 print 'Retrieving %d documents from index "%s/%s".' % (n, self._index, self._doc_type)
             else:
@@ -383,7 +386,7 @@ class ESQuery:
                 break
             else:
 
-                print "Processing %d-%d documents..." % (cnt+1, cnt+hits_cnt) ,
+                print "Processing %d-%d documents..." % (cnt+1, cnt + hits_cnt),
                 res = self._cleaned_res(raw_res)
                 if inbatch:
                     yield res
@@ -397,7 +400,6 @@ class ESQuery:
 
         print "="*20
         print 'Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0))
-
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
@@ -443,7 +445,7 @@ class ESQueryBuilder():
 
         """
         self.options = query_options
-        self.species = self.options.pop('species', 'all')   #species should be either 'all' or a list of taxids.
+        self.species = self.options.pop('species', 'all')   # species should be either 'all' or a list of taxids.
         self.species_facet_filter = self.options.pop('species_facet_filter', None)
         self.entrezonly = self.options.pop('entrezonly', False)
         self.ensemblonly = self.options.pop('ensemblonly', False)
@@ -456,12 +458,12 @@ class ESQueryBuilder():
         for key in set(self.options) - set(self._allowed_options):
                 del self.options[key]
 
-        #this is a fake query to make sure to return empty hits
+        # this is a fake query to make sure to return empty hits
         self._nohits_query = {
-                            "match": {
-                                'non_exist_field': ''
-                            }
-                        }
+            "match": {
+                'non_exist_field': ''
+            }
+        }
 
     def _parse_sort_option(self, options):
         sort = options.get('sort', None)
@@ -469,8 +471,8 @@ class ESQueryBuilder():
             _sort_array = []
             for field in sort.split(','):
                 field = field.strip()
-                if field == 'name' or field[1:]=='name':
-                    #sorting on "name" field is ignored, as it is a multi-text field.
+                if field == 'name' or field[1:] == 'name':
+                    # sorting on "name" field is ignored, as it is a multi-text field.
                     continue
                 if field.startswith('-'):
                     _f = {"%s" % field[1:]: "desc"}
@@ -485,75 +487,79 @@ class ESQueryBuilder():
         if facets:
             _facets = {}
             for field in facets.split(','):
-                _facets[field]= {"terms": {"field": field}}
+                _facets[field] = {"terms": {"field": field}}
             options["facets"] = _facets
         return options
 
     def dis_max_query(self, q):
         #remove '"' and '\' from q, they will break json decoder.
-        q = q.replace('"','').replace('\\', '')
+        q = q.replace('"', '').replace('\\', '')
         _query = {
-            "dis_max" : {
-                "tie_breaker" : 0,
-                "boost" : 1,
-                "queries" : [
+            "dis_max": {
+                "tie_breaker": 0,
+                "boost": 1,
+                "queries": [
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "match" : { "symbol" : {
-                                            "query": "%(q)s",
-                                            "analyzer": "whitespace_lowercase"
-                                            }
-                                      },
-                        },
-                        "boost_factor": 5
-                    }
+                        "custom_boost_factor": {
+                            "query": {
+                                "match": {
+                                    "symbol": {
+                                        "query": "%(q)s",
+                                        "analyzer": "whitespace_lowercase"
+                                    }
+                                },
+                            },
+                            "boost_factor": 5
+                        }
                     },
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            #This makes phrase match of "cyclin-dependent kinase 2" appears first
-                            "match_phrase" : { "name" : "%(q)s"},
-                        },
-                        "boost_factor": 4
-                    }
+                        "custom_boost_factor": {
+                            "query": {
+                                #This makes phrase match of "cyclin-dependent kinase 2" appears first
+                                "match_phrase": {"name": "%(q)s"},
+                            },
+                            "boost_factor": 4
+                        }
                     },
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "match" : { "name" : {
-                                            "query": "%(q)s",
-                                            "operator" : "and",
-                                            "analyzer": "whitespace_lowercase"
-                                            }
-                                      },
-                        },
-                        "boost_factor" : 3
-                    }
+                        "custom_boost_factor": {
+                            "query": {
+                                "match": {
+                                    "name": {
+                                        "query": "%(q)s",
+                                        "operator": "and",
+                                        "analyzer": "whitespace_lowercase"
+                                    }
+                                },
+                            },
+                            "boost_factor": 3
+                        }
                     },
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "match" : { "unigene" : {
-                                                    "query": "%(q)s" ,
-                                                    "analyzer": "string_lowercase"
-                                                 }
-                                             }
-                        },
-                        "boost_factor": 1.1
-                    }
+                        "custom_boost_factor": {
+                            "query": {
+                                "match": {
+                                    "unigene": {
+                                        "query": "%(q)s",
+                                        "analyzer": "string_lowercase"
+                                    }
+                                }
+                            },
+                            "boost_factor": 1.1
+                        }
                     },
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "match" : { "go" : {
-                                                    "query": "%(q)s" ,
-                                                    "analyzer": "string_lowercase"
-                                                 }
-                                             }
-                        },
-                        "boost_factor": 1.1
-                    }
+                        "custom_boost_factor": {
+                            "query": {
+                                "match": {
+                                    "go": {
+                                        "query": "%(q)s",
+                                        "analyzer": "string_lowercase"
+                                    }
+                                }
+                            },
+                            "boost_factor": 1.1
+                        }
                     },
                     # {
                     # "custom_boost_factor": {
@@ -568,16 +574,16 @@ class ESQueryBuilder():
                     # }
                     # },
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "query_string" : {
-                                            "query": "%(q)s",
-                                            "default_operator": "AND",
-                                            "auto_generate_phrase_queries": True
+                        "custom_boost_factor": {
+                            "query": {
+                                "query_string": {
+                                    "query": "%(q)s",
+                                    "default_operator": "AND",
+                                    "auto_generate_phrase_queries": True
+                                },
                             },
-                        },
-                        "boost_factor": 1
-                    }
+                            "boost_factor": 1
+                        }
                     },
 
                 ]
@@ -588,59 +594,62 @@ class ESQueryBuilder():
 
         if is_int(q):
             _query['dis_max']['queries'] = []
-            _query['dis_max']['queries'].insert(0,
-                    {
+            _query['dis_max']['queries'].insert(
+                0,
+                {
                     "custom_boost_factor": {
-                        "query" : {
-                            "term" : { "entrezgene" : int(q)},
+                        "query": {
+                            "term": {"entrezgene": int(q)},
                         },
                         "boost_factor": 8
                     }
-                    }
-                    )
-
+                }
+            )
 
         return _query
 
     def wildcard_query(self, q):
         '''q should contains either * or ?, but not the first character.'''
         _query = {
-            "dis_max" : {
-                "tie_breaker" : 0,
-                "boost" : 1,
-                "queries" : [
+            "dis_max": {
+                "tie_breaker": 0,
+                "boost": 1,
+                "queries": [
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "wildcard" : { "symbol" : {
-                                            "value": "%(q)s",
-                                            "boost": 5.0,
-                                            }
-                            },
-                        },
-                    }
-                    },
-                    {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "wildcard" : { "name" : {
-                                           "value": "%(q)s",
-                                           "boost": 1.1,
-                                            }
+                        "custom_boost_factor": {
+                            "query": {
+                                "wildcard": {
+                                    "symbol": {
+                                        "value": "%(q)s",
+                                        "boost": 5.0,
+                                    }
+                                },
                             },
                         }
-                    }
                     },
                     {
-                    "custom_boost_factor": {
-                        "query" : {
-                            "wildcard" : { "summary" : {
-                                           "value": "%(q)s",
-                                           "boost": 0.5,
-                                            }
-                            },
+                        "custom_boost_factor": {
+                            "query": {
+                                "wildcard": {
+                                    "name": {
+                                        "value": "%(q)s",
+                                        "boost": 1.1,
+                                    }
+                                },
+                            }
                         }
-                    }
+                    },
+                    {
+                        "custom_boost_factor": {
+                            "query": {
+                                "wildcard": {
+                                    "summary": {
+                                        "value": "%(q)s",
+                                        "boost": 0.5,
+                                    }
+                                },
+                            }
+                        }
                     },
 
                 ]
@@ -669,7 +678,7 @@ class ESQueryBuilder():
         _query = {
             "query_string": {
                 "query": "%(q)s",
-#                "analyzer": "string_lowercase",
+                # "analyzer": "string_lowercase",
                 "default_operator": "AND",
                 "auto_generate_phrase_queries": True
             }
@@ -690,9 +699,9 @@ class ESQueryBuilder():
         _query = {
             'filtered': {
                 'query': _query,
-                'filter' : {
-                    "terms" : {
-                        "taxid" : self.species
+                'filter': {
+                    "terms": {
+                        "taxid": self.species
                     }
                 }
             }
@@ -708,20 +717,20 @@ class ESQueryBuilder():
         if self.species and self.species != 'all':
             if len(self.species) == 1:
                 filters.append({
-                     "term" : {"taxid" : self.species[0] }
-                    })
+                    "term": {"taxid": self.species[0]}
+                })
             else:
                 filters.append({
-                     "terms" : {"taxid" : self.species }
-                    })
+                    "terms": {"taxid": self.species}
+                })
         if self.entrezonly:
             filters.append({
-                 "exists" : { "field" : "entrezgene" }
-                })
+                "exists": {"field": "entrezgene"}
+            })
         if self.ensemblonly:
             filters.append({
-                 "exists" : { "field" : "ensemblgene" }
-                })
+                "exists": {"field": "ensemblgene"}
+            })
 
         if self.userfilter:
             _uf = UserFilters()
@@ -752,7 +761,7 @@ class ESQueryBuilder():
         _query = {
             'filtered': {
                 'query': _query,
-                'filter' : filters
+                'filter': filters
             }
         }
 
@@ -767,12 +776,12 @@ class ESQueryBuilder():
         if self.species_facet_filter:
             if len(self.species) == 1:
                 filters.append({
-                     "term" : {"taxid" : self.species_facet_filter[0] }
-                    })
+                    "term": {"taxid": self.species_facet_filter[0]}
+                })
             else:
                 filters.append({
-                     "terms" : {"taxid" : self.species_facet_filter }
-                    })
+                    "terms": {"taxid": self.species_facet_filter}
+                })
         if filters:
             if len(filters) == 1:
                 filters = filters[0]
@@ -785,32 +794,30 @@ class ESQueryBuilder():
 
         return _query
 
-
     def add_species_custom_filters_score(self, _query):
         _query = {
             "custom_filters_score": {
-            "query": _query,
-            "filters" : [
-                #downgrade "pseudogene" matches
-                {
-                    "filter" : { "term" : { "name" : "pseudogene" } },
-                    "boost" : "0.5"
-                },
-
-                {
-                    "filter" : { "term" : { "taxid" : 9606 } },
-                    "boost" : "1.55"
-                },
-                {
-                    "filter" : { "term" : { "taxid" : 10090 } },
-                    "boost" : "1.3"
-                },
-                {
-                    "filter" : { "term" : { "taxid" : 10116 } },
-                    "boost" : "1.1"
-                },
-            ],
-            "score_mode" : "first"
+                "query": _query,
+                "filters": [
+                    #downgrade "pseudogene" matches
+                    {
+                        "filter": {"term": {"name": "pseudogene"}},
+                        "boost": "0.5"
+                    },
+                    {
+                        "filter": {"term": {"taxid": 9606}},
+                        "boost": "1.55"
+                    },
+                    {
+                        "filter": {"term": {"taxid": 10090}},
+                        "boost": "1.3"
+                    },
+                    {
+                        "filter": {"term": {"taxid": 10116}},
+                        "boost": "1.1"
+                    },
+                ],
+                "score_mode": "first"
             }
         }
         return _query
@@ -958,25 +965,25 @@ class ESQueryBuilder():
         if chr.lower().startswith('chr'):
             chr = chr[3:]
         _query = {
-                   "nested" : {
-                       "path" : "genomic_pos",
-                       "query" : {
-                            "bool" : {
-                                "must" : [
-                                    {
-                                        "term" : {"genomic_pos.chr" : chr.lower()}
-                                    },
-                                    {
-                                        "range" : {"genomic_pos.start" : {"lte" : gend}}
-                                    },
-                                    {
-                                        "range" : {"genomic_pos.end" : {"gte" : gstart}}
-                                    }
-                                ]
+            "nested": {
+                "path": "genomic_pos",
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {"genomic_pos.chr": chr.lower()}
+                            },
+                            {
+                                "range": {"genomic_pos.start": {"lte": gend}}
+                            },
+                            {
+                                "range": {"genomic_pos.end": {"gte": gstart}}
                             }
-                        }
+                        ]
                     }
                 }
+            }
+        }
         # _query = {
         #     'filtered': {
         #         'query': _query,
@@ -991,21 +998,22 @@ class ESQueryBuilder():
             _q.update(self.options)
         return _q
 
+
 class UserFilters:
     def __init__(self):
         self.conn = es
         self.ES_INDEX_NAME = 'userfilters'
         self.ES_INDEX_TYPE = 'filter'
         self._MAPPING = {
-           "dynamic": False,
-           "properties": {}
-        }   #this mapping disables indexing completely since we don't need it.
+            "dynamic": False,
+            "properties": {}
+        }   # this mapping disables indexing completely since we don't need it.
 
     def create(self):
         print "Creating index...",
         print self.conn.create_index(self.ES_INDEX_NAME)
         print "Updating mapping...",
-        print self.conn.put_mapping(self.ES_INDEX_TYPE ,
+        print self.conn.put_mapping(self.ES_INDEX_TYPE,
                                     self._MAPPING,
                                     [self.ES_INDEX_NAME])
 
@@ -1044,7 +1052,7 @@ class UserFilters:
         print '\ttotal filters: {}'.format(self.count())
         q = {"query": {"match_all": {}}}
         res = self.conn.search_raw(q, indices=self.ES_INDEX_NAME, doc_types=self.ES_INDEX_TYPE,
-                              **{"from": str(skip), "size": str(1000)})
+                                   **{"from": str(skip), "size": str(1000)})
         return [hit['_source'] for hit in res.hits.hits]
 
     def delete(self, name, noconfirm=False):
@@ -1087,8 +1095,8 @@ def make_test_index():
         return [h['_source'] for h in res['hits']['hits']]
 
     gli = get_sample_gene('CDK2') + \
-          get_sample_gene('BTK')  + \
-          get_sample_gene('insulin')
+        get_sample_gene('BTK') + \
+        get_sample_gene('insulin')
 
     from utils.es import ESIndexer
     index_name = 'genedoc_2'
