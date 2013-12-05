@@ -14,7 +14,7 @@ from config import ES_HOST
 
 class ESQueryAsync(ESQuery):
     es_connection = tornadoes.ESConnection(ES_HOST.split(':')[0])
-    es_connection.httprequest_kwargs = {'request_timeout': 30.}  #increase default timeout from 20 to 30s
+    es_connection.httprequest_kwargs = {'request_timeout': 120.}  #increase default timeout from 20 to 120s
 
     def _search_async(self, q, species='all', callback=None):
         self._set_index(species)
