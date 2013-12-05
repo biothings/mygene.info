@@ -85,15 +85,15 @@ class MetaDataHandler(BaseHandler):
         esq = ESQuery()
         metadata = esq.metadata()
         metadata["app_revision"] = __revision__
-        self.return_json(json.dumps(metadata,indent=2), encode=False)
+        self.return_json(json.dumps(metadata, indent=2), encode=False)
 
 
 APP_LIST = [
-        (r"/", MainHandler),
-        (r"/status", StatusCheckHandler),
-        (r"/metadata", MetaDataHandler),
-        (r"/v2/metadata", MetaDataHandler),
-        (r"/v2a/metadata", MetaDataHandler),
+    (r"/", MainHandler),
+    (r"/status", StatusCheckHandler),
+    (r"/metadata", MetaDataHandler),
+    (r"/v2/metadata", MetaDataHandler),
+    (r"/v2a/metadata", MetaDataHandler),
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)
@@ -105,20 +105,21 @@ APP_LIST += add_apps('v2a', api_v2_async_app_list)
 #APP_LIST += add_apps('auth', auth_app_list)
 if options.debug:
     APP_LIST += [
-            #/widget/* static path
-            (r"/widget/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(STATIC_PATH, 'widget')}),
-            #this should be the last one
-            (r"/?(.*)", tornado.web.StaticFileHandler, {'path': DOCS_STATIC_PATH}),
+        #/widget/* static path
+        (r"/widget/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(STATIC_PATH, 'widget')}),
+        #this should be the last one
+        (r"/?(.*)", tornado.web.StaticFileHandler, {'path': DOCS_STATIC_PATH}),
     ]
 
 settings = {}
 if options.debug:
 #     from config import STATIC_PATH
     settings.update({
-         "static_path": STATIC_PATH,
-     })
+        "static_path": STATIC_PATH,
+    })
 #    from config import auth_settings
 #    settings.update(auth_settings)
+
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)
@@ -141,4 +142,3 @@ if __USE_WSGI__:
 
 if __name__ == "__main__":
     main()
-
