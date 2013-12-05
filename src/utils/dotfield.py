@@ -10,9 +10,9 @@ def make_object(attr, value):
     attr_list = attr.split('.')
     s = ''
     for k in attr_list:
-    	s += '{"' + k + '":'
+        s += '{"' + k + '":'
     s += json.dumps(value)
-    s += "}"* (len(attr_list))
+    s += "}" * (len(attr_list))
     return json.loads(s)
 
 
