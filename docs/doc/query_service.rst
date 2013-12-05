@@ -25,7 +25,7 @@ Query parameters
 
 q
 """""
-    Required, passing user query. The detailed query syntax for parameter "**q**" we explained [below](#query-syntax)
+    Required, passing user query. The detailed query syntax for parameter "**q**" we explained `below <#query-syntax>`_.
 
 fields
 """"""
