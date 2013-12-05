@@ -1,17 +1,19 @@
 import time
 import types
+from shlex import shlex
 
 
 #===============================================================================
 # Misc. Utility functions
 #===============================================================================
 
-def ask(prompt,options='YN'):
+def ask(prompt, options='YN'):
     '''Prompt Yes or No,return the upper case 'Y' or 'N'.'''
-    options=options.upper()
+    options = options.upper()
     while 1:
-        s=raw_input(prompt+'[%s]' % '|'.join(list(options))).strip().upper()
-        if s in options: break
+        s = raw_input(prompt + '[%s]' % '|'.join(list(options))).strip().upper()
+        if s in options:
+            break
     return s
 
 
@@ -35,14 +37,13 @@ def timesofar(t0, clock=0):
     return t_str
 
 
-
 def safe_unicode(s, mask='#'):
     '''replace non-decodable char into "#".'''
     try:
         _s = unicode(s)
     except UnicodeDecodeError, e:
         pos = e.args[2]
-        _s = s.replace(s[pos],mask)
+        _s = s.replace(s[pos], mask)
         print 'Warning: invalid character "%s" is masked as "%s".' % (s[pos], mask)
         return safe_unicode(_s, mask)
 
@@ -60,28 +61,47 @@ def is_int(s):
 
 def safe_genome_pos(s):
     '''
-       >>> safe_genome_pos(1000) = 1000
-       >>> safe_genome_pos('1000') = 1000
-       >>> safe_genome_pos('10,000') = 100000
+       safe_genome_pos(1000) = 1000
+       safe_genome_pos('1000') = 1000
+       safe_genome_pos('10,000') = 100000
     '''
-    s_type = type(s)
-    if s_type is types.IntType:
+    if isinstance(s, int):
         return s
-    elif s_type in types.StringTypes:
-        return int(s.replace(',',''))
+    elif isinstance(s, types.StringTypes):
+        return int(s.replace(',', ''))
     else:
-        raise ValueError('invalid type "%s" for "save_genome_pos"' % s_type)
+        raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
 
 
 class dotdict(dict):
     def __getattr__(self, attr):
         value = self.get(attr, None)
-        if type(value) is types.DictType:
+        if isinstance(value, dict):
             return dotdict(value)
         else:
             return value
-    __setattr__= dict.__setitem__
-    __delattr__= dict.__delitem__
+    __setattr__ = dict.__setitem__
+    __delattr__ = dict.__delitem__
+
+
+def split_ids(q):
+    '''split input query string into list of ids.
+       any of " \t\n\x0b\x0c\r|,+" as the separator,
+        but perserving a phrase if quoted
+        (either single or double quoted)
+        more detailed rules see:
+        http://docs.python.org/2/library/shlex.html#parsing-rules
+
+        e.g. split_ids('CDK2 CDK3') --> ['CDK2', 'CDK3']
+             split_ids('"CDK2 CDK3"\n CDk4')  --> ['CDK2 CDK3', 'CDK4']
+
+    '''
+    lex = shlex(q, posix=True)
+    lex.whitespace = ' \t\n\x0b\x0c\r|,+'
+    lex.whitespace_split = True
+    lex.commenters = ''
+    ids = list(lex)
+    return ids
 
 
 #===============================================================================
