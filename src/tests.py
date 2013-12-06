@@ -18,18 +18,19 @@ Nose tests
 run as "nosetests tests"
     or "nosetests tests:test_main"
 '''
-import types
 import httplib2
 import urllib
 import json
-from nose.tools import ok_, eq_, with_setup
+from nose.tools import ok_, eq_
 
-host='http://localhost:9000'
+
+host = 'http://localhost:9000'
 api = host + '/v2'
 
 h = httplib2.Http()
 _d = json.loads    # shorthand for json decode
 _e = json.dumps    # shorthand for json encode
+
 
 #############################################################
 # Hepler functions                                          #
@@ -41,34 +42,41 @@ def truncate(s, limit):
     else:
         return s[:limit] + '...'
 
+
 def json_ok(s, checkerror=True):
     d = _d(s)
     if checkerror:
-        ok_(not (type(d) is types.DictType and 'error' in d), truncate(str(d), 100))
+        ok_(not (isinstance(d, dict) and 'error' in d), truncate(str(d), 100))
     return d
+
 
 def get_ok(url):
     res, con = h.request(url)
     eq_(res.status, 200)
     return con
 
+
 def get_404(url):
     res, con = h.request(url)
     eq_(res.status, 404)
+
 
 def get_405(url):
     res, con = h.request(url)
     eq_(res.status, 405)
 
+
 def head_ok(url):
     res, con = h.request(url, 'HEAD')
     eq_(res.status, 200)
+
 
 def post_ok(url, params):
     headers = {'Content-type': 'application/x-www-form-urlencoded'}
     res, con = h.request(url, 'POST', urllib.urlencode(params), headers=headers)
     eq_(res.status, 200)
     return con
+
 
 def w_cdk2(res):
     '''test "res" object for:
@@ -82,8 +90,10 @@ def w_cdk2(res):
 def setup_func():
     print 'Testing "%s"...' % host
 
+
 def teardown_func():
     pass
+
 
 #############################################################
 # Test functions                                            #
@@ -132,11 +142,11 @@ def test_gene_object():
 
     #pig
     res = json_ok(get_ok(api + '/gene/397593'))
-    assert res.get('reporter', {}).has_key('snowball'), 'Missing field "reporter.snowball" in gene "397593"'
+    assert 'snowball' in res.get('reporter', {}), 'Missing field "reporter.snowball" in gene "397593"'
 
     #nematode
     res = json_ok(get_ok(api + '/gene/172677'))
-    res = json_ok(get_ok(api + '/gene/9821293'))    #this is not nematode, "taxid": 31234
+    res = json_ok(get_ok(api + '/gene/9821293'))    # this is not nematode, "taxid": 31234
     attr = 'WormBase'
     assert res.get(attr, None) is not None, 'Missing field "{}" in gene "9821293"'.format(attr)
 
@@ -187,39 +197,41 @@ def test_query():
     res = json_ok(get_ok(api + '/query?q=tRNA:Y1:85Ae'), checkerror=False)
     assert 'error' in res
 
+
 def test_query_post():
     #/query via post
     json_ok(post_ok(api + '/query', {'q': '1017'}))
 
     res = json_ok(post_ok(api + '/query', {'q': '1017',
-                                            'scopes': 'entrezgene'}))
+                                           'scopes': 'entrezgene'}))
     eq_(len(res), 1)
     eq_(res[0]['_id'], '1017')
 
     res = json_ok(post_ok(api + '/query', {'q': '211803_at,1018',
-                                            'scopes': 'reporter,entrezgene'}))
+                                           'scopes': 'reporter,entrezgene'}))
     eq_(len(res), 2)
     eq_(res[0]['_id'], '1017')
     eq_(res[1]['_id'], '1018')
 
     res = json_ok(post_ok(api + '/query', {'q': 'CDK2',
-                                            'species': 'human,10090,frog,pig',
-                                            'scopes': 'symbol',
-                                            'fields': 'name,symbol'}))
+                                           'species': 'human,10090,frog,pig',
+                                           'scopes': 'symbol',
+                                           'fields': 'name,symbol'}))
     assert len(res) == 4, (res, len(res))
     res = json_ok(post_ok(api + '/query', {}), checkerror=False)
     assert 'error' in res, res
 
+
 def test_query_interval():
     res = json_ok(get_ok(api + '/query?q=chr1:1000-100000&species=human'))
-    ok_(len(res['hits'])>1)
+    ok_(len(res['hits']) > 1)
     ok_('_id' in res['hits'][0])
 
 
 def test_query_size():
     res = json_ok(get_ok(api + '/query?q=cdk?'))
-    eq_(len(res['hits']), 10)  #default is 10
-    ok_(res['total']>10)
+    eq_(len(res['hits']), 10)  # default is 10
+    ok_(res['total'] > 10)
 
     res = json_ok(get_ok(api + '/query?q=cdk?&size=0'))
     eq_(len(res['hits']), 0)
@@ -237,7 +249,7 @@ def test_query_size():
     eq_(res['hits'][0], res1['hits'][10])
 
     #assert 1==0
-    res = json_ok(get_ok(api + '/query?q=cdk?&size=1a'), checkerror=False)  #invalid size parameter
+    res = json_ok(get_ok(api + '/query?q=cdk?&size=1a'), checkerror=False)  # invalid size parameter
     assert 'error' in res
 
 
@@ -263,6 +275,7 @@ def test_gene():
 
     #res = json_ok(get_ok(api + '/boc/bgps/gene/1017'))
     #ok_('SpeciesList' in res)
+
 
 def test_gene_post():
     res = json_ok(post_ok(api + '/gene', {'ids': '1017'}))
@@ -315,5 +328,21 @@ def test_query_userfilter():
     res2 = json_ok(get_ok(api + '/query?q=cdk&userfilter=bgood_cure_griffith'))
     ok_(res1['total'] > res2['total'])
 
-    res2 = json_ok(get_ok(api + '/query?q=cdk&userfilter=aaaa'))   #nonexisting user filter gets ignored.
+    res2 = json_ok(get_ok(api + '/query?q=cdk&userfilter=aaaa'))   # nonexisting user filter gets ignored.
     eq_(res1['total'], res2['total'])
+
+
+def test_existsfilter():
+    res1 = json_ok(get_ok(api + '/query?q=cdk'))
+    res2 = json_ok(get_ok(api + '/query?q=cdk&exists=pharmgkb'))
+    ok_(res1['total'] > res2['total'])
+    res3 = json_ok(get_ok(api + '/query?q=cdk&exists=pharmgkb,pdb'))
+    ok_(res2['total'] > res3['total'])
+
+
+def test_missingfilter():
+    res1 = json_ok(get_ok(api + '/query?q=cdk'))
+    res2 = json_ok(get_ok(api + '/query?q=cdk&missing=pdb'))
+    ok_(res1['total'] > res2['total'])
+    res3 = json_ok(get_ok(api + '/query?q=cdk&missing=pdb,MIM'))
+    ok_(res2['total'] > res3['total'])
