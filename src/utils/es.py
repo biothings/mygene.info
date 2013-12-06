@@ -884,15 +884,10 @@ class ESQueryBuilder():
             else:
                 _query = {
                     "match": {
-                        "ensemblgene": "%s" % id
+                        "ensemblgene": "{}".format(id),
+                        "operator": "and"
                     }
                 }
-                # _query = {
-                #     "query_string": {
-                #         "query": "%s" % id,
-                #     }
-                # }
-
         else:
             if type(scopes) in types.StringTypes:
                 _field = scopes
@@ -910,7 +905,8 @@ class ESQueryBuilder():
                 else:
                     _query = {
                         "match": {
-                            _field: "%s" % id
+                            _field: "{}".format(id),
+                            "operator": "and"
                         }
                     }
             elif type(scopes) in (types.ListType, types.TupleType):
@@ -942,8 +938,9 @@ class ESQueryBuilder():
                 elif str_fields:
                     _query = {
                         "multi_match": {
-                            "query": "%s" % id,
-                            "fields": str_fields
+                            "query": "{}".format(id),
+                            "fields": str_fields,
+                            "operator": "and"
                         }
                     }
                 else:
