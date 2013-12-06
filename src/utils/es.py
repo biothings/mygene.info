@@ -5,7 +5,6 @@
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
 
-import types
 import json
 import re
 import time
@@ -123,7 +122,7 @@ class ESQuery:
             should be either None (return all fields) or a list fields.
         '''
         if fields:
-            if type(fields) in types.StringTypes:
+            if isinstance(fields, (str, unicode)):
                 if fields.lower() == 'all':
                     fields = None     # all fields will be returned.
                 else:
@@ -143,14 +142,14 @@ class ESQuery:
         if isinstance(species, int):
             return [species]
 
-        if type(species) in types.StringTypes:
+        if isinstance(species, (str, unicode)):
             if species.lower() == 'all':
                 #if self.species == 'all': do not apply species filter, all species is included.
                 return species.lower()
             else:
                 species = [s.strip().lower() for s in species.split(',')]
 
-        if type(species) not in [types.ListType, types.TupleType]:
+        if isinstance(species, (list, tuple)):
             raise ValueError('"species" parameter must be a string, integer or a list/tuple, not "{}".'.format(type(species)))
 
         _species = []
@@ -889,7 +888,7 @@ class ESQueryBuilder():
                     }
                 }
         else:
-            if type(scopes) in types.StringTypes:
+            if isinstance(scopes, (str, unicode)):
                 _field = scopes
                 if _field in ['entrezgene', 'retired']:
                     if id_is_int:
@@ -909,7 +908,7 @@ class ESQueryBuilder():
                             "operator": "and"
                         }
                     }
-            elif type(scopes) in (types.ListType, types.TupleType):
+            elif isinstance(scopes, (list, tuple)):
                 int_fields = []
                 str_fields = copy.copy(scopes)
                 if 'entrezgene' in str_fields:
