@@ -21,11 +21,13 @@ run as "nosetests tests"
 import httplib2
 import urllib
 import json
+import sys
 from nose.tools import ok_, eq_
 
 
 host = 'http://localhost:9000'
 api = host + '/v2'
+sys.stderr.write('URL base: {}\n'.format(api))
 
 h = httplib2.Http()
 _d = json.loads    # shorthand for json decode
