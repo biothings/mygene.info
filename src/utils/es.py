@@ -442,6 +442,10 @@ class ESQueryBuilder():
             entrezonly  default false
             ensemblonly default false
             userfilter  optional, provide the name of a saved user filter (in "userfilters" index)
+            exists      optional, passing field, comma-separated fields, returned
+                                  genes must have given field(s).
+            missing     optional, passing field, comma-separated fields, returned
+                                  genes must have NO given field(s).
 
         """
         self.options = query_options
@@ -449,8 +453,16 @@ class ESQueryBuilder():
         self.species_facet_filter = self.options.pop('species_facet_filter', None)
         self.entrezonly = self.options.pop('entrezonly', False)
         self.ensemblonly = self.options.pop('ensemblonly', False)
+        # userfilter
         userfilter = self.options.pop('userfilter', None)
         self.userfilter = userfilter.split(',') if userfilter else None
+        # exist filter
+        existsfilter = self.options.pop('exists', None)
+        self.existsfilter = existsfilter.split(',') if existsfilter else None
+        # missing filter
+        missingfilter = self.options.pop('missing', None)
+        self.missingfilter = missingfilter.split(',') if missingfilter else None
+
         self._parse_sort_option(self.options)
         self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
@@ -738,6 +750,17 @@ class ESQueryBuilder():
                 _filter = _uf.get(_fname)
                 if _filter:
                     filters.append(_filter['filter'])
+
+        if self.existsfilter:
+            for _filter in self.existsfilter:
+                filters.append({
+                    "exists": {"field": _filter}
+                })
+        if self.missingfilter:
+            for _filter in self.missingfilter:
+                filters.append({
+                    "missing": {"field": _filter}
+                })
 
         if filters:
             if len(filters) == 1:
