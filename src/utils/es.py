@@ -149,7 +149,7 @@ class ESQuery:
             else:
                 species = [s.strip().lower() for s in species.split(',')]
 
-        if isinstance(species, (list, tuple)):
+        if not isinstance(species, (list, tuple)):
             raise ValueError('"species" parameter must be a string, integer or a list/tuple, not "{}".'.format(type(species)))
 
         _species = []
