@@ -854,14 +854,17 @@ class ESQueryBuilder():
 
                else  string_query (for test)
         '''
-        if mode == 1:
-            _query = self.dis_max_query(q)
-        elif mode == 2:
-            _query = self.wildcard_query(q)
-        elif mode == 3:
-            _query = self.raw_string_query(q)
+        if q == '__all__':
+            _query = {"match_all": {}}
         else:
-            _query = self.string_query(q)
+            if mode == 1:
+                _query = self.dis_max_query(q)
+            elif mode == 2:
+                _query = self.wildcard_query(q)
+            elif mode == 3:
+                _query = self.raw_string_query(q)
+            else:
+                _query = self.string_query(q)
 
         _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
