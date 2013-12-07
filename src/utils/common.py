@@ -1,6 +1,10 @@
+from __future__ import print_function
+import sys
 import time
 import types
 from shlex import shlex
+
+str_types = str if sys.version_info.major == 3 else (str, unicode)
 
 
 #===============================================================================
@@ -41,10 +45,10 @@ def safe_unicode(s, mask='#'):
     '''replace non-decodable char into "#".'''
     try:
         _s = unicode(s)
-    except UnicodeDecodeError, e:
+    except UnicodeDecodeError as e:
         pos = e.args[2]
         _s = s.replace(s[pos], mask)
-        print 'Warning: invalid character "%s" is masked as "%s".' % (s[pos], mask)
+        print('Warning: invalid character "{}" is masked as "{}".'.format(s[pos], mask))
         return safe_unicode(_s, mask)
 
     return _s
@@ -57,6 +61,19 @@ def is_int(s):
         return True
     except ValueError:
         return False
+
+
+def is_str(s):
+    """return True or False if input is a string or not.
+        python3 compatible.
+    """
+    return isinstance(s, str_types)
+
+
+def is_seq(li):
+    """return True if input is either a list or a tuple.
+    """
+    return isinstance(li, (list, tuple))
 
 
 def safe_genome_pos(s):

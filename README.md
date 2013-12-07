@@ -5,7 +5,7 @@ This project is a web front-end of next generation (v2) of MyGene.info (Gene Ann
 
 #### 1. Prerequisites
 
-    python
+    python (>=2.7)
     mercurial
 
    In Ubuntu/Debian system, you can install all prerequisites by

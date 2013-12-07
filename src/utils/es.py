@@ -15,8 +15,10 @@ from pyes.exceptions import NotFoundException, ElasticSearchException
 from pyes.utils import make_path
 from pyes.query import MatchAllQuery, StringQuery
 
-from config import ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL, ES_INDEX_TYPE
-from utils.common import ask, is_int, timesofar, safe_genome_pos, dotdict, taxid_d
+from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL,
+                    ES_INDEX_TYPE)
+from utils.common import (ask, is_int, is_str, is_seq, timesofar,
+                          safe_genome_pos, dotdict, taxid_d)
 from utils.dotfield import parse_dot_fields
 
 
@@ -122,7 +124,7 @@ class ESQuery:
             should be either None (return all fields) or a list fields.
         '''
         if fields:
-            if isinstance(fields, (str, unicode)):
+            if is_str(fields):
                 if fields.lower() == 'all':
                     fields = None     # all fields will be returned.
                 else:
@@ -142,14 +144,14 @@ class ESQuery:
         if isinstance(species, int):
             return [species]
 
-        if isinstance(species, (str, unicode)):
+        if is_str(species):
             if species.lower() == 'all':
                 #if self.species == 'all': do not apply species filter, all species is included.
                 return species.lower()
             else:
                 species = [s.strip().lower() for s in species.split(',')]
 
-        if not isinstance(species, (list, tuple)):
+        if not is_seq(species):
             raise ValueError('"species" parameter must be a string, integer or a list/tuple, not "{}".'.format(type(species)))
 
         _species = []
@@ -888,7 +890,7 @@ class ESQueryBuilder():
                     }
                 }
         else:
-            if isinstance(scopes, (str, unicode)):
+            if is_str(scopes):
                 _field = scopes
                 if _field in ['entrezgene', 'retired']:
                     if id_is_int:
@@ -908,7 +910,7 @@ class ESQueryBuilder():
                             "operator": "and"
                         }
                     }
-            elif isinstance(scopes, (list, tuple)):
+            elif is_seq(scopes):
                 int_fields = []
                 str_fields = copy.copy(scopes)
                 if 'entrezgene' in str_fields:
