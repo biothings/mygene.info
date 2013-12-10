@@ -1,4 +1,5 @@
 import re
+import json
 
 from tornado.web import HTTPError
 
@@ -105,13 +106,18 @@ class QueryHandler(BaseHandler):
             scopes
             fields
             species
+
+            jsoninput   if true, input "q" is a json string, must be decoded as a list.
         '''
         kwargs = self.get_query_params()
         q = kwargs.pop('q', None)
+        jsoninput = kwargs.pop('jsoninput', None) in ('1', 'true')
         if q:
             # ids = re.split('[\s\r\n+|,]+', q)
             try:
-                ids = split_ids(q)
+                ids = json.loads(q) if jsoninput else split_ids(q)
+                if not isinstance(ids, list):
+                    raise ValueError
             except ValueError:
                 ids = None
                 res = {'success': False, 'error': 'Invalid input for "q" parameter.'}
