@@ -223,6 +223,13 @@ def test_query_post():
     res = json_ok(post_ok(api + '/query', {}), checkerror=False)
     assert 'error' in res, res
 
+    res = json_ok(post_ok(api + '/query', {'q': '[1017, "1018"]',
+                                           'scopes': 'entrezgene',
+                                           'jsoninput': 'true'}))
+    eq_(len(res), 2)
+    eq_(res[0]['_id'], '1017')
+    eq_(res[1]['_id'], '1018')
+
 
 def test_query_interval():
     res = json_ok(get_ok(api + '/query?q=chr1:1000-100000&species=human'))
