@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Copyright [2010-2011] [Chunlei Wu]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,6 +38,14 @@ _e = json.dumps    # shorthand for json encode
 #############################################################
 # Hepler functions                                          #
 #############################################################
+def encode_dict(d):
+    '''urllib.urlencode (python 2.x) cannot take unicode string.
+       encode as utf-8 first to get it around.
+    '''
+    return dict([(key, val.encode('utf-8')) for key, val in d.iteritems()
+                 if isinstance(val, basestring)])
+
+
 def truncate(s, limit):
     '''truncate a string.'''
     if len(s) <= limit:
@@ -75,7 +84,7 @@ def head_ok(url):
 
 def post_ok(url, params):
     headers = {'Content-type': 'application/x-www-form-urlencoded'}
-    res, con = h.request(url, 'POST', urllib.urlencode(params), headers=headers)
+    res, con = h.request(url, 'POST', urllib.urlencode(encode_dict(params)), headers=headers)
     eq_(res.status, 200)
     return con
 
@@ -355,3 +364,27 @@ def test_missingfilter():
     ok_(res1['total'] > res2['total'])
     res3 = json_ok(get_ok(api + '/query?q=cdk&missing=pdb,MIM'))
     ok_(res2['total'] > res3['total'])
+
+
+def test_unicode():
+    s = u'基因'
+
+    get_404(api + '/gene/' + s)
+
+    res = json_ok(post_ok(api + '/gene', {'ids': s}))
+    eq_(res[0]['notfound'], True)
+    eq_(len(res), 1)
+    res = json_ok(post_ok(api + '/gene', {'ids': '1017, ' + s}))
+    eq_(res[1]['notfound'], True)
+    eq_(len(res), 2)
+
+    res = json_ok(get_ok(api + '/query?q=' + s))
+    eq_(res['hits'], [])
+
+    res = json_ok(post_ok(api + '/query', {"q": s, "scopes": 'symbol'}))
+    eq_(res[0]['notfound'], True)
+    eq_(len(res), 1)
+
+    res = json_ok(post_ok(api + '/query', {"q": 'cdk2+' + s}))
+    eq_(res[1]['notfound'], True)
+    eq_(len(res), 2)
