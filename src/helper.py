@@ -1,13 +1,12 @@
-import types
 import json
 import tornado.web
-from utils.common import is_int
 from utils.ga import GAMixIn
 
+
 class BaseHandler(tornado.web.RequestHandler, GAMixIn):
-    jsonp_parameter='callback'
-    cache_max_age=604800  # 7days
-    disable_caching=False
+    jsonp_parameter = 'callback'
+    cache_max_age = 604800  # 7days
+    disable_caching = False
 
     def _check_fields_param(self, kwargs):
         '''support "filter" as an alias of "fields" parameter for back-compatability.'''
@@ -30,12 +29,12 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     def get_query_params(self):
         _args = {}
         for k in self.request.arguments:
-            v = self.request.arguments[k]
-            if type(v) is types.ListType and len(v) == 1:
+            v = self.get_arguments(k)
+            if len(v) == 1:
                 _args[k] = v[0]
             else:
                 _args[k] = v
-        _args.pop(self.jsonp_parameter, None)   #exclude jsonp parameter if passed.
+        _args.pop(self.jsonp_parameter, None)   # exclude jsonp parameter if passed.
         self._check_fields_param(_args)
         self._check_paging_param(_args)
         return _args
@@ -59,7 +58,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             #get etag if data is a dictionary and has "etag" attribute.
             etag = data.get('etag', None) if isinstance(data, dict) else None
             self.set_cacheable(etag=etag)
-        self.support_cors();
+        self.support_cors()
         if jsoncallback:
             self.write('%s(%s)' % (jsoncallback, _json_data))
         else:
