@@ -123,8 +123,6 @@ class QueryHandler(BaseHandler):
                 res = {'success': False, 'error': 'Invalid input for "q" parameter.'}
             if ids:
                 scopes = kwargs.pop('scopes', None)
-                if scopes:
-                    scopes = [x.strip() for x in scopes.split(',')]
                 fields = kwargs.pop('fields', None)
                 res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
         else:

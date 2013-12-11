@@ -119,6 +119,23 @@ class ESQuery:
         else:
             return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
 
+    def _cleaned_scopes(self, scopes):
+        '''return a cleaned scopes parameter.
+            should be either a string or a list of scope fields.
+        '''
+        if scopes:
+            if is_str(scopes):
+                scopes = [x.strip() for x in scopes.split(',')]
+            if is_seq(scopes):
+                scopes = [x for x in scopes if x]
+                if len(scopes) == 1:
+                    scopes = scopes[0]
+            else:
+                scopes = None
+        else:
+            scopes = None
+        return scopes
+
     def _cleaned_fields(self, fields):
         '''return a cleaned fields parameter.
             should be either None (return all fields) or a list fields.
@@ -198,7 +215,7 @@ class ESQuery:
         options.dotfield = kwargs.pop('dotfield', True) not in [False, 'false']
         scopes = kwargs.pop('scopes', None)
         if scopes:
-            options.scopes = self._cleaned_fields(scopes)
+            options.scopes = self._cleaned_scopes(scopes)
         kwargs["fields"] = self._cleaned_fields(fields)
         #if no dotfield in "fields", set dotfield always be True, i.e., no need to parse dotfield
         if not options.dotfield:
@@ -888,8 +905,10 @@ class ESQueryBuilder():
             else:
                 _query = {
                     "match": {
-                        "ensemblgene": "{}".format(id),
-                        "operator": "and"
+                        "ensemblgene": {
+                            "query": u"{}".format(id),
+                            "operator": "and"
+                        }
                     }
                 }
         else:
@@ -909,8 +928,10 @@ class ESQueryBuilder():
                 else:
                     _query = {
                         "match": {
-                            _field: "{}".format(id),
-                            "operator": "and"
+                            _field: {
+                                "query": u"{}".format(id),
+                                "operator": "and"
+                            }
                         }
                     }
             elif is_seq(scopes):
@@ -942,7 +963,7 @@ class ESQueryBuilder():
                 elif str_fields:
                     _query = {
                         "multi_match": {
-                            "query": "{}".format(id),
+                            "query": u"{}".format(id),
                             "fields": str_fields,
                             "operator": "and"
                         }
