@@ -1,6 +1,15 @@
 import json
+import datetime
 import tornado.web
 from utils.ga import GAMixIn
+
+
+class DateTimeJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        else:
+            return super(DateTimeJSONEncoder, self).default(obj)
 
 
 class BaseHandler(tornado.web.RequestHandler, GAMixIn):
@@ -52,7 +61,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
            string.
         '''
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
-        _json_data = json.dumps(data) if encode else data
+        _json_data = json.dumps(data, cls=DateTimeJSONEncoder) if encode else data
         self.set_header("Content-Type", "application/json; charset=UTF-8")
         if not self.disable_caching:
             #get etag if data is a dictionary and has "etag" attribute.
