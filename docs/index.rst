@@ -104,6 +104,7 @@ Who is using MyGene.info?
 
 * `BioGPS <http://biogps.org>`_
 * `GeneWikiPlus <http://genewikiplus.org>`_
+* `myGeneNet <http://netbio.bgu.ac.il/mygenenet>`_
 
 
 Contact us
