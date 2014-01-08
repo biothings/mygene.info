@@ -16,6 +16,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     jsonp_parameter = 'callback'
     cache_max_age = 604800  # 7days
     disable_caching = False
+    boolean_parameters = set(['raw', 'rawquery', 'entrezonly', 'ensemblonly'])
 
     def _check_fields_param(self, kwargs):
         '''support "filter" as an alias of "fields" parameter for back-compatability.'''
@@ -35,6 +36,15 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             del kwargs['skip']
         return kwargs
 
+    def _check_boolean_param(self, kwargs):
+        '''Normalize the value of boolean parameters.
+           if 1 or true, set to True, otherwise False.
+        '''
+        for k in kwargs:
+            if k in self.boolean_parameters:
+                kwargs[k] = kwargs[k].lower() in ['1', 'true']
+        return kwargs
+
     def get_query_params(self):
         _args = {}
         for k in self.request.arguments:
@@ -46,6 +56,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
         _args.pop(self.jsonp_parameter, None)   # exclude jsonp parameter if passed.
         self._check_fields_param(_args)
         self._check_paging_param(_args)
+        self._check_boolean_param(_args)
         return _args
 
     # def get_current_user(self):
