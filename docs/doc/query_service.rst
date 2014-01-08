@@ -63,6 +63,14 @@ species_facet_filter
 """"""""""""""""""""
     Optional, relevant when faceting on species (i.e., "facets=taxid" are passed). It's used to pass species filter without changing the scope of faceting, so that the returned facet counts won't change. Either species name or taxonomy id can be used, just like "`species <#species>`_" parameter above. See `examples of faceted queries here <#faceted-queries>`_.
 
+entrezonly
+""""""""""
+    Optional, when passed as "true" or "1", the query returns only the hits with valid Entrez gene ids. Default: false.
+
+ensemblonly
+"""""""""""
+    Optional, when passed as "true" or "1", the query returns only the hits with valid Ensembl gene ids. Default: false.
+
 callback
 """"""""
     Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
@@ -340,8 +348,8 @@ If you need to, you can also pass multiple fields as comma-separated list::
     http://mygene.info/v2/query?q=cdk2&size=1&facets=taxid,type_of_gene
 
 
-Particularly relevant to species facets (i.e., "facets=taxid"), you can also pass a
-"`species_facet_filter <#species_facet_filter>`_" parameter to filter the returned hits on a given species, without changing the scope of the facets (i.e. facet counts will not change). This is useful when you need to get the subset of the hits for a given species after the initial faceted queries on species.
+Particularly relevant to species facets (i.e., "facets=taxid"), you can pass a
+"`species_facet_filter <#species_facet_filter>`_" parameter to filter the returned hits on a given species, without changing the scope of the facets (i.e. facet counts will not change). This is useful when you need to get the subset of the hits for a given species after the initial faceted query on species.
 
 You can see the different "hits" are returned in the following queries, while "facets" keeps the same::
 
