@@ -55,6 +55,13 @@ sort
 """"
     Optional, the comma-separated fields to sort on. Prefix with "-" for descending order, otherwise in ascending order. Default: sort by matching scores in decending order.
 
+facets
+""""""
+    Optional, a single field or comma-separated fields to return facets, for example, "facets=taxid", "facets=taxid,type_of_gene". See `examples of faceted queries here <#faceted-queries>`_.
+
+species_facet_filter
+""""""""""""""""""""
+    Optional, relevant when faceting on species (i.e., "facets=taxid" are passed). It's used to pass species filter without changing the scope of faceting, so that the returned facet counts won't change. Either species name or taxonomy id can be used, just like "`species <#species>`_" parameter above. See `examples of faceted queries here <#faceted-queries>`_.
 
 callback
 """"""""
@@ -232,6 +239,120 @@ should return hits as:
       "max_score": 87.76775,
       "took": 4
     }
+
+
+Faceted queries
+----------------
+If you need to perform a faceted query, you can pass an optional "`facets <#facets>`_" parameter. For example, if you want to get the facets on species, you can pass "facets=taxid":
+
+A GET request like this::
+
+    http://mygene.info/v2/query?q=cdk2&size=1&facets=taxid
+
+should return hits as:
+
+.. code-block:: json
+    :emphasize-lines: 15-36
+
+    {
+      "hits":[
+        {
+          "entrezgene":1017,
+          "name":"cyclin-dependent kinase 2",
+          "_score":400.43347,
+          "symbol":"CDK2",
+          "_id":"1017",
+          "taxid":9606
+        }
+      ],
+      "total":26,
+      "max_score":400.43347,
+      "took":7,
+      "facets":{
+        "taxid":{
+          "_type":"terms",
+          "total":26,
+          "terms":[
+            {
+              "count":14,
+              "term":9606
+            },
+            {
+              "count":7,
+              "term":10116
+            },
+            {
+              "count":5,
+              "term":10090
+            }
+          ],
+          "other":0,
+          "missing":0
+        }
+      }
+    }
+
+Another useful field to get facets on is "type_of_gene"::
+
+    http://mygene.info/v2/query?q=cdk2&size=1&facets=type_of_gene
+
+It should return hits as:
+
+.. code-block:: json
+    :emphasize-lines: 15-32
+
+    {
+      "hits":[
+        {
+          "entrezgene":1017,
+          "name":"cyclin-dependent kinase 2",
+          "_score":400.43347,
+          "symbol":"CDK2",
+          "_id":"1017",
+          "taxid":9606
+        }
+      ],
+      "total":26,
+      "max_score":400.43347,
+      "took":97,
+      "facets":{
+        "type_of_gene":{
+          "_type":"terms",
+          "total":26,
+          "terms":[
+            {
+              "count":20,
+              "term":"protein-coding"
+            },
+            {
+              "count":6,
+              "term":"pseudo"
+            }
+          ],
+          "other":0,
+          "missing":0
+        }
+      }
+    }
+
+If you need to, you can also pass multiple fields as comma-separated list::
+
+    http://mygene.info/v2/query?q=cdk2&size=1&facets=taxid,type_of_gene
+
+
+Particularly relevant to species facets (i.e., "facets=taxid"), you can also pass a
+"`species_facet_filter <#species_facet_filter>`_" parameter to filter the returned hits on a given species, without changing the scope of the facets (i.e. facet counts will not change). This is useful when you need to get the subset of the hits for a given species after the initial faceted queries on species.
+
+You can see the different "hits" are returned in the following queries, while "facets" keeps the same::
+
+    http://localhost:9000/v2/query?q=cdk?&size=1&facets=taxid&species_facet_filter=human
+
+v.s.
+::
+
+    http://localhost:9000/v2/query?q=cdk?&size=1&facets=taxid&species_facet_filter=mouse
+
+
 
 
 
