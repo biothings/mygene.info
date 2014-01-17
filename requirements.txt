@@ -11,9 +11,9 @@
 # pip install pycurl
 
 
-pyes>=0.19.1
-thrift>=0.9.0
-tornado>=3.1
+pyes>=0.90.1
+thrift>=0.9.1
+tornado>=3.2
 tornadoes>=1.4.1
 #the following patched version has been merged into v1.4.1
 #-e git+git://github.com/newgene/tornado-es.git#egg=tornadoes   #this is a patched version of tornadoes

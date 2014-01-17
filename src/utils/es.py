@@ -84,7 +84,7 @@ class ESQuery:
 
     def _msearch(self, q, species='all'):
         self._set_index(species)
-        path = make_path((self._index, self._doc_type, '_msearch'))
+        path = make_path(self._index, self._doc_type, '_msearch')
         res = self.conn._send_request('GET', path, body=q)
         self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
@@ -421,7 +421,7 @@ class ESQuery:
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
-        mapping = self.conn.indices.get_mapping(self._doc_type, self._index)
+        mapping = self.conn.indices.get_mapping(self._doc_type, self._index, raw=True)
         if raw:
             return mapping
 
