@@ -65,14 +65,14 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
     #         return None
     #     return tornado.escape.json_decode(user_json)
 
-    def return_json(self, data, encode=True):
+    def return_json(self, data, encode=True, indent=None):
         '''return passed data object as JSON response.
            if <jsonp_parameter> is passed, return a valid JSONP response.
            if encode is False, assumes input data is already a JSON encoded
            string.
         '''
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
-        _json_data = json.dumps(data, cls=DateTimeJSONEncoder) if encode else data
+        _json_data = json.dumps(data, cls=DateTimeJSONEncoder, indent=indent) if encode else data
         self.set_header("Content-Type", "application/json; charset=UTF-8")
         if not self.disable_caching:
             #get etag if data is a dictionary and has "etag" attribute.

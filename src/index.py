@@ -85,7 +85,7 @@ class MetaDataHandler(BaseHandler):
         esq = ESQuery()
         metadata = esq.metadata()
         metadata["app_revision"] = __revision__
-        self.return_json(json.dumps(metadata, indent=2), encode=False)
+        self.return_json(metadata, indent=2)
 
 
 APP_LIST = [
