@@ -3,6 +3,15 @@ import datetime
 import tornado.web
 from utils.ga import GAMixIn
 
+SUPPORT_MSGPACK = False
+if SUPPORT_MSGPACK:
+    import msgpack
+
+    def msgpack_encode_datetime(obj):
+        if isinstance(obj, datetime.datetime):
+            return {'__datetime__': True, 'as_str': obj.strftime("%Y%m%dT%H:%M:%S.%f")}
+        return obj
+
 
 class DateTimeJSONEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -54,6 +63,8 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             else:
                 _args[k] = v
         _args.pop(self.jsonp_parameter, None)   # exclude jsonp parameter if passed.
+        if SUPPORT_MSGPACK:
+            _args.pop('msgpack', None)
         self._check_fields_param(_args)
         self._check_paging_param(_args)
         self._check_boolean_param(_args)
@@ -72,8 +83,14 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
            string.
         '''
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
-        _json_data = json.dumps(data, cls=DateTimeJSONEncoder, indent=indent) if encode else data
-        self.set_header("Content-Type", "application/json; charset=UTF-8")
+        if SUPPORT_MSGPACK:
+            use_msgpack = self.get_argument('msgpack', '')
+        if SUPPORT_MSGPACK and use_msgpack:
+            _json_data = msgpack.packb(data, use_bin_type=True, default=msgpack_encode_datetime)
+            self.set_header("Content-Type", "application/x-msgpack")
+        else:
+            _json_data = json.dumps(data, cls=DateTimeJSONEncoder, indent=indent) if encode else data
+            self.set_header("Content-Type", "application/json; charset=UTF-8")
         if not self.disable_caching:
             #get etag if data is a dictionary and has "etag" attribute.
             etag = data.get('etag', None) if isinstance(data, dict) else None
