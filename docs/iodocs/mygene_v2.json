@@ -54,18 +54,23 @@
                         },
                         {
                             "Name": "entrezonly",
-                            "Type": "string",
+                            "Type": "boolean",
                             "Description": "when passed as “true” or “1”, the query returns only the hits with valid Entrez gene ids. Default: false."
                         },
                         {
                             "Name": "ensemblonly",
-                            "Type": "string",
+                            "Type": "boolean",
                             "Description": "when passed as “true” or “1”, the query returns only the hits with valid Ensembl gene ids. Default: false."
                         },
                         {
                             "Name": "callback",
                             "Type": "string",
                             "Description": "you can pass a \"callback\" parameter to make a JSONP call."
+                        },
+                        {
+                            "Name": "dotfield",
+                            "Type": "boolean",
+                            "Description": "control the format of the returned fields when passed \"fields\" parameter contains dot notation, e.g. \"fields=refseq.rna\". If \"true\" or \"1\", the returned data object contains a single \"refseq.rna\" field, otherwise (\"false\" or \"0\"), a single \"refseq\" field with a sub-field of \"rna\". Default: true."
                         },
                         {
                             "Name": "filter",
@@ -112,6 +117,11 @@
                             "Name": "species",
                             "Type": "string",
                             "Description": "can be used to limit the gene hits from given species. You can use \"common names\" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). All other species, you can provide their taxonomy ids. Multiple species can be passed using comma as a separator. Default: human,mouse,rat."
+                        },
+                        {
+                            "Name": "dotfield",
+                            "Type": "boolean",
+                            "Description": "control the format of the returned fields when passed \"fields\" parameter contains dot notation, e.g. \"fields=refseq.rna\". If \"true\" or \"1\", the returned data object contains a single \"refseq.rna\" field, otherwise (\"false\" or \"0\"), a single \"refseq\" field with a sub-field of \"rna\". Default: true."
                         }
                     ]
                 },
@@ -130,14 +140,14 @@
                             "Description": "genome interval in format of \"chr#:start-end\", e.g., chr1:151,073,054-151,383,976 (comma allowed)"
                         },
                         {
-                            "Name": "species",
-                            "Type": "string",
-                            "Description": "Optional, do the genome interval query for the given species. You can use \"common names\" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). Any other species, you can provide its taxonomy id. Default: human."
-                        },
-                        {
                             "Name": "fields",
                             "Type": "string",
                             "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                        },
+                        {
+                            "Name": "species",
+                            "Type": "string",
+                            "Description": "Optional, do the genome interval query for the given species. You can use \"common names\" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). Any other species, you can provide its taxonomy id. Default: human."
                         },
                         {
                             "Name": "size",
@@ -155,9 +165,24 @@
                             "Description": "the comma-separated fields to sort on. Prefix with \"-\" for descending order, otherwise in ascending order. Default: sort by matching scores in decending order."
                         },
                         {
+                            "Name": "entrezonly",
+                            "Type": "boolean",
+                            "Description": "when passed as “true” or “1”, the query returns only the hits with valid Entrez gene ids. Default: false."
+                        },
+                        {
+                            "Name": "ensemblonly",
+                            "Type": "boolean",
+                            "Description": "when passed as “true” or “1”, the query returns only the hits with valid Ensembl gene ids. Default: false."
+                        },
+                        {
                             "Name": "callback",
                             "Type": "string",
                             "Description": "you can pass a \"callback\" parameter to make a JSONP call."
+                        },
+                        {
+                            "Name": "dotfield",
+                            "Type": "boolean",
+                            "Description": "control the format of the returned fields when passed \"fields\" parameter contains dot notation, e.g. \"fields=refseq.rna\". If \"true\" or \"1\", the returned data object contains a single \"refseq.rna\" field, otherwise (\"false\" or \"0\"), a single \"refseq\" field with a sub-field of \"rna\". Default: true."
                         },
                         {
                             "Name": "filter",
@@ -209,6 +234,11 @@
                             "Name": "filter",
                             "Type": "string",
                             "Description": "alias for \"fields\" parameter."
+                        },
+                        {
+                            "Name": "dotfield",
+                            "Type": "boolean",
+                            "Description": "control the format of the returned fields when passed \"fields\" parameter contains dot notation, e.g. \"fields=refseq.rna\". If \"true\" or \"1\", the returned data object contains a single \"refseq.rna\" field, otherwise (\"false\" or \"0\"), a single \"refseq\" field with a sub-field of \"rna\". Default: true."
                         }
                     ]
                 },
@@ -235,7 +265,11 @@
                             "Name": "species",
                             "Type": "string",
                             "Description": "Optional, can be used to limit the gene hits from given species. You can use \"common names\" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). All other species, you can provide their taxonomy ids. Multiple species can be passed using comma as a separator. Default: all."
-
+                        },
+                        {
+                            "Name": "dotfield",
+                            "Type": "boolean",
+                            "Description": "control the format of the returned fields when passed \"fields\" parameter contains dot notation, e.g. \"fields=refseq.rna\". If \"true\" or \"1\", the returned data object contains a single \"refseq.rna\" field, otherwise (\"false\" or \"0\"), a single \"refseq\" field with a sub-field of \"rna\". Default: true."
                         }
                     ]
                 }

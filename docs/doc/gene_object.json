@@ -1,899 +1,1851 @@
 .. code-block :: json
 
-    {
-      "MIM": "116953",
-      "ipi": [
-        "IPI00031681",
-        "IPI00910650"
-      ],
-      "accession": {
-        "genomic": [
-          "ABBA01008397",
-          "AC025162",
-          "AC034102",
-          "AC_000144",
-          "AF512553",
-          "AMYH01004497",
-          "CH471054",
-          "NC_000012",
-          "NC_018923",
-          "NT_029419",
-          "NW_001838059",
-          "NW_004078075",
-          "U50730"
-        ],
-        "protein": [
-          "AAA35667",
-          "AAH03065",
-          "AAM34794",
-          "AAP35467",
-          "ABM84693",
-          "ABM92215",
-          "BAA32794",
-          "BAF84630",
-          "BAG56780",
-          "CAA43807",
-          "CAA43985",
-          "CAL38014",
-          "EAW96856",
-          "EAW96857",
-          "EAW96858",
-          "EAW96859",
-          "EAW96860",
-          "NP_001789",
-          "NP_439892",
-          "P24941"
-        ],
-        "rna": [
-          "AA810989",
-          "AB012305",
-          "AK291941",
-          "AK293246",
-          "AM393136",
-          "BC003065",
-          "BJ991087",
-          "BT006821",
-          "DQ890598",
-          "DQ893767",
-          "M68520",
-          "NM_001798",
-          "NM_052827",
-          "X61622",
-          "X62071"
-        ]
-      },
-      "ec": "2.7.11.22",
-      "go": {
-        "CC": [
-          {
-            "term": "cyclin-dependent protein kinase holoenzyme complex",
-            "id": "GO:0000307"
-          },
-          {
-            "term": "chromosome, telomeric region",
-            "id": "GO:0000781"
-          },
-          {
-            "term": "condensed chromosome",
-            "id": "GO:0000793"
-          },
-          {
-            "term": "X chromosome",
-            "id": "GO:0000805"
-          },
-          {
-            "term": "Y chromosome",
-            "id": "GO:0000806"
-          },
-          {
-            "term": "nucleus",
-            "id": "GO:0005634"
-          },
-          {
-            "term": "nucleoplasm",
-            "id": "GO:0005654"
-          },
-          {
-            "term": "transcription factor complex",
-            "id": "GO:0005667"
-          },
-          {
-            "term": "cytoplasm",
-            "id": "GO:0005737"
-          },
-          {
-            "term": "endosome",
-            "id": "GO:0005768"
-          },
-          {
-            "term": "centrosome",
-            "id": "GO:0005813"
-          },
-          {
-            "term": "cytosol",
-            "id": "GO:0005829"
-          },
-          {
-            "term": "Cajal body",
-            "id": "GO:0015030"
-          }
-        ],
-        "MF": [
-          {
-            "term": "cyclin-dependent protein serine/threonine kinase activity",
-            "id": "GO:0004693"
-          },
-          {
-            "term": "cyclin-dependent protein serine/threonine kinase activity",
-            "id": "GO:0004693"
-          },
-          {
-            "term": "protein binding",
-            "id": "GO:0005515"
-          },
-          {
-            "term": "ATP binding",
-            "id": "GO:0005524"
-          },
-          {
-            "term": "cyclin binding",
-            "id": "GO:0030332"
-          },
-          {
-            "term": "histone kinase activity",
-            "id": "GO:0035173"
-          },
-          {
-            "term": "metal ion binding",
-            "id": "GO:0046872"
-          }
-        ],
-        "BP": [
-          {
-            "term": "G1/S transition of mitotic cell cycle",
-            "id": "GO:0000082"
-          },
-          {
-            "term": "G2 phase of mitotic cell cycle",
-            "id": "GO:0000085"
-          },
-          {
-            "term": "G2/M transition of mitotic cell cycle",
-            "id": "GO:0000086"
-          },
-          {
-            "term": "mitotic cell cycle",
-            "id": "GO:0000278"
-          },
-          {
-            "term": "DNA replication",
-            "id": "GO:0006260"
-          },
-          {
-            "term": "DNA repair",
-            "id": "GO:0006281"
-          },
-          {
-            "term": "potassium ion transport",
-            "id": "GO:0006813"
-          },
-          {
-            "term": "DNA damage response, signal transduction by p53 class mediator resulting in cell cycle arrest",
-            "id": "GO:0006977"
-          },
-          {
-            "term": "mitosis",
-            "id": "GO:0007067"
-          },
-          {
-            "term": "meiosis",
-            "id": "GO:0007126"
-          },
-          {
-            "term": "Ras protein signal transduction",
-            "id": "GO:0007265"
-          },
-          {
-            "term": "blood coagulation",
-            "id": "GO:0007596"
-          },
-          {
-            "term": "positive regulation of cell proliferation",
-            "id": "GO:0008284"
-          },
-          {
-            "term": "histone phosphorylation",
-            "id": "GO:0016572"
-          },
-          {
-            "term": "anaphase-promoting complex-dependent proteasomal ubiquitin-dependent protein catabolic process",
-            "id": "GO:0031145"
-          },
-          {
-            "term": "mitotic G1 DNA damage checkpoint",
-            "id": "GO:0031571"
-          },
-          {
-            "term": "positive regulation of DNA-dependent DNA replication initiation",
-            "id": "GO:0032298"
-          },
-          {
-            "term": "positive regulation of transcription, DNA-dependent",
-            "id": "GO:0045893"
-          },
-          {
-            "term": "centrosome duplication",
-            "id": "GO:0051298"
-          },
-          {
-            "term": "cell division",
-            "id": "GO:0051301"
-          },
-          {
-            "term": "regulation of ubiquitin-protein ligase activity involved in mitotic cell cycle",
-            "id": "GO:0051439"
-          },
-          {
-            "term": "regulation of gene silencing",
-            "id": "GO:0060968"
-          },
-          {
-            "term": "cellular response to nitric oxide",
-            "id": "GO:0071732"
-          }
-        ]
-      },
-      "pir": "A41227",
-      "unigene": [
-        "Hs.19192",
-        "Hs.689624"
-      ],
-      "interpro": [
-        {
-          "short_desc": "Prot_kinase_cat_dom",
-          "id": "IPR000719",
-          "desc": "Protein kinase, catalytic domain"
-        },
-        {
-          "short_desc": "Kinase-like_dom",
-          "id": "IPR011009",
-          "desc": "Protein kinase-like domain"
-        },
-        {
-          "short_desc": "Ser-Thr/Tyr_kinase_cat_dom",
-          "id": "IPR001245",
-          "desc": "Serine-threonine/tyrosine-protein kinase catalytic domain"
-        },
-        {
-          "short_desc": "Ser/Thr_dual-sp_kinase_dom",
-          "id": "IPR002290",
-          "desc": "Serine/threonine- / dual specificity protein kinase, catalytic  domain"
-        },
-        {
-          "short_desc": "Tyr_kinase_cat_dom",
-          "id": "IPR020635",
-          "desc": "Tyrosine-protein kinase, catalytic domain"
-        }
-      ],
-      "pharmgkb": "PA101",
-      "HPRD": "00310",
-      "prosite": "PS50011",
-      "homologene": {
-        "genes": [
+  {
+    "MIM":"116953",
+    "exons":{
+      "NM_052827":{
+        "chr":"12",
+        "strand":1,
+        "exons":[
           [
-            9606,
-            1017
+            56360555,
+            56360908
           ],
           [
-            10090,
-            12566
+            56361640,
+            56361718
           ],
           [
-            10116,
-            362817
+            56361832,
+            56361953
           ],
           [
-            7227,
-            42453
+            56362561,
+            56362732
           ],
           [
-            7955,
-            406715
+            56364827,
+            56365031
           ],
           [
-            3702,
-            824036
-          ],
-          [
-            4530,
-            4328135
-          ],
-          [
-            4530,
-            4331415
-          ],
-          [
-            4896,
-            2539869
-          ],
-          [
-            4932,
-            852457
-          ],
-          [
-            5141,
-            3876264
-          ],
-          [
-            7165,
-            3291042
-          ],
-          [
-            9031,
-            100529062
-          ],
-          [
-            9544,
-            711002
-          ],
-          [
-            9598,
-            467032
-          ],
-          [
-            9615,
-            100855704
-          ],
-          [
-            9913,
-            519217
-          ],
-          [
-            28985,
-            2896999
-          ],
-          [
-            33169,
-            4620303
-          ],
-          [
-            318829,
-            2679140
+            56365304,
+            56366568
           ]
         ],
-        "id": 74409
+        "txstart":56360555,
+        "cdsstart":56360792,
+        "cdsend":56365409,
+        "txend":56366568
       },
-      "reporter": {
-        "HG-U133_Plus_2": [
-          "204252_at",
-          "211803_at",
-          "211804_s_at"
+      "NM_001798":{
+        "chr":"12",
+        "strand":1,
+        "exons":[
+          [
+            56360555,
+            56360908
+          ],
+          [
+            56361640,
+            56361718
+          ],
+          [
+            56361832,
+            56361953
+          ],
+          [
+            56362561,
+            56362732
+          ],
+          [
+            56363258,
+            56363360
+          ],
+          [
+            56364827,
+            56365031
+          ],
+          [
+            56365304,
+            56366568
+          ]
         ],
-        "HG-U95Av2": [
-          "1792_g_at",
-          "1833_at"
-        ]
-      },
-      "symbol": "CDK2",
-      "genomic_pos": {
-        "start": 56360553,
-        "chr": "12",
-        "end": 56366568,
-        "strand": 1
-      },
-      "reagent": {
-        "GNF_hs_LentiORF-HA-MYC": {
-          "id": "GNF282834",
-          "relationship": "is"
-        },
-        "GNF_hs-Origene": [
-          {
-            "id": "GNF035860",
-            "relationship": "similar to"
-          },
-          {
-            "id": "GNF037258",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF048982",
-            "relationship": "is"
-          }
-        ],
-        "GNF_hs-ORFeome1_1_reads": {
-          "id": "GNF161504",
-          "relationship": "is"
-        },
-        "GNF_hs-druggable_lenti-shRNA": [
-          {
-            "id": "GNF081385",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF081386",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF081387",
-            "relationship": "is"
-          }
-        ],
-        "NOVART_hs-genome_siRNA": [
-          {
-            "id": "GNF093028",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF132726",
-            "relationship": "is"
-          }
-        ],
-        "GNF_mm+hs-MGC": {
-          "id": "GNF002384",
-          "relationship": "is"
-        },
-        "GNF_hs-pkinase_IDT-siRNA": [
-          {
-            "id": "GNF166768",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF166769",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF166770",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF166771",
-            "relationship": "is"
-          }
-        ],
-        "GNF_hs_LentiORF-Jred": {
-          "id": "GNF283761",
-          "relationship": "is"
-        },
-        "GNF_hs-druggable_siRNA": [
-          {
-            "id": "GNF066537",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF066538",
-            "relationship": "is"
-          }
-        ],
-        "GNF_Qia_hs-genome_v1_siRNA": [
-          {
-            "id": "GNF247215",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF247216",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF247217",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF247218",
-            "relationship": "is"
-          }
-        ],
-        "GNF_hs-druggable_plasmid-shRNA": [
-          {
-            "id": "GNF051995",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF056761",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF061563",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF078683",
-            "relationship": "is"
-          }
-        ],
-        "Invitrogen_IVTHSSIPKv2": [
-          {
-            "id": "GNF324610",
-            "relationship": "is"
-          },
-          {
-            "id": "GNF324611",
-            "relationship": "is"
-          }
-        ],
-        "NIBRI_hs-Secretome_pDEST": {
-          "id": "GNF337962",
-          "relationship": "is"
-        }
-      },
-      "Vega": "OTTHUMG00000170575",
-      "refseq": {
-        "genomic": [
-          "AC_000144",
-          "NC_000012",
-          "NC_018923",
-          "NT_029419",
-          "NW_001838059",
-          "NW_004078075"
-        ],
-        "protein": [
-          "NP_001789",
-          "NP_439892"
-        ],
-        "rna": [
-          "NM_001798",
-          "NM_052827"
-        ]
-      },
-      "name": "cyclin-dependent kinase 2",
-      "taxid": 9606,
-      "summary": "The protein encoded by this gene is a member of the Ser/Thr protein kinase family. This protein kinase is highly similar to the gene products of S. cerevisiae cdc28, and S. pombe cdc2. It is a catalytic subunit of the cyclin-dependent protein kinase complex, whose activity is restricted to the G1-S phase, and essential for cell cycle G1/S phase transition. This protein associates with and regulated by the regulatory subunits of the complex including cyclin A or E, CDK inhibitor p21Cip1 (CDKN1A) and p27Kip1 (CDKN1B). Its activity is also regulated by its protein phosphorylation. Two alternatively spliced variants and multiple transcription initiation sites of this gene have been reported. [provided by RefSeq, Jul 2008].",
-      "alias": "p33(CDK2)",
-      "entrezgene": 1017,
-      "uniprot": {
-        "Swiss-Prot": "P24941",
-        "TrEMBL": [
-          "E7ESI2",
-          "G3V317",
-          "G3V5T9"
-        ]
-      },
-      "ensembl": {
-        "protein": [
-          "ENSP00000243067",
-          "ENSP00000266970",
-          "ENSP00000393605",
-          "ENSP00000450983",
-          "ENSP00000452138",
-          "ENSP00000452514"
-        ],
-        "gene": "ENSG00000123374",
-        "transcript": [
-          "ENST00000266970",
-          "ENST00000354056",
-          "ENST00000440311",
-          "ENST00000553376",
-          "ENST00000554545",
-          "ENST00000554619",
-          "ENST00000555357",
-          "ENST00000555408",
-          "ENST00000556146",
-          "ENST00000556276",
-          "ENST00000556464",
-          "ENST00000556656"
-        ]
-      },
-      "map_location": "12q13",
-      "_id": "1017",
-      "type_of_gene": "protein-coding",
-      "pdb": [
-        "1AQ1",
-        "1B38",
-        "1B39",
-        "1BUH",
-        "1CKP",
-        "1DI8",
-        "1DM2",
-        "1E1V",
-        "1E1X",
-        "1E9H",
-        "1F5Q",
-        "1FIN",
-        "1FQ1",
-        "1FVT",
-        "1FVV",
-        "1G5S",
-        "1GIH",
-        "1GII",
-        "1GIJ",
-        "1GY3",
-        "1GZ8",
-        "1H00",
-        "1H01",
-        "1H07",
-        "1H08",
-        "1H0V",
-        "1H0W",
-        "1H1P",
-        "1H1Q",
-        "1H1R",
-        "1H1S",
-        "1H24",
-        "1H25",
-        "1H26",
-        "1H27",
-        "1H28",
-        "1HCK",
-        "1HCL",
-        "1JST",
-        "1JSU",
-        "1JSV",
-        "1JVP",
-        "1KE5",
-        "1KE6",
-        "1KE7",
-        "1KE8",
-        "1KE9",
-        "1OGU",
-        "1OI9",
-        "1OIQ",
-        "1OIR",
-        "1OIT",
-        "1OIU",
-        "1OIY",
-        "1OKV",
-        "1OKW",
-        "1OL1",
-        "1OL2",
-        "1P2A",
-        "1P5E",
-        "1PF8",
-        "1PKD",
-        "1PW2",
-        "1PXI",
-        "1PXJ",
-        "1PXK",
-        "1PXL",
-        "1PXM",
-        "1PXN",
-        "1PXO",
-        "1PXP",
-        "1PYE",
-        "1QMZ",
-        "1R78",
-        "1URC",
-        "1URW",
-        "1V1K",
-        "1VYW",
-        "1VYZ",
-        "1W0X",
-        "1W8C",
-        "1W98",
-        "1WCC",
-        "1Y8Y",
-        "1Y91",
-        "1YKR",
-        "2A0C",
-        "2A4L",
-        "2B52",
-        "2B53",
-        "2B54",
-        "2B55",
-        "2BHE",
-        "2BHH",
-        "2BKZ",
-        "2BPM",
-        "2BTR",
-        "2BTS",
-        "2C4G",
-        "2C5N",
-        "2C5O",
-        "2C5V",
-        "2C5X",
-        "2C5Y",
-        "2C68",
-        "2C69",
-        "2C6I",
-        "2C6K",
-        "2C6L",
-        "2C6M",
-        "2C6O",
-        "2C6T",
-        "2CCH",
-        "2CCI",
-        "2CJM",
-        "2CLX",
-        "2DS1",
-        "2DUV",
-        "2EXM",
-        "2FVD",
-        "2G9X",
-        "2HIC",
-        "2I40",
-        "2IW6",
-        "2IW8",
-        "2IW9",
-        "2J9M",
-        "2JGZ",
-        "2R3F",
-        "2R3G",
-        "2R3H",
-        "2R3I",
-        "2R3J",
-        "2R3K",
-        "2R3L",
-        "2R3M",
-        "2R3N",
-        "2R3O",
-        "2R3P",
-        "2R3Q",
-        "2R3R",
-        "2R64",
-        "2UUE",
-        "2UZB",
-        "2UZD",
-        "2UZE",
-        "2UZL",
-        "2UZN",
-        "2UZO",
-        "2V0D",
-        "2V22",
-        "2VTA",
-        "2VTH",
-        "2VTI",
-        "2VTJ",
-        "2VTL",
-        "2VTM",
-        "2VTN",
-        "2VTO",
-        "2VTP",
-        "2VTQ",
-        "2VTR",
-        "2VTS",
-        "2VTT",
-        "2VU3",
-        "2VV9",
-        "2W05",
-        "2W06",
-        "2W17",
-        "2W1H",
-        "2WEV",
-        "2WFY",
-        "2WHB",
-        "2WIH",
-        "2WIP",
-        "2WMA",
-        "2WMB",
-        "2WPA",
-        "2WXV",
-        "2X1N",
-        "2XMY",
-        "2XNB",
-        "3BHT",
-        "3BHU",
-        "3BHV",
-        "3DDP",
-        "3DDQ",
-        "3DOG",
-        "3EID",
-        "3EJ1",
-        "3EOC",
-        "3EZR",
-        "3EZV",
-        "3F5X",
-        "3FZ1",
-        "3IG7",
-        "3IGG",
-        "3LE6",
-        "3LFN",
-        "3LFQ",
-        "3LFS",
-        "3MY5",
-        "3NS9",
-        "3PJ8",
-        "3PXF",
-        "3PXQ",
-        "3PXR",
-        "3PXY",
-        "3PXZ",
-        "3PY0",
-        "3PY1",
-        "3QHR",
-        "3QHW",
-        "3QL8",
-        "3QQF",
-        "3QQG",
-        "3QQH",
-        "3QQJ",
-        "3QQK",
-        "3QQL",
-        "3QRT",
-        "3QRU",
-        "3QTQ",
-        "3QTR",
-        "3QTS",
-        "3QTU",
-        "3QTW",
-        "3QTX",
-        "3QTZ",
-        "3QU0",
-        "3QWJ",
-        "3QWK",
-        "3QX2",
-        "3QX4",
-        "3QXO",
-        "3QXP",
-        "3QZF",
-        "3QZG",
-        "3QZH",
-        "3QZI",
-        "3R1Q",
-        "3R1S",
-        "3R1Y",
-        "3R28",
-        "3R6X",
-        "3R71",
-        "3R73",
-        "3R7E",
-        "3R7I",
-        "3R7U",
-        "3R7V",
-        "3R7Y",
-        "3R83",
-        "3R8L",
-        "3R8M",
-        "3R8P",
-        "3R8U",
-        "3R8V",
-        "3R8Z",
-        "3R9D",
-        "3R9H",
-        "3R9N",
-        "3R9O",
-        "3RAH",
-        "3RAI",
-        "3RAK",
-        "3RAL",
-        "3RJC",
-        "3RK5",
-        "3RK7",
-        "3RK9",
-        "3RKB",
-        "3RM6",
-        "3RM7",
-        "3RMF",
-        "3RNI",
-        "3ROY",
-        "3RPO",
-        "3RPR",
-        "3RPV",
-        "3RPY",
-        "3RZB",
-        "3S00",
-        "3S0O",
-        "3S1H",
-        "3S2P",
-        "3SQQ",
-        "3SW4",
-        "3SW7",
-        "3TI1",
-        "3TIY",
-        "3TIZ",
-        "3TNW",
-        "3UNJ",
-        "3UNK",
-        "4ACM",
-        "4BCK",
-        "4BCM",
-        "4BCN",
-        "4BCO",
-        "4BCQ",
-        "4EOI",
-        "4EOJ",
-        "4EOK",
-        "4EOL",
-        "4EOM",
-        "4EON",
-        "4EOO",
-        "4EOP",
-        "4EOQ",
-        "4EOR",
-        "4EOS",
-        "4ERW",
-        "4EZ3",
-        "4EZ7",
-        "4GCJ",
-        "4I3Z",
-        "4II5"
+        "txstart":56360555,
+        "cdsstart":56360792,
+        "cdsend":56365409,
+        "txend":56366568
+      }
+    },
+    "ipi":[
+      "IPI00031681",
+      "IPI00910650"
+    ],
+    "accession":{
+      "genomic":[
+        "ABBA01008397",
+        "AC025162",
+        "AC034102",
+        "AC_000144",
+        "AF512553",
+        "AMYH02026556",
+        "AMYH02026557",
+        "CH471054",
+        "NC_000012",
+        "NC_018923",
+        "NT_029419",
+        "NW_001838059",
+        "NW_004929384",
+        "U50730"
       ],
-      "HGNC": "1771"
-    }
+      "rna":[
+        "AA810989",
+        "AB012305",
+        "AK291941",
+        "AK293246",
+        "AM393136",
+        "BC003065",
+        "BJ991087",
+        "BT006821",
+        "DQ890598",
+        "DQ893767",
+        "M68520",
+        "NM_001798",
+        "NM_052827",
+        "X61622",
+        "X62071",
+        "XM_005268559"
+      ],
+      "protein":[
+        "AAA35667",
+        "AAH03065",
+        "AAM34794",
+        "AAP35467",
+        "ABM84693",
+        "ABM92215",
+        "BAA32794",
+        "BAF84630",
+        "BAG56780",
+        "CAA43807",
+        "CAA43985",
+        "CAL38014",
+        "EAW96856",
+        "EAW96857",
+        "EAW96858",
+        "EAW96859",
+        "EAW96860",
+        "NP_001789",
+        "NP_439892",
+        "P24941",
+        "XP_005268616"
+      ]
+    },
+    "ec":"2.7.11.22",
+    "go":{
+      "CC":[
+        {
+          "term":"cyclin-dependent protein kinase holoenzyme complex",
+          "pubmed":8692841,
+          "id":"GO:0000307",
+          "evidence":"IDA"
+        },
+        {
+          "term":"chromosome, telomeric region",
+          "id":"GO:0000781",
+          "evidence":"IEA"
+        },
+        {
+          "term":"condensed chromosome",
+          "id":"GO:0000793",
+          "evidence":"IEA"
+        },
+        {
+          "term":"X chromosome",
+          "id":"GO:0000805",
+          "evidence":"IEA"
+        },
+        {
+          "term":"Y chromosome",
+          "id":"GO:0000806",
+          "evidence":"IEA"
+        },
+        {
+          "term":"nucleus",
+          "pubmed":10767298,
+          "id":"GO:0005634",
+          "evidence":"IDA"
+        },
+        {
+          "term":"nucleoplasm",
+          "id":"GO:0005654",
+          "evidence":"TAS"
+        },
+        {
+          "term":"transcription factor complex",
+          "id":"GO:0005667",
+          "evidence":"IEA"
+        },
+        {
+          "term":"cytoplasm",
+          "pubmed":10767298,
+          "id":"GO:0005737",
+          "evidence":"IDA"
+        },
+        {
+          "term":"endosome",
+          "id":"GO:0005768",
+          "evidence":"IDA"
+        },
+        {
+          "term":"centrosome",
+          "pubmed":19238148,
+          "id":"GO:0005813",
+          "evidence":"TAS"
+        },
+        {
+          "term":"cytosol",
+          "id":"GO:0005829",
+          "evidence":"TAS"
+        },
+        {
+          "term":"Cajal body",
+          "pubmed":10995387,
+          "id":"GO:0015030",
+          "evidence":"IDA"
+        }
+      ],
+      "MF":[
+        {
+          "term":"cyclin-dependent protein serine/threonine kinase activity",
+          "id":"GO:0004693",
+          "evidence":"IDA"
+        },
+        {
+          "term":"cyclin-dependent protein serine/threonine kinase activity",
+          "id":"GO:0004693",
+          "evidence":"TAS"
+        },
+        {
+          "term":"protein binding",
+          "pubmed":10330164,
+          "id":"GO:0005515",
+          "evidence":"IPI"
+        },
+        {
+          "term":"ATP binding",
+          "id":"GO:0005524",
+          "evidence":"IEA"
+        },
+        {
+          "term":"cyclin binding",
+          "pubmed":1653904,
+          "id":"GO:0030332",
+          "evidence":"IDA"
+        },
+        {
+          "term":"histone kinase activity",
+          "pubmed":8692841,
+          "id":"GO:0035173",
+          "qualifier":"contributes_to",
+          "evidence":"IDA"
+        },
+        {
+          "term":"metal ion binding",
+          "id":"GO:0046872",
+          "evidence":"IEA"
+        }
+      ],
+      "BP":[
+        {
+          "term":"G1/S transition of mitotic cell cycle",
+          "id":"GO:0000082",
+          "evidence":"TAS"
+        },
+        {
+          "term":"mitotic G2 phase",
+          "id":"GO:0000085",
+          "evidence":"TAS"
+        },
+        {
+          "term":"G2/M transition of mitotic cell cycle",
+          "pubmed":1653904,
+          "id":"GO:0000086",
+          "evidence":"NAS"
+        },
+        {
+          "term":"mitotic cell cycle",
+          "id":"GO:0000278",
+          "evidence":"TAS"
+        },
+        {
+          "term":"DNA replication",
+          "pubmed":19238148,
+          "id":"GO:0006260",
+          "evidence":"TAS"
+        },
+        {
+          "term":"DNA repair",
+          "id":"GO:0006281",
+          "evidence":"IEA"
+        },
+        {
+          "term":"potassium ion transport",
+          "id":"GO:0006813",
+          "evidence":"IEA"
+        },
+        {
+          "term":"DNA damage response, signal transduction by p53 class mediator resulting in cell cycle arrest",
+          "id":"GO:0006977",
+          "evidence":"TAS"
+        },
+        {
+          "term":"mitosis",
+          "id":"GO:0007067",
+          "evidence":"IEA"
+        },
+        {
+          "term":"meiosis",
+          "pubmed":19238148,
+          "id":"GO:0007126",
+          "evidence":"TAS"
+        },
+        {
+          "term":"Ras protein signal transduction",
+          "pubmed":9054499,
+          "id":"GO:0007265",
+          "evidence":"IEP"
+        },
+        {
+          "term":"blood coagulation",
+          "id":"GO:0007596",
+          "evidence":"TAS"
+        },
+        {
+          "term":"positive regulation of cell proliferation",
+          "pubmed":10767298,
+          "id":"GO:0008284",
+          "evidence":"IDA"
+        },
+        {
+          "term":"histone phosphorylation",
+          "pubmed":8692841,
+          "id":"GO:0016572",
+          "evidence":"IDA"
+        },
+        {
+          "term":"anaphase-promoting complex-dependent proteasomal ubiquitin-dependent protein catabolic process",
+          "id":"GO:0031145",
+          "evidence":"TAS"
+        },
+        {
+          "term":"mitotic G1 DNA damage checkpoint",
+          "id":"GO:0031571",
+          "evidence":"TAS"
+        },
+        {
+          "term":"positive regulation of DNA-dependent DNA replication initiation",
+          "id":"GO:0032298",
+          "evidence":"IEA"
+        },
+        {
+          "term":"positive regulation of transcription, DNA-templated",
+          "id":"GO:0045893",
+          "evidence":"IEA"
+        },
+        {
+          "term":"centrosome duplication",
+          "pubmed":19238148,
+          "id":"GO:0051298",
+          "evidence":"TAS"
+        },
+        {
+          "term":"regulation of ubiquitin-protein ligase activity involved in mitotic cell cycle",
+          "id":"GO:0051439",
+          "evidence":"TAS"
+        },
+        {
+          "term":"regulation of gene silencing",
+          "id":"GO:0060968",
+          "evidence":"IDA"
+        },
+        {
+          "term":"cellular response to nitric oxide",
+          "id":"GO:0071732",
+          "evidence":"TAS"
+        }
+      ]
+    },
+    "pir":"A41227",
+    "unigene":[
+      "Hs.19192",
+      "Hs.689624"
+    ],
+    "interpro":[
+      {
+        "short_desc":"Prot_kinase_cat_dom",
+        "id":"IPR000719",
+        "desc":"Protein kinase, catalytic domain"
+      },
+      {
+        "short_desc":"Kinase-like_dom",
+        "id":"IPR011009",
+        "desc":"Protein kinase-like domain"
+      },
+      {
+        "short_desc":"Ser-Thr/Tyr_kinase_cat_dom",
+        "id":"IPR001245",
+        "desc":"Serine-threonine/tyrosine-protein kinase catalytic domain"
+      },
+      {
+        "short_desc":"Ser/Thr_dual-sp_kinase_dom",
+        "id":"IPR002290",
+        "desc":"Serine/threonine- / dual specificity protein kinase, catalytic  domain"
+      },
+      {
+        "short_desc":"Tyr_kinase_cat_dom",
+        "id":"IPR020635",
+        "desc":"Tyrosine-protein kinase, catalytic domain"
+      }
+    ],
+    "pharmgkb":"PA101",
+    "generif":[
+      {
+        "text":"Cyclin A/Cdk2 and cyclin E/cdk2 continuously shuttle between the nucleus and the cytoplasm",
+        "pubmed":"11907280"
+      },
+      {
+        "text":"results argue that TTK-associated CDK2 may function to maintain target-specific phosphorylation of RNA Pol II that is essential for Tat transactivation of HIV-1 promoter",
+        "pubmed":"12049628"
+      },
+      {
+        "text":"Activation mechanism role of cyclin binding versus phosphorylation",
+        "pubmed":"12081504"
+      },
+      {
+        "text":"CDK2/cyclin E is required for Tat-dependent transcription in vitro.",
+        "pubmed":"12114499"
+      },
+      {
+        "text":"CDK2 binding to cyclin E is required to drive cells from G(1) into S phase",
+        "pubmed":"12149264"
+      },
+      {
+        "text":"Interferon gamma reduces the activity of Cdk4 and Cdk2, inhibiting he G1 cell cycle in human hepatocellular carcinoma cells.",
+        "pubmed":"12531694"
+      },
+      {
+        "text":"CDK2 is not required for sustained cell division.",
+        "pubmed":"12676582"
+      },
+      {
+        "text":"Data suggest that the interaction between PKCeta and cyclin E is carefully regulated, and is correlated with the inactivated form of the cyclin E/Cdk2 complex.",
+        "pubmed":"12729791"
+      },
+      {
+        "text":"IRF1 represses CDK2 gene expression by interfering with SP1-dependent transcriptional activation.",
+        "pubmed":"12732645"
+      },
+      {
+        "text":"role in regulating Cdc25A half life",
+        "pubmed":"12801928"
+      },
+      {
+        "text":"TGF-beta 1 inhibition requires early G(1) induction and stabilization of p21 protein, which binds to & inhibits cyclin E-CDK2 and cyclin A-CDK2 kinase activity rather than direct modulation of cyclin or CDK protein levels as seen in other systems.",
+        "pubmed":"12810668"
+      },
+      {
+        "text":"Cdk2 has a role in phosphorylation of the NF-Y transcription factor",
+        "pubmed":"12857729"
+      },
+      {
+        "text":"CDK2 has a role in the G2 DNA damage checkpoint",
+        "pubmed":"12912980"
+      },
+      {
+        "text":"Kaposi's sarcoma-associated herpesvirus K-bZIP physically associates with cyclin-CDK2 and downmodulates its kinase activity.",
+        "pubmed":"12915577"
+      },
+      {
+        "text":"it is evident that B-Myb protein may promote cell proliferation by a non-transcriptional mechanism that involves release of active cyclin/cyclin dependent kinase 2 from cyclin-dependent inhibitor 1C p57(KIP2)",
+        "pubmed":"12947099"
+      },
+      {
+        "text":"Inhibition of Cdk2 by 1,25-(OH)2D3 may thus involve two mechanisms: 1) reduced nuclear Cdk2 available for cyclin binding and activation and 2) impairment of cyclin E-Cdk2-dependent p27 degradation through cytoplasmic mislocalization of Cdk2.",
+        "pubmed":"12954644"
+      },
+      {
+        "text":"kinetic insight into the basis for selecting suboptimal specificity determinants for the phosphorylation of cellular substrates",
+        "pubmed":"14506259"
+      },
+      {
+        "text":"multisite phosphorylation by Cdk2 and GSK3 controls cyclin E degradation",
+        "pubmed":"14536078"
+      },
+      {
+        "text":"CDK2 binds to SU9516 at Leu83 and Glu81",
+        "pubmed":"14550307"
+      },
+      {
+        "text":"CDK2 activation process through phosphorylation is examined using 2D PAGE",
+        "pubmed":"14551212"
+      },
+      {
+        "text":"Epstein-Barr virus can inhibit genotoxin-induced G1 arrest downstream of p53 by preventing the inactivation of CDK2",
+        "pubmed":"14562046"
+      },
+      {
+        "text":"p220 is an essential downstream component of the cyclin E/Cdk2 signaling pathway and functions to coordinate multiple elements of the G1/S transition.",
+        "pubmed":"14612403"
+      },
+      {
+        "text":"CDK2-cyclin E, without prior CDK4-cyclin D activity, can phosphorylate and inactivate pRb, activate E2F, and induce DNA synthesis.",
+        "pubmed":"14645251"
+      },
+      {
+        "text":"significant difference in their biochemical properties between CDK4/cyclin D1 and CDK2/cyclin A affecting regulation of cellular RB function",
+        "pubmed":"14646596"
+      },
+      {
+        "text":"cyclin-dependent kinase (CDK)2, -4, and -6 were down-regulated from the myelocytes/metamyelocytes stages and onward",
+        "pubmed":"14694185"
+      },
+      {
+        "text":"CDK2 complexes have roles in G(1)/S deregulation and tumor progression",
+        "pubmed":"14701826"
+      },
+      {
+        "text":"CDK2 regulates beta-catenin phosphorylation/ degradation",
+        "pubmed":"14985333"
+      },
+      {
+        "text":"Cdk2 and Cdk4 phosphorylate human Cdt1 and induce its degradation",
+        "pubmed":"15004027"
+      },
+      {
+        "text":"Binding to Cdk2-cyclin A is accompanied by p27 folding, and kinetic data suggest a sequential mechanism that is initiated by binding to cyclin A",
+        "pubmed":"15024385"
+      },
+      {
+        "text":"We also found that cyclin A/CDK2 phosphorylates Axin, thereby enhancing its association with beta-catenin.",
+        "pubmed":"15063782"
+      },
+      {
+        "text":"study provides evidence that the cyclin A1-cyclin dependent kinase 2 complex plays a role in several signaling pathways important for cell cycle control and meiosis",
+        "pubmed":"15159402"
+      },
+      {
+        "text":"interacts with dephosphorylated NIRF",
+        "pubmed":"15178429"
+      },
+      {
+        "text":"cyclin A-cdk2 plays an ancillary noncatalytic role in the ubiquitination of p27(KIP1) by the SCF(skp2) complex",
+        "pubmed":"15199159"
+      },
+      {
+        "text":"Results identify an important role for CDK2 in the maintenance of genomic stability, acting via an ATM- and ATR-dependent pathway.",
+        "pubmed":"15226429"
+      },
+      {
+        "text":"after CDK4/6 inactivation, the fate of pancreatic tumor cells depends on the ability to modulate CDK2 activity",
+        "pubmed":"15309028"
+      },
+      {
+        "text":"Data suggest that cyclin D1-Cdk2 complexes mediate some of the transforming effects of cyclin D1 and demonstrate that the cyclin D1-Cdk2 fusion protein is a useful model to investigate the biological functions of cyclin D1-Cdk2 complexes.",
+        "pubmed":"15355984"
+      },
+      {
+        "text":"These findings establish a novel function for cyclin A1 and CDK2 in DNA double strand break repair following radiation damage.",
+        "pubmed":"15456866"
+      },
+      {
+        "text":"Phosphborylation of progesterone receptor serine 400 mediates ligand-independent transcriptional activity in response to activation of CDK2.",
+        "pubmed":"15572662"
+      },
+      {
+        "text":"cyclin A/Cdk2 has a role as a progesterone receptor coactivator",
+        "pubmed":"15601848"
+      },
+      {
+        "text":"CDK2 depletion suppressed growth and cell cycle progression in melanoma and may be a suitable drug target in melanoma.",
+        "pubmed":"15607961"
+      },
+      {
+        "text":"Inhibition of CDK2 kinase by indole-3-carbinol is accompanied by selective alterations in cyclin E composition.",
+        "pubmed":"15611077"
+      },
+      {
+        "text":"molecular dynamics study on the complex CDK2 with the peptide substrate HHASPRK",
+        "pubmed":"15632290"
+      },
+      {
+        "text":"Results demonstrate that a peptide derived from the alpha5 helix of cyclin A significantly inhibits kinase activity of complexes harboring CDK2, and forms stable complexes with CDK2-cyclin A.",
+        "pubmed":"15649889"
+      },
+      {
+        "text":"crystal structure of phospho-CDK2 in complex with a truncated cyclin E1 (residues 81-363) at 2.25 A resolution",
+        "pubmed":"15660127"
+      },
+      {
+        "text":"CDK2-BRCA1-Nucleophosmin pathway coordinately functions in cell growth and tumor progression pathways.",
+        "pubmed":"15665273"
+      },
+      {
+        "text":"HTm4 binding to KAP.Cdk2.cyclin A complex enhances the phosphatase activity of KAP, dissociates cyclin A, and facilitates KAP dephosphorylation of Cdk2",
+        "pubmed":"15671017"
+      },
+      {
+        "text":"Results present a comprehensive description of the dynamic behavior of cyclin-dependent kinase 2 in complex with cyclin A.",
+        "pubmed":"15695825"
+      },
+      {
+        "text":"Puralpha has been shown to colocalize with cyclin A/Cdk2 and to coimmunoprecipitate with cyclin A during S-phase and we show that this interaction is mediated by a specific affinity of Puralpha for Cdk2.",
+        "pubmed":"15707957"
+      },
+      {
+        "text":"Rapid binding of p27 domain 1 to cyclin A tethers the inhibitor to the binary Cdk2/cyclin A complex",
+        "pubmed":"15890360"
+      },
+      {
+        "text":"CDK2 translational down-regulation may be a key regulatory event in replicative senescence of endothelial cells.",
+        "pubmed":"15922732"
+      },
+      {
+        "text":"origin recognition complex 2 has an unexpected role in CDK2 activation, a linkage that could be important for maintaining genomic stability",
+        "pubmed":"15944161"
+      },
+      {
+        "text":"Cdk2 destabilizes p21 via the cy2 cyclin-binding motif and p21 phosphorylation",
+        "pubmed":"15964852"
+      },
+      {
+        "text":"Our results demonstrate that differential regulation of Cdc2 and Cdk2 activity by different doses of doxorubicin may contribute to the induction of two modes of cell death in hepatoma cells, either apoptosis or cell death through mitotic catastrophe.",
+        "pubmed":"16036217"
+      },
+      {
+        "text":"CINP is part of the Cdc7-dependent mechanism of origin firing and a functional and physical link between Cdk2 and Cdc7 complexes at the origins",
+        "pubmed":"16082200"
+      },
+      {
+        "text":"CDK2 inhibition modifies the dynamics of chromatin-bound minichromosome maintenance complex and replication protein A",
+        "pubmed":"16082227"
+      },
+      {
+        "text":"results indicate that CDK2 participates in Tat-mediated HIV-1 transcription and may serve as a potential therapeutic target",
+        "pubmed":"16085226"
+      },
+      {
+        "text":"Cdk2 inhibition decreases the efficiency of chemical induction of KSHV lytic transcripts ORF 50 and 26. Importantly, Cdk2 activity is also essential for replication in other human herpesviruses",
+        "pubmed":"16150942"
+      },
+      {
+        "text":"A new concept indicates in this review that both Cdk2 and/or Cdc2 can drive cells through G1/S phase in parallel.",
+        "pubmed":"16258277"
+      },
+      {
+        "text":"Cdk2 dependent phosphorylation(s) cannot be a critical trigger of replicon initiation in response to reoxygenation after several hours of hypoxia, at least in the T24 cells studied",
+        "pubmed":"16262700"
+      },
+      {
+        "text":"We propose that during TNFalpha-induced apoptosis, PKCdelta-mediated phosphorylation of p21(WAF1/CIP1) at (146)Ser attenuates the Cdk2 binding of p21(WAF1/CIP1) and thereby upregulates Cdk2 activity.",
+        "pubmed":"16343435"
+      },
+      {
+        "text":"molecular analysis of the CDK5/p25 and CDK2/cyclin A systems",
+        "pubmed":"16407256"
+      },
+      {
+        "text":"Cyclin-dependent kinases regulate the transcriptional activity of FOXM1c; a combination of three phosphorylation sites mediates the Cyclin E and Cyclin A/CDK2 effects.",
+        "pubmed":"16504183"
+      },
+      {
+        "text":"Here, we show that human papillomavirus type 16 16E1--E4 is also able to associate with cyclin A and Cdk2 during the G2 phase of the cell cycle.",
+        "pubmed":"16540140"
+      },
+      {
+        "text":"The interaction between roscovitine and cyclin-dependent kinase 2 (cdk2) was investigated by performing correlated ab initio quantum-chemical calculations.",
+        "pubmed":"16575928"
+      },
+      {
+        "text":"the phospho-CDK2/cyclin A recruitment site has a role in substrate recognition",
+        "pubmed":"16707497"
+      },
+      {
+        "text":"Phosphorylation of the linker histone H1 by CDK regulates its binding to HP1alpha",
+        "pubmed":"16762841"
+      },
+      {
+        "text":"suggest a novel retinoic acid (RA)-signaling, by which RA-induced p21 induction and complex formation with cyclin E/CDK2 diverts CDK2 function from normally driving proliferation to alternatively promoting apoptosis",
+        "pubmed":"16765349"
+      },
+      {
+        "text":"Membrane depolarization may stimulate cellular proliferation by augmenting the expression of cyclin E leading to increases in Cdk2 activity and RB phosphorylation in a neuroblastoma cell line.",
+        "pubmed":"16824683"
+      },
+      {
+        "text":"the Chk1-mediated S-phase checkpoint targets initiation factor Cdc45 via a Cdc25A/Cdk2-independent mechanism",
+        "pubmed":"16912045"
+      },
+      {
+        "text":"Breast cancer cells lacking cancer predisposition genes BRCA1 are more sensitive to CDK2 inhibitors.",
+        "pubmed":"16912201"
+      },
+      {
+        "text":"analysis of the NBI1-binding site on cyclin A which inhibits the catalytic activity of the complex cyclin-dependent kinase 2-cyclin A",
+        "pubmed":"17001081"
+      },
+      {
+        "text":"progression of melanoma is associated with changes in CDK-2 expression level",
+        "pubmed":"17013093"
+      },
+      {
+        "text":"functional interaction between CDK2 and FOXO1 provides a mechanism that regulates apoptotic cell death after DNA strand breakage",
+        "pubmed":"17038621"
+      },
+      {
+        "text":"Kinetic and crystallographic analyses of CDK2-cyclin A complexes reveal that this inhibitory mechanism operates through steric blockade of peptide substrate binding.",
+        "pubmed":"17095507"
+      },
+      {
+        "text":"Review highlights an alternative role for CDK2 in the regulation of progesterone receptor signaling.",
+        "pubmed":"17207508"
+      },
+      {
+        "text":"TopBP1 necessary for the G(1)/S transition: one for activating cyclin E/CDK2 kinase and the other for loading replication components onto chromatin to initiate DNA synthesis.",
+        "pubmed":"17293600"
+      },
+      {
+        "text":"Our results demonstrate that CDK2 is capable of autophosphorylation at Thr160.",
+        "pubmed":"17361108"
+      },
+      {
+        "text":"results argue that Mdm2 is needed for full inhibition of Cdk2 activity by p21, thereby positively contributing to p53-dependent cell cycle arrest",
+        "pubmed":"17371838"
+      },
+      {
+        "text":"Both Cdk1 and -2 require cyclin binding and T loop phosphorylation for full activity.",
+        "pubmed":"17386261"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"17409409"
+      },
+      {
+        "text":"The structure of phospho-CDK2/cyclin B is reported. pCDK2/cyclin B is less discriminatory in substrate recognition than CDK2/cyclin A & has properties of both an S-phase & an M-phase kinase. CDK2/cyclin B is effective against S phase substrates.",
+        "pubmed":"17495531"
+      },
+      {
+        "text":"ATRIP is a CDK2 substrate, and CDK2-dependent phosphorylation of S224 regulates the ability of ATR-ATRIP to promote cell cycle arrest in response to DNA damage",
+        "pubmed":"17638878"
+      },
+      {
+        "text":"Phosphorylation on a conserved Thr14 can inhibit activities of both the kinases, but phosphorylating another conserved Tyr15, however, can lead to totally opposite inhibition and stimulation consequences in CDK2 and CDK5.",
+        "pubmed":"17713927"
+      },
+      {
+        "text":"The conserved rigid regions are important for nucleotide binding, catalysis, and substrate recognition; most flexible regions correlate with those where large conformational changes occur during CDK2 regulation processes.",
+        "pubmed":"18042686"
+      },
+      {
+        "text":"cdk2 activity is necessary for the survival of human DLBCL.",
+        "pubmed":"18156799"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"18174243"
+      },
+      {
+        "text":"major Cdk2-dependent multiple gene regulatory events are present in pemphigus vulgar",
+        "pubmed":"18199752"
+      },
+      {
+        "text":"serum starvation induces G1 arrest through suppression of Skp2-dependent CDK2 activity and Skp2-independent CDK4 activity in human SK-OV-3 ovarian cancer cells",
+        "pubmed":"18202766"
+      },
+      {
+        "text":"growth arrest by SmE directly correlates with the reduction of cyclin E, CDK2, CDC25C and CDC2 expression, and up-regulation of p27Kip",
+        "pubmed":"18208561"
+      },
+      {
+        "text":"Findings strongly demonstrate that retinoblastoma (RB) and cyclin-dependent kinase 2 (CDK2) on one side and cytokeratin 8 (CK8) and epidermal growth factor receptor 2 (HER2) on the other may affect the clinical course of the disease in 56% of patients.",
+        "pubmed":"18236071"
+      },
+      {
+        "text":"Cyclin E and SV40 small T antigen cooperate to bypass quiescence and contribute to transformation by activating CDK2 in human fibroblasts",
+        "pubmed":"18276582"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"18281541"
+      },
+      {
+        "text":"Bim-mediated apoptosis following actin damage due to deregulation of Cdk2 and the cell cycle by the absence of functional p53.",
+        "pubmed":"18345036"
+      },
+      {
+        "text":"G2 phase cyclin A/cdk2 controls the timing of entry into mitosis by controlling the subsequent activation of cyclin B/cdk1, but also has an unexpected role in coordinating the activation of cyclin B/cdk1 at the centrosome and in the nucleus",
+        "pubmed":"18372919"
+      },
+      {
+        "text":"disruption of the spindle-assembly checkpoint does not directly influence p53 activation, but the shortening of the mitotic arrest allows cyclin E-CDK2 to be activated before the accumulation of p21(CIP1/WAF1).",
+        "pubmed":"18400748"
+      },
+      {
+        "text":"Results suggest that GSK-3 regulates nuclear p27 Kip1 expression through downregulation of Skp2 expression and regulates p27 Kip1 assembly with CDK2, playing a critical role in the G0/G1 arrest associated with intestinal cell differentiation.",
+        "pubmed":"18408738"
+      },
+      {
+        "text":"The structures of fully active cyclin-dependent kinase-2 (CDK2)complexed with ATP and peptide substrate, CDK2 after the catalytic reaction, and CDK2 inhibited by phosphorylation at Thr14/Tyr15 were studied using molecular dynamics simulations.",
+        "pubmed":"18470542"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"18507837"
+      },
+      {
+        "text":"Cdk2-associated complexes, by targeting SHP-1 for proteolysis, counteract the ability of SHP-1 to block cell cycle progression of intestinal epithelial cells",
+        "pubmed":"18617527"
+      },
+      {
+        "text":"Cyclin A-CDK activity during G(1) would result in an inhibition of progression into the S phase.",
+        "pubmed":"18635963"
+      },
+      {
+        "text":"the cyclin A-CDK2 complex may be a potential effector of NFATs, specifically NFATc1, in mediating SMC multiplication leading to neointima formation.",
+        "pubmed":"18667424"
+      },
+      {
+        "text":"Cdk2 negatively regulates the activity of hPXR, and suggest an important role for Cdk2 in regulating hPXR activity and CYP3A4 expression in hepatocytes passing through the cell cycle",
+        "pubmed":"18784074"
+      },
+      {
+        "text":"This suggests an important role for CDK2 in cell cycle regulation in hESCs that are likely to bear significant impacts on the maintenance of their pluripotent phenotype.",
+        "pubmed":"18806832"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"18941885"
+      },
+      {
+        "text":"Cyclin A assembles with Cdk1 only after complex formation with Cdk2 reaches a plateau during late S and G2 phases.",
+        "pubmed":"19061641"
+      },
+      {
+        "text":"These findings establish phosphorylation events by CDKs 1 and 2 as key regulators of Discs Large 1 localisation and function.",
+        "pubmed":"19066288"
+      },
+      {
+        "text":"Notch-1 may be mediated through regulating the expression of cell cycle regulatory proteins cyclin D1, CDK2 and p21 and the activity of Akt signaling",
+        "pubmed":"19091404"
+      },
+      {
+        "text":"These results demonstrate that double phosphorylation of CDK2 peptides increases the stoichiometry of metal ion binding, and hence may contribute to the previously observed regulation of CDK2 activity by metal ions.",
+        "pubmed":"19101503"
+      },
+      {
+        "text":"the pathway of apoptin-induced apoptosis and show that it essentially depends on abnormal phosphatidylinositol 3-kinase (PI3-kinase)/Akt activation, resulting in the activation of the cyclin-dependent kinase CDK2",
+        "pubmed":"19103742"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"19124506"
+      },
+      {
+        "text":"Overexpression of CDK2 was strongly correlated with abnormal proliferation in laryngeal squamous cell carcinoma.",
+        "pubmed":"19166026"
+      },
+      {
+        "text":"Results show that human Cdk2 is a functional homolog for most of Ime2 functions.",
+        "pubmed":"19197163"
+      },
+      {
+        "text":"disruption of Smad2 function by CDK2 phosphorylation acts as a mechanism for TGF-beta resistance in multiple myeloma.",
+        "pubmed":"19201832"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"19258477"
+      },
+      {
+        "text":"Strengthened signals in imputation-based analysis at CDK2 SNPs rs2069391, rs2069414 and rs17528736 lend evidence to the role of cell cycle genes in ovarian cancer etiology.",
+        "pubmed":"19258477"
+      },
+      {
+        "text":"The combination of st and deregulated cyclin E result in cooperative and coordinated activation of both an essential origin licensing factor, CDC6, and an activity required for origin firing, CDK2, resulting in progression from quiescence to S phase.",
+        "pubmed":"19321444"
+      },
+      {
+        "text":"Co-depletion of Cdc6 and p53 in normal cells restored Cdk2 activation and Rb phosphorylation, permitting them to enter S phase with a reduced rate of replication.",
+        "pubmed":"19440053"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"19594747"
+      },
+      {
+        "text":"resistance of oral squamous carcinoma to IFNgamma is not due to deficiency in STAT1-dependent signaling but from a defect in the signaling component that mediates IFNgamma-induced down-regulation of CcnA2 and Cdk2 expression",
+        "pubmed":"19596857"
+      },
+      {
+        "text":"Four genes previously not examined in that respect in laryngeal carcinoma, occurred to be good markers of the neoplasm. They are: metal-proteinase ADAM12, cyclin-dependent kinase 2-CDK2, kinesin 14-KIF14, suppressor 1 of checkpoint-CHES1.",
+        "pubmed":"19609547"
+      },
+      {
+        "text":"Data demonstrate that the novel anticancer mechanism of hinokitiol involves accumulation of p27, down-regulation of pRb, Skp2, and impairment of Cdk2 function.",
+        "pubmed":"19631451"
+      },
+      {
+        "text":"cyclin A/cdk2-dependent phosphorylation of APC affects astral microtubule attachment to the cortical surface in mitosis",
+        "pubmed":"19703905"
+      },
+      {
+        "text":"Results suggest that simple but robust rules encoded in the CDK2 structure play a dominant role in predefining the mechanisms of ligand binding, which may be advantageously exploited in designing inhibitors.",
+        "pubmed":"19706521"
+      },
+      {
+        "text":"Studies indicate that roscovitine arrests the cell cycle is direct inhibition of CDK1, a mitotic regulator, and CDK2, involved in G1/S transition.",
+        "pubmed":"19723060"
+      },
+      {
+        "text":"Overexpression of Notch1 in laryngeal carcinoma cell line was coupled with the downregulation of cdk2",
+        "pubmed":"19724860"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"19738611"
+      },
+      {
+        "text":"results show that the expression of UGT1A1 and CYP2B6 is negatively regulated through a CDK2 signaling pathway linked to cell cycle progression in HepG2 and SW480 cells",
+        "pubmed":"19797611"
+      },
+      {
+        "text":"Results underscore the crucial role of cyclin A2-CDK2 in regulating the PLK1-SCF(beta-TrCP1)-EMI1-APC/C axis and CDC6 to trigger genome reduplication after the activity of CDK1 is suppressed.",
+        "pubmed":"19822658"
+      },
+      {
+        "text":"Since CAC1 interacts with CDK2 and promotes the kinase activity of CDK2 protein, we propose that CAC1 is a novel cell cycle associated protein capable of promoting cell proliferation.",
+        "pubmed":"19829063"
+      },
+      {
+        "text":"Chk1 signalling causes centrosome amplification after ionizing radiation by upregulating Cdk2 activity through activating phosphorylation.",
+        "pubmed":"19838212"
+      },
+      {
+        "text":"Data show that SHP-1 knockdown increases p27stability, decreases the CDK6 levels, inducing retinoblastoma protein hypophosphorylation, downregulation of cyclin E and thereby a decrease in the CDK2 activity.",
+        "pubmed":"19838216"
+      },
+      {
+        "text":"expression upregulation is critical for TLR9-stimulated proliferation of kung cancer cells",
+        "pubmed":"19854217"
+      },
+      {
+        "text":"Export was also reduced by Cdk inhibition or cyclin A RNA interference, suggesting that cyclin A/Cdk complexes contribute to Wee1 export.",
+        "pubmed":"19858290"
+      },
+      {
+        "text":"aberrant regulation of S100P in HCC might activate cyclin D1 and CDK expression and contribute to the mitogenic potential of tumor cells during Hepatocellular carcinoma carcinogenesis.",
+        "pubmed":"19885547"
+      },
+      {
+        "text":"Cellular production of IGFBP-3 leads to G1 cell cycle arrest with inhibition of CDK2 and CDK4.",
+        "pubmed":"19960406"
+      },
+      {
+        "text":"Data show that Myc repressed Ras-induced senescence, and that Cdk2 interacted with Myc at promoters, where it affected Myc-dependent regulation of genes, including those of proteins known to control senescence.",
+        "pubmed":"19966300"
+      },
+      {
+        "text":"FUS-DDIT3 and the normal DDIT3 bind CDK2.",
+        "pubmed":"20017906"
+      },
+      {
+        "text":"Results directly show that the inhibition of Cdk1 activity and the persistence of Cdk2 activity in G2 cells induces endoreplication without mitosis.",
+        "pubmed":"20062077"
+      },
+      {
+        "text":"Results show that most of the up-regulated sites phosphorylated by cyclin-dependent CDK1 or CDK2 were almost fully phosphorylated in mitotic cells.",
+        "pubmed":"20068231"
+      },
+      {
+        "text":"the nitric oxide-mediated biphasic effect was dependent on Cdk2 nitrosylation/activation and the loss of mitochondrial potential",
+        "pubmed":"20079829"
+      },
+      {
+        "text":"central roles for CDK2 nuclear-cytoplasmic trafficking and cyclin E in the mechanism of 1,25-(OH)(2)D(3)-mediated growth inhibition in prostate cancer cells",
+        "pubmed":"20147522"
+      },
+      {
+        "text":"These findings demonstrate that Cdk2 maintains a balance of S-phase regulatory proteins and thereby coordinates subsequent p53-independent G(2)/M checkpoint activation.",
+        "pubmed":"20195506"
+      },
+      {
+        "text":"Data describe the properties of a mutant form of Cdk2 identified during large-scale sequencing of protein kinases from cancerous tissue.",
+        "pubmed":"20399812"
+      },
+      {
+        "text":"Triticum aestivum-5B2 (( Ta ) 5B2) is suggested to be a wheat analogue of human CDK2 enzyme.",
+        "pubmed":"20422243"
+      },
+      {
+        "text":"Conclude that cisplatin likely activates both caspase-dependent and -independent cell death, and Cdk2 is required for both pathways.",
+        "pubmed":"20444741"
+      },
+      {
+        "text":"In addition to having a pivotal role in the up-regulation of IL-2 and IL-2RA gene expression, IKK controls the expression of cyclin D3, cyclin E and CDK2, and the stability SKP2 and its co-factor CKS1B, through mechanisms independent of IL-2.",
+        "pubmed":"20465575"
+      },
+      {
+        "text":"Observational study of gene-disease association. (HuGE Navigator)",
+        "pubmed":"20508983"
+      },
+      {
+        "text":"Hr and VDR interact via multiple protein-protein interfaces, catalyzing histone demethylation to effect chromatin remodeling and repress the transcription of VDR target genes that control the hair cycle.",
+        "pubmed":"20512928"
+      },
+      {
+        "text":"protein phosphatase 1 competition with Cdk-cyclins for retinoblastoma protein(Rb) binding is sufficient to retain Rb activity and block cell-cycle advancement.",
+        "pubmed":"20694007"
+      },
+      {
+        "text":"cyclin-dependent kinases (Cdks), especially Cdk1 and Cdk2, promote interphase nuclear pore complex formation in human dividing cells.",
+        "pubmed":"20711190"
+      },
+      {
+        "text":"Nuclear export of HPV31 E1 is inhibited by Cdk2 phosphorylation at two serines residues, S92 and S106.",
+        "pubmed":"20844047"
+      },
+      {
+        "text":"The results demonstrate that CDK2-mediated phosphorylation is a key mechanism governing EZH2 function and that there is a link between the cell-cycle machinery and epigenetic gene silencing.",
+        "pubmed":"20935635"
+      },
+      {
+        "text":"Observational study of gene-disease association and gene-environment interaction. (HuGE Navigator)",
+        "pubmed":"21048031"
+      },
+      {
+        "text":"Data show that miR-302 simultaneously suppressed both the cyclin E-CDK2 and cyclin D-CDK4/6 pathways to block>70% of the G1-S cell cycle transition.",
+        "pubmed":"21062975"
+      },
+      {
+        "text":"Overexpression of human Cdk2 resulted in a defect in the G1 to S transition and a reduction in viability.",
+        "pubmed":"21099355"
+      },
+      {
+        "text":"MicroRNA miR-885-5p targets CDK2 and MCM5, activates p53 and inhibits proliferation and survival.",
+        "pubmed":"21233845"
+      },
+      {
+        "text":"Cdk2 functions via a Cdk2/SHP-1/beta-catenin/CEACAM1 axis, and show that Cdk2 has the capacity to regulate insulin internalization.",
+        "pubmed":"21262353"
+      },
+      {
+        "text":"XPD may play an important role in cell apoptosis of hepatoma by inducing an over-expression of p53, but suppressing expressions of c-myc and cdk2",
+        "pubmed":"21264535"
+      },
+      {
+        "text":"CDK2 downregulation causes high apoptosis at the early time points",
+        "pubmed":"21319273"
+      },
+      {
+        "text":"Conclude that in cisplatin induced-kidney injury phosphorylation of p21 by Cdk2 limits the effectiveness of p21 to inhibit Cdk2.",
+        "pubmed":"21325496"
+      },
+      {
+        "text":"the ability of Emi1 to inhibit APC/C is negatively regulated by CDKs",
+        "pubmed":"21454540"
+      },
+      {
+        "text":"cyclin E and CDK2 genes are key physiological effectors of the c-ETS1 proto-oncogene. Furthermore, c-ETS1 is indispensable for the hepatotropic action of HBx in cell cycle deregulation.",
+        "pubmed":"21515670"
+      },
+      {
+        "text":"Transient binding of a second catalytic magnesium activates the structure and dynamics of CDK2 kinase for catalysis.",
+        "pubmed":"21565702"
+      },
+      {
+        "text":"The deubiquitinase USP37 binds CDH1 and removes degradative polyubiquitin from cyclin A. USP37 was induced by E2F factors in G1, peaked at G1/S, and was degraded in late mitosis. Phosphorylation of USP37 by CDK2 stimulated its full activity.",
+        "pubmed":"21596315"
+      },
+      {
+        "text":"anti-oncogenic role of miR-372 may be through control of cell growth and cell cycle progression by down-regulating the cell cycle genes CDK2 and cyclin A1",
+        "pubmed":"21646351"
+      },
+      {
+        "text":"Cdk2 is required for cell proliferation.",
+        "pubmed":"21658603"
+      },
+      {
+        "text":"RT-PCR and Western blotting results revealed that both mRNA and protein levels of CDK2 were significantly higher in tumor tissues.",
+        "pubmed":"21769424"
+      },
+      {
+        "text":"NF-Y binds to CCAAT sequences in the Cyclin A promoter, as well as to those in the promoters of cell cycle G2 regulators such as CDC2, Cyclin B and CDC25C.",
+        "pubmed":"21871181"
+      },
+      {
+        "text":"Epstein-Barr virus Rta-mediated transactivation of p21 and 14-3-3sigma arrests cells at the G1/S transition by reducing cyclin E/CDK2 activity.",
+        "pubmed":"21918011"
+      },
+      {
+        "text":"The expression level of CDK2 protein did not change significantly in silica-induced human embryo lung fibroblasts.",
+        "pubmed":"21941773"
+      },
+      {
+        "text":"excess of MCM3 up-regulates the phosphorylation of CHK1 Ser-345 and CDK2 Thr-14.",
+        "pubmed":"21965652"
+      },
+      {
+        "text":"The S-phase-specific cyclin-dependent kinase 2 was required for robust activation of ATR in response to diverse chemotherapeutic agents.",
+        "pubmed":"22084169"
+      },
+      {
+        "text":"The authors show that, in human and mouse, Mre11 controls these events through a direct interaction with CDK2 that is required for CtIP phosphorylation and BRCA1 interaction in normally dividing cells.",
+        "pubmed":"22231403"
+      },
+      {
+        "text":"Lin-28 homologue A (LIN28A) promotes cell cycle progression via regulation of cyclin-dependent kinase 2 (CDK2), cyclin D1 (CCND1), and cell division cycle 25 homolog A (CDC25A) expression in cancer.",
+        "pubmed":"22467868"
+      },
+      {
+        "text":"CDK2 inhibition drastically diminishes anchorage-independent growth of human cancer cells and cells transformed with various oncogenes",
+        "pubmed":"22474407"
+      },
+      {
+        "text":"low molecular weight cyclin E (LMW-E) requires CDK2-associated kinase activity to induce mammary tumor formation by disrupting acinar development",
+        "pubmed":"22479189"
+      },
+      {
+        "text":"The activation of p21(Waf1/Cip1) was significantly up-regulated over time, but there was no change in the level of CDK2 expression by treatment of HEK293 cells with various concentrations of veterinary antibiotics.",
+        "pubmed":"22673765"
+      },
+      {
+        "text":"Human cytomegalovirus IE1/2 expression was downregulated by cyclin A2, CDK1 and CDK2.",
+        "pubmed":"22718829"
+      },
+      {
+        "text":"exposure of cancer cells (such as HeLa and MCF7 cells) to H2O2 increased CDK2 activity with no accompanying change in the PCNA level, leading to cell proliferation.",
+        "pubmed":"22819841"
+      },
+      {
+        "text":"By a chemical-genetic approach study identified Nbs1 as a target of Cdk2, and mapped the phosphorylation to a conserved CDK consensus recognition site.",
+        "pubmed":"22927831"
+      },
+      {
+        "text":"cellular CDK2 phosphorylates the functionally critical S/T-P sites of the hepadnavirus core CTD and is incorporated into viral capsids",
+        "pubmed":"22951823"
+      },
+      {
+        "text":"cyclin A-Cdk2 regulates apoptosis through a mechanism that involves Rad9phosphorylation",
+        "pubmed":"23028682"
+      },
+      {
+        "text":"human papillomavirus E4 proteins can interact with cyclin A and cdk2, which may contribute to viral manipulation of the host cell cycle.",
+        "pubmed":"23065011"
+      },
+      {
+        "text":"Cdk2 also binds the N-terminal domain of Fbw7-gamma as well as SLP-1.",
+        "pubmed":"23082202"
+      },
+      {
+        "text":"CDK2 phosphorylates CDK9 on Ser 90 and thereby contributes to HIV-1 transcription.",
+        "pubmed":"23140174"
+      },
+      {
+        "text":"EEF2 phosphorylation by cyclin A-cyclin-dependent kinase 2 (CDK2) on a novel site, serine 595 (S595), directly regulates T56 phosphorylation by eEF2K.",
+        "pubmed":"23184662"
+      },
+      {
+        "text":"This study aimed to explore the effects of single nucleotide polymorphisms in CDK2 and CCNE1 on breast cancer risk, progression and survival in a Chinese Han population.",
+        "pubmed":"23185313"
+      },
+      {
+        "text":"Constitutive Cdk2 activity promotes aneuploidy while altering the spindle assembly and tetraploidy checkpoints.",
+        "pubmed":"23321641"
+      },
+      {
+        "text":"Constitutive CCND1/CDK2 expression contributes to neoplastic mammary epithelial cell transformation.",
+        "pubmed":"23390492"
+      },
+      {
+        "text":"The prolyl isomerase Pin1 acts synergistically with CDK2 to regulate the basal activity of estrogen receptor alpha in breast cancer.",
+        "pubmed":"23390529"
+      },
+      {
+        "text":"the up-regulation of CDK2 by CUL4B is achieved via the repression of miR-372 and miR-373, which target CDK2.",
+        "pubmed":"23479742"
+      },
+      {
+        "text":"Data indicate that TG02 blocked signaling by CDKs 1, 2, 7, and 9 and ERK5, leading to potent and highly consistent antimyeloma activity.",
+        "pubmed":"23532886"
+      },
+      {
+        "text":"The expression of CDK2 mRNA significantly decreased in P(CDK2-siRNA).",
+        "pubmed":"23643165"
+      },
+      {
+        "text":"A specific and essential roles for Cdk2 inhibitory phosphorylation in the successful execution of the replication stress checkpoint response and in maintaining genome integrity.",
+        "pubmed":"23671119"
+      },
+      {
+        "text":"MCM7 is a substrate of cyclin E/Cdk2 and can be phosphorylated on Ser-121.",
+        "pubmed":"23720738"
+      },
+      {
+        "text":"CDK7 involved in phosphorylation/activation of CDK4 and CDK6; existence of CDK4-activating kinase(s) other than CDK7; and novel CDK7-dependent positive feedbacks mediated by p21 phosphorylation by CDK4 and CDK2 to sustain CDK4 activation.",
+        "pubmed":"23737759"
+      },
+      {
+        "text":"FBXO28 activity and stability are regulated during the cell cycle by CDK1/2-mediated phosphorylation of FBXO28, which is required for its efficient ubiquitylation of MYC.",
+        "pubmed":"23776131"
+      },
+      {
+        "text":"Cells decide at the end of mitosis to either start the next cell cycle by immediately building up CDK2 activity or to enter a transient G0-like state by suppressing CDK2 activity.",
+        "pubmed":"24075009"
+      }
+    ],
+    "HPRD":"00310",
+    "prosite":"PS50011",
+    "homologene":{
+      "genes":[
+        [
+          9606,
+          1017
+        ],
+        [
+          10090,
+          12566
+        ],
+        [
+          10116,
+          362817
+        ],
+        [
+          7227,
+          42453
+        ],
+        [
+          7955,
+          406715
+        ],
+        [
+          3702,
+          824036
+        ],
+        [
+          4530,
+          4328135
+        ],
+        [
+          4530,
+          4331415
+        ],
+        [
+          4896,
+          2539869
+        ],
+        [
+          4932,
+          852457
+        ],
+        [
+          5141,
+          3876264
+        ],
+        [
+          7165,
+          3291042
+        ],
+        [
+          9031,
+          100529062
+        ],
+        [
+          9544,
+          711002
+        ],
+        [
+          9598,
+          467032
+        ],
+        [
+          9615,
+          100855704
+        ],
+        [
+          9913,
+          519217
+        ],
+        [
+          28985,
+          2896999
+        ],
+        [
+          33169,
+          4620303
+        ],
+        [
+          318829,
+          2679140
+        ]
+      ],
+      "id":74409
+    },
+    "reporter":{
+      "HG-U133_Plus_2":[
+        "204252_at",
+        "211803_at",
+        "211804_s_at"
+      ],
+      "HG-U95Av2":[
+        "1792_g_at",
+        "1833_at"
+      ]
+    },
+    "symbol":"CDK2",
+    "genomic_pos":{
+      "start":56360553,
+      "chr":"12",
+      "end":56366568,
+      "strand":1
+    },
+    "reagent":{
+      "GNF_hs_LentiORF-HA-MYC":{
+        "id":"GNF282834",
+        "relationship":"is"
+      },
+      "GNF_hs-Origene":[
+        {
+          "id":"GNF035860",
+          "relationship":"similar to"
+        },
+        {
+          "id":"GNF037258",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF048982",
+          "relationship":"is"
+        }
+      ],
+      "GNF_hs-ORFeome1_1_reads":{
+        "id":"GNF161504",
+        "relationship":"is"
+      },
+      "GNF_hs-druggable_lenti-shRNA":[
+        {
+          "id":"GNF081385",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF081386",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF081387",
+          "relationship":"is"
+        }
+      ],
+      "NOVART_hs-genome_siRNA":[
+        {
+          "id":"GNF093028",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF132726",
+          "relationship":"is"
+        }
+      ],
+      "GNF_mm+hs-MGC":{
+        "id":"GNF002384",
+        "relationship":"is"
+      },
+      "GNF_hs-pkinase_IDT-siRNA":[
+        {
+          "id":"GNF166768",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF166769",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF166770",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF166771",
+          "relationship":"is"
+        }
+      ],
+      "GNF_hs_LentiORF-Jred":{
+        "id":"GNF283761",
+        "relationship":"is"
+      },
+      "GNF_hs-druggable_siRNA":[
+        {
+          "id":"GNF066537",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF066538",
+          "relationship":"is"
+        }
+      ],
+      "GNF_Qia_hs-genome_v1_siRNA":[
+        {
+          "id":"GNF247215",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF247216",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF247217",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF247218",
+          "relationship":"is"
+        }
+      ],
+      "NIBRI_hs-Secretome_pDEST":{
+        "id":"GNF337962",
+        "relationship":"is"
+      },
+      "Invitrogen_IVTHSSIPKv2":[
+        {
+          "id":"GNF324610",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF324611",
+          "relationship":"is"
+        }
+      ],
+      "GNF_hs-druggable_plasmid-shRNA":[
+        {
+          "id":"GNF051995",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF056761",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF061563",
+          "relationship":"is"
+        },
+        {
+          "id":"GNF078683",
+          "relationship":"is"
+        }
+      ]
+    },
+    "Vega":"OTTHUMG00000170575",
+    "refseq":{
+      "genomic":[
+        "AC_000144",
+        "NC_000012",
+        "NC_018923",
+        "NT_029419",
+        "NW_001838059",
+        "NW_004929384"
+      ],
+      "rna":[
+        "NM_001798",
+        "NM_052827",
+        "XM_005268559"
+      ],
+      "protein":[
+        "NP_001789",
+        "NP_439892",
+        "XP_005268616"
+      ]
+    },
+    "_timestamp":"2013-12-22T00:00:00",
+    "name":"cyclin-dependent kinase 2",
+    "taxid":9606,
+    "summary":"The protein encoded by this gene is a member of the Ser/Thr protein kinase family. This protein kinase is highly similar to the gene products of S. cerevisiae cdc28, and S. pombe cdc2. It is a catalytic subunit of the cyclin-dependent protein kinase complex, whose activity is restricted to the G1-S phase, and essential for cell cycle G1/S phase transition. This protein associates with and regulated by the regulatory subunits of the complex including cyclin A or E, CDK inhibitor p21Cip1 (CDKN1A) and p27Kip1 (CDKN1B). Its activity is also regulated by its protein phosphorylation. Two alternatively spliced variants and multiple transcription initiation sites of this gene have been reported. [provided by RefSeq, Jul 2008].",
+    "alias":"p33(CDK2)",
+    "entrezgene":1017,
+    "uniprot":{
+      "Swiss-Prot":"P24941",
+      "TrEMBL":[
+        "E7ESI2",
+        "G3V317",
+        "G3V5T9"
+      ]
+    },
+    "ensembl":{
+      "protein":[
+        "ENSP00000243067",
+        "ENSP00000266970",
+        "ENSP00000393605",
+        "ENSP00000450983",
+        "ENSP00000452138",
+        "ENSP00000452514"
+      ],
+      "gene":"ENSG00000123374",
+      "transcript":[
+        "ENST00000266970",
+        "ENST00000354056",
+        "ENST00000440311",
+        "ENST00000553376",
+        "ENST00000554545",
+        "ENST00000554619",
+        "ENST00000555357",
+        "ENST00000555408",
+        "ENST00000556146",
+        "ENST00000556276",
+        "ENST00000556464",
+        "ENST00000556656"
+      ]
+    },
+    "map_location":"12q13",
+    "_id":"1017",
+    "type_of_gene":"protein-coding",
+    "pdb":[
+      "1AQ1",
+      "1B38",
+      "1B39",
+      "1BUH",
+      "1CKP",
+      "1DI8",
+      "1DM2",
+      "1E1V",
+      "1E1X",
+      "1E9H",
+      "1F5Q",
+      "1FIN",
+      "1FQ1",
+      "1FVT",
+      "1FVV",
+      "1G5S",
+      "1GIH",
+      "1GII",
+      "1GIJ",
+      "1GY3",
+      "1GZ8",
+      "1H00",
+      "1H01",
+      "1H07",
+      "1H08",
+      "1H0V",
+      "1H0W",
+      "1H1P",
+      "1H1Q",
+      "1H1R",
+      "1H1S",
+      "1H24",
+      "1H25",
+      "1H26",
+      "1H27",
+      "1H28",
+      "1HCK",
+      "1HCL",
+      "1JST",
+      "1JSU",
+      "1JSV",
+      "1JVP",
+      "1KE5",
+      "1KE6",
+      "1KE7",
+      "1KE8",
+      "1KE9",
+      "1OGU",
+      "1OI9",
+      "1OIQ",
+      "1OIR",
+      "1OIT",
+      "1OIU",
+      "1OIY",
+      "1OKV",
+      "1OKW",
+      "1OL1",
+      "1OL2",
+      "1P2A",
+      "1P5E",
+      "1PF8",
+      "1PKD",
+      "1PW2",
+      "1PXI",
+      "1PXJ",
+      "1PXK",
+      "1PXL",
+      "1PXM",
+      "1PXN",
+      "1PXO",
+      "1PXP",
+      "1PYE",
+      "1QMZ",
+      "1R78",
+      "1URC",
+      "1URW",
+      "1V1K",
+      "1VYW",
+      "1VYZ",
+      "1W0X",
+      "1W8C",
+      "1W98",
+      "1WCC",
+      "1Y8Y",
+      "1Y91",
+      "1YKR",
+      "2A0C",
+      "2A4L",
+      "2B52",
+      "2B53",
+      "2B54",
+      "2B55",
+      "2BHE",
+      "2BHH",
+      "2BKZ",
+      "2BPM",
+      "2BTR",
+      "2BTS",
+      "2C4G",
+      "2C5N",
+      "2C5O",
+      "2C5V",
+      "2C5X",
+      "2C5Y",
+      "2C68",
+      "2C69",
+      "2C6I",
+      "2C6K",
+      "2C6L",
+      "2C6M",
+      "2C6O",
+      "2C6T",
+      "2CCH",
+      "2CCI",
+      "2CJM",
+      "2CLX",
+      "2DS1",
+      "2DUV",
+      "2EXM",
+      "2FVD",
+      "2G9X",
+      "2HIC",
+      "2I40",
+      "2IW6",
+      "2IW8",
+      "2IW9",
+      "2J9M",
+      "2JGZ",
+      "2R3F",
+      "2R3G",
+      "2R3H",
+      "2R3I",
+      "2R3J",
+      "2R3K",
+      "2R3L",
+      "2R3M",
+      "2R3N",
+      "2R3O",
+      "2R3P",
+      "2R3Q",
+      "2R3R",
+      "2R64",
+      "2UUE",
+      "2UZB",
+      "2UZD",
+      "2UZE",
+      "2UZL",
+      "2UZN",
+      "2UZO",
+      "2V0D",
+      "2V22",
+      "2VTA",
+      "2VTH",
+      "2VTI",
+      "2VTJ",
+      "2VTL",
+      "2VTM",
+      "2VTN",
+      "2VTO",
+      "2VTP",
+      "2VTQ",
+      "2VTR",
+      "2VTS",
+      "2VTT",
+      "2VU3",
+      "2VV9",
+      "2W05",
+      "2W06",
+      "2W17",
+      "2W1H",
+      "2WEV",
+      "2WFY",
+      "2WHB",
+      "2WIH",
+      "2WIP",
+      "2WMA",
+      "2WMB",
+      "2WPA",
+      "2WXV",
+      "2X1N",
+      "2XMY",
+      "2XNB",
+      "3BHT",
+      "3BHU",
+      "3BHV",
+      "3DDP",
+      "3DDQ",
+      "3DOG",
+      "3EID",
+      "3EJ1",
+      "3EOC",
+      "3EZR",
+      "3EZV",
+      "3F5X",
+      "3FZ1",
+      "3IG7",
+      "3IGG",
+      "3LE6",
+      "3LFN",
+      "3LFQ",
+      "3LFS",
+      "3MY5",
+      "3NS9",
+      "3PJ8",
+      "3PXF",
+      "3PXQ",
+      "3PXR",
+      "3PXY",
+      "3PXZ",
+      "3PY0",
+      "3PY1",
+      "3QHR",
+      "3QHW",
+      "3QL8",
+      "3QQF",
+      "3QQG",
+      "3QQH",
+      "3QQJ",
+      "3QQK",
+      "3QQL",
+      "3QRT",
+      "3QRU",
+      "3QTQ",
+      "3QTR",
+      "3QTS",
+      "3QTU",
+      "3QTW",
+      "3QTX",
+      "3QTZ",
+      "3QU0",
+      "3QWJ",
+      "3QWK",
+      "3QX2",
+      "3QX4",
+      "3QXO",
+      "3QXP",
+      "3QZF",
+      "3QZG",
+      "3QZH",
+      "3QZI",
+      "3R1Q",
+      "3R1S",
+      "3R1Y",
+      "3R28",
+      "3R6X",
+      "3R71",
+      "3R73",
+      "3R7E",
+      "3R7I",
+      "3R7U",
+      "3R7V",
+      "3R7Y",
+      "3R83",
+      "3R8L",
+      "3R8M",
+      "3R8P",
+      "3R8U",
+      "3R8V",
+      "3R8Z",
+      "3R9D",
+      "3R9H",
+      "3R9N",
+      "3R9O",
+      "3RAH",
+      "3RAI",
+      "3RAK",
+      "3RAL",
+      "3RJC",
+      "3RK5",
+      "3RK7",
+      "3RK9",
+      "3RKB",
+      "3RM6",
+      "3RM7",
+      "3RMF",
+      "3RNI",
+      "3ROY",
+      "3RPO",
+      "3RPR",
+      "3RPV",
+      "3RPY",
+      "3RZB",
+      "3S00",
+      "3S0O",
+      "3S1H",
+      "3S2P",
+      "3SQQ",
+      "3SW4",
+      "3SW7",
+      "3TI1",
+      "3TIY",
+      "3TIZ",
+      "3TNW",
+      "3ULI",
+      "3UNJ",
+      "3UNK",
+      "4ACM",
+      "4BCK",
+      "4BCM",
+      "4BCN",
+      "4BCO",
+      "4BCP",
+      "4BCQ",
+      "4BGH",
+      "4EK3",
+      "4EK4",
+      "4EK5",
+      "4EK6",
+      "4EK8",
+      "4EOI",
+      "4EOJ",
+      "4EOK",
+      "4EOL",
+      "4EOM",
+      "4EON",
+      "4EOO",
+      "4EOP",
+      "4EOQ",
+      "4EOR",
+      "4EOS",
+      "4ERW",
+      "4EZ3",
+      "4EZ7",
+      "4FKG",
+      "4FKI",
+      "4FKJ",
+      "4FKL",
+      "4FKO",
+      "4FKP",
+      "4FKQ",
+      "4FKR",
+      "4FKS",
+      "4FKT",
+      "4FKU",
+      "4FKV",
+      "4FKW",
+      "4FX3",
+      "4GCJ",
+      "4I3Z",
+      "4II5",
+      "4KD1",
+      "4LYN"
+    ],
+    "HGNC":"1771"
+  }

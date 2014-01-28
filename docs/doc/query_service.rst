@@ -34,7 +34,7 @@ fields
 
 species
 """""""
-    Optional, can be used to limit the gene hits from given species. You can use "common names" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). All other species, you can provide their taxonomy ids. See `more details here <data.html#species>`_. Multiple species can be passed using comma as a separator. Default: human,mouse,rat.
+    Optional, can be used to limit the gene hits from given species. You can use "common names" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). All other species, you can provide their taxonomy ids. See `more details here <data.html#species>`_. Multiple species can be passed using comma as a separator. Passing "all" will query against all available species. Default: human,mouse,rat.
 
 size
 """"
@@ -74,6 +74,10 @@ ensemblonly
 callback
 """"""""
     Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
+
+dotfield
+""""""""""
+    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: true.
 
 filter
 """"""
@@ -134,7 +138,7 @@ Field                        Description                                     Exa
 **ensembltranscript**         Ensembl transcript id                             `q=ensembltranscript:ENST00000266970 </v2/query?q=ensembltranscript:ENST00000266970>`_
 **ensemblprotein**            Ensembl protein id                                `q=ensemblprotein:ENSP00000243067 </v2/query?q=ensemblprotein:ENSP00000243067>`_
 **uniprot**                   UniProt id                                        `q=uniprot:P24941 </v2/query?q=uniprot:P24941>`_
-**ipi**                       PIP id                                            `q=ipi:IPI00031681 </v2/query?q=ipi:IPI00031681>`_
+**ipi** (deprecated!)         IPI id                                            `q=ipi:IPI00031681 </v2/query?q=ipi:IPI00031681>`_
 **pdb**                       PDB id                                            `q=pdb:1AQ1 </v2/query?q=pdb:1AQ1>`_
 **prosite**                   Prosite id                                        `q=prosite:PS50011 </v2/query?q=prosite:PS50011>`_
 **interpro**                  InterPro id                                       `q=interpro:IPR008351 </v2/query?q=interpro:IPR008351>`_
@@ -399,6 +403,10 @@ fields
 """"""
     Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v2/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
     "symbol,name,taxid,entrezgene,ensemblgene".
+
+dotfield
+""""""""""
+    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: true.
 
 Example code
 ------------

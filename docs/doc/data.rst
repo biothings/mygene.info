@@ -22,6 +22,8 @@ NetAffy          whenever a new
                  release is available
 PharmGKB         whenever a new
                  release is available
+UCSC             whenever a new               For "exons" field
+                 release is available
 ============    =======================      =================================
 
 The most updated data information can be accessed `here </v2/metadata>`_.
@@ -30,7 +32,7 @@ The most updated data information can be accessed `here </v2/metadata>`_.
 
 Gene object
 ------------
-Gene annotation data are both stored and returned as a gene object, which is essentially a collection of fields (attribuites) and their values:
+Gene annotation data are both stored and returned as a gene object, which is essentially a collection of fields (attributes) and their values:
 
 .. code-block :: json
 
@@ -73,6 +75,8 @@ For convenience, we allow you to pass these *common names* for commonly used spe
     frog         Xenopus tropicalis         8364
     pig          Sus scrofa                 9823
     ===========  =======================    ===========
+
+If needed, you can pass "species=all" to query against all available species, although, we recommend you to pass specific species you need for faster response.
 
 
 .. _genome_assemblies:

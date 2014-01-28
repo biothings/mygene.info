@@ -47,6 +47,10 @@ filter
 """""""
     Alias for "fields" parameter.
 
+dotfield
+""""""""""
+    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: true.
+
 
 
 Returned object
@@ -91,7 +95,11 @@ fields
 
 species
 """""""""""
-     Optional, can be used to limit the gene hits from given species. You can use "common names" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). All other species, you can provide their taxonomy ids. See `more details here <data.html#species>`_. Multiple species can be passed using comma as a separator. Default: human,mouse,rat.
+    Optional, can be used to limit the gene hits from given species. You can use "common names" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). All other species, you can provide their taxonomy ids. See `more details here <data.html#species>`_. Multiple species can be passed using comma as a separator. Passing "all" will query against all available species. Default: all.
+
+dotfield
+""""""""""
+    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: true.
 
 Example code
 ------------
@@ -113,25 +121,30 @@ Returned result (the value of "con" variable above) from above example code shou
 .. code-block:: json
 
     [
-        {
-         "refseq":
-            {
-                "rna": ["NM_001798.3",
-                        "NM_052827.2"]
-            },
-         "symbol": "CDK2",
-         "_id": "1017",
-         "name": "cyclin-dependent kinase 2"
-        },
-        {
-         "refseq":
-            {
-                "rna": "NM_000061.2"
-            },
-         "symbol": "BTK",
-         "_id": "695",
-         "name": "Bruton agammaglobulinemia tyrosine kinase"
-        }
+      {
+        "_id":"1017",
+        "name":"cyclin-dependent kinase 2",
+        "query":"1017",
+        "refseq.rna":[
+          "NM_001798",
+          "NM_052827",
+          "XM_005268559"
+        ],
+        "symbol":"CDK2"
+      },
+      {
+        "_id":"695",
+        "name":"Bruton agammaglobulinemia tyrosine kinase",
+        "query":"695",
+        "refseq.rna":[
+          "NM_000061",
+          "NM_001287344",
+          "NM_001287345",
+          "XM_005262181",
+          "XM_005278108"
+        ],
+        "symbol":"BTK"
+      }
     ]
 
 
