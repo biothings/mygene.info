@@ -47,6 +47,7 @@ class GeneHandler(BaseHandler):
             ids = re.split('[\s\r\n+|,]+', ids)
             scopes = 'entrezgene,ensemblgene,retired'
             fields = kwargs.pop('fields', None)
+            kwargs.setdefault('species', 'all')
             res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
