@@ -91,7 +91,7 @@ ids
 fields
 """""""
     Optional, can be a comma-separated fields to limit the fields returned from the matching hits.
-    If “fields=all”, all available fields will be returned. Note that it supports dot notation as well, e.g., you can pass "refseq.rna". Default: “symbol,name,taxid,entrezgene,ensemblgene”.
+    If “fields=all”, all available fields will be returned. Note that it supports dot notation as well, e.g., you can pass "refseq.rna". Default: “symbol,name,taxid,entrezgene”.
 
 species
 """""""""""

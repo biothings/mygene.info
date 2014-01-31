@@ -71,7 +71,7 @@ class ESQuery:
         self._doc_type = ES_INDEX_TYPE
 
         #self._doc_type = 'gene_sample'
-        self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene', 'ensemblgene']
+        self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
         #self._default_species = [9606, 10090, 10116, 7227, 6239]  # human, mouse, rat, fruitfly, celegan
         self._default_species = [9606, 10090, 10116]               # human, mouse, rat
         self._tier_1_species = set(taxid_d.values())
@@ -448,7 +448,7 @@ class ESQuery:
 class ESQueryBuilder():
     def __init__(self, **query_options):
         """You can pass these options:
-            fields     default ['name', 'symbol', 'taxid', 'entrezgene', 'ensemblgene']
+            fields     default ['name', 'symbol', 'taxid', 'entrezgene']
             from       default 0
             size       default 10
             sort       e.g. sort='entrezgene,-symbol'
