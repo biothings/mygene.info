@@ -30,6 +30,8 @@ def get_es(es_host=None):
 
 
 es = get_es()
+dummy_model = lambda es, res: res
+es.model = dummy_model    # set it to dummy_model, so that the query will return the raw object.
 
 
 def get_lastest_indices(es_host=None):
@@ -52,9 +54,6 @@ def get_lastest_indices(es_host=None):
     return latest_indices
 
 
-dummy_model = lambda es, res: res
-
-
 class MGQueryError(Exception):
     pass
 
@@ -63,7 +62,7 @@ class ESQuery:
     def __init__(self):
         #self.conn0 = es0
         self.conn = es
-        self.conn.model = dummy_model
+        #self.conn.model = dummy_model
         # self._index = 'genedoc_mygene'
         # self._index = 'genedoc_mygene_allspecies'
         # self._doc_type = 'gene'
