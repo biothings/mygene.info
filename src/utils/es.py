@@ -836,25 +836,25 @@ class ESQueryBuilder():
 
     def add_species_custom_filters_score(self, _query):
         _query = {
-            "custom_filters_score": {
+            "function_score": {
                 "query": _query,
-                "filters": [
+                "functions": [
                     #downgrade "pseudogene" matches
                     {
                         "filter": {"term": {"name": "pseudogene"}},
-                        "boost": "0.5"
+                        "boost_factor": "0.5"
                     },
                     {
                         "filter": {"term": {"taxid": 9606}},
-                        "boost": "1.55"
+                        "boost_factor": "1.55"
                     },
                     {
                         "filter": {"term": {"taxid": 10090}},
-                        "boost": "1.3"
+                        "boost_factor": "1.3"
                     },
                     {
                         "filter": {"term": {"taxid": 10116}},
-                        "boost": "1.1"
+                        "boost_factor": "1.1"
                     },
                 ],
                 "score_mode": "first"
