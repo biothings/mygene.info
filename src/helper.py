@@ -1,5 +1,6 @@
 import json
 import datetime
+from collections import OrderedDict
 import tornado.web
 from utils.ga import GAMixIn
 
@@ -82,6 +83,9 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
            if encode is False, assumes input data is already a JSON encoded
            string.
         '''
+        if isinstance(data, dict):
+            data['__need_your_help'] = 'We are working on a grant based on MyGene.info, please send us an email at cwu@scripps.edu to show your support. Read more at http://bit.ly/mygeneinfo , thanks!'
+            data = OrderedDict(sorted(data.items(), key=lambda x: x[0].lower()))
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         if SUPPORT_MSGPACK:
             use_msgpack = self.get_argument('msgpack', '')
