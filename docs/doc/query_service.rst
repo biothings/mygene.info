@@ -91,6 +91,10 @@ skip
 """"
     Alias for "from" parameter.
 
+email
+""""""
+    Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.
+
 
 Query syntax
 ------------
@@ -407,6 +411,10 @@ fields
 dotfield
 """"""""""
     Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: true.
+
+email
+""""""
+    Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.
 
 Example code
 ------------
