@@ -103,6 +103,7 @@ Who is using MyGene.info?
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * `BioGPS <http://biogps.org>`_
+* `Monarch Initiative <http://www.monarchinitiative.org>`_
 * `GeneWikiPlus <http://genewikiplus.org>`_
 * `myGeneNet <http://netbio.bgu.ac.il/mygenenet>`_
 
