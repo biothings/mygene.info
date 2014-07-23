@@ -465,7 +465,7 @@ class ESQuery:
         }
         if '_meta' in mapping[self._doc_type]:
             metadata.update(mapping[self._doc_type]['_meta'])
-        metadata['geneome_assembly'] = GENOME_ASSEMBLY
+        metadata['genome_assembly'] = GENOME_ASSEMBLY
         metadata['taxonomy'] = TAXONOMY
         return metadata
 
