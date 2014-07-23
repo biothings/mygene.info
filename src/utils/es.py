@@ -22,6 +22,30 @@ from utils.common import (ask, is_int, is_str, is_seq, timesofar,
 from utils.dotfield import parse_dot_fields
 
 
+GENOME_ASSEMBLY = {
+    "human": "hg19",
+    "mouse": "mm10",
+    "rat": "rn4",
+    "fruitfly": "dm3",
+    "nematode": "ce10",
+    "zebrafish": "zv9",
+    "frog": "xenTro3",
+    "pig": "susScr2"
+}
+
+TAXONOMY = {
+    "human": 9606,
+    "mouse": 10090,
+    "rat": 10116,
+    "fruitfly": 7227,
+    "nematode": 6239,
+    "zebrafish": 7955,
+    "thale-cress": 3702,
+    "frog": 8364,
+    "pig": 9823
+}
+
+
 def get_es(es_host=None):
     es_host = es_host or ES_HOST
     conn = ES(es_host, default_indices=[ES_INDEX_NAME_ALL],
@@ -441,6 +465,8 @@ class ESQuery:
         }
         if '_meta' in mapping[self._doc_type]:
             metadata.update(mapping[self._doc_type]['_meta'])
+        metadata['geneome_assembly'] = GENOME_ASSEMBLY
+        metadata['taxonomy'] = TAXONOMY
         return metadata
 
 

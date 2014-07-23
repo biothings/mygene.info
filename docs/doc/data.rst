@@ -98,7 +98,7 @@ This table lists the genome assembies for commonly-used species:
     mouse        Mus musculus              GRCm38 (mm10)
     rat          Rattus norvegicus         Rnor_5.0 (rn4)
     fruitfly     Drosophila melanogaster   BDGP5 (dm3)
-    nematode     Caenorhabditis elegans    WBcel235 (ce7)
+    nematode     Caenorhabditis elegans    WBcel235 (ce10)
     zebrafish    Danio rerio               Zv9 (danRer6)
     frog         Xenopus tropicalis        JGI_4.2 (xenTro2)
     pig          Sus scrofa                Sscrofa10.2 (susScr2)
