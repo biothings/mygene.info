@@ -92,6 +92,8 @@ What's behind MyGene.info?
 
 On top of ElasticSearch, we use `tornado <http://www.tornadoweb.org>`_, a lightweighted and fast web framework in python, to build our application layer. And then `Nginx <http://nginx.org>`_ is used as the front-end to serve outside requests.
 
+See also: `MyGene.info talk at BOSC2013 <http://www.slideshare.net/anewgene/bosc2013-my-geneinfo>`_.
+
 
 Is this project open-sourced?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
