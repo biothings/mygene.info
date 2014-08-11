@@ -23,7 +23,7 @@ from utils.dotfield import parse_dot_fields
 
 
 GENOME_ASSEMBLY = {
-    "human": "hg19",
+    "human": "hg38",
     "mouse": "mm10",
     "rat": "rn4",
     "fruitfly": "dm3",
