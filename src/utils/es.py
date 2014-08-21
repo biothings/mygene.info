@@ -711,7 +711,10 @@ class ESQueryBuilder():
             }
             }
         _query = json.dumps(_query)
-        _query = json.loads(_query % {'q': q.lower()})
+        try:
+            _query = json.loads(_query % {'q': q.lower()})
+        except ValueError:
+            raise MGQueryError("invalid query term.")
 
         return _query
 
