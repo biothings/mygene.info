@@ -53,7 +53,7 @@ We implemented this demo in four ways:
 Example 1: using CGI
 ^^^^^^^^^^^^^^^^^^^^
 
- * `Download sample code here </_static/demo/mygene_info_demo_cgi.py>`_.
+ * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_cgi.py>`_.
 
  * It's a simple python CGI script. To run it, you just need to drop it to your favorite web server's cgi-bin folder (make sure your python, v2.6 up, is in the path).
 
@@ -62,33 +62,33 @@ Example 1: using CGI
 Example 2: using tornado
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    * `Download sample code here </_static/demo/mygene_info_demo_tornado.py>`_.
+    * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_tornado.py>`_.
     * This single python script can be used to run a standalone website. Just run: ``python mygene_info_demo_tornado.py``.You then have your website up at ``http://localhost:8000``.
 
-    Besides python (v2.6 up), you also need `tornado <http://www.tornadoweb.org>`_ to run this code. You can either install it by your own (``pip install tornado``), or download `this zip file </_static/demo/mygene_info_demo_tornado.zip>`_, which includes tornado in it.
+    Besides python (v2.6 up), you also need `tornado <http://www.tornadoweb.org>`_ to run this code. You can either install it by your own (``pip install tornado``), or download `this zip file <http://mygene.info/_static/demo/mygene_info_demo_tornado.zip>`_, which includes tornado in it.
 
     * `See it in action here </demo/mygene_info_demo_tornado>`_
 
 Example 3: using JSONP
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
- * `Download sample code here </_static/demo/mygene_info_demo_jsonp.zip>`_.
+ * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_jsonp.zip>`_.
 
  * The zip file contains one html file and one javascript file. There is no server-side code at all. To run it, just unzip it and open the html file in any browser. All remote service calls are done at client side (via browsers). Put the files into any web server serving static files will allow you to publish to the world.
 
- * `See it in action here </_static/demo/mygene_info_demo_jsonp.html>`_
+ * `See it in action here <http://mygene.info/_static/demo/mygene_info_demo_jsonp.html>`_
 
 Example 4: using CORS
 ^^^^^^^^^^^^^^^^^^^^^^^
 
- * `Download sample code here </_static/demo/mygene_info_demo_cors.zip>`_.
+ * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_cors.zip>`_.
 
  * The zip file contains one html file and one javascript file. There is no server-side code at all. To run it, just unzip it and open the html file in any browser. All remote service calls are done at client side (via browsers). Put the files into any web server serving static files will allow you to publish to the world.
 
  * This demo is almost the same as the one using JSONP, except that the actual AJAX call to MyGene.info server is made via CORS.
 
 
- * `See it in action here </_static/demo/mygene_info_demo_cors.html>`_
+ * `See it in action here <http://mygene.info/_static/demo/mygene_info_demo_cors.html>`_
 
 
 .. include :: autocomplete.rst

@@ -20,7 +20,7 @@ To obtain the gene annotation via our web service is as simple as calling this U
 By default, this will return the complete gene annotation object in JSON format. See `here <#returned-object>`_ for an example and :ref:`here <gene_object>` for more details. If the input **geneid** is not valid, 404 (NOT FOUND) will be returned.
 
 .. hint::
-    A retired Entrez Gene id works too if it is replaced by a new one, e.g., `245794 <http://mygene.info/v2/gene/245794>`_. But a "*discontinued*" gene id will not return any hit, e.g., `138 <http://www.ncbi.nlm.nih.gov/gene/138>`_.
+    A retired Entrez gene id works too if it is replaced by a new one, e.g., `245794 <http://mygene.info/v2/gene/245794>`_. But a "*discontinued*" gene id will not return any hit, e.g., `138 <http://www.ncbi.nlm.nih.gov/gene/138>`_.
 
 Optionally, you can pass a "**fields**" parameter to return only the annotation you want (by filtering returned object fields)::
 
