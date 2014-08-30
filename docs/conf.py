@@ -263,3 +263,8 @@ try:
 except ImportError:
     print 'Warning: "sphinx_bootstrap_theme" is not installed, fall back to default theme.'
     pass
+
+import sphinx_rtd_theme
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme_options = {}
