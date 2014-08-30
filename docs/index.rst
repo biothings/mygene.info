@@ -74,40 +74,7 @@ Documentation
 FAQ
 -------
 
-How many species are supported?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-We support **ALL** species available from NCBI and Ensembl. `See more <doc/data.html#species>`_.
-
-How frequent are the gene annotation data updated?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Gene annotation data are regularly updated once a week to keep it up-to-date. The most updated data information can be accessed `here <http://mygene.info/v2/metadata>`_. `See more <doc/data.html#data-sources>`_.
-
-
-What's behind MyGene.info?
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-`MyGene.info <http://mygene.info>`_ is built on `ElasticSearch <http://www.elasticsearch.org>`_, a document-based database and powerful query engine. Unlike more commonly used relational database systems (e.g., Oracle, MySQL), data are stored as "key-document" pairs. The "document" is a JSON-formatted gene annotation object, while the "key" is a gene ID (Entrez or Ensembl). The hierarchical structure of gene annotation data can be represented naturally in this key-document model. This simple object structure in ElasticSearch greatly simplified both data loading and data queries, and also gains impressive query performance and flexibility.
-
-On top of ElasticSearch, we use `tornado <http://www.tornadoweb.org>`_, a lightweighted and fast web framework in python, to build our application layer. And then `Nginx <http://nginx.org>`_ is used as the front-end to serve outside requests.
-
-See also: `MyGene.info talk at BOSC2013 <http://www.slideshare.net/anewgene/bosc2013-my-geneinfo>`_.
-
-
-Is this project open-sourced?
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Yes, this project is open-sourced under Apache2 license. The source code of `MyGene.info <http://mygene.info>`_ are hosted at `bitbucket <https://bitbucket.org/sulab/mygene.info/src>`_.
-
-
-Who is using MyGene.info?
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-* `BioGPS <http://biogps.org>`_
-* `Monarch Initiative <http://www.monarchinitiative.org>`_
-* `GeneWikiPlus <http://genewikiplus.org>`_
-* `myGeneNet <http://netbio.bgu.ac.il/mygenenet>`_
+See FAQ page here: http://mygene.info/faq/
 
 
 Contact us
