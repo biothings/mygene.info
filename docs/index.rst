@@ -3,13 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. cssclass:: hidden-title
-Home
-****
 
 
-MyGene.info : Gene Annotation Query as a Service
-*************************************************
+MyGene.info documentation
+*************************
+
+Introduction
+-------------
 
 .. image:: _static/logo.png
    :align: left
@@ -25,12 +25,6 @@ MyGene.info : Gene Annotation Query as a Service
     </p>
     <script type="text/javascript" src="_static/get_meta.js" charset="utf-8"></script>
 
-
-.. container:: mg-citation
-
-    To cite MyGene.info::
-
-        Wu C, MacLeod I, Su AI (2013) BioGPS and MyGene.info: organizing online, gene-centric information. Nucl. Acids Res. 41(D1): D561-D565.
 
 .. raw:: html
 
@@ -61,6 +55,7 @@ Documentation
 .. toctree::
    :maxdepth: 3
 
+   index
    Try it live on interactive API page <http://mygene.info/v2/api>
    doc/migration_from_v1
    doc/data
