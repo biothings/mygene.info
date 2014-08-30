@@ -24,6 +24,9 @@ PharmGKB         whenever a new
                  release is available
 UCSC             whenever a new               For "exons" field
                  release is available
+CPDB             whenever a new               For "pathway" field
+                 release is available
+
 ============    =======================      =================================
 
 The most updated data information can be accessed `here <http://mygene.info/v2/metadata>`_.
