@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright [2010-2011] [Chunlei Wu]
+# Copyright [2010-2014] [Chunlei Wu]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from nose.tools import ok_, eq_
 
 
 host = 'http://localhost:9000'
+#host = 'http://dev.mygene.info:8000'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))
 

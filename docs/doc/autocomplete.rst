@@ -61,7 +61,7 @@ As shown in above example, you can access the gene object as **ui.item**::
 
 .. Note:: if you don't define your own callback function (like the minimal HTML page below), the default behavior is to display an alert msg with the gene selected. To change this default behavior, you must overwrite with your own callback function (keep the same name as "**mygene_query_select_callback**").
 
-A minimal HTML page with autocomplete enabled looks just like this (`See it in action here </widget/autocomplete/demo_minimal.html>`_):
+A minimal HTML page with autocomplete enabled looks just like this (`See it in action here <http://mygene.info/widget/autocomplete/demo_minimal.html>`_):
 
 .. code-block:: html
 

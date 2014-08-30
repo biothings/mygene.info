@@ -128,43 +128,43 @@ Available fields
 ========================    =============================================    =================================================================================
 Field                        Description                                     Examples
 ========================    =============================================    =================================================================================
-**entrezgene**                Entrez gene id                                    `q=entrezgene:1017 </v2/query?q=entrezgene:1017>`_
-**ensemblgene**               Ensembl gene id                                   `q=ensemblgene:ENSG00000123374 </v2/query?q=ensemblgene:ENSG00000123374>`_
-**symbol**                    official gene symbol                              `q=symbol:cdk2 </v2/query?q=symbol:cdk2>`_
-**name**                      gene name                                         `q=name:cyclin-dependent </v2/query?q=name:cyclin-dependent>`_
-**alias**                     gene alias                                        `q=alias:p33 </v2/query?q=alias:p33>`_
-**summary**                   gene summary text                                 `q=summary:insulin </v2/query?q=summary:insulin>`_
-**refseq**                    NCBI RefSeq id  (both rna and proteins)           `q=refseq:NM_001798 </v2/query?q=refseq:NM_001798>`_ :raw-html:`<br />`
-                                                                                `q=refseq:NP_439892 </v2/query?q=refseq:NP_439892>`_
-**unigene**                   NCBI UniGene id                                   `q=unigene:Hs.19192 </v2/query?q=unigene:Hs.19192>`_
-**homologene**                NCBI HomoloGene id                                `q=homologene:74409 </v2/query?q=homologene:74409>`_
-**accession**                 NCBI GeneBank Accession number                    `q=accession:AA810989 </v2/query?q=accession:AA810989>`_
-**ensembltranscript**         Ensembl transcript id                             `q=ensembltranscript:ENST00000266970 </v2/query?q=ensembltranscript:ENST00000266970>`_
-**ensemblprotein**            Ensembl protein id                                `q=ensemblprotein:ENSP00000243067 </v2/query?q=ensemblprotein:ENSP00000243067>`_
-**uniprot**                   UniProt id                                        `q=uniprot:P24941 </v2/query?q=uniprot:P24941>`_
-**ipi** (deprecated!)         IPI id                                            `q=ipi:IPI00031681 </v2/query?q=ipi:IPI00031681>`_
-**pdb**                       PDB id                                            `q=pdb:1AQ1 </v2/query?q=pdb:1AQ1>`_
-**prosite**                   Prosite id                                        `q=prosite:PS50011 </v2/query?q=prosite:PS50011>`_
-**interpro**                  InterPro id                                       `q=interpro:IPR008351 </v2/query?q=interpro:IPR008351>`_
-**mim**                       OMIM id                                           `q=mim:116953 </v2/query?q=MIM:116953>`_
-**pharmgkb**                  PharmGKB id                                       `q=pharmgkb:PA101 </v2/query?q=pharmgkb:PA101>`_
-**reporter**                  Affymetrix probeset id                            `q=reporter:204252_at </v2/query?q=reporter:204252_at>`_
-**reagent**                   GNF reagent id                                    `q=reagent:GNF282834 </v2/query?q=reagent:GNF282834>`_
-**go**                        Gene Ontology id                                  `q=go:0000307 </v2/query?q=go:0000307>`_
-**hgnc**                      HUGO Gene Nomenclature Committee                  `q=hgnc:1771 </v2/query?q=HGNC:1771>`_
-**hprd**                      Human Protein Reference Database                  `q=hprd:00310 </v2/query?q=HPRD:00310>`_
-**mgi**                       Mouse Genome Informatics                          `q=mgi:MGI\\\\:88339 </v2/query?q=mgi:MGI%5C%5C:88339>`_
-**rgb**                       Rat Genome Database                               `q=rgd:620620 </v2/query?q=RGD:620620>`_
-**flybase**                   A Database of Drosophila Genes & Genomes          `q=flybase:FBgn0004107&species=fruitfly </v2/query?q=FLYBASE:FBgn0004107&species=fruitfly>`_
-**wormbase**                  C elegans and related nematodes database          `q=wormbase:WBGene00057218&species=31234 </v2/query?q=wormbase:WBGene00057218&species=31234>`_
-**zfin**                      Zebrafish Information Network                     `q=zfin:ZDB-GENE-980526-104&species=zebrafish </v2/query?q=ZFIN:ZDB-GENE-980526-104&species=zebrafish>`_
-**tair**                      Arabidopsis Information Resource                  `q=tair:AT3G48750&species=thale-cress </v2/query?q=TAIR:AT3G48750&species=thale-cress>`_
-**xenbase**                   Xenopus laevis and Xenopus tropicalis             `q=xenbase:XB-GENE-1001990&species=frog </v2/query?q=xenbase:XB-GENE-1001990&species=frog>`_
+**entrezgene**                Entrez gene id                                    `q=entrezgene:1017 <http://mygene.info/v2/query?q=entrezgene:1017>`_
+**ensemblgene**               Ensembl gene id                                   `q=ensemblgene:ENSG00000123374 <http://mygene.info/v2/query?q=ensemblgene:ENSG00000123374>`_
+**symbol**                    official gene symbol                              `q=symbol:cdk2 <http://mygene.info/v2/query?q=symbol:cdk2>`_
+**name**                      gene name                                         `q=name:cyclin-dependent <http://mygene.info/v2/query?q=name:cyclin-dependent>`_
+**alias**                     gene alias                                        `q=alias:p33 <http://mygene.info/v2/query?q=alias:p33>`_
+**summary**                   gene summary text                                 `q=summary:insulin <http://mygene.info/v2/query?q=summary:insulin>`_
+**refseq**                    NCBI RefSeq id  (both rna and proteins)           `q=refseq:NM_001798 <http://mygene.info/v2/query?q=refseq:NM_001798>`_ :raw-html:`<br />`
+                                                                                `q=refseq:NP_439892 <http://mygene.info/v2/query?q=refseq:NP_439892>`_
+**unigene**                   NCBI UniGene id                                   `q=unigene:Hs.19192 <http://mygene.info/v2/query?q=unigene:Hs.19192>`_
+**homologene**                NCBI HomoloGene id                                `q=homologene:74409 <http://mygene.info/v2/query?q=homologene:74409>`_
+**accession**                 NCBI GeneBank Accession number                    `q=accession:AA810989 <http://mygene.info/v2/query?q=accession:AA810989>`_
+**ensembltranscript**         Ensembl transcript id                             `q=ensembltranscript:ENST00000266970 <http://mygene.info/v2/query?q=ensembltranscript:ENST00000266970>`_
+**ensemblprotein**            Ensembl protein id                                `q=ensemblprotein:ENSP00000243067 <http://mygene.info/v2/query?q=ensemblprotein:ENSP00000243067>`_
+**uniprot**                   UniProt id                                        `q=uniprot:P24941 <http://mygene.info/v2/query?q=uniprot:P24941>`_
+**ipi** (deprecated!)         IPI id                                            `q=ipi:IPI00031681 <http://mygene.info/v2/query?q=ipi:IPI00031681>`_
+**pdb**                       PDB id                                            `q=pdb:1AQ1 <http://mygene.info/v2/query?q=pdb:1AQ1>`_
+**prosite**                   Prosite id                                        `q=prosite:PS50011 <http://mygene.info/v2/query?q=prosite:PS50011>`_
+**interpro**                  InterPro id                                       `q=interpro:IPR008351 <http://mygene.info/v2/query?q=interpro:IPR008351>`_
+**mim**                       OMIM id                                           `q=mim:116953 <http://mygene.info/v2/query?q=MIM:116953>`_
+**pharmgkb**                  PharmGKB id                                       `q=pharmgkb:PA101 <http://mygene.info/v2/query?q=pharmgkb:PA101>`_
+**reporter**                  Affymetrix probeset id                            `q=reporter:204252_at <http://mygene.info/v2/query?q=reporter:204252_at>`_
+**reagent**                   GNF reagent id                                    `q=reagent:GNF282834 <http://mygene.info/v2/query?q=reagent:GNF282834>`_
+**go**                        Gene Ontology id                                  `q=go:0000307 <http://mygene.info/v2/query?q=go:0000307>`_
+**hgnc**                      HUGO Gene Nomenclature Committee                  `q=hgnc:1771 <http://mygene.info/v2/query?q=HGNC:1771>`_
+**hprd**                      Human Protein Reference Database                  `q=hprd:00310 <http://mygene.info/v2/query?q=HPRD:00310>`_
+**mgi**                       Mouse Genome Informatics                          `q=mgi:MGI\\\\:88339 <http://mygene.info/v2/query?q=mgi:MGI%5C%5C:88339>`_
+**rgb**                       Rat Genome Database                               `q=rgd:620620 <http://mygene.info/v2/query?q=RGD:620620>`_
+**flybase**                   A Database of Drosophila Genes & Genomes          `q=flybase:FBgn0004107&species=fruitfly <http://mygene.info/v2/query?q=FLYBASE:FBgn0004107&species=fruitfly>`_
+**wormbase**                  C elegans and related nematodes database          `q=wormbase:WBGene00057218&species=31234 <http://mygene.info/v2/query?q=wormbase:WBGene00057218&species=31234>`_
+**zfin**                      Zebrafish Information Network                     `q=zfin:ZDB-GENE-980526-104&species=zebrafish <http://mygene.info/v2/query?q=ZFIN:ZDB-GENE-980526-104&species=zebrafish>`_
+**tair**                      Arabidopsis Information Resource                  `q=tair:AT3G48750&species=thale-cress <http://mygene.info/v2/query?q=TAIR:AT3G48750&species=thale-cress>`_
+**xenbase**                   Xenopus laevis and Xenopus tropicalis             `q=xenbase:XB-GENE-1001990&species=frog <http://mygene.info/v2/query?q=xenbase:XB-GENE-1001990&species=frog>`_
 
                               biology and genomics resource
-**mirbase**                   database of published miRNA sequences and          `q=mirbase:MI0017267 </v2/query?q=mirbase:MI0017267>`_
+**mirbase**                   database of published miRNA sequences and          `q=mirbase:MI0017267 <http://mygene.info/v2/query?q=mirbase:MI0017267>`_
                               annotation
-**retired**                   Retired Entrez gene id, including those            `q=retired:84999 </v2/query?q=retired:84999>`_
+**retired**                   Retired Entrez gene id, including those            `q=retired:84999 <http://mygene.info/v2/query?q=retired:84999>`_
                               with replaced gene ids.
 ========================    =============================================    =================================================================================
 
