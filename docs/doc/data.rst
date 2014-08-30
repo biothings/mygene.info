@@ -14,8 +14,8 @@ We currently obtain the gene annotation data from several public data resources 
 Source           Update frequency               Notes
 ============    =======================      =================================
 NCBI Entrez      weekly snapshot
-Ensembl          whenever a new               Ensembl Pre! and EnsemblGenomes
-                 release is available         are not included at the moment
+Ensembl          whenever a new              | Ensembl Pre! and EnsemblGenomes
+                 release is available        | are not included at the moment
 Uniprot          whenever a new
                  release is available
 NetAffy          whenever a new

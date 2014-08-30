@@ -145,6 +145,7 @@ Field                        Description                                     Exa
 **ipi** (deprecated!)         IPI id                                            `q=ipi:IPI00031681 <http://mygene.info/v2/query?q=ipi:IPI00031681>`_
 **pdb**                       PDB id                                            `q=pdb:1AQ1 <http://mygene.info/v2/query?q=pdb:1AQ1>`_
 **prosite**                   Prosite id                                        `q=prosite:PS50011 <http://mygene.info/v2/query?q=prosite:PS50011>`_
+**pfam**                      PFam id                                           `q=pfam:PF00069 <http://mygene.info/v2/query?q=pfam:PF00069>`_
 **interpro**                  InterPro id                                       `q=interpro:IPR008351 <http://mygene.info/v2/query?q=interpro:IPR008351>`_
 **mim**                       OMIM id                                           `q=mim:116953 <http://mygene.info/v2/query?q=MIM:116953>`_
 **pharmgkb**                  PharmGKB id                                       `q=pharmgkb:PA101 <http://mygene.info/v2/query?q=pharmgkb:PA101>`_
@@ -159,13 +160,12 @@ Field                        Description                                     Exa
 **wormbase**                  C elegans and related nematodes database          `q=wormbase:WBGene00057218&species=31234 <http://mygene.info/v2/query?q=wormbase:WBGene00057218&species=31234>`_
 **zfin**                      Zebrafish Information Network                     `q=zfin:ZDB-GENE-980526-104&species=zebrafish <http://mygene.info/v2/query?q=ZFIN:ZDB-GENE-980526-104&species=zebrafish>`_
 **tair**                      Arabidopsis Information Resource                  `q=tair:AT3G48750&species=thale-cress <http://mygene.info/v2/query?q=TAIR:AT3G48750&species=thale-cress>`_
-**xenbase**                   Xenopus laevis and Xenopus tropicalis             `q=xenbase:XB-GENE-1001990&species=frog <http://mygene.info/v2/query?q=xenbase:XB-GENE-1001990&species=frog>`_
-
-                              biology and genomics resource
-**mirbase**                   database of published miRNA sequences and          `q=mirbase:MI0017267 <http://mygene.info/v2/query?q=mirbase:MI0017267>`_
-                              annotation
-**retired**                   Retired Entrez gene id, including those            `q=retired:84999 <http://mygene.info/v2/query?q=retired:84999>`_
-                              with replaced gene ids.
+**xenbase**                 | Xenopus laevis and Xenopus tropicalis             `q=xenbase:XB-GENE-1001990&species=frog <http://mygene.info/v2/query?q=xenbase:XB-GENE-1001990&species=frog>`_
+                            | biology and genomics resource
+**mirbase**                 | database of published miRNA                       `q=mirbase:MI0017267 <http://mygene.info/v2/query?q=mirbase:MI0017267>`_
+                            | sequences and annotation
+**retired**                 | Retired Entrez gene id, including                 `q=retired:84999 <http://mygene.info/v2/query?q=retired:84999>`_
+                            | those with replaced gene ids.
 ========================    =============================================    =================================================================================
 
 
