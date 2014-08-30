@@ -20,6 +20,22 @@ Introduction
 
 .. raw:: html
 
+    <style>
+    #status {
+        margin:0!important;
+        line-height:1em!important;
+    }
+
+    #status span{
+        margin-left:auto;
+        margin-right:auto;
+        width: 100%;
+        display: block;
+        text-align: center;
+        font-weight: bold;
+        font-family: "Open Sans", Arial, sans-serif !important;
+    }
+    </style>
     <p id="status">
     <span id="status_text"></span>
     </p>
@@ -28,6 +44,12 @@ Introduction
 
 .. raw:: html
 
+    <style>
+    #twitter-widget-0 {
+          width: 100% !important;
+          height: 180px !important;
+    }
+    </style>
     <a class="twitter-timeline" Width="100%" height="200px" data-chrome="noborders nofooter transparent noscrollbar" href="https://twitter.com/mygeneinfo" data-widget-id="372882575196299264">Tweets by @mygeneinfo</a>
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
