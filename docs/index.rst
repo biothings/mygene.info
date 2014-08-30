@@ -42,7 +42,7 @@ MyGene.info : Gene Annotation Query as a Service
 What's new in v2 API
 ------------------------
 
-* **ALL** species are supported now! That's about 12,000 in total. [`more <doc/data.html#species>`_]
+* **ALL** species are supported now! That's more than 14,000 in total. [`more <doc/data.html#species>`_]
 * Gene annotation data are even more `up-to-date <doc/data.html#data-sources>`_ (weekly updates).
 * Gene query service supports `"fields" parameter <doc/query_service.html#fields>`_ to return any fields. Previously, you need to call gene query service separately if you need more than gene symbols and names.
 * Fine-tuned query algorithm to return relevant gene hits first.
@@ -50,7 +50,7 @@ What's new in v2 API
 
 `Migration guide from v1 to v2 API <doc/migration_from_v1.html>`_
 
-Still want to stick with v1 API for a while? It's still there: `v1 API </v1/doc>`_, but annotation data there won't be updated any more.
+Still want to stick with v1 API for a while? It's still there: `v1 API <http://mygene.info/v1/doc>`_, but annotation data there won't be updated any more.
 
 .. include :: doc/quick_start.rst
 
@@ -82,7 +82,7 @@ We support **ALL** species available from NCBI and Ensembl. `See more <doc/data.
 How frequent are the gene annotation data updated?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Gene annotation data are regularly updated once a week to keep it up-to-date. The most updated data information can be accessed `here </v2/metadata>`_. `See more <doc/data.html#data-sources>`_.
+Gene annotation data are regularly updated once a week to keep it up-to-date. The most updated data information can be accessed `here <http://mygene.info/v2/metadata>`_. `See more <doc/data.html#data-sources>`_.
 
 
 What's behind MyGene.info?
