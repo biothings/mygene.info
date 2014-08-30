@@ -55,7 +55,6 @@ Documentation
 .. toctree::
    :maxdepth: 3
 
-   index
    Try it live on interactive API page <http://mygene.info/v2/api>
    doc/migration_from_v1
    doc/data
