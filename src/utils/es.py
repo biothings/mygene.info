@@ -214,7 +214,11 @@ class ESQuery:
         if query:
             mat = re.search(pattern, query)
             if mat:
-                return mat.groupdict()
+                d = mat.groupdict()
+                if query.startswith('hg19.'):
+                    # support hg19 for human (default is hg38)
+                    d['assembly'] = 'hg19'
+                return d
 
     def _is_wildcard_query(self, query):
         '''Return True if input query is a wildcard query.'''
@@ -1032,25 +1036,35 @@ class ESQueryBuilder():
             _q.update(self.options)
         return _q
 
-    def build_genomic_pos_query(self, chr, gstart, gend):
+    def build_genomic_pos_query(self, chr, gstart, gend, assembly=None):
+        '''By default if assembly is None, the lastest assembly is used.
+           for some species (e.g. human) we support multiple assemblies,
+           exact assembly is passed as well.
+        '''
         gstart = safe_genome_pos(gstart)
         gend = safe_genome_pos(gend)
         if chr.lower().startswith('chr'):
             chr = chr[3:]
+
+        genomic_pos_field = "genomic_pos"
+        if assembly:
+            if assembly == 'hg19':
+                genomic_pos_field = "genomic_pos_hg19"
+
         _query = {
             "nested": {
-                "path": "genomic_pos",
+                "path": genomic_pos_field,
                 "query": {
                     "bool": {
                         "must": [
                             {
-                                "term": {"genomic_pos.chr": chr.lower()}
+                                "term": {genomic_pos_field + ".chr": chr.lower()}
                             },
                             {
-                                "range": {"genomic_pos.start": {"lte": gend}}
+                                "range": {genomic_pos_field + ".start": {"lte": gend}}
                             },
                             {
-                                "range": {"genomic_pos.end": {"gte": gstart}}
+                                "range": {genomic_pos_field + ".end": {"gte": gstart}}
                             }
                         ]
                     }
