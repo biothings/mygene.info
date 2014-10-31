@@ -92,6 +92,11 @@ FAQ
 
 See FAQ page here: http://mygene.info/faq/
 
+Related links
+-------------
+
+* `mygene.hub <https://bitbucket.org/sulab/mygene.hub>`_
+
 
 Contact us
 -------------------------
