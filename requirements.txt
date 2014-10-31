@@ -29,3 +29,6 @@ Sphinx==1.2b1
 #for nosetests
 nose>=1.3.0
 httplib2>=0.8
+
+#Optional
+#msgpack>=0.4

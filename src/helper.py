@@ -4,9 +4,12 @@ from collections import OrderedDict
 import tornado.web
 from utils.ga import GAMixIn
 
-SUPPORT_MSGPACK = False
+SUPPORT_MSGPACK = True
 if SUPPORT_MSGPACK:
-    import msgpack
+    try:
+        import msgpack
+    except ImportError:
+        SUPPORT_MSGPACK = False
 
     def msgpack_encode_datetime(obj):
         if isinstance(obj, datetime.datetime):
@@ -89,7 +92,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
         if SUPPORT_MSGPACK:
             use_msgpack = self.get_argument('msgpack', '')
         if SUPPORT_MSGPACK and use_msgpack:
-            _json_data = msgpack.packb(data, use_bin_type=True, default=msgpack_encode_datetime)
+            _json_data = msgpack.packb(data, default=msgpack_encode_datetime)
             self.set_header("Content-Type", "application/x-msgpack")
         else:
             _json_data = json.dumps(data, cls=DateTimeJSONEncoder, indent=indent) if encode else data
