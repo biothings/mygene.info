@@ -20,6 +20,7 @@ from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL,
 from utils.common import (ask, is_int, is_str, is_seq, timesofar,
                           safe_genome_pos, dotdict, taxid_d)
 from utils.dotfield import parse_dot_fields
+from utils.taxonomy import TaxonomyQuery
 
 
 GENOME_ASSEMBLY = {
@@ -257,6 +258,10 @@ class ESQuery:
 
         #this species parameter is added to the query, thus will change facet counts.
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
+        include_tax_tree = kwargs.pop('include_tax_tree', False)
+        if include_tax_tree:
+            tq = TaxonomyQuery()
+            kwargs['species'] = tq.get_expanded_species_li(kwargs['species'])
 
         #this parameter is to add species filter without changing facet counts.
         kwargs['species_facet_filter'] = self._cleaned_species(kwargs.get('species_facet_filter', None),
@@ -353,7 +358,7 @@ class ESQuery:
             elif self._is_wildcard_query(q):
                 _q = qbdr.build(q, mode=2)   # wildcard query
             else:
-            # normal text query
+                # normal text query
                 _q = qbdr.build(q, mode=1)
         except MGQueryError as err:
             return {'success': False,
@@ -391,12 +396,12 @@ class ESQuery:
 
         return res
 
-    def query_interval(self, taxid, chr,  gstart, gend, **kwargs):
+    def query_interval(self, taxid, chr, gstart, gend, **kwargs):
         '''deprecated! Use query method with interval query string.'''
         kwargs.setdefault('fields', ['symbol', 'name', 'taxid'])
         rawquery = kwargs.pop('rawquery', None)
         qbdr = ESQueryBuilder(**kwargs)
-        _q = qbdr.build_genomic_pos_query(taxid, chr,  gstart, gend)
+        _q = qbdr.build_genomic_pos_query(taxid, chr, gstart, gend)
         if rawquery:
             return _q
         return self._search(_q)
@@ -578,6 +583,7 @@ class ESQueryBuilder():
                                 "match_phrase": {"name": "%(q)s"},
                             },
                             "boost_factor": 4
+
                         }
                     },
                     {
@@ -647,7 +653,7 @@ class ESQueryBuilder():
 
                 ]
             }
-            }
+        }
         _query = json.dumps(_query)
         _query = json.loads(_query % {'q': q})
 
@@ -713,7 +719,7 @@ class ESQueryBuilder():
 
                 ]
             }
-            }
+        }
         _query = json.dumps(_query)
         try:
             _query = json.loads(_query % {'q': q.lower()})
@@ -1112,7 +1118,7 @@ class UserFilters:
         elif id_list and id_field:
             _filter = {
                 "terms": {id_field: id_list}
-                }
+            }
         if _filter:
             print 'Adding filter "{}"...'.format(name),
             _doc = {'_id': name,
