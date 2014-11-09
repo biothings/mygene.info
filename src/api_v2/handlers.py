@@ -5,6 +5,7 @@ from tornado.web import HTTPError
 
 from helper import BaseHandler
 from utils.es import ESQuery
+from utils.taxonomy import TaxonomyQuery
 from utils.common import split_ids
 
 
@@ -136,8 +137,19 @@ class QueryHandler(BaseHandler):
                              'value': len(q) if q else 0})
 
 
+class SpeciesHandler(BaseHandler):
+    tq = TaxonomyQuery()
+
+    def get(self, taxid):
+        res = self.tq.get_species_info(taxid)
+        if res:
+            self.return_json(res)
+        else:
+            raise HTTPError(404)
+
 APP_LIST = [
     (r"/gene/([\w\-\.]+)/?", GeneHandler),   # for gene get request
     (r"/gene/?$", GeneHandler),              # for gene post request
     (r"/query/?", QueryHandler),
+    (r"/species/(\d+)/?", SpeciesHandler),
 ]
