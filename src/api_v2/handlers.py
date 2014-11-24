@@ -141,7 +141,9 @@ class SpeciesHandler(BaseHandler):
     tq = TaxonomyQuery()
 
     def get(self, taxid):
-        res = self.tq.get_species_info(taxid)
+        kwargs = self.get_query_params()
+        include_children = kwargs.get('include_children', False)
+        res = self.tq.get_species_info(taxid, include_children=include_children)
         if res:
             self.return_json(res)
         else:

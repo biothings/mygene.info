@@ -10,12 +10,16 @@ class TaxonomyQuery:
         self._index = 'taxonomy'
         self._doc_type = 'species'
 
-    def get_species_info(self, taxid):
+    def get_species_info(self, taxid, include_children=False):
+        taxid = int(taxid)
         try:
             res = self.es.get(self._index, self._doc_type, taxid)
-            return res
         except NotFoundException:
-            pass
+            res = None
+        if res:
+            if include_children:
+                res['children'] = self.get_all_children_tax_ids(taxid, include_self=False)
+            return res
 
     def get_all_children_tax_ids(self, taxid, has_gene=True, include_self=True, raw=False):
 
@@ -43,8 +47,11 @@ class TaxonomyQuery:
         if raw:
             return res
         taxid_li = [int(x['_id']) for x in res['hits']['hits']]
-        if include_self and taxid not in taxid_li:
-            taxid_li.append(taxid)
+        if include_self:
+            if taxid not in taxid_li:
+                taxid_li.append(taxid)
+        elif taxid in taxid_li:
+            taxid_li.remove(taxid)
 
         return sorted(taxid_li)
 
@@ -55,3 +62,8 @@ class TaxonomyQuery:
             if len(taxid_set) >= max:
                 break
         return sorted(taxid_set)[:max]
+        # if len(taxid_set) > max:
+        #     out = {"truncated": True, "list": sorted(taxid_set)[:max]}
+        # else:
+        #     out = sorted(taxid_set)
+        # return out
