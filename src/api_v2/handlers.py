@@ -143,7 +143,8 @@ class SpeciesHandler(BaseHandler):
     def get(self, taxid):
         kwargs = self.get_query_params()
         include_children = kwargs.get('include_children', False)
-        res = self.tq.get_species_info(taxid, include_children=include_children)
+        has_gene = kwargs.get('has_gene', False)
+        res = self.tq.get_species_info(taxid, include_children=include_children, has_gene=has_gene)
         if res:
             self.return_json(res)
         else:
