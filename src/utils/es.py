@@ -1056,6 +1056,8 @@ class ESQueryBuilder():
         if assembly:
             if assembly == 'hg19':
                 genomic_pos_field = "genomic_pos_hg19"
+            if assembly == 'mm9':
+                genomic_pos_field = "genomic_pos_mm9"
 
         _query = {
             "nested": {
