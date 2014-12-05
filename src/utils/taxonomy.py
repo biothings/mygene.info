@@ -10,7 +10,7 @@ MAX_TAXID_COUNT = 10000
 class TaxonomyQuery:
     def __init__(self):
         self.es = ES(ES_HOST)
-        self._index = 'taxonomy'
+        self._index = 'taxonomy_current'
         self._doc_type = 'species'
 
     def get_species_info(self, taxid, include_children=False, has_gene=False):
