@@ -219,6 +219,10 @@ class ESQuery:
                 if query.startswith('hg19.'):
                     # support hg19 for human (default is hg38)
                     d['assembly'] = 'hg19'
+                if query.startswith('mm9.'):
+                    # support mm9 for mouse (default is mm10)
+                    d['assembly'] = 'mm9'
+
                 return d
 
     def _is_wildcard_query(self, query):
