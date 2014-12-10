@@ -97,8 +97,8 @@ This table lists the genome assembies for commonly-used species:
     ===========  =======================   =======================
     Common name  Genus name                Genome assembly
     ===========  =======================   =======================
-    human        Homo sapiens              GRCh38 (hg38, with hg19 support)
-    mouse        Mus musculus              GRCm38 (mm10, with mm9 support)
+    human        Homo sapiens              GRCh38 (hg38), also support hg19
+    mouse        Mus musculus              GRCm38 (mm10), also support mm9
     rat          Rattus norvegicus         Rnor_5.0 (rn4)
     fruitfly     Drosophila melanogaster   BDGP5 (dm3)
     nematode     Caenorhabditis elegans    WBcel235 (ce10)
