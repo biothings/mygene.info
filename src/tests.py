@@ -25,9 +25,15 @@ import json
 import sys
 from nose.tools import ok_, eq_
 
+try:
+    import msgpack
+except ImportError:
+    sys.stderr.write("Warning: msgpack is not available.")
+
 
 host = 'http://localhost:9000'
 #host = 'http://dev.mygene.info:8000'
+#host = 'http://mygene.info'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -57,6 +63,13 @@ def truncate(s, limit):
 
 def json_ok(s, checkerror=True):
     d = _d(s)
+    if checkerror:
+        ok_(not (isinstance(d, dict) and 'error' in d), truncate(str(d), 100))
+    return d
+
+
+def msgpack_ok(b, checkerror=True):
+    d = msgpack.unpackb(b)
     if checkerror:
         ok_(not (isinstance(d, dict) and 'error' in d), truncate(str(d), 100))
     return d
@@ -279,8 +292,9 @@ def test_gene():
     # testing non-ascii character
     get_404(api + '/gene/' + '54097\xef\xbf\xbd\xef\xbf\xbdmouse')
 
+    # commented out this test, as no more
     #allow dot in the geneid
-    res = json_ok(get_ok(api + '/gene/Y105C5B.255'))
+    #res = json_ok(get_ok(api + '/gene/Y105C5B.255'))
 
     # testing filtering parameters
     res = json_ok(get_ok(api + '/gene/1017?fields=symbol,name,entrezgene'))
@@ -389,3 +403,58 @@ def test_unicode():
     res = json_ok(post_ok(api + '/query', {"q": 'cdk2+' + s}))
     eq_(res[1]['notfound'], True)
     eq_(len(res), 2)
+
+
+def test_hg19():
+    res = json_ok(get_ok(api + '/query?q=hg19.chr12:57,795,963-57,815,592&species=human'))
+    ok_(len(res['hits']) == 2)
+    ok_('_id' in res['hits'][0])
+    res2 = json_ok(get_ok(api + '/query?q=chr12:57,795,963-57,815,592&species=human'))
+    ok_(res['total'] != res2['total'])
+
+    res = json_ok(get_ok(api + '/gene/10017?fields=genomic_pos_hg19,exons_hg19'))
+    ok_('genomic_pos_hg19' in res)
+    ok_('exons_hg19' in res)
+
+
+def test_mm9():
+    res = json_ok(get_ok(api + '/query?q=mm9.chr12:57,795,963-57,815,592&species=mouse'))
+    ok_(len(res['hits']) == 2)
+    ok_('_id' in res['hits'][0])
+    res2 = json_ok(get_ok(api + '/query?q=chr12:57,795,963-57,815,592&species=mouse'))
+    ok_(res['total'] != res2['total'])
+
+    res = json_ok(get_ok(api + '/gene/12049?fields=genomic_pos_mm9,exons_mm9'))
+    ok_('genomic_pos_mm9' in res)
+    ok_('exons_mm9' in res)
+
+
+def test_msgpack():
+    res = json_ok(get_ok(api + '/gene/1017'))
+    res2 = msgpack_ok(get_ok(api + '/gene/1017?msgpack=true'))
+    ok_(res, res2)
+
+    res = json_ok(get_ok(api + '/query/?q=cdk'))
+    res2 = msgpack_ok(get_ok(api + '/query/?q=cdk&msgpack=true'))
+    ok_(res, res2)
+
+    res = json_ok(get_ok(api + '/metadata'))
+    res2 = msgpack_ok(get_ok(api + '/metadata?msgpack=true'))
+    ok_(res, res2)
+
+
+def test_taxonomy():
+    res = json_ok(get_ok(api + '/species/1239'))
+    ok_("lineage" in res)
+
+    res = json_ok(get_ok(api + '/species/46170?include_children=true'))
+    ok_(len(res['children']) >= 306)
+
+    res2 = json_ok(get_ok(api + '/species/46170?include_children=true&has_gene=1'))
+    ok_(len(res2['children']) >= 39)
+    ok_(len(res2['children']) <= len(res['children']))
+
+    res = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=46170&include_tax_tree=true'))
+    ok_(res['total'] >= 10)
+    res2 = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=46170'))
+    eq_(res2['total'], 0)
