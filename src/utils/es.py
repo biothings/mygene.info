@@ -457,7 +457,11 @@ class ESQuery:
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
+        print 'xxxxxxxxxxxxxxxxxx'
+        print self._index
+        print self._doc_type
         mapping = self.conn.indices.get_mapping(self._doc_type, self._index, raw=True)
+        print 'xxxxxxxxxxxxxxxxxx'
         if raw:
             return mapping
 

@@ -11,13 +11,13 @@
 # pip install pycurl
 
 
-pyes>=0.90.1
+pyes>=0.99.5
 thrift>=0.9.1
 tornado>=3.2
 tornadoes>=1.4.1
+git+git://github.com/tj-4-zune/py-ga-mob.git
 #the following patched version has been merged into v1.4.1
 #-e git+git://github.com/newgene/tornado-es.git#egg=tornadoes   #this is a patched version of tornadoes
-
 
 #for tracking API on Google Analytics
 pyga==2.4.2
