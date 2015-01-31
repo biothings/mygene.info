@@ -14,22 +14,32 @@
 
 
 #!/usr/bin/python
-print "Content-Type: text/html"
+print("Content-Type: text/html")
 
 import os
 import cgi
-import urlparse
-import urllib
+try:
+    import urlparse
+    import urllib
+    import httplib
+    PY3=False
+except ImportError:
+    import urllib.parse
+    import urllib.request, urllib.parse, urllib.error
+    import http.client
+    PY3=True
 import types
 import json
-import httplib
 
 #turn it on when debugging
 #import cgitb
 #cgitb.enable()
 
 def call_service(url):
-    h = httplib.HTTPConnection('mygene.info')
+    if PY3:
+        h = http.client.HTTPConnection('mygene.info')
+    else:
+        h = httplib.HTTPConnection('mygene.info')
     h.request('GET', url)
     res = h.getresponse()
     con = res.read()
@@ -37,7 +47,7 @@ def call_service(url):
         out = json.loads(con)
         return out
     else:
-        print con
+        print(con)
 
 
 form_html = '''
@@ -48,27 +58,33 @@ form_html = '''
 <input type="hidden" name="limit" value="100" /><input type="submit"></input></p>
 </form>
 '''
-print form_html
+print(form_html)
 
 qs = os.environ.get("QUERY_STRING", '')
-params = urlparse.parse_qs(qs)
+if  PY3:
+    params = urllib.parse.parse_qs(qs)
+else:
+    params = urlparse.parse_qs(qs)
 query = params.get('q', [''])[0]
 if query:
     #do the query
-    out = call_service('/v2/query?' + urllib.urlencode(dict(q=query, species='mouse', limit=1000)))
+    if PY3:
+        out = call_service('/v2/query?' + urllib.parse.urlencode(dict(q=query, species='mouse', limit=1000)))
+    else:
+        out = call_service('/v2/query?' + urllib.urlencode(dict(q=query, species='mouse', limit=1000)))
     if 'total' in out:
         #render the gene list
-        print "<h3>Found %d matched mouse gene(s)</h3>" % out['total']
+        print("<h3>Found %d matched mouse gene(s)</h3>" % out['total'])
         if out['total']>0:
-            print '<table>'
-            print '<tr><td>Symbol</td><td>Name</td></td>'
+            print('<table>')
+            print('<tr><td>Symbol</td><td>Name</td></td>')
             for gene in out['hits']:
-                print '<tr><td><a href="?showgene=%s">%s</a></td><td>%s</td></tr>' % (gene['_id'], gene.get('symbol', 'None'), gene.get('name', ''))
-            print '</table>'
+                print('<tr><td><a href="?showgene=%s">%s</a></td><td>%s</td></tr>' % (gene['_id'], gene.get('symbol', 'None'), gene.get('name', '')))
+            print('</table>')
     else:
         #something wrong, show the error
         err = out.get('error', out.get('reason', 'Invalid query!'))
-        print '<p>Error:<pre>&nbsp;%s</pre></p>' % err
+        print('<p>Error:<pre>&nbsp;%s</pre></p>' % err)
 
 else:
    geneid = params.get('showgene',[''])[0]
@@ -78,17 +94,21 @@ else:
         ps_list = []
         if gene and 'reporter' in gene:
             ps_list = gene['reporter'].get('Mouse430_2',[])
-            if type(ps_list) is not types.ListType:
-                # if only one probeset available, it's returned as a string, so we need to convert it to a list
-                ps_list = [ps_list]
+            if PY3:
+                if type(ps_list) is not list:
+                    ps_list = [ps_list]
+            else:
+                if type(ps_list) is not types.ListType:
+                    # if only one probeset available, it's returned as a string, so we need to convert it to a list
+                    ps_list = [ps_list]
         if ps_list:
             for ps in ps_list:
-                print '<img src="http://biogps.org/dataset/4/chart/%s">' % ps
+                print('<img src="http://biogps.org/dataset/4/chart/%s">' % ps)
         else:
-            print '<p>No data available for this gene.</p>'
+            print('<p>No data available for this gene.</p>')
 
 
-print '</html>'
+print('</html>')
 
 
 

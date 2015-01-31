@@ -16,7 +16,15 @@
 '''
 A simple Mygene.info demo site based on tornado
 '''
-from mygene_info_demo_tornado import MainHandler as Demo_Tornado_Handler
+import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
+if PY3:
+    from .mygene_info_demo_tornado import MainHandler as Demo_Tornado_Handler
+else:
+    from mygene_info_demo_tornado import MainHandler as Demo_Tornado_Handler
 
 
 APP_LIST = [

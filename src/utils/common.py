@@ -1,10 +1,17 @@
 from __future__ import print_function
 import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
 import time
 import types
 from shlex import shlex
 
-str_types = str if sys.version_info.major == 3 else (str, unicode)
+if PY3:
+    str_types = str if sys.version_info.major == 3 else (str, str)
+else:
+    str_types = str if sys.version_info.major == 3 else (str, unicode)
 
 
 #===============================================================================
@@ -15,7 +22,10 @@ def ask(prompt, options='YN'):
     '''Prompt Yes or No,return the upper case 'Y' or 'N'.'''
     options = options.upper()
     while 1:
-        s = raw_input(prompt + '[%s]' % '|'.join(list(options))).strip().upper()
+        if PY3:
+            s = input(prompt + '[%s]' % '|'.join(list(options))).strip().upper()
+        else:
+            s = raw_input(prompt + '[%s]' % '|'.join(list(options))).strip().upper()
         if s in options:
             break
     return s
@@ -44,7 +54,10 @@ def timesofar(t0, clock=0):
 def safe_unicode(s, mask='#'):
     '''replace non-decodable char into "#".'''
     try:
-        _s = unicode(s)
+        if PY3:
+            _s = str(s)
+        else:
+            _s = unicode(s)
     except UnicodeDecodeError as e:
         pos = e.args[2]
         _s = s.replace(s[pos], mask)
@@ -82,12 +95,20 @@ def safe_genome_pos(s):
        safe_genome_pos('1000') = 1000
        safe_genome_pos('10,000') = 100000
     '''
-    if isinstance(s, int):
-        return s
-    elif isinstance(s, types.StringTypes):
-        return int(s.replace(',', ''))
+    if PY3:
+        if isinstance(s, int):
+            return s
+        elif isinstance(s, str):
+            return int(s.replace(',', ''))
+        else:
+            raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
     else:
-        raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
+        if isinstance(s, int):
+            return s
+        elif isinstance(s, types.StringTypes):
+            return int(s.replace(',', ''))
+        else:
+            raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
 
 
 class dotdict(dict):

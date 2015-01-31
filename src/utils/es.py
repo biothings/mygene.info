@@ -4,7 +4,11 @@
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
-
+import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
 import json
 import re
 import time
@@ -61,7 +65,10 @@ es.model = dummy_model    # set it to dummy_model, so that the query will return
 
 def get_lastest_indices(es_host=None):
     conn = get_es(es_host)
-    index_li = conn.get_indices().keys()
+    if PY3:
+        index_li = list(conn.get_indices().keys())
+    else:
+        index_li = conn.get_indices().keys()
 
     latest_indices = []
     for prefix in ('genedoc_mygene', 'genedoc_mygene_allspecies'):
@@ -73,8 +80,8 @@ def get_lastest_indices(es_host=None):
                 _li.append((mat.group(1), index))
         latest_indices.append(sorted(_li)[-1])
     if latest_indices[0][0] != latest_indices[1][0]:
-        print "Warning: unmatched timestamp:"
-        print '\n'.join([x[1] for x in latest_indices])
+        print("Warning: unmatched timestamp:")
+        print('\n'.join([x[1] for x in latest_indices]))
     latest_indices = [x[1] for x in latest_indices]
     return latest_indices
 
@@ -432,7 +439,7 @@ class ESQuery:
                                                start=s, size=step, scan=True,
                                                scroll='5m', **kwargs)
                 n = raw_res['hits']['total']
-                print 'Retrieving %d documents from index "%s/%s".' % (n, self._index, self._doc_type)
+                print('Retrieving %d documents from index "%s/%s".' % (n, self._index, self._doc_type))
             else:
                 raw_res = self.conn.search_scroll(raw_res._scroll_id, scroll='5m')
             hits_cnt = len(raw_res['hits']['hits'])
@@ -440,7 +447,7 @@ class ESQuery:
                 break
             else:
 
-                print "Processing %d-%d documents..." % (cnt+1, cnt + hits_cnt),
+                print("Processing %d-%d documents..." % (cnt+1, cnt + hits_cnt),)
                 res = self._cleaned_res(raw_res)
                 if inbatch:
                     yield res
@@ -448,33 +455,44 @@ class ESQuery:
                     for hit in res:
                         yield hit
                 cnt += hits_cnt
-                print 'Done.[%.1f%%,%s]' % (cnt*100./n, timesofar(t1))
+                print('Done.[%.1f%%,%s]' % (cnt*100./n, timesofar(t1)))
                 if e and cnt > e:
                     break
 
-        print "="*20
-        print 'Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0))
+        print("="*20)
+        print('Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0)))
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
-        print 'xxxxxxxxxxxxxxxxxx'
-        print self._index
-        print self._doc_type
+        print('xxxxxxxxxxxxxxxxxx')
+        print(self._index)
+        print(self._doc_type)
         mapping = self.conn.indices.get_mapping(self._doc_type, self._index, raw=True)
-        print 'xxxxxxxxxxxxxxxxxx'
+        print('xxxxxxxxxxxxxxxxxx')
         if raw:
             return mapping
 
         def get_fields(properties):
-            for k, v in properties.items():
-                if 'properties' in v:
-                    for f in get_fields(v['properties']):
+            if PY3:
+                for k, v in list(properties.items()):
+                    if 'properties' in v:
+                        for f in get_fields(v['properties']):
+                            yield f
+                    else:
+                        if v.get('index', None) == 'no':
+                            continue
+                        f = v.get('index_name', k)
                         yield f
-                else:
-                    if v.get('index', None) == 'no':
-                        continue
-                    f = v.get('index_name', k)
-                    yield f
+            else:
+                for k, v in properties.items():
+                    if 'properties' in v:
+                        for f in get_fields(v['properties']):
+                            yield f
+                    else:
+                        if v.get('index', None) == 'no':
+                            continue
+                        f = v.get('index_name', k)
+                        yield f
 
         field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
@@ -1113,12 +1131,12 @@ class UserFilters:
         }   # this mapping disables indexing completely since we don't need it.
 
     def create(self):
-        print "Creating index...",
-        print self.conn.create_index(self.ES_INDEX_NAME)
-        print "Updating mapping...",
-        print self.conn.put_mapping(self.ES_INDEX_TYPE,
+        print("Creating index...",)
+        print(self.conn.create_index(self.ES_INDEX_NAME))
+        print("Updating mapping...",)
+        print(self.conn.put_mapping(self.ES_INDEX_TYPE,
                                     self._MAPPING,
-                                    [self.ES_INDEX_NAME])
+                                    [self.ES_INDEX_NAME]))
 
     def add(self, name, id_list=[], id_field="entrezgene", raw_filter=None):
         '''add a named filter.'''
@@ -1130,14 +1148,14 @@ class UserFilters:
                 "terms": {id_field: id_list}
             }
         if _filter:
-            print 'Adding filter "{}"...'.format(name),
+            print('Adding filter "{}"...'.format(name),)
             _doc = {'_id': name,
                     'filter': _filter}
-            print self.conn.index(_doc, self.ES_INDEX_NAME,
+            print(self.conn.index(_doc, self.ES_INDEX_NAME,
                                   self.ES_INDEX_TYPE,
-                                  id=_doc['_id'])
+                                  id=_doc['_id']))
         else:
-            print "No filter to add."
+            print("No filter to add.")
 
     def get(self, name):
         '''get a named filter.'''
@@ -1152,7 +1170,7 @@ class UserFilters:
 
     def get_all(self, skip=0, size=1000):
         '''get all named filter.'''
-        print '\ttotal filters: {}'.format(self.count())
+        print('\ttotal filters: {}'.format(self.count()))
         q = {"query": {"match_all": {}}}
         res = self.conn.search_raw(q, indices=self.ES_INDEX_NAME, doc_types=self.ES_INDEX_TYPE,
                                    **{"from": str(skip), "size": str(1000)})
@@ -1164,10 +1182,10 @@ class UserFilters:
         if _filter:
             msg = 'Found filter "{}". Continue to delete it?'.format(name)
             if noconfirm or ask(msg) == 'Y':
-                print 'Deleting filter "{}"...'.format(name),
-                print self.conn.delete(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name)
+                print('Deleting filter "{}"...'.format(name),)
+                print(self.conn.delete(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name))
         else:
-            print 'Filter "{}" does not exist. Abort now.'.format(name)
+            print('Filter "{}" does not exist. Abort now.'.format(name))
 
     def rename(self, name, newname):
         '''"rename" a named filter.
@@ -1180,7 +1198,7 @@ class UserFilters:
                 self.add(newname, raw_filter=_filter['filter'])
                 self.delete(name, noconfirm=True)
         else:
-            print 'Filter "{}" does not exist. Abort now.'.format(name)
+            print('Filter "{}" does not exist. Abort now.'.format(name))
 
 
 def make_test_index():
@@ -1211,14 +1229,14 @@ def make_test_index():
     except:
         pass
     mapping = dict(conn.get_mapping('gene', index_name)['gene'])
-    print conn.put_mapping(index_type, mapping, [index_name])
+    print(conn.put_mapping(index_type, mapping, [index_name]))
 
-    print "Building index..."
+    print("Building index...")
     cnt = 0
     for doc in gli:
         conn.index(doc, index_name, index_type, doc['_id'])
         cnt += 1
-        print cnt, ':', doc['_id']
-    print conn.flush()
-    print conn.refresh()
-    print 'Done! - {} docs indexed.'.format(cnt)
+        print(cnt, ':', doc['_id'])
+    print(conn.flush())
+    print(conn.refresh())
+    print('Done! - {} docs indexed.'.format(cnt))
