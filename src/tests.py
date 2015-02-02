@@ -39,8 +39,8 @@ except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
 
-host = 'http://localhost:9000'
-#host = 'http://dev.mygene.info:8000'
+#host = 'http://localhost:9000'
+host = 'http://dev.mygene.info:8000'
 #host = 'http://mygene.info'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))

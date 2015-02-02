@@ -1,13 +1,5 @@
 import sys
-if sys.version > '3':
-    PY3 = True
-else:
-    PY3 = False
-
-if PY3:
-    from .utils.ga import GAMixIn
-else:
-    from utils.ga import GAMixIn
+from utils.ga import GAMixIn
 import json
 import datetime
 from collections import OrderedDict
@@ -97,10 +89,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
            string.
         '''
         if isinstance(data, dict):
-            if PY3:
-                data = OrderedDict(sorted(list(data.items()), key=lambda x: x[0].lower()))
-            else:
-                data = OrderedDict(sorted(data.items(), key=lambda x: x[0].lower()))
+            data = OrderedDict(sorted(list(data.items()), key=lambda x: x[0].lower()))
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         if SUPPORT_MSGPACK:
             use_msgpack = self.get_argument('msgpack', '')
