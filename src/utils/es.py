@@ -4,20 +4,15 @@
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
-import sys
-if sys.version > '3':
-    PY3 = True
-else:
-    PY3 = False
 import json
 import re
 import time
 import copy
 
-from pyes import ES
-from pyes.exceptions import NotFoundException, ElasticSearchException
-from pyes.utils import make_path
-from pyes.query import MatchAllQuery, StringQuery
+# from pyes import ES
+# from pyes.exceptions import NotFoundException, ElasticSearchException
+# from pyes.utils import make_path
+# from pyes.query import MatchAllQuery, StringQuery
 
 from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL,
                     ES_INDEX_TYPE)
@@ -25,6 +20,8 @@ from utils.common import (ask, is_int, is_str, is_seq, timesofar,
                           safe_genome_pos, dotdict, taxid_d)
 from utils.dotfield import parse_dot_fields
 from utils.taxonomy import TaxonomyQuery
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
 
 
 GENOME_ASSEMBLY = {
@@ -53,22 +50,26 @@ TAXONOMY = {
 
 def get_es(es_host=None):
     es_host = es_host or ES_HOST
-    conn = ES(es_host, default_indices=[ES_INDEX_NAME_ALL],
-              timeout=120.0, max_retries=10)
+    # create es connection
+    # conn = ES(es_host, default_indices=[ES_INDEX_NAME_ALL],
+    #           timeout=120.0, max_retries=10)
+    conn = Elasticsearch(es_host)
     return conn
 
 
 es = get_es()
 dummy_model = lambda es, res: res
-es.model = dummy_model    # set it to dummy_model, so that the query will return the raw object.
+# set it to dummy_model, so that
+# the query will return the raw object.
+es.model = dummy_model
 
 
+# seems not working, and not used
 def get_lastest_indices(es_host=None):
-    conn = get_es(es_host)
-    if PY3:
-        index_li = list(conn.get_indices().keys())
-    else:
-        index_li = conn.get_indices().keys()
+    # conn = get_es(es_host)
+    conn = Elasticsearch(es_host)
+    # get all indices from es connection
+    index_li = list(conn.indices.get('*').keys())
 
     latest_indices = []
     for prefix in ('genedoc_mygene', 'genedoc_mygene_allspecies'):
@@ -92,31 +93,34 @@ class MGQueryError(Exception):
 
 class ESQuery:
     def __init__(self):
-        #self.conn0 = es0
+        # self.conn0 = es0
         self.conn = es
-        #self.conn.model = dummy_model
+        # self.conn.model = dummy_model
         # self._index = 'genedoc_mygene'
         # self._index = 'genedoc_mygene_allspecies'
         # self._doc_type = 'gene'
         self._index = ES_INDEX_NAME_ALL
         self._doc_type = ES_INDEX_TYPE
 
-        #self._doc_type = 'gene_sample'
+        # self._doc_type = 'gene_sample'
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
-        #self._default_species = [9606, 10090, 10116, 7227, 6239]  # human, mouse, rat, fruitfly, celegan
+        # self._default_species = [9606, 10090, 10116, 7227, 6239]  # human, mouse, rat, fruitfly, celegan
         self._default_species = [9606, 10090, 10116]               # human, mouse, rat
         self._tier_1_species = set(taxid_d.values())
 
     def _search(self, q, species='all'):
         self._set_index(species)
-        res = self.conn.search_raw(q, indices=self._index, doc_types=self._doc_type)
+        # body = '{"query" : {"term" : { "_all" : ' + q + ' }}}'
+        res = self.conn.search(index=self._index, doc_type=self._doc_type,
+                                   body=q)
         self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
     def _msearch(self, q, species='all'):
         self._set_index(species)
-        path = make_path(self._index, self._doc_type, '_msearch')
-        res = self.conn._send_request('GET', path, body=q)
+        # path = make_path(self._index, self._doc_type, '_msearch')
+        res = self.conn.msearch(index=self._index, doc_type=self._doc_type,
+                                body=q)
         self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
@@ -286,8 +290,9 @@ class ESQuery:
         raw = kwargs.pop('raw', False)
         #res = self.conn0.get(self._index, self._doc_type, geneid, **kwargs)
         try:
-            res = self.conn.get(self._index, self._doc_type, geneid, **kwargs)
-        except NotFoundException:
+            res = self.conn.get(index=self._index, doc_type=self._doc_type,
+                                id=geneid, **kwargs)
+        except NotFoundError:
             return None
         return res if raw else self._get_genedoc(res)
 
@@ -379,12 +384,10 @@ class ESQuery:
             if options.rawquery:
                 return _q
 
-            try:
-                res = self._search(_q, species=kwargs['species'])
-            except ElasticSearchException as err:
-                err_msg = err.message if options.raw else "invalid query term."
+            res = self._search(_q, species=kwargs['species'])
+            if res['hits']['total'] == 0:
                 return {'success': False,
-                        'error': err_msg}
+                        'error': 'Invalid query. Please check parameters.'}
 
             if not options.raw:
                 _res = res['hits']
@@ -403,7 +406,8 @@ class ESQuery:
                         parse_dot_fields(v)
                 res = _res
         else:
-            res = {'success': False, 'error': "Invalid query. Please check parameters."}
+            res = {'success': False,
+                   'error': "Invalid query. Please check parameters."}
 
         return res
 
@@ -473,26 +477,15 @@ class ESQuery:
             return mapping
 
         def get_fields(properties):
-            if PY3:
-                for k, v in list(properties.items()):
-                    if 'properties' in v:
-                        for f in get_fields(v['properties']):
-                            yield f
-                    else:
-                        if v.get('index', None) == 'no':
-                            continue
-                        f = v.get('index_name', k)
+            for k, v in list(properties.items()):
+                if 'properties' in v:
+                    for f in get_fields(v['properties']):
                         yield f
-            else:
-                for k, v in properties.items():
-                    if 'properties' in v:
-                        for f in get_fields(v['properties']):
-                            yield f
-                    else:
-                        if v.get('index', None) == 'no':
-                            continue
-                        f = v.get('index_name', k)
-                        yield f
+                else:
+                    if v.get('index', None) == 'no':
+                        continue
+                    f = v.get('index_name', k)
+                    yield f
 
         field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
