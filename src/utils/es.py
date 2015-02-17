@@ -583,7 +583,7 @@ class ESQueryBuilder():
                 "boost": 1,
                 "queries": [
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "symbol": {
@@ -592,21 +592,21 @@ class ESQueryBuilder():
                                     }
                                 },
                             },
-                            "boost_factor": 5
+                            "weight": 5
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 #This makes phrase match of "cyclin-dependent kinase 2" appears first
                                 "match_phrase": {"name": "%(q)s"},
                             },
-                            "boost_factor": 4
+                            "weight": 4
 
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "name": {
@@ -616,11 +616,11 @@ class ESQueryBuilder():
                                     }
                                 },
                             },
-                            "boost_factor": 3
+                            "weight": 3
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "unigene": {
@@ -629,11 +629,11 @@ class ESQueryBuilder():
                                     }
                                 }
                             },
-                            "boost_factor": 1.1
+                            "weight": 1.1
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "go": {
@@ -642,7 +642,7 @@ class ESQueryBuilder():
                                     }
                                 }
                             },
-                            "boost_factor": 1.1
+                            "weight": 1.1
                         }
                     },
                     # {
@@ -658,7 +658,7 @@ class ESQueryBuilder():
                     # }
                     # },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "query_string": {
                                     "query": "%(q)s",
@@ -666,7 +666,7 @@ class ESQueryBuilder():
                                     "auto_generate_phrase_queries": True
                                 },
                             },
-                            "boost_factor": 1
+                            "weight": 1
                         }
                     },
 
@@ -681,11 +681,11 @@ class ESQueryBuilder():
             _query['dis_max']['queries'].insert(
                 0,
                 {
-                    "custom_boost_factor": {
+                    "function_score": {
                         "query": {
                             "term": {"entrezgene": int(q)},
                         },
-                        "boost_factor": 8
+                        "weight": 8
                     }
                 }
             )
@@ -700,36 +700,36 @@ class ESQueryBuilder():
                 "boost": 1,
                 "queries": [
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "wildcard": {
                                     "symbol": {
                                         "value": "%(q)s",
-                                        "boost": 5.0,
+                                        "weight": 5.0,
                                     }
                                 },
                             },
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "wildcard": {
                                     "name": {
                                         "value": "%(q)s",
-                                        "boost": 1.1,
+                                        "weight": 1.1,
                                     }
                                 },
                             }
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "wildcard": {
                                     "summary": {
                                         "value": "%(q)s",
-                                        "boost": 0.5,
+                                        "weight": 0.5,
                                     }
                                 },
                             }
