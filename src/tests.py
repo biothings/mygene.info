@@ -31,13 +31,14 @@ except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
 
-host = 'http://localhost:9000'
+#host = 'http://localhost:9000'
 #host = 'http://dev.mygene.info:8000'
-#host = 'http://mygene.info'
+host = 'http://mygene.info'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))
 
 h = httplib2.Http()
+#h = httplib2.Http(disable_ssl_certificate_validation=True)
 _d = json.loads    # shorthand for json decode
 _e = json.dumps    # shorthand for json encode
 
@@ -454,7 +455,7 @@ def test_taxonomy():
     ok_(len(res2['children']) >= 39)
     ok_(len(res2['children']) <= len(res['children']))
 
-    res = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=46170&include_tax_tree=true'))
-    ok_(res['total'] >= 10)
-    res2 = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=46170'))
+    res = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=1386&include_tax_tree=true'))
+    ok_(res['total'] >= 5)
+    res2 = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=1386'))
     eq_(res2['total'], 0)
