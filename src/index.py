@@ -33,7 +33,7 @@ from utils.es import ESQuery
 from helper import add_apps, BaseHandler
 from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
-from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
+#from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
 from demo.handlers import APP_LIST as demo_app_list
 #from auth.handlers import APP_LIST as auth_app_list
 
@@ -109,7 +109,7 @@ APP_LIST += add_apps('v2', api_v2_app_list)
 APP_LIST += add_apps('v1', api_v1_app_list)
 APP_LIST += add_apps('demo', demo_app_list)
 
-APP_LIST += add_apps('v2a', api_v2_async_app_list)
+#APP_LIST += add_apps('v2a', api_v2_async_app_list)
 #APP_LIST += add_apps('auth', auth_app_list)
 if options.debug:
     APP_LIST += [

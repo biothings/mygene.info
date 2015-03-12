@@ -384,10 +384,11 @@ class ESQuery:
             if options.rawquery:
                 return _q
 
-            res = self._search(_q, species=kwargs['species'])
-            if res['hits']['total'] == 0:
-                return {'success': False,
-                        'error': 'Invalid query. Please check parameters.'}
+            try:
+                res = self._search(_q, species=kwargs['species'])
+            except Exception as e:
+                print e
+                return {'success': False, 'error': e.message}
 
             if not options.raw:
                 _res = res['hits']
@@ -468,11 +469,7 @@ class ESQuery:
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
-        print('xxxxxxxxxxxxxxxxxx')
-        print(self._index)
-        print(self._doc_type)
-        mapping = self.conn.indices.get_mapping(self._doc_type, self._index, raw=True)
-        print('xxxxxxxxxxxxxxxxxx')
+        mapping = self.conn.indices.get_mapping(self._doc_type, self._index)
         if raw:
             return mapping
 
@@ -486,7 +483,7 @@ class ESQuery:
                         continue
                     f = v.get('index_name', k)
                     yield f
-
+        mapping = mapping.values()[0]['mappings']
         field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
             'available_fields': sorted(field_set)
@@ -705,7 +702,7 @@ class ESQueryBuilder():
                                 "wildcard": {
                                     "symbol": {
                                         "value": "%(q)s",
-                                        "weight": 5.0,
+                                        # "weight": 5.0,
                                     }
                                 },
                             },
@@ -717,7 +714,7 @@ class ESQueryBuilder():
                                 "wildcard": {
                                     "name": {
                                         "value": "%(q)s",
-                                        "weight": 1.1,
+                                        # "weight": 1.1,
                                     }
                                 },
                             }
@@ -729,7 +726,7 @@ class ESQueryBuilder():
                                 "wildcard": {
                                     "summary": {
                                         "value": "%(q)s",
-                                        "weight": 0.5,
+                                        # "weight": 0.5,
                                     }
                                 },
                             }
@@ -1154,7 +1151,7 @@ class UserFilters:
         '''get a named filter.'''
         try:
             return self.conn.get(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name)['_source']
-        except NotFoundException:
+        except NotFoundError:
             return None
 
     def count(self):

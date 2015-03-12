@@ -1,5 +1,5 @@
-from pyes import ES
-from pyes.exceptions import NotFoundException
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
 
 from config import ES_HOST
 
@@ -9,7 +9,7 @@ MAX_TAXID_COUNT = 10000
 
 class TaxonomyQuery:
     def __init__(self):
-        self.es = ES(ES_HOST)
+        self.es = Elasticsearch(ES_HOST)
         self._index = 'taxonomy_current'
         self._doc_type = 'species'
 
@@ -21,7 +21,7 @@ class TaxonomyQuery:
         taxid = int(taxid)
         try:
             res = self.es.get(self._index, self._doc_type, taxid)
-        except NotFoundException:
+        except NotFoundError:
             res = None
         if res:
             if include_children:
