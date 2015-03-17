@@ -1150,7 +1150,7 @@ class UserFilters:
     def get(self, name):
         '''get a named filter.'''
         try:
-            return self.conn.get(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name)['_source']
+            return self.conn.get(self.ES_INDEX_NAME, name, self.ES_INDEX_TYPE)['_source']
         except NotFoundError:
             return None
 
