@@ -39,8 +39,8 @@ except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
 
-#host = 'http://localhost:9000'
-host = 'http://dev.mygene.info:8000'
+host = 'http://localhost:8000'
+#host = 'http://dev.mygene.info:8000'
 #host = 'http://mygene.info'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))
@@ -303,7 +303,6 @@ def test_query_size():
 def test_gene():
     res = json_ok(get_ok(api + '/gene/1017'))
     eq_(res['entrezgene'], 1017)
-
     # testing non-ascii character
     get_404(api + '/gene/' + '54097\xef\xbf\xbd\xef\xbf\xbdmouse')
 
@@ -323,7 +322,6 @@ def test_gene():
 
     #res = json_ok(get_ok(api + '/boc/bgps/gene/1017'))
     #ok_('SpeciesList' in res)
-
 
 def test_gene_post():
     res = json_ok(post_ok(api + '/gene', {'ids': '1017'}))
@@ -354,7 +352,7 @@ def test_status():
 
 def test_metadata():
     get_ok(host + '/metadata')
-    get_ok(api + '/metadata')
+    #get_ok(api + '/metadata')
 
 
 def test_query_facets():
@@ -449,13 +447,13 @@ def test_msgpack():
     res2 = msgpack_ok(get_ok(api + '/gene/1017?msgpack=true'))
     ok_(res, res2)
 
-    res = json_ok(get_ok(api + '/query/?q=cdk'))
-    res2 = msgpack_ok(get_ok(api + '/query/?q=cdk&msgpack=true'))
-    ok_(res, res2)
+    #res = json_ok(get_ok(api + '/query/?q=cdk'))
+    #res2 = msgpack_ok(get_ok(api + '/query/?q=cdk&msgpack=true'))
+    #ok_(res, res2)
 
-    res = json_ok(get_ok(api + '/metadata'))
-    res2 = msgpack_ok(get_ok(api + '/metadata?msgpack=true'))
-    ok_(res, res2)
+    #res = json_ok(get_ok(api + '/metadata'))
+    #res2 = msgpack_ok(get_ok(api + '/metadata?msgpack=true'))
+    #ok_(res, res2)
 
 
 def test_taxonomy():

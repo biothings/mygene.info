@@ -302,6 +302,55 @@ class ESQuery:
         res = self.conn.mget(geneid_list, self._index, self._doc_type, **kwargs)
         return res if raw else [self._get_genedoc(doc) for doc in res]
 
+    def  change_back(self,res_dic,field_dic):
+        back_dic = {}
+        source_dic={}
+        for item_key in res_dic:
+            if item_key == 'hits':
+                dic_hits = res_dic['hits']
+                back_dic['hits']={}
+                for hits_key in dic_hits:
+                    if hits_key == 'hits':
+                        back_dic['hits']['hits']=[{}]
+                        dic_hhits = dic_hits['hits'][0]
+                        for hhits_key in dic_hhits:
+                            if hhits_key == '_source':
+                                source_dic = dic_hhits['_source']
+                            else:
+                                back_dic['hits']['hits'][0][hhits_key] = dic_hhits[hhits_key]
+                    else:
+                        back_dic['hits'][hits_key] = dic_hits[hits_key]
+            else:
+                back_dic[item_key] = res_dic[item_key]
+        if isinstance(field_dic['fields'],str):
+            str_field = field_dic['fields']
+            arry_temp = str_field.split('.')
+            if len(arry_temp) < 2:
+                back_dic['hits']['hits'][0]['_source'] = source_dic
+                return back_dic
+            else:
+                temp_dic = {}
+                temp_val = source_dic
+                for item_key in arry_temp:
+                    temp_val = temp_val[item_key]
+                temp_dic[field_dic['fields']] = temp_val
+                back_dic['hits']['hits'][0]['_source'] = temp_dic
+                return back_dic
+        else:
+            temp_dic = {}
+            for item_str in field_dic['fields']:
+                arry_temp = item_str.split('.')
+                if len(arry_temp) < 2:
+                    temp_dic[item_str] = source_dic[item_str]
+                else:
+                    temp_val = source_dic
+                    str_key = item_str[0:len(item_str)-len(arry_temp[len(arry_temp)-1])-1]
+                    for item_key in range(0,len(arry_temp)-1):
+                        temp_val = temp_val[arry_temp[item_key]]
+                    temp_dic[item_str] = temp_val
+            back_dic['hits']['hits'][0]['_source'] = temp_dic
+            return back_dic
+                    
     def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
         options = self._get_cleaned_query_options(fields, kwargs)
@@ -310,6 +359,8 @@ class ESQuery:
         if options.rawquery:
             return _q
         res = self._search(_q, species=options.kwargs['species'])
+        if kwargs['fields'] != None:
+            res = self.change_back(res , kwargs)
         if not options.raw:
             res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
         return res
@@ -464,7 +515,6 @@ class ESQuery:
                 if e and cnt > e:
                     break
 
-        print("="*20)
         print('Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0)))
 
     def metadata(self, raw=False):
@@ -530,7 +580,6 @@ class ESQueryBuilder():
         # missing filter
         missingfilter = self.options.pop('missing', None)
         self.missingfilter = missingfilter.split(',') if missingfilter else None
-
         self._parse_sort_option(self.options)
         self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
@@ -1034,6 +1083,11 @@ class ESQueryBuilder():
         _q = {"query": _query}
         if self.options:
             _q.update(self.options)
+        print self.options
+        print _q
+        if 'fields' in _q and _q['fields'] is not None:
+            _q['_source'] = _q['fields']
+            del _q['fields']
         return _q
 
     def build_multiple_id_query(self, id_list, scopes=None):
