@@ -19,7 +19,6 @@ class GeneHandler(BaseHandler):
            /gene/1017?fields=symbol,name
            /gene/1017?fields=symbol,name,reporter.HG-U133_Plus_2
         '''
-        print self.request.arguments
         if geneid:
             kwargs = self.get_query_params()
             kwargs.setdefault('scopes', 'entrezgene,ensemblgene,retired')
@@ -33,46 +32,6 @@ class GeneHandler(BaseHandler):
                 raise HTTPError(404)
         else:
             raise HTTPError(404)
-
-    def post_res(self,fields,res):
-        back_res = []
-        if isinstance(fields,str):
-            arry_temp = fields.split('.')
-            if len(arry_temp) < 2:
-                return res
-            else:
-                for item_dic in res:
-                    temp_dic = {}
-                    for item_key in item_dic:
-                        if item_key == arry_temp[0]:
-                            temp_val = item_dic
-                            for key_arry in arry_temp:
-                                temp_val = temp_val[key_arry]
-                            temp_dic[fields] = temp_val
-                            back_res.append(temp_dic)
-                        else:
-                            temp_dic[item_key] = item_dic[item_key]
-                            back_res.append(temp_dic)
-                return back_res
-        else:
-            for item_dic in res:
-                temp = {}
-                for item_key in item_dic:
-                    flag = 0
-                    for field_str in fields:
-                        arry_temp = field_str.split('.')
-                        if item_key == arry_temp[0]:
-                            temp_val = item_dic
-                            for key_arry in arry_temp:
-                                temp_val = temp_val[key_arry]
-                            temp[field_str] = temp_val
-                            
-                            flag = 1
-                            break
-                    if flag == 0:
-                        temp[item_key] = item_dic[item_key]
-                back_res.append(temp)
-            return back_res 
 
     def post(self, geneid=None):
         '''
@@ -91,8 +50,6 @@ class GeneHandler(BaseHandler):
             fields = kwargs.pop('fields', None)
             kwargs.setdefault('species', 'all')
             res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
-            if fields != None:
-                res = self.post_res(fields.split(','),res)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
         self.return_json(res)
