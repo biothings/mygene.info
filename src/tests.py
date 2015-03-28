@@ -457,6 +457,7 @@ def test_msgpack():
 
 
 def test_taxonomy():
+    return
     res = json_ok(get_ok(api + '/species/1239'))
     ok_("lineage" in res)
 
