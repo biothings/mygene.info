@@ -352,7 +352,7 @@ def test_status():
 
 def test_metadata():
     get_ok(host + '/metadata')
-    #get_ok(api + '/metadata')
+    get_ok(api + '/metadata')
 
 
 def test_query_facets():
@@ -447,13 +447,13 @@ def test_msgpack():
     res2 = msgpack_ok(get_ok(api + '/gene/1017?msgpack=true'))
     ok_(res, res2)
 
-    #res = json_ok(get_ok(api + '/query/?q=cdk'))
-    #res2 = msgpack_ok(get_ok(api + '/query/?q=cdk&msgpack=true'))
-    #ok_(res, res2)
+    res = json_ok(get_ok(api + '/query/?q=cdk'))
+    res2 = msgpack_ok(get_ok(api + '/query/?q=cdk&msgpack=true'))
+    ok_(res, res2)
 
-    #res = json_ok(get_ok(api + '/metadata'))
-    #res2 = msgpack_ok(get_ok(api + '/metadata?msgpack=true'))
-    #ok_(res, res2)
+    res = json_ok(get_ok(api + '/metadata'))
+    res2 = msgpack_ok(get_ok(api + '/metadata?msgpack=true'))
+    ok_(res, res2)
 
 
 def test_taxonomy():
