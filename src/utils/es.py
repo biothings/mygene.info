@@ -302,7 +302,7 @@ class ESQuery:
         res = self.conn.mget(geneid_list, self._index, self._doc_type, **kwargs)
         return res if raw else [self._get_genedoc(doc) for doc in res]
 
-    def  change_back(self,res_dic,field_dic):
+    def change_back(self,res_dic,field_dic):
         back_dic = {}
         source_dic={}
         for item_key in res_dic:
