@@ -350,7 +350,7 @@ class ESQuery:
                     temp_dic[item_str] = temp_val
             back_dic['hits']['hits'][0]['_source'] = temp_dic
             return back_dic
-                    
+
     def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
         options = self._get_cleaned_query_options(fields, kwargs)
@@ -519,7 +519,7 @@ class ESQuery:
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
-        mapping = self.conn.indices.get_mapping(self._doc_type, self._index)
+        mapping = self.conn.indices.get_mapping(self._index, self._doc_type)
         if raw:
             return mapping
 
