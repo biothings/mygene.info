@@ -141,7 +141,7 @@ class ESQuery:
             doc = parse_dot_fields(doc)
         return doc
 
-    def _get_genedoc_2(self, hit, dotfield=True):
+    def _get_genedoc_2(self, hit, dotfield=True, fields=None):
         """
         use ES _source to support fields/filter argument,
         by default ES response is not dotted.
@@ -150,8 +150,8 @@ class ESQuery:
         doc.setdefault('_id', hit['_id'])
         if '_version' in hit:
             doc.setdefault('_version', hit['_version'])
-        if dotfield and self.options.kwargs['fields'] is not None:
-            doc = compose_dot_fields(doc, self.options.kwargs['fields'])
+        if dotfield and fields:
+            doc = compose_dot_fields(doc, fields)
         return doc
 
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=True):
@@ -164,9 +164,26 @@ class ESQuery:
         if total == 0:
             return empty
         elif total == 1 and single_hit:
-            return self._get_genedoc_2(hits['hits'][0], dotfield=dotfield)
+            return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
         else:
-            return [self._get_genedoc_2(hit, dotfield=dotfield) for hit in hits['hits']]
+            return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
+
+    def _cleaned_res_2(self, res, empty=[], error={'error': True},
+                       single_hit=False, dotfield=True, fields=None):
+        if 'error' in res:
+            return error
+
+        hits = res['hits']
+        total = hits['total']
+        if total == 0:
+            return empty
+        elif total == 1 and single_hit:
+            return self._get_genedoc_2(hits['hits'][0],
+                                       dotfield=dotfield, fields=fields)
+        else:
+            return [self._get_genedoc_2(hit,
+                                        dotfield=dotfield,  fields=fields)
+                    for hit in hits['hits']]
 
     def _cleaned_scopes(self, scopes):
         '''return a cleaned scopes parameter.
@@ -316,55 +333,6 @@ class ESQuery:
         res = self.conn.mget(geneid_list, self._index, self._doc_type, **kwargs)
         return res if raw else [self._get_genedoc(doc) for doc in res]
 
-    def change_back(self,res_dic,field_dic):
-        back_dic = {}
-        source_dic={}
-        for item_key in res_dic:
-            if item_key == 'hits':
-                dic_hits = res_dic['hits']
-                back_dic['hits']={}
-                for hits_key in dic_hits:
-                    if hits_key == 'hits':
-                        back_dic['hits']['hits']=[{}]
-                        dic_hhits = dic_hits['hits'][0]
-                        for hhits_key in dic_hhits:
-                            if hhits_key == '_source':
-                                source_dic = dic_hhits['_source']
-                            else:
-                                back_dic['hits']['hits'][0][hhits_key] = dic_hhits[hhits_key]
-                    else:
-                        back_dic['hits'][hits_key] = dic_hits[hits_key]
-            else:
-                back_dic[item_key] = res_dic[item_key]
-        if isinstance(field_dic['fields'],str):
-            str_field = field_dic['fields']
-            arry_temp = str_field.split('.')
-            if len(arry_temp) < 2:
-                back_dic['hits']['hits'][0]['_source'] = source_dic
-                return back_dic
-            else:
-                temp_dic = {}
-                temp_val = source_dic
-                for item_key in arry_temp:
-                    temp_val = temp_val[item_key]
-                temp_dic[field_dic['fields']] = temp_val
-                back_dic['hits']['hits'][0]['_source'] = temp_dic
-                return back_dic
-        else:
-            temp_dic = {}
-            for item_str in field_dic['fields']:
-                arry_temp = item_str.split('.')
-                if len(arry_temp) < 2:
-                    temp_dic[item_str] = source_dic[item_str]
-                else:
-                    temp_val = source_dic
-                    str_key = item_str[0:len(item_str)-len(arry_temp[len(arry_temp)-1])-1]
-                    for item_key in range(0,len(arry_temp)-1):
-                        temp_val = temp_val[arry_temp[item_key]]
-                    temp_dic[item_str] = temp_val
-            back_dic['hits']['hits'][0]['_source'] = temp_dic
-            return back_dic
-
     def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
         options = self._get_cleaned_query_options(fields, kwargs)
@@ -374,7 +342,9 @@ class ESQuery:
             return _q
         res = self._search(_q, species=options.kwargs['species'])
         if not options.raw:
-            res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
+            res = self._cleaned_res_2(res, empty=None, single_hit=True,
+                                      dotfield=options.dotfield,
+                                      fields=options.kwargs['fields'])
         return res
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
@@ -397,7 +367,9 @@ class ESQuery:
         for i in range(len(res)):
             hits = res[i]
             qterm = geneid_list[i]
-            hits = self._cleaned_res(hits, empty=[], single_hit=False, dotfield=options.dotfield)
+            hits = self._cleaned_res_2(hits, empty=[], single_hit=False,
+                                       dotfield=options.dotfield,
+                                       fields=options.kwargs['fields'])
             if len(hits) == 0:
                 _res.append({u'query': qterm,
                              u'notfound': True})
