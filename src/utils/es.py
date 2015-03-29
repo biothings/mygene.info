@@ -422,7 +422,6 @@ class ESQuery:
             try:
                 res = self._search(_q, species=kwargs['species'])
             except Exception as e:
-                print e
                 return {'success': False, 'error': e.message}
 
             if not options.raw:
