@@ -61,4 +61,5 @@ def compose_dot_fields(genedoc, fields):
             for e in ks[1:]:
                 t = t[e]
             res[k] = t
+            del res[ks[0]]
     return res if res else genedoc
