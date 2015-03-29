@@ -22,6 +22,7 @@ from utils.dotfield import parse_dot_fields
 from utils.taxonomy import TaxonomyQuery
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
+from src.utils.dotfield import compose_dot_fields
 
 
 GENOME_ASSEMBLY = {
@@ -140,6 +141,19 @@ class ESQuery:
             doc = parse_dot_fields(doc)
         return doc
 
+    def _get_genedoc_2(self, hit, dotfield=True):
+        """
+        use ES _source to support fields/filter argument,
+        by default ES response is not dotted.
+        """
+        doc = hit.get('_source', hit.get('fields', {}))
+        doc.setdefault('_id', hit['_id'])
+        if '_version' in hit:
+            doc.setdefault('_version', hit['_version'])
+        if dotfield and self.options.kwargs['fields'] is not None:
+            doc = compose_dot_fields(doc, self.options.kwargs['fields'])
+        return doc
+
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=True):
         '''res is the dictionary returned from a query.'''
         if 'error' in res:
@@ -150,9 +164,9 @@ class ESQuery:
         if total == 0:
             return empty
         elif total == 1 and single_hit:
-            return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
+            return self._get_genedoc_2(hits['hits'][0], dotfield=dotfield)
         else:
-            return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
+            return [self._get_genedoc_2(hit, dotfield=dotfield) for hit in hits['hits']]
 
     def _cleaned_scopes(self, scopes):
         '''return a cleaned scopes parameter.
@@ -359,8 +373,6 @@ class ESQuery:
         if options.rawquery:
             return _q
         res = self._search(_q, species=options.kwargs['species'])
-        if kwargs['fields'] != None:
-            res = self.change_back(res , kwargs)
         if not options.raw:
             res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
         return res
@@ -1083,8 +1095,7 @@ class ESQueryBuilder():
         _q = {"query": _query}
         if self.options:
             _q.update(self.options)
-        print self.options
-        print _q
+
         if 'fields' in _q and _q['fields'] is not None:
             _q['_source'] = _q['fields']
             del _q['fields']

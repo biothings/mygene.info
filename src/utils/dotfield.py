@@ -44,3 +44,20 @@ def parse_dot_fields(genedoc):
     for key in dot_fields:
         del genedoc[key]
     return genedoc
+
+
+def compose_dot_fields(genedoc, fields):
+    """
+    reverse funtion of parse_dot_fields
+    """
+    res = dict()
+    for k in fields:
+        if k.index('.') == -1:
+            res[k] = genedoc[k]
+        else:
+            ks = k.split('.')
+            t = genedoc[ks[0]]
+            for e in ks[1:]:
+                t = t[e]
+            res[k] = t
+    return res
