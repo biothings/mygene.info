@@ -52,7 +52,7 @@ def compose_dot_fields(genedoc, fields):
     """
     res = dict()
     for k in fields:
-        if k.index('.') == -1:
+        if k.find('.') == -1:
             res[k] = genedoc[k]
         else:
             ks = k.split('.')
