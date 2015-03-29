@@ -50,14 +50,15 @@ def compose_dot_fields(genedoc, fields):
     """
     reverse funtion of parse_dot_fields
     """
-    res = dict()
+    res = None
     for k in fields:
-        if k.find('.') == -1:
-            res[k] = genedoc[k]
-        else:
+        if k.find('.') != -1:
+            if not res:
+                import copy
+                res = copy.deepcopy(genedoc)
             ks = k.split('.')
             t = genedoc[ks[0]]
             for e in ks[1:]:
                 t = t[e]
             res[k] = t
-    return res
+    return res if res else genedoc
