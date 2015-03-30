@@ -4,6 +4,12 @@
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
+import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
+
 import json
 import re
 import time
@@ -422,7 +428,11 @@ class ESQuery:
             try:
                 res = self._search(_q, species=kwargs['species'])
             except Exception as e:
-                return {'success': False, 'error': e.message}
+                if PY3:
+                    msg = str(e)
+                else:
+                    msg = e.message
+                return {'success': False, 'error': msg}
 
             if not options.raw:
                 _res = res['hits']
