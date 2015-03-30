@@ -51,7 +51,7 @@ def compose_dot_fields(genedoc, fields):
     reverse funtion of parse_dot_fields
     """
     res = None
-    to_del = []
+    to_del = set()
     for k in fields:
         if k.find('.') != -1:
             if not res:
@@ -61,7 +61,7 @@ def compose_dot_fields(genedoc, fields):
             t = genedoc[ks[0]]
             for e in ks[1:]:
                 t = t[e]
-            to_del.append(ks[0])
+            to_del.add(ks[0])
             res[k] = t
     for k in to_del:
         del res[k]
