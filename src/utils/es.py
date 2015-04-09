@@ -526,7 +526,7 @@ class ESQuery:
                         continue
                     f = v.get('index_name', k)
                     yield f
-        mapping = mapping.values()[0]['mappings']
+        mapping = list(mapping.values())[0]['mappings']
         field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
             'available_fields': sorted(field_set)

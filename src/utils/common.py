@@ -134,11 +134,18 @@ def split_ids(q):
              split_ids('"CDK2 CDK3"\n CDk4')  --> ['CDK2 CDK3', 'CDK4']
 
     '''
-    lex = shlex(q.encode('utf8'), posix=True)
+    if PY3:
+        lex = shlex(q, posix=True)
+    else:
+        lex = shlex(q.encode('utf8'), posix=True)
+
     lex.whitespace = ' \t\n\x0b\x0c\r|,+'
     lex.whitespace_split = True
     lex.commenters = ''
-    ids = [x.decode('utf8').strip() for x in list(lex)]
+    if PY3:
+        ids = [x.strip() for x in list(lex)]
+    else:
+        ids = [x.decode('utf8').strip() for x in list(lex)]
     ids = [x for x in ids if x]
     return ids
 

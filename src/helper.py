@@ -100,7 +100,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             _json_data = json.dumps(data, cls=DateTimeJSONEncoder, indent=indent) if encode else data
             self.set_header("Content-Type", "application/json; charset=UTF-8")
         if not self.disable_caching:
-            #get etag if data is a dictionary and has "etag" attribute.
+            # get etag if data is a dictionary and has "etag" attribute.
             etag = data.get('etag', None) if isinstance(data, dict) else None
             self.set_cacheable(etag=etag)
         self.support_cors()
