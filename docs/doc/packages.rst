@@ -70,7 +70,7 @@ You can also play with this `jsFiddle <http://jsfiddle.net/frm3X/>`_ example:
 
 Another MyGene Python wrapper
 ------------------------------
-This is yet another Python wrapper of MyGene.info services created by `Brian Schrader <http://brianschrader.com>`__. It's hosted at "https://github.com/Sonictherocketman/mygene-api".
+This is yet another Python wrapper of MyGene.info services created by `Brian Schrader <http://brianschrader.com/about/>`__. It's hosted at https://github.com/Sonictherocketman/mygene-api.
 
 It's available from `PyPI <https://pypi.python.org/pypi/mygene-api>`__ as well::
 
