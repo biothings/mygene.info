@@ -23,7 +23,7 @@ tornadoes>=1.4.1
 pyga==2.4.2
 
 #for build sphinx docs
-Sphinx==1.2b1
+Sphinx>=1.2.2
 #sphinx-bootstrap-theme==0.3.1
 
 #for nosetests
