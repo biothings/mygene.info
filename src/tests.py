@@ -180,7 +180,7 @@ def test_gene_object():
     res = json_ok(get_ok(api + '/gene/2539869'))
 
     #e coli.
-    res = json_ok(get_ok(api + '/gene/12931566'))
+    res = json_ok(get_ok(api + '/gene/915770'))
 
     #mirna
     res = json_ok(get_ok(api + '/gene/406881'))
@@ -456,6 +456,6 @@ def test_taxonomy():
     ok_(len(res2['children']) <= len(res['children']))
 
     res = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=1386&include_tax_tree=true'))
-    ok_(res['total'] >= 5)
+    ok_(res['total'] >= 2)
     res2 = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=1386'))
     eq_(res2['total'], 0)
