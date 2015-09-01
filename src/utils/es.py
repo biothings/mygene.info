@@ -4,16 +4,21 @@
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
+import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
 
 import json
 import re
 import time
 import copy
 
-from pyes import ES
-from pyes.exceptions import NotFoundException, ElasticSearchException
-from pyes.utils import make_path
-from pyes.query import MatchAllQuery, StringQuery
+# from pyes import ES
+# from pyes.exceptions import NotFoundException, ElasticSearchException
+# from pyes.utils import make_path
+# from pyes.query import MatchAllQuery, StringQuery
 
 from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL,
                     ES_INDEX_TYPE)
@@ -21,6 +26,9 @@ from utils.common import (ask, is_int, is_str, is_seq, timesofar,
                           safe_genome_pos, dotdict, taxid_d)
 from utils.dotfield import parse_dot_fields
 from utils.taxonomy import TaxonomyQuery
+from elasticsearch import Elasticsearch
+from elasticsearch.exceptions import NotFoundError
+from src.utils.dotfield import compose_dot_fields
 
 
 GENOME_ASSEMBLY = {
@@ -49,19 +57,26 @@ TAXONOMY = {
 
 def get_es(es_host=None):
     es_host = es_host or ES_HOST
-    conn = ES(es_host, default_indices=[ES_INDEX_NAME_ALL],
-              timeout=120.0, max_retries=10)
+    # create es connection
+    # conn = ES(es_host, default_indices=[ES_INDEX_NAME_ALL],
+    #           timeout=120.0, max_retries=10)
+    conn = Elasticsearch(es_host)
     return conn
 
 
 es = get_es()
 dummy_model = lambda es, res: res
-es.model = dummy_model    # set it to dummy_model, so that the query will return the raw object.
+# set it to dummy_model, so that
+# the query will return the raw object.
+es.model = dummy_model
 
 
+# seems not working, and not used
 def get_lastest_indices(es_host=None):
-    conn = get_es(es_host)
-    index_li = conn.get_indices().keys()
+    # conn = get_es(es_host)
+    conn = Elasticsearch(es_host)
+    # get all indices from es connection
+    index_li = list(conn.indices.get('*').keys())
 
     latest_indices = []
     for prefix in ('genedoc_mygene', 'genedoc_mygene_allspecies'):
@@ -73,8 +88,8 @@ def get_lastest_indices(es_host=None):
                 _li.append((mat.group(1), index))
         latest_indices.append(sorted(_li)[-1])
     if latest_indices[0][0] != latest_indices[1][0]:
-        print "Warning: unmatched timestamp:"
-        print '\n'.join([x[1] for x in latest_indices])
+        print("Warning: unmatched timestamp:")
+        print('\n'.join([x[1] for x in latest_indices]))
     latest_indices = [x[1] for x in latest_indices]
     return latest_indices
 
@@ -85,31 +100,34 @@ class MGQueryError(Exception):
 
 class ESQuery:
     def __init__(self):
-        #self.conn0 = es0
+        # self.conn0 = es0
         self.conn = es
-        #self.conn.model = dummy_model
+        # self.conn.model = dummy_model
         # self._index = 'genedoc_mygene'
         # self._index = 'genedoc_mygene_allspecies'
         # self._doc_type = 'gene'
         self._index = ES_INDEX_NAME_ALL
         self._doc_type = ES_INDEX_TYPE
 
-        #self._doc_type = 'gene_sample'
+        # self._doc_type = 'gene_sample'
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
-        #self._default_species = [9606, 10090, 10116, 7227, 6239]  # human, mouse, rat, fruitfly, celegan
+        # self._default_species = [9606, 10090, 10116, 7227, 6239]  # human, mouse, rat, fruitfly, celegan
         self._default_species = [9606, 10090, 10116]               # human, mouse, rat
         self._tier_1_species = set(taxid_d.values())
 
     def _search(self, q, species='all'):
         self._set_index(species)
-        res = self.conn.search_raw(q, indices=self._index, doc_types=self._doc_type)
+        # body = '{"query" : {"term" : { "_all" : ' + q + ' }}}'
+        res = self.conn.search(index=self._index, doc_type=self._doc_type,
+                                   body=q)
         self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
     def _msearch(self, q, species='all'):
         self._set_index(species)
-        path = make_path(self._index, self._doc_type, '_msearch')
-        res = self.conn._send_request('GET', path, body=q)
+        # path = make_path(self._index, self._doc_type, '_msearch')
+        res = self.conn.msearch(index=self._index, doc_type=self._doc_type,
+                                body=q)
         self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
@@ -129,6 +147,19 @@ class ESQuery:
             doc = parse_dot_fields(doc)
         return doc
 
+    def _get_genedoc_2(self, hit, dotfield=True, fields=None):
+        """
+        use ES _source to support fields/filter argument,
+        by default ES response is not dotted.
+        """
+        doc = hit.get('_source', hit.get('fields', {}))
+        doc.setdefault('_id', hit['_id'])
+        if '_version' in hit:
+            doc.setdefault('_version', hit['_version'])
+        if dotfield and fields:
+            doc = compose_dot_fields(doc, fields)
+        return doc
+
     def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=True):
         '''res is the dictionary returned from a query.'''
         if 'error' in res:
@@ -142,6 +173,23 @@ class ESQuery:
             return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
         else:
             return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
+
+    def _cleaned_res_2(self, res, empty=[], error={'error': True},
+                       single_hit=False, dotfield=True, fields=None):
+        if 'error' in res:
+            return error
+
+        hits = res['hits']
+        total = hits['total']
+        if total == 0:
+            return empty
+        elif total == 1 and single_hit:
+            return self._get_genedoc_2(hits['hits'][0],
+                                       dotfield=dotfield, fields=fields)
+        else:
+            return [self._get_genedoc_2(hit,
+                                        dotfield=dotfield,  fields=fields)
+                    for hit in hits['hits']]
 
     def _cleaned_scopes(self, scopes):
         '''return a cleaned scopes parameter.
@@ -279,8 +327,9 @@ class ESQuery:
         raw = kwargs.pop('raw', False)
         #res = self.conn0.get(self._index, self._doc_type, geneid, **kwargs)
         try:
-            res = self.conn.get(self._index, self._doc_type, geneid, **kwargs)
-        except NotFoundException:
+            res = self.conn.get(index=self._index, doc_type=self._doc_type,
+                                id=geneid, **kwargs)
+        except NotFoundError:
             return None
         return res if raw else self._get_genedoc(res)
 
@@ -299,7 +348,9 @@ class ESQuery:
             return _q
         res = self._search(_q, species=options.kwargs['species'])
         if not options.raw:
-            res = self._cleaned_res(res, empty=None, single_hit=True, dotfield=options.dotfield)
+            res = self._cleaned_res_2(res, empty=None, single_hit=True,
+                                      dotfield=options.dotfield,
+                                      fields=options.kwargs['fields'])
         return res
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
@@ -322,7 +373,9 @@ class ESQuery:
         for i in range(len(res)):
             hits = res[i]
             qterm = geneid_list[i]
-            hits = self._cleaned_res(hits, empty=[], single_hit=False, dotfield=options.dotfield)
+            hits = self._cleaned_res_2(hits, empty=[], single_hit=False,
+                                       dotfield=options.dotfield,
+                                       fields=options.kwargs['fields'])
             if len(hits) == 0:
                 _res.append({u'query': qterm,
                              u'notfound': True})
@@ -374,10 +427,12 @@ class ESQuery:
 
             try:
                 res = self._search(_q, species=kwargs['species'])
-            except ElasticSearchException as err:
-                err_msg = err.message if options.raw else "invalid query term."
-                return {'success': False,
-                        'error': err_msg}
+            except Exception as e:
+                if PY3:
+                    msg = str(e)
+                else:
+                    msg = e.message
+                return {'success': False, 'error': msg}
 
             if not options.raw:
                 _res = res['hits']
@@ -396,7 +451,8 @@ class ESQuery:
                         parse_dot_fields(v)
                 res = _res
         else:
-            res = {'success': False, 'error': "Invalid query. Please check parameters."}
+            res = {'success': False,
+                   'error': "Invalid query. Please check parameters."}
 
         return res
 
@@ -432,7 +488,7 @@ class ESQuery:
                                                start=s, size=step, scan=True,
                                                scroll='5m', **kwargs)
                 n = raw_res['hits']['total']
-                print 'Retrieving %d documents from index "%s/%s".' % (n, self._index, self._doc_type)
+                print('Retrieving %d documents from index "%s/%s".' % (n, self._index, self._doc_type))
             else:
                 raw_res = self.conn.search_scroll(raw_res._scroll_id, scroll='5m')
             hits_cnt = len(raw_res['hits']['hits'])
@@ -440,7 +496,7 @@ class ESQuery:
                 break
             else:
 
-                print "Processing %d-%d documents..." % (cnt+1, cnt + hits_cnt),
+                print("Processing %d-%d documents..." % (cnt+1, cnt + hits_cnt),)
                 res = self._cleaned_res(raw_res)
                 if inbatch:
                     yield res
@@ -448,21 +504,20 @@ class ESQuery:
                     for hit in res:
                         yield hit
                 cnt += hits_cnt
-                print 'Done.[%.1f%%,%s]' % (cnt*100./n, timesofar(t1))
+                print('Done.[%.1f%%,%s]' % (cnt*100./n, timesofar(t1)))
                 if e and cnt > e:
                     break
 
-        print "="*20
-        print 'Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0))
+        print('Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0)))
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
-        mapping = self.conn.indices.get_mapping(self._doc_type, self._index, raw=True)
+        mapping = self.conn.indices.get_mapping(self._index, self._doc_type)
         if raw:
             return mapping
 
         def get_fields(properties):
-            for k, v in properties.items():
+            for k, v in list(properties.items()):
                 if 'properties' in v:
                     for f in get_fields(v['properties']):
                         yield f
@@ -471,7 +526,7 @@ class ESQuery:
                         continue
                     f = v.get('index_name', k)
                     yield f
-
+        mapping = list(mapping.values())[0]['mappings']
         field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
             'available_fields': sorted(field_set)
@@ -518,7 +573,6 @@ class ESQueryBuilder():
         # missing filter
         missingfilter = self.options.pop('missing', None)
         self.missingfilter = missingfilter.split(',') if missingfilter else None
-
         self._parse_sort_option(self.options)
         self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
@@ -568,7 +622,7 @@ class ESQueryBuilder():
                 "boost": 1,
                 "queries": [
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "symbol": {
@@ -577,21 +631,21 @@ class ESQueryBuilder():
                                     }
                                 },
                             },
-                            "boost_factor": 5
+                            "weight": 5
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 #This makes phrase match of "cyclin-dependent kinase 2" appears first
                                 "match_phrase": {"name": "%(q)s"},
                             },
-                            "boost_factor": 4
+                            "weight": 4
 
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "name": {
@@ -601,11 +655,11 @@ class ESQueryBuilder():
                                     }
                                 },
                             },
-                            "boost_factor": 3
+                            "weight": 3
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "unigene": {
@@ -614,11 +668,11 @@ class ESQueryBuilder():
                                     }
                                 }
                             },
-                            "boost_factor": 1.1
+                            "weight": 1.1
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "match": {
                                     "go": {
@@ -627,7 +681,7 @@ class ESQueryBuilder():
                                     }
                                 }
                             },
-                            "boost_factor": 1.1
+                            "weight": 1.1
                         }
                     },
                     # {
@@ -643,7 +697,7 @@ class ESQueryBuilder():
                     # }
                     # },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "query_string": {
                                     "query": "%(q)s",
@@ -651,7 +705,7 @@ class ESQueryBuilder():
                                     "auto_generate_phrase_queries": True
                                 },
                             },
-                            "boost_factor": 1
+                            "weight": 1
                         }
                     },
 
@@ -666,11 +720,11 @@ class ESQueryBuilder():
             _query['dis_max']['queries'].insert(
                 0,
                 {
-                    "custom_boost_factor": {
+                    "function_score": {
                         "query": {
                             "term": {"entrezgene": int(q)},
                         },
-                        "boost_factor": 8
+                        "weight": 8
                     }
                 }
             )
@@ -685,36 +739,36 @@ class ESQueryBuilder():
                 "boost": 1,
                 "queries": [
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "wildcard": {
                                     "symbol": {
                                         "value": "%(q)s",
-                                        "boost": 5.0,
+                                        # "weight": 5.0,
                                     }
                                 },
                             },
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "wildcard": {
                                     "name": {
                                         "value": "%(q)s",
-                                        "boost": 1.1,
+                                        # "weight": 1.1,
                                     }
                                 },
                             }
                         }
                     },
                     {
-                        "custom_boost_factor": {
+                        "function_score": {
                             "query": {
                                 "wildcard": {
                                     "summary": {
                                         "value": "%(q)s",
-                                        "boost": 0.5,
+                                        # "weight": 0.5,
                                     }
                                 },
                             }
@@ -1022,6 +1076,10 @@ class ESQueryBuilder():
         _q = {"query": _query}
         if self.options:
             _q.update(self.options)
+
+        if 'fields' in _q and _q['fields'] is not None:
+            _q['_source'] = _q['fields']
+            del _q['fields']
         return _q
 
     def build_multiple_id_query(self, id_list, scopes=None):
@@ -1109,12 +1167,12 @@ class UserFilters:
         }   # this mapping disables indexing completely since we don't need it.
 
     def create(self):
-        print "Creating index...",
-        print self.conn.create_index(self.ES_INDEX_NAME)
-        print "Updating mapping...",
-        print self.conn.put_mapping(self.ES_INDEX_TYPE,
+        print("Creating index...",)
+        print(self.conn.create_index(self.ES_INDEX_NAME))
+        print("Updating mapping...",)
+        print(self.conn.put_mapping(self.ES_INDEX_TYPE,
                                     self._MAPPING,
-                                    [self.ES_INDEX_NAME])
+                                    [self.ES_INDEX_NAME]))
 
     def add(self, name, id_list=[], id_field="entrezgene", raw_filter=None):
         '''add a named filter.'''
@@ -1126,20 +1184,20 @@ class UserFilters:
                 "terms": {id_field: id_list}
             }
         if _filter:
-            print 'Adding filter "{}"...'.format(name),
+            print('Adding filter "{}"...'.format(name),)
             _doc = {'_id': name,
                     'filter': _filter}
-            print self.conn.index(_doc, self.ES_INDEX_NAME,
+            print(self.conn.index(_doc, self.ES_INDEX_NAME,
                                   self.ES_INDEX_TYPE,
-                                  id=_doc['_id'])
+                                  id=_doc['_id']))
         else:
-            print "No filter to add."
+            print("No filter to add.")
 
     def get(self, name):
         '''get a named filter.'''
         try:
-            return self.conn.get(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name)['_source']
-        except NotFoundException:
+            return self.conn.get(self.ES_INDEX_NAME, name, self.ES_INDEX_TYPE)['_source']
+        except NotFoundError:
             return None
 
     def count(self):
@@ -1148,7 +1206,7 @@ class UserFilters:
 
     def get_all(self, skip=0, size=1000):
         '''get all named filter.'''
-        print '\ttotal filters: {}'.format(self.count())
+        print('\ttotal filters: {}'.format(self.count()))
         q = {"query": {"match_all": {}}}
         res = self.conn.search_raw(q, indices=self.ES_INDEX_NAME, doc_types=self.ES_INDEX_TYPE,
                                    **{"from": str(skip), "size": str(1000)})
@@ -1160,10 +1218,10 @@ class UserFilters:
         if _filter:
             msg = 'Found filter "{}". Continue to delete it?'.format(name)
             if noconfirm or ask(msg) == 'Y':
-                print 'Deleting filter "{}"...'.format(name),
-                print self.conn.delete(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name)
+                print('Deleting filter "{}"...'.format(name),)
+                print(self.conn.delete(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name))
         else:
-            print 'Filter "{}" does not exist. Abort now.'.format(name)
+            print('Filter "{}" does not exist. Abort now.'.format(name))
 
     def rename(self, name, newname):
         '''"rename" a named filter.
@@ -1176,7 +1234,7 @@ class UserFilters:
                 self.add(newname, raw_filter=_filter['filter'])
                 self.delete(name, noconfirm=True)
         else:
-            print 'Filter "{}" does not exist. Abort now.'.format(name)
+            print('Filter "{}" does not exist. Abort now.'.format(name))
 
 
 def make_test_index():
@@ -1207,14 +1265,14 @@ def make_test_index():
     except:
         pass
     mapping = dict(conn.get_mapping('gene', index_name)['gene'])
-    print conn.put_mapping(index_type, mapping, [index_name])
+    print(conn.put_mapping(index_type, mapping, [index_name]))
 
-    print "Building index..."
+    print("Building index...")
     cnt = 0
     for doc in gli:
         conn.index(doc, index_name, index_type, doc['_id'])
         cnt += 1
-        print cnt, ':', doc['_id']
-    print conn.flush()
-    print conn.refresh()
-    print 'Done! - {} docs indexed.'.format(cnt)
+        print(cnt, ':', doc['_id'])
+    print(conn.flush())
+    print(conn.refresh())
+    print('Done! - {} docs indexed.'.format(cnt))

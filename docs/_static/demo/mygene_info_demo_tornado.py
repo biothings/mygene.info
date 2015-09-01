@@ -12,11 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
 
-import urllib
+if PY3:
+    import urllib.request, urllib.parse, urllib.error
+    import http.client
+else:
+    import urllib
+    import httplib
 import types
 import json
-import httplib
+
 
 import tornado.httpserver
 import tornado.ioloop
@@ -24,7 +34,10 @@ import tornado.web
 
 
 def call_service(url):
-    h = httplib.HTTPConnection('mygene.info')
+    if PY3:
+        h = http.client.HTTPConnection('mygene.info')
+    else:
+        h = httplib.HTTPConnection('mygene.info')
     h.request('GET', url)
     res = h.getresponse()
     con = res.read()
@@ -37,7 +50,10 @@ class MainHandler(tornado.web.RequestHandler):
         d = {'gene_list': None, 'ps_list': None, 'error': None}
         query = self.get_argument('q', '')
         if query:
-            out = call_service('/v2/query?' + urllib.urlencode(dict(q=query, species='mouse', limit=1000)))
+            if PY3:
+                out = call_service('/v2/query?' + urllib.parse.urlencode(dict(q=query, species='mouse', limit=1000)))
+            else:
+                out = call_service('/v2/query?' + urllib.urlencode(dict(q=query, species='mouse', limit=1000)))
             if 'total' in out:
                 gene_list = []
                 for gene in out['hits']:
@@ -55,9 +71,14 @@ class MainHandler(tornado.web.RequestHandler):
                ps_list = []
                if gene and 'reporter' in gene:
                    ps_list = gene['reporter'].get('Mouse430_2',[])
-                   if type(ps_list) is not types.ListType:
-                       # if only one probeset available, it's returned as a string, so we need to convert it to a list
-                       ps_list = [ps_list]
+                   if PY3:
+                       if type(ps_list) is not list:
+                           # if only one probeset available, it's returned as a string, so we need to convert it to a list
+                           ps_list = [ps_list]
+                   else:
+                       if type(ps_list) is not types.ListType:
+                           # if only one probeset available, it's returned as a string, so we need to convert it to a list
+                           ps_list = [ps_list]
                d['ps_list'] = ps_list
         self.render('templates/demo_form.html', **d)
 

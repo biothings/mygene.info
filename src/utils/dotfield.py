@@ -44,3 +44,35 @@ def parse_dot_fields(genedoc):
     for key in dot_fields:
         del genedoc[key]
     return genedoc
+
+
+def compose_dot_fields_by_fields(genedoc, fields):
+    """
+    reverse funtion of parse_dot_fields
+    """
+    res = None
+    to_del = set()
+    for k in fields:
+        if k.find('.') != -1:
+            if not res:
+                import copy
+                res = copy.deepcopy(genedoc)
+            ks = k.split('.')
+            broke = False
+            if ks[0] in genedoc:
+                t = genedoc[ks[0]]
+                for e in ks[1:]:
+                    if e in t:
+                        t = t[e]
+                    else:
+                        broke = True
+                        break
+                if broke:
+                    continue
+                to_del.add(ks[0])
+                res[k] = t
+
+    for k in to_del:
+        del res[k]
+
+    return res if res else genedoc

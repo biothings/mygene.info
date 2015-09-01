@@ -8,6 +8,11 @@ Currently available URLs:
 
 '''
 import sys
+if sys.version > '3':
+    PY3 = True
+else:
+    PY3 = False
+
 import os.path
 import subprocess
 import json
@@ -22,12 +27,13 @@ from tornado.options import define, options
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 if src_path not in sys.path:
     sys.path.append(src_path)
+
 from config import INCLUDE_DOCS
 from utils.es import ESQuery
 from helper import add_apps, BaseHandler
 from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
-from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
+#from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
 from demo.handlers import APP_LIST as demo_app_list
 #from auth.handlers import APP_LIST as auth_app_list
 
@@ -56,6 +62,8 @@ def _get_rev():
     pipe = subprocess.Popen(["hg", "id", "-n", "-i"],
                             stdout=subprocess.PIPE)
     output = pipe.stdout.read().strip()
+    if PY3:
+        output = output.decode()
     return ':'.join(reversed(output.replace('+', '').split(' ')))
 __revision__ = _get_rev()
 
@@ -101,7 +109,7 @@ APP_LIST += add_apps('v2', api_v2_app_list)
 APP_LIST += add_apps('v1', api_v1_app_list)
 APP_LIST += add_apps('demo', demo_app_list)
 
-APP_LIST += add_apps('v2a', api_v2_async_app_list)
+#APP_LIST += add_apps('v2a', api_v2_async_app_list)
 #APP_LIST += add_apps('auth', auth_app_list)
 if options.debug:
     APP_LIST += [

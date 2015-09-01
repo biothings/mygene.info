@@ -1,8 +1,10 @@
+import sys
+from utils.ga import GAMixIn
 import json
 import datetime
 from collections import OrderedDict
 import tornado.web
-from utils.ga import GAMixIn
+
 
 SUPPORT_MSGPACK = True
 if SUPPORT_MSGPACK:
@@ -87,7 +89,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
            string.
         '''
         if isinstance(data, dict):
-            data = OrderedDict(sorted(data.items(), key=lambda x: x[0].lower()))
+            data = OrderedDict(sorted(list(data.items()), key=lambda x: x[0].lower()))
         jsoncallback = self.get_argument(self.jsonp_parameter, '')  # return as JSONP
         if SUPPORT_MSGPACK:
             use_msgpack = self.get_argument('msgpack', '')
@@ -98,7 +100,7 @@ class BaseHandler(tornado.web.RequestHandler, GAMixIn):
             _json_data = json.dumps(data, cls=DateTimeJSONEncoder, indent=indent) if encode else data
             self.set_header("Content-Type", "application/json; charset=UTF-8")
         if not self.disable_caching:
-            #get etag if data is a dictionary and has "etag" attribute.
+            # get etag if data is a dictionary and has "etag" attribute.
             etag = data.get('etag', None) if isinstance(data, dict) else None
             self.set_cacheable(etag=etag)
         self.support_cors()

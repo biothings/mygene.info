@@ -52,7 +52,6 @@ class GeneHandler(BaseHandler):
             res = self.esq.mget_gene2(ids, fields=fields, scopes=scopes, **kwargs)
         else:
             res = {'success': False, 'error': "Missing required parameters."}
-
         self.return_json(res)
         self.ga_track(event={'category': 'v2_api',
                              'action': 'gene_post',
