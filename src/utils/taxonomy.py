@@ -20,7 +20,7 @@ class TaxonomyQuery:
         '''
         taxid = int(taxid)
         try:
-            res = self.es.get(self._index, self._doc_type, taxid)
+            res = self.es.get(index=self._index, doc_type=self._doc_type, id=taxid)['_source']
         except NotFoundError:
             res = None
         if res:
@@ -50,7 +50,7 @@ class TaxonomyQuery:
         else:
             q['query']['query_string']['query'] = "lineage:{}".format(taxid)
 
-        res = self.es.search_raw(q, indices=self._index, doc_types=self._doc_type, fields='_id', size=MAX_TAXID_COUNT)
+        res = self.es.search(body=q, index=self._index, doc_type=self._doc_type, fields='_id', size=MAX_TAXID_COUNT)
         if raw:
             return res
         taxid_li = [int(x['_id']) for x in res['hits']['hits']]

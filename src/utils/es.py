@@ -28,7 +28,7 @@ from utils.dotfield import parse_dot_fields
 from utils.taxonomy import TaxonomyQuery
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
-from src.utils.dotfield import compose_dot_fields
+from src.utils.dotfield import compose_dot_fields_by_fields as compose_dot_fields
 
 
 GENOME_ASSEMBLY = {

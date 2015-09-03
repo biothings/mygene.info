@@ -12,18 +12,16 @@
 
 
 pyes>=0.99.5
+elasticsearch>=1.2.0
 thrift>=0.9.1
 tornado>=3.2
 tornadoes>=1.4.1
-git+git://github.com/tj-4-zune/py-ga-mob.git
-#the following patched version has been merged into v1.4.1
-#-e git+git://github.com/newgene/tornado-es.git#egg=tornadoes   #this is a patched version of tornadoes
 
 #for tracking API on Google Analytics
-pyga==2.4.2
+-e git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
 
 #for build sphinx docs
-Sphinx>=1.2.2
+Sphinx>=1.2.3
 #sphinx-bootstrap-theme==0.3.1
 
 #for nosetests
@@ -31,4 +29,4 @@ nose>=1.3.0
 httplib2>=0.8
 
 #Optional
-#msgpack>=0.4
+msgpack-python

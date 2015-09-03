@@ -33,7 +33,7 @@ class GAMixIn:
                                   page=page)
             r = pvr.build_http_request()
             _req_list.append(HTTPRequest(r.get_full_url(),
-                                         "POST" if r.has_data() else "GET",
+                                         "POST" if (r.data) else "GET",
                                          headers=r.headers,
                                          body=r.data))
             if event:
@@ -46,7 +46,7 @@ class GAMixIn:
                                   event=evt)
                 r = er.build_http_request()
                 _req_list.append(HTTPRequest(r.get_full_url(),
-                                             "POST" if r.has_data() else "GET",
+                                             "POST" if (r.data) else "GET",
                                              headers=r.headers,
                                              body=r.data))
 
