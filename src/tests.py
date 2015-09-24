@@ -472,3 +472,8 @@ def test_taxonomy():
     ok_(res['total'] >= 2)
     res2 = json_ok(get_ok(api + '/query?q=lytic%20enzyme&species=1386'))
     eq_(res2['total'], 0)
+
+
+def test_static():
+    get_ok(host + '/favicon.ico')
+    get_ok(host + '/robots.txt')
