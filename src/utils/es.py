@@ -119,7 +119,7 @@ class ESQuery:
         self._set_index(species)
         # body = '{"query" : {"term" : { "_all" : ' + q + ' }}}'
         res = self.conn.search(index=self._index, doc_type=self._doc_type,
-                                   body=q)
+                               body=q)
         self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
@@ -188,7 +188,7 @@ class ESQuery:
                                        dotfield=dotfield, fields=fields)
         else:
             return [self._get_genedoc_2(hit,
-                                        dotfield=dotfield,  fields=fields)
+                                        dotfield=dotfield, fields=fields)
                     for hit in hits['hits']]
 
     def _cleaned_scopes(self, scopes):
@@ -467,7 +467,7 @@ class ESQuery:
         return self._search(_q)
 
     def doc_feeder(self, step=1000, s=None, e=None, inbatch=False, query=None, **kwargs):
-        '''A iterator for returning docs in a ES index with batch query.
+        '''deprecated! A iterator for returning docs in a ES index with batch query.
            additional filter query can be passed via "query", e.g.,
            doc_feeder(query='taxid:9606'}})
            other parameters can be passed via "**kwargs":
@@ -578,7 +578,12 @@ class ESQueryBuilder():
         self._allowed_options = ['fields', 'start', 'from', 'size',
                                  'sort', 'explain', 'version', 'facets']
         for key in set(self.options) - set(self._allowed_options):
-                del self.options[key]
+            del self.options[key]
+        # convert "fields" option to "_source"
+        # use "_source" instead of "fields" for ES v1.x and up
+        if 'fields' in self.options and self.options['fields'] is not None:
+            self.options['_source'] = self.options['fields']
+            del self.options['fields']
 
         # this is a fake query to make sure to return empty hits
         self._nohits_query = {
@@ -1077,9 +1082,9 @@ class ESQueryBuilder():
         if self.options:
             _q.update(self.options)
 
-        if 'fields' in _q and _q['fields'] is not None:
-            _q['_source'] = _q['fields']
-            del _q['fields']
+        # if 'fields' in _q and _q['fields'] is not None:
+        #     _q['_source'] = _q['fields']
+        #     del _q['fields']
         return _q
 
     def build_multiple_id_query(self, id_list, scopes=None):
