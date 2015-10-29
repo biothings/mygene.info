@@ -20,28 +20,31 @@ run as "nosetests tests"
     or "nosetests tests:test_main"
 '''
 import sys
+import os
+import json
+import httplib2
+from nose.tools import ok_, eq_
 if sys.version > '3':
     PY3 = True
 else:
     PY3 = False
-import httplib2
 if PY3:
-    import urllib.request, urllib.parse, urllib.error
+    import urllib.request
+    import urllib.parse
+    import urllib.error
 else:
     import urllib
-import json
-
-from nose.tools import ok_, eq_
 
 try:
     import msgpack
 except ImportError:
     sys.stderr.write("Warning: msgpack is not available.")
 
-#host = 'http://54.213.82.178'
-#host = 'http://localhost:8000'
-#host = 'http://dev.mygene.info:8000'
-host = 'http://mygene.info'
+host = os.getenv("MG_HOST")
+if not host:
+    #host = 'http://localhost:8000'
+    #host = 'http://dev.mygene.info:8000'
+    host = 'http://mygene.info'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -59,10 +62,10 @@ def encode_dict(d):
     '''
     if PY3:
         return dict([(key, val.encode('utf-8')) for key, val in d.items()
-                 if isinstance(val, str)])
+                     if isinstance(val, str)])
     else:
         return dict([(key, val.encode('utf-8')) for key, val in d.iteritems()
-                 if isinstance(val, basestring)])
+                     if isinstance(val, basestring)])
 
 
 def truncate(s, limit):
