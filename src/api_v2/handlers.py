@@ -198,6 +198,6 @@ APP_LIST = [
     (r"/gene/?$", GeneHandler),              # for gene post request
     (r"/query/?", QueryHandler),
     (r"/species/(\d+)/?", SpeciesHandler),
-    (r"/v2/metadata", MetaDataHandler),
-    (r"/v2/metadata/fields", FieldsHandler),
+    (r"/metadata", MetaDataHandler),
+    (r"/metadata/fields", FieldsHandler),
 ]
