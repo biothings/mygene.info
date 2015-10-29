@@ -537,6 +537,11 @@ class ESQuery:
         metadata['taxonomy'] = TAXONOMY
         return metadata
 
+    def query_fields(self, **kwargs):
+        # query the metadata to get the available fields for a variant object
+        r = self.conn.indices.get(index=self._index)
+        return r[list(r.keys())[0]]['mappings'][self._doc_type]['properties']
+
 
 class ESQueryBuilder():
     def __init__(self, **query_options):

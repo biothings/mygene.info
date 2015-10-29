@@ -7,6 +7,7 @@ from helper import BaseHandler
 from utils.es import ESQuery
 from utils.taxonomy import TaxonomyQuery
 from utils.common import split_ids
+import os
 
 
 class GeneHandler(BaseHandler):
@@ -149,9 +150,54 @@ class SpeciesHandler(BaseHandler):
         else:
             raise HTTPError(404)
 
+
+class MetaDataHandler(BaseHandler):
+    '''Return db metadata in json string.'''
+    disable_caching = True
+
+    def get(self):
+        esq = ESQuery()
+        metadata = esq.metadata()
+        metadata["app_revision"] = os.environ["MYGENE_REVISION"]
+        self.return_json(metadata, indent=2)
+
+
+class FieldsHandler(BaseHandler):
+    esq = ESQuery()
+
+    def get(self):
+        #notes = json.load(open(config.FIELD_NOTES_PATH, 'r'))
+        es_mapping = self.esq.query_fields()
+
+        def get_indexed_properties_in_dict(d, prefix):
+            r = {}
+            for (k, v) in d.items():
+                r[prefix + '.' + k] = {}
+                r[prefix + '.' + k]['indexed'] = False
+                if 'type' in v:
+                    r[prefix + '.' + k]['type'] = v['type']
+                    if ('index' not in v) or ('index' in v and v['index'] != 'no'):
+                        # indexed field
+                        r[prefix + '.' + k]['indexed'] = True
+                else:
+                    r[prefix + '.' + k]['type'] = 'object'
+                    r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
+            return r
+
+        r = {}
+        for (k, v) in get_indexed_properties_in_dict(es_mapping, '').items():
+            k1 = k.lstrip('.')
+            r[k1] = v
+            #if k1 in notes:
+            #    r[k1]['notes'] = notes[k1]
+        self.return_json(r)
+
+
 APP_LIST = [
     (r"/gene/([\w\-\.]+)/?", GeneHandler),   # for gene get request
     (r"/gene/?$", GeneHandler),              # for gene post request
     (r"/query/?", QueryHandler),
     (r"/species/(\d+)/?", SpeciesHandler),
+    (r"/v2/metadata", MetaDataHandler),
+    (r"/v2/metadata/fields", FieldsHandler),
 ]

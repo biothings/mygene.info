@@ -13,9 +13,10 @@ if sys.version > '3':
 else:
     PY3 = False
 
-import os.path
+#import os.path
+import os
 import subprocess
-import json
+#import json
 
 import tornado.httpserver
 import tornado.ioloop
@@ -30,9 +31,10 @@ if src_path not in sys.path:
 
 from config import INCLUDE_DOCS
 from utils.es import ESQuery
-from helper import add_apps, BaseHandler
+from helper import add_apps
 from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
+from api_v2.handlers import MetaDataHandler
 #from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
 from demo.handlers import APP_LIST as demo_app_list
 #from auth.handlers import APP_LIST as auth_app_list
@@ -66,6 +68,7 @@ def _get_rev():
         output = output.decode()
     return ':'.join(reversed(output.replace('+', '').split(' ')))
 __revision__ = _get_rev()
+os.environ["MYGENE_REVISION"] = __revision__
 
 
 class StatusCheckHandler(tornado.web.RequestHandler):
@@ -85,22 +88,10 @@ class MainHandler(tornado.web.RequestHandler):
             self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
 
 
-class MetaDataHandler(BaseHandler):
-    '''Return db metadata in json string.'''
-    disable_caching = True
-
-    def get(self):
-        esq = ESQuery()
-        metadata = esq.metadata()
-        metadata["app_revision"] = __revision__
-        self.return_json(metadata, indent=2)
-
-
 APP_LIST = [
     (r"/", MainHandler),
     (r"/status", StatusCheckHandler),
     (r"/metadata", MetaDataHandler),
-    (r"/v2/metadata", MetaDataHandler),
     (r"/v2a/metadata", MetaDataHandler),
 ]
 
@@ -121,12 +112,12 @@ if options.debug:
 
 settings = {}
 if options.debug:
-#     from config import STATIC_PATH
+    #     from config import STATIC_PATH
     settings.update({
         "static_path": STATIC_PATH,
     })
-#    from config import auth_settings
-#    settings.update(auth_settings)
+    #    from config import auth_settings
+    #    settings.update(auth_settings)
 
 
 def main():
