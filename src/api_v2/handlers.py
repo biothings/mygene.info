@@ -72,13 +72,17 @@ class QueryHandler(BaseHandler):
             size
             sort
             species
+            fetch_all
 
             explain
         '''
         kwargs = self.get_query_params()
         q = kwargs.pop('q', None)
+        scroll_id = kwargs.pop('scroll_id', None)
         _has_error = False
-        if q:
+        if scroll_id:
+            res = self.esq.scroll(scroll_id, fields=None, **kwargs)
+        elif q:
             explain = self.get_argument('explain', None)
             if explain and explain.lower() == 'true':
                 kwargs['explain'] = True
@@ -92,6 +96,11 @@ class QueryHandler(BaseHandler):
                         _has_error = True
             if not _has_error:
                 res = self.esq.query(q, **kwargs)
+                if kwargs.get('fetch_all', False):
+                    self.ga_track(event={'category': 'v2_api',
+                                         'action': 'fetch_all',
+                                         'label': 'total',
+                                         'value': res.get('total', None)})
         else:
             res = {'success': False, 'error': "Missing required parameters."}
 

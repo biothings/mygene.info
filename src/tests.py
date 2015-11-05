@@ -481,3 +481,12 @@ def test_taxonomy():
 def test_static():
     get_ok(host + '/favicon.ico')
     get_ok(host + '/robots.txt')
+
+
+def test_fetch_all():
+    res = json_ok(get_ok(api + '/query?q=cdk2&fetch_all=true'))
+    assert '_scroll_id' in res
+
+    res2 = json_ok(get_ok(api + '/query?scroll_id=' + res['_scroll_id']))
+    assert 'hits' in res2
+    ok_(len(res2['hits']) >= 2)

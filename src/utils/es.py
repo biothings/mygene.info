@@ -98,6 +98,10 @@ class MGQueryError(Exception):
     pass
 
 
+class MGScrollSetupError(Exception):
+    pass
+
+
 class ESQuery:
     def __init__(self):
         # self.conn0 = es0
@@ -108,6 +112,15 @@ class ESQuery:
         # self._doc_type = 'gene'
         self._index = ES_INDEX_NAME_ALL
         self._doc_type = ES_INDEX_TYPE
+        
+        # Scroll setup
+        self._scroll_time = '1m'
+        self._total_scroll_size = 1000
+        if self._total_scroll_size % self.get_number_of_shards() == 0:
+            self._scroll_size = int(self._total_scroll_size / self.get_number_of_shards())
+        else:
+            raise MGScrollSetupError("_total_scroll_size of {} can't be ".format(self._total_scroll_size) +
+                                     "divided evenly among {} shards.".format(self.get_number_of_shards()))
 
         # self._doc_type = 'gene_sample'
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
@@ -115,11 +128,11 @@ class ESQuery:
         self._default_species = [9606, 10090, 10116]               # human, mouse, rat
         self._tier_1_species = set(taxid_d.values())
 
-    def _search(self, q, species='all'):
+    def _search(self, q, species='all', scroll_options={}):
         self._set_index(species)
         # body = '{"query" : {"term" : { "_all" : ' + q + ' }}}'
         res = self.conn.search(index=self._index, doc_type=self._doc_type,
-                               body=q)
+                               body=q, **scroll_options)
         self._index = ES_INDEX_NAME_ALL     # reset self._index
         return res
 
@@ -173,6 +186,20 @@ class ESQuery:
             return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
         else:
             return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
+
+    def _clean_res2(self, res):
+        ''' res is the dictionary returned from a query.
+            do some reformating of raw ES results before returning.
+
+            This method is used for self.query method.
+        '''
+        _res = res['hits']
+        for attr in ['took', 'facets', 'aggregations', '_scroll_id']:
+            if attr in res:
+                _res[attr] = res[attr]
+        _res['hits'] = [self._get_genedoc(hit) for hit in _res['hits']]
+        return _res
+
 
     def _cleaned_res_2(self, res, empty=[], error={'error': True},
                        single_hit=False, dotfield=True, fields=None):
@@ -293,6 +320,7 @@ class ESQuery:
         options.rawquery = kwargs.pop('rawquery', False)
         #if dofield is false, returned fields contains dot notation will be restored as an object.
         options.dotfield = kwargs.pop('dotfield', True) not in [False, 'false']
+        options.fetch_all = kwargs.pop('fetch_all', False)
         scopes = kwargs.pop('scopes', None)
         if scopes:
             options.scopes = self._cleaned_scopes(scopes)
@@ -321,6 +349,12 @@ class ESQuery:
 
         options.kwargs = kwargs
         return options
+
+    def get_number_of_shards(self):
+        r = self.conn.indices.get_settings(self._index)
+        n_shards = r[list(r.keys())[0]]['settings']['index']['number_of_shards']
+        n_shards = int(n_shards)
+        return n_shards
 
     def get_gene(self, geneid, fields='all', **kwargs):
         kwargs['fields'] = self._cleaned_fields(fields)
@@ -395,6 +429,9 @@ class ESQuery:
         q = re.sub(u'[\t\n\x0b\x0c\r\x00]+', ' ', q)
         q = q.strip()
         _q = None
+        scroll_options = {}
+        if options.fetch_all:
+            scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
         try:
@@ -426,7 +463,7 @@ class ESQuery:
                 return _q
 
             try:
-                res = self._search(_q, species=kwargs['species'])
+                res = self._search(_q, species=kwargs['species'], scroll_options=scroll_options)
             except Exception as e:
                 if PY3:
                     msg = str(e)
@@ -435,25 +472,40 @@ class ESQuery:
                 return {'success': False, 'error': msg}
 
             if not options.raw:
-                _res = res['hits']
-                _res['took'] = res['took']
-                if "facets" in res:
-                    _res['facets'] = res['facets']
-                for v in _res['hits']:
-                    del v['_type']
-                    del v['_index']
-                    for attr in ['fields', '_source']:
-                        if attr in v:
-                            v.update(v[attr])
-                            del v[attr]
-                            break
-                    if not options.dotfield:
-                        parse_dot_fields(v)
-                res = _res
+                res = self._clean_res2(res)
+                #_res = res['hits']
+                #_res['took'] = res['took']
+                #if "facets" in res:
+                #    _res['facets'] = res['facets']
+                #for v in _res['hits']:
+                #    del v['_type']
+                #    del v['_index']
+                #    for attr in ['fields', '_source']:
+                #        if attr in v:
+                #            v.update(v[attr])
+                #            del v[attr]
+                #            break
+                #    if not options.dotfield:
+                #        parse_dot_fields(v)
+                #res = _res
         else:
             res = {'success': False,
                    'error': "Invalid query. Please check parameters."}
 
+        return res
+
+    def scroll(self, scroll_id, fields=None, **kwargs):
+        options = self._get_cleaned_query_options(fields, kwargs)
+        r = self.conn.scroll(scroll_id, scroll=self._scroll_time)
+        scroll_id = r.get('_scroll_id')
+        if scroll_id is None or not r['hits']['hits']:
+            return {'success': False, 'error': 'No results to return.'}
+        else:
+            if not options.raw:
+                res = self._clean_res2(r)
+        #res.update({'_scroll_id': scroll_id})
+        if r['_shards']['failed']:
+            res.update({'_warning': 'Scroll request has failed on {} shards out of {}.'.format(r['_shards']['failed'], r['_shards']['total'])})
         return res
 
     def query_interval(self, taxid, chr, gstart, gend, **kwargs):
