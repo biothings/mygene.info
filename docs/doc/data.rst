@@ -108,8 +108,24 @@ This table lists the genome assembies for commonly-used species:
     ===========  =======================   =======================
 
 
+Available fields
+----------------
 
+The table below lists of all of the possible fields that could be in a gene object.
 
 .. raw:: html
+
+    <table class='indexed-field-table stripe'>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Indexed</th>
+                <th>Type</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <div id="spacer" style="height:300px"></div>

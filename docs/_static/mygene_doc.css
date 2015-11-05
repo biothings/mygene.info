@@ -1,0 +1,8 @@
+.indexed-field-table thead th {text-align:left;padding-left:0px !important;padding-bottom:3px !important;padding-top:3px !important;padding-right:10px !important;}
+.indexed-field-table tbody td {text-align:left;padding-bottom:2px !important;padding-top:2px !important;padding-left:0px !important;white-space:nowrap;}
+.dataTables_wrapper {font-size:13px;padding-bottom:10px;}
+.indexed-field-table thead {font-size:14px;}
+.italic {font-style:italic;}
+.dataTables_filter {float:left !important;}
+.dataTables_length {float:right !important;}
+.dataTables_filter input[type="search"] {font-size:12px;padding-top:1px;padding-bottom:1px; width:200px;}
