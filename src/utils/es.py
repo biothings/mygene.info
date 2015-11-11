@@ -112,7 +112,7 @@ class ESQuery:
         # self._doc_type = 'gene'
         self._index = ES_INDEX_NAME_ALL
         self._doc_type = ES_INDEX_TYPE
-        
+
         # Scroll setup
         self._scroll_time = '1m'
         self._total_scroll_size = 1000
@@ -187,20 +187,6 @@ class ESQuery:
         else:
             return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
 
-    def _clean_res2(self, res):
-        ''' res is the dictionary returned from a query.
-            do some reformating of raw ES results before returning.
-
-            This method is used for self.query method.
-        '''
-        _res = res['hits']
-        for attr in ['took', 'facets', 'aggregations', '_scroll_id']:
-            if attr in res:
-                _res[attr] = res[attr]
-        _res['hits'] = [self._get_genedoc(hit) for hit in _res['hits']]
-        return _res
-
-
     def _cleaned_res_2(self, res, empty=[], error={'error': True},
                        single_hit=False, dotfield=True, fields=None):
         if 'error' in res:
@@ -217,6 +203,19 @@ class ESQuery:
             return [self._get_genedoc_2(hit,
                                         dotfield=dotfield, fields=fields)
                     for hit in hits['hits']]
+
+    def _cleaned_res_3(self, res):
+        ''' res is the dictionary returned from a query.
+            do some reformating of raw ES results before returning.
+
+            This method is used for self.query method.
+        '''
+        _res = res['hits']
+        for attr in ['took', 'facets', 'aggregations', '_scroll_id']:
+            if attr in res:
+                _res[attr] = res[attr]
+        _res['hits'] = [self._get_genedoc_2(hit) for hit in _res['hits']]
+        return _res
 
     def _cleaned_scopes(self, scopes):
         '''return a cleaned scopes parameter.
@@ -472,7 +471,7 @@ class ESQuery:
                 return {'success': False, 'error': msg}
 
             if not options.raw:
-                res = self._clean_res2(res)
+                res = self._cleaned_res_3(res)
                 #_res = res['hits']
                 #_res['took'] = res['took']
                 #if "facets" in res:
@@ -502,7 +501,7 @@ class ESQuery:
             return {'success': False, 'error': 'No results to return.'}
         else:
             if not options.raw:
-                res = self._clean_res2(r)
+                res = self._cleaned_res_3(r)
         #res.update({'_scroll_id': scroll_id})
         if r['_shards']['failed']:
             res.update({'_warning': 'Scroll request has failed on {} shards out of {}.'.format(r['_shards']['failed'], r['_shards']['total'])})

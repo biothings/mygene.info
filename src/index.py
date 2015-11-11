@@ -35,6 +35,7 @@ from helper import add_apps
 from api_v1.handlers import APP_LIST as api_v1_app_list
 from api_v2.handlers import APP_LIST as api_v2_app_list
 from api_v2.handlers import MetaDataHandler
+from api_v2.handlers import FieldsHandler
 #from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
 from demo.handlers import APP_LIST as demo_app_list
 #from auth.handlers import APP_LIST as auth_app_list
@@ -93,6 +94,7 @@ APP_LIST = [
     (r"/status", StatusCheckHandler),
     (r"/metadata", MetaDataHandler),
     (r"/v2a/metadata", MetaDataHandler),
+    (r"/metadata/fields", FieldsHandler),
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)
