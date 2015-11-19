@@ -199,7 +199,7 @@ class FieldsHandler(BaseHandler):
             r[k1] = v
             #if k1 in notes:
             #    r[k1]['notes'] = notes[k1]
-        self.return_json(r)
+        self.return_json(r, indent=2)
 
 
 APP_LIST = [

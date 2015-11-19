@@ -578,9 +578,10 @@ class ESQuery:
                     f = v.get('index_name', k)
                     yield f
         mapping = list(mapping.values())[0]['mappings']
-        field_set = set(get_fields(mapping[self._doc_type]['properties']))
+        #field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
-            'available_fields': sorted(field_set)
+            #'available_fields': sorted(field_set)
+            'available_fields': 'http://mygene.info/metadata/fields'
         }
         if '_meta' in mapping[self._doc_type]:
             metadata.update(mapping[self._doc_type]['_meta'])
