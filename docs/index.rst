@@ -87,6 +87,11 @@ Documentation
    terms
 
 
+How to cite
+------------
+
+See citation page here: http://mygene.info/citation/
+
 FAQ
 -------
 
