@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/jquery-ui.min.css" rel="stylesheet">
+    <link href="css/jquery-ui.theme.min.css" rel="stylesheet">
+    <link href="css/jquery.jsonview.css" rel="stylesheet">
+    <link href="css/front.css" rel="stylesheet">
+    <script src="js/jquery-1.12.0.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script>
+    <script src="js/jquery.jsonview.js"></script>
+    <script src="js/mygene_front.js"></script>
+</head>
+<body>
+    <div class='top-navbar'>
+        <a href="http://mygene.info" class="logo-link"><img src='css/mygene.png' id='mygene-logo'></img></a>
+        <p class="logo-text">MyGene.info</p>
+        <div class='spacer'>
+        </div>
+        <div class='navbar-row first'>
+            <select id="search-type">
+                <option value="1" selected="selected">Gene ID</option>
+                <option value="2">Text Query</option>
+                <option value="3">Metadata</option>
+                <option value="4">Available Fields</option>
+            </select>
+            <input type="text" id="main-input" placeholder="Enter comma separated gene ids here">
+            <button id="search-button" type="button" class='ui-button ui-corner-all ui-widget ui-state-default'>Search</button>
+        </div>
+        <div class='navbar-row second'>
+            <label for="fields-input">Return Fields:</label>
+            <input type="text" id="fields-input" value="all">
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="introduction">
+            <p>
+                You can use this simple front-end to query the MyGene.info API.  The pull down menu to the left of the search bar has 4 different types of queries you can do: search by Gene ID(s), search by full text query, get the MyGene.info database metadata, and get the available fields in the MyGene.info database (the last two don't accept any input, just click search).
+            </p>
+            <p>
+                The Return Fields input allows you to specify which fields to return in your gene object.  If you are only interested in certain databases, you can choose to return only them.  The textbox autocompletes with all available fields.
+            </p>
+            <p>
+                For more informations and docs, check out the <a href='http://mygene.info'>MyGene.info API landing page</a>.
+            </p>
+
+        </div>
+        <div class="results">
+        
+        </div>
+    </div> <!-- /container -->
+</body>
+</html>

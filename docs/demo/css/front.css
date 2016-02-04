@@ -1,0 +1,134 @@
+body {
+    margin: 0px;
+    min-width: 930px;
+    position: relative;
+}
+.top-navbar {
+    border: 1px solid transparent;
+    background-color: #f8f8f8;
+    border-color: #e7e7e7;
+    border-width: 0 0 1px;
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 86px;
+    width: 100%;
+    min-width: 930px;
+}
+.spacer {
+    height: 86px;
+    width: 100px;
+    z-index: 0;
+    border: 1px solid transparent;
+    border-color: #e7e7e7;
+    border-width: 0 1px 0 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+.container {
+    margin-top: 87px;
+    z-index: 0;
+    position: absolute;
+    min-height: 1px;
+    padding-top: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-bottom: 10px;
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 0.75em;
+}
+.introduction {
+    width:600px;
+}
+.results {
+    display: none;
+}
+#mygene-logo {
+    width: 65px;
+    height: 65px;
+    margin-top: 0px;
+    margin-left: 0px;
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    left: 0;
+}
+.logo-link {
+    width: 65px;
+    height: 65px;
+    margin-top: 2px;
+    margin-left: 18px;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+.logo-text {
+    font-size: 0.67em;
+    margin: 0px;
+    position: absolute;
+    z-index: 0;
+    top: 68px;
+    left: 12px;
+    float: left;
+    font-family: Verdana, Geneva, sans-serif;
+}  
+#main-input {
+    width: 500px;
+    font-size: 0.8em;
+    margin-right: 8px;
+    margin-top: 5px;
+}
+#fields-input {
+    width: 300px;
+    font-size: 0.8em;
+}
+.ui-widget {
+    font-size: 0.8em;
+}
+.ui-selectmenu-button {
+    width: 140px !important;
+    float: left;
+    margin-right: 8px;
+}
+.navbar-row {
+    float: left;
+    padding-left:20px;
+    padding-top:0px;
+    padding-bottom:0px;
+    margin-top: 5px;
+    margin-left: 101px;
+}
+.first {
+    margin-top:15px;
+}
+.second {
+    clear: left;
+}
+.navbar-row label {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 0.7em;
+}
+#search-button {
+    height: 30px;
+}
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.json-panel {
+    margin-bottom: 10px;
+}
+.error {
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 0.8em;
+    color: red;
+}
+.executing {
+    color: black;
+    font-size: 0.8em;
+    font-family: Verdana, Geneva, sans-serif;
+}
