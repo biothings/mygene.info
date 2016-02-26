@@ -1,5 +1,6 @@
-var theseFields = ['all'];
+var theseFields = [];
 var serverAddress = 'mygene.info';
+var apiVersion = 'v2';
 
 function split( val ) {
     return val.split( /,\s*/ );
@@ -18,12 +19,15 @@ function successHandler(data, textStatus, jqXHR) {
     jQuery('.json-panel button').remove();
     jQuery('.json-panel').remove();
     jQuery('.json-view').remove();
-    jQuery('.results').html("<div class='json-panel'><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
+    jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
     jQuery('.json-panel button').button();
     jQuery('.json-view').JSONView(data); //, {collapsed: true});
     jQuery('.json-view').JSONView('expand');
     jQuery('#expand-json').click(function() {jQuery('.json-view').JSONView('expand');});
     jQuery('#collapse-json').click(function() {jQuery('.json-view').JSONView('collapse');});
+    if('total' in data) {
+        jQuery('#total-text').html(data['total'] + " total result(s).  Showing top " + data["hits"].length + " result(s).").show();
+    }
 }
 
 function errorHandler(message, m_class) {
@@ -79,11 +83,47 @@ jQuery(document).ready(function() {
         }
     );
 
+    // gene examples
+    jQuery('.gene-example a').click(function() {
+        if(jQuery(this).data().example == "1") {
+            jQuery("#main-input").val("1017");
+            jQuery("#fields-input").val("");
+        }
+        else if(jQuery(this).data().example == "2") { 
+            jQuery("#main-input").val("ENSG00000123374");
+            jQuery("#fields-input").val("");
+        }
+        else if(jQuery(this).data().example == "3") { 
+        }
+    });
+
+    // query examples
+    jQuery('.query-example a').click(function() {
+        if(jQuery(this).data().example == "1") { 
+            jQuery("#main-input").val("symbol:cdk?");
+            jQuery("#fields-input").val("symbol, ensembl.gene");
+            jQuery("#size-input").val("50").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "2") { 
+            jQuery('#main-input').val("tumor AND suppressor");
+            jQuery("#fields-input").val("");
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "3") { 
+            jQuery('#main-input').val("uniprot:P24941");
+            jQuery("#fields-input").val("");
+            jQuery("#size-input").val("10").selectmenu('refresh', true);
+        }
+        else if(jQuery(this).data().example == "help") { 
+            
+        }
+    });
+
     // Make this a button
     jQuery('#search-button').button().click(function() {
         // Search button click handler
         var searchType = jQuery('#search-type').val();
-        var endpointBase = 'https://' + serverAddress;
+        var endpointBase = 'https://' + serverAddress + '/' + apiVersion;
         var queryText = jQuery('#main-input').val();
         var fieldsText = jQuery('#fields-input').val();
         if(!(fieldsText)) {fieldsText = 'all';}
@@ -93,27 +133,24 @@ jQuery(document).ready(function() {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
             if(queryText.indexOf(",") == -1) {
-                // get to variant endpoint
-                jQuery.get(endpointBase + '/v1/variant/' + queryText + '?fields=' + fieldsText).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
+                // get to gene endpoint
+                jQuery.get(endpointBase + '/gene/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText)).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
             }
             else {
-                // post to variant endpoint
-                jQuery.post(endpointBase + '/v1/variant', {'ids': queryText, 'fields': fieldsText}).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
+                // post to gene endpoint
+                jQuery.post(endpointBase + '/gene', {'ids': queryText, 'fields': fieldsText}).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
             }
         }
         else if(searchType == 2) {
+            var querySize = jQuery('#size-input').val();
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            //jQuery.ajax(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText, {
-            //    success: successHandler,
-            //    error: function(jqXHR, textStatus, errorThrown) {errorHandler("Couldn't retreive results for query " + jQuery('#main-input').val() + "."); console.log(jqXHR); console.log(textStatus); console.log(errorThrown);}
-            //});
-            jQuery.get(endpointBase + '/v1/query?q=' + queryText + '&fields=' + fieldsText).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            jQuery.get(endpointBase + '/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/metadata').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyVariant database metadata.  API error.", "error");});
+            jQuery.get(endpointBase + '/metadata').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyGene database metadata.  API error.", "error");});
         }
         else if(searchType == 4) {
             // available fields query
@@ -121,39 +158,54 @@ jQuery(document).ready(function() {
             jQuery.get(endpointBase + '/metadata/fields').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
         }
     });
+    // Select menu is a widget
+    jQuery('#size-input').selectmenu();
+
     // Make this a select menu widget
     jQuery('#search-type').selectmenu({
         change: function() {
             if(jQuery(this).val() == 1) {
-                // Query by HGVS ID
+                // Query by gene ID
                 jQuery('#main-input').val("");
-                jQuery('#main-input').attr('placeholder', 'Enter comma separated HGVS ids here');
+                jQuery('#main-input').attr('placeholder', 'Enter comma separated Entrez or Ensembl gene ids here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery(".examples").hide();
+                jQuery(".gene-example").show();
             }
             else if(jQuery(this).val() == 2) {
                 jQuery('#main-input').val("");
                 jQuery('#main-input').attr('placeholder', 'Enter query here');
                 jQuery('#main-input').prop('disabled', false);
                 jQuery("#fields-input").prop('disabled', false);
-                jQuery("#query-param-group").show();
+                jQuery("#size-input-button").show();
+                jQuery("label[for='size-input-button']").show();
+                jQuery(".examples").hide();
+                jQuery(".query-example").show();
             }
             else if(jQuery(this).val() == 3) {
                 jQuery('#main-input').val("");
-                jQuery('#fields-input').val("all");
+                jQuery('#fields-input').val("");
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery(".examples").hide();
+                jQuery(".filler").show();
             }
             else if(jQuery(this).val() == 4) {
                 jQuery('#main-input').val("");
-                jQuery('#fields-input').val("all");
+                jQuery('#fields-input').val("");
                 jQuery('#main-input').attr('placeholder', 'No input accepted');
                 jQuery('#main-input').prop('disabled', true);
                 jQuery("#fields-input").prop('disabled', true);
-                jQuery("#query-param-group").hide();
+                jQuery("#size-input-button").hide();
+                jQuery("label[for='size-input-button']").hide();
+                jQuery(".examples").hide();
+                jQuery(".filler").show();
             }
         }
     });

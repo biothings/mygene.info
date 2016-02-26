@@ -4,18 +4,19 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/jquery-ui.min.css" rel="stylesheet">
-    <link href="css/jquery-ui.theme.min.css" rel="stylesheet">
-    <link href="css/jquery.jsonview.css" rel="stylesheet">
-    <link href="css/front.css" rel="stylesheet">
-    <script src="js/jquery-1.12.0.min.js"></script>
-    <script src="js/jquery-ui.min.js"></script>
-    <script src="js/jquery.jsonview.js"></script>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link href="css/mygene.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/cupertino/jquery-ui.min.css">
+    <link href="css/mygene.css" rel="stylesheet">
+    <link href="https://cdn.rawgit.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+    <script src="https://cdn.rawgit.com/yesmeck/jquery-jsonview/master/dist/jquery.jsonview.min.js"></script>
     <script src="js/mygene_front.js"></script>
 </head>
 <body>
     <div class='top-navbar'>
-        <a href="http://mygene.info" class="logo-link"><img src='css/mygene.png' id='mygene-logo'></img></a>
+        <a href="http://mygene.info" class="logo-link"><img src='https://mygene.info/content/images/2014/Aug/logo-2.png' id='mygene-logo'></img></a>
         <p class="logo-text">MyGene.info</p>
         <div class='spacer'>
         </div>
@@ -26,12 +27,26 @@
                 <option value="3">Metadata</option>
                 <option value="4">Available Fields</option>
             </select>
-            <input type="text" id="main-input" placeholder="Enter comma separated gene ids here">
-            <button id="search-button" type="button" class='ui-button ui-corner-all ui-widget ui-state-default'>Search</button>
+            <input type="text" id="main-input" placeholder="Enter comma separated Entrez or Ensembl gene ids here">
+            <button id="search-button" type="button">Search</button>
         </div>
         <div class='navbar-row second'>
+            <p class='examples gene-example'><a href="javascript:;" data-example="1">1017</a><a href="javascript:;" data-example="2">ENSG00000123374</a><!--<a href="javascript:;" data-example="3"></a>--></p>
+            <p class='examples query-example'><a href="javascript:;" data-example="1">symbol:cdk?</a><a href="javascript:;" data-example="2">tumor AND suppressor</a><a href="javascript:;" data-example="3">uniprot:P24941</a><a href="http://docs.mygene.info/en/latest/doc/query_service.html#query-syntax" target="_blank" class="help-link">Help?</a></p>
+            <p class='examples filler'>&nbsp;</p>
+        </div>
+        <div class='navbar-row third'>
             <label for="fields-input">Return Fields:</label>
-            <input type="text" id="fields-input" value="all">
+            <input type="text" id="fields-input" placeholder="all">
+            <label for="size-input">Size:</label>
+            <select id="size-input">
+                <option value="1">1</option>
+                <option value="10" selected="selected">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="500">500</option>
+                <option value="1000">1000</option>
+            </select>
         </div>
     </div>
 
@@ -41,7 +56,7 @@
                 You can use this simple front-end to query the MyGene.info API.  The pull down menu to the left of the search bar has 4 different types of queries you can do: search by Gene ID(s), search by full text query, get the MyGene.info database metadata, and get the available fields in the MyGene.info database (the last two don't accept any input, just click search).
             </p>
             <p>
-                The Return Fields input allows you to specify which fields to return in your gene object.  If you are only interested in certain databases, you can choose to return only them.  The textbox autocompletes with all available fields.
+                The Return Fields input allows you to specify which fields to return in your variant object.  If you are only interested in certain databases, you can choose to return only them.  The textbox autocompletes with all available fields.
             </p>
             <p>
                 For more informations and docs, check out the <a href='http://mygene.info'>MyGene.info API landing page</a>.

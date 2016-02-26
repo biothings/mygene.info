@@ -89,18 +89,24 @@ class MainHandler(tornado.web.RequestHandler):
             self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
 
 
+class DemoHandler(tornado.web.RequestHandler):
+    def get(self):
+        with open('../docs/demo/index.html', 'r') as demo_file:
+            self.write(demo_file.read())
+
 APP_LIST = [
     (r"/", MainHandler),
     (r"/status", StatusCheckHandler),
     (r"/metadata", MetaDataHandler),
     (r"/v2a/metadata", MetaDataHandler),
     (r"/metadata/fields", FieldsHandler),
+    (r"/demo", DemoHandler),
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)
 APP_LIST += add_apps('v2', api_v2_app_list)
 APP_LIST += add_apps('v1', api_v1_app_list)
-APP_LIST += add_apps('demo', demo_app_list)
+#APP_LIST += add_apps('demo', demo_app_list)
 
 #APP_LIST += add_apps('v2a', api_v2_async_app_list)
 #APP_LIST += add_apps('auth', auth_app_list)

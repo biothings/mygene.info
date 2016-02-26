@@ -36,14 +36,20 @@ body {
     padding-left: 10px;
     padding-right: 10px;
     padding-bottom: 10px;
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.75em;
 }
 .introduction {
     width:600px;
 }
+.introduction p:first-child {
+    margin-top: 0px;
+}
 .results {
     display: none;
+}
+.results p:first-child {
+    margin-top: 0px;
 }
 #mygene-logo {
     width: 65px;
@@ -71,25 +77,29 @@ body {
     position: absolute;
     z-index: 0;
     top: 68px;
-    left: 12px;
+    left: 19px;
     float: left;
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
 }  
 #main-input {
     width: 500px;
     font-size: 0.8em;
     margin-right: 8px;
     margin-top: 5px;
+    float: left;
 }
 #fields-input {
     width: 300px;
     font-size: 0.8em;
+    float: left;
+    margin-left: 5px;
+    margin-top: 2px;
 }
 .ui-widget {
     font-size: 0.8em;
 }
-.ui-selectmenu-button {
-    width: 140px !important;
+#search-type-button {
+    width: 145px !important;
     float: left;
     margin-right: 8px;
 }
@@ -102,17 +112,38 @@ body {
     margin-left: 101px;
 }
 .first {
-    margin-top:15px;
+    margin-top: 8px;
 }
 .second {
     clear: left;
+    margin-top: 0px;
+    margin-left: 249px;
+}
+.third {
+    clear: left;
+}
+.query-example {
+    display: none;
+}
+.examples {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    font-size: 0.8em;
+}
+.examples a {
+    margin-left: 10px;
+}
+.filler {
+    display: none;
+    height: 15px;
 }
 .navbar-row label {
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.7em;
 }
 #search-button {
     height: 30px;
+    float: left;
 }
 .ui-autocomplete {
     max-height: 200px;
@@ -122,13 +153,45 @@ body {
 .json-panel {
     margin-bottom: 10px;
 }
+#total-text {
+    display: none;
+    margin-bottom: 9px;
+    margin-top: 0px;
+}
+#size-input {
+    display: none;
+    float: left;
+    font-size: 0.7em;
+}
+#size-input-button {
+    display: none;
+    float: left;
+    font-size: 0.7em;
+    width: 65px !important;
+    height: 21px;
+    margin-left: 5px;
+}
 .error {
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     font-size: 0.8em;
     color: red;
 }
 .executing {
     color: black;
     font-size: 0.8em;
-    font-family: Verdana, Geneva, sans-serif;
+    font-family: 'Open Sans', sans-serif;
+}
+label[for="size-input-button"] {
+    display: none;
+    float: left;
+    margin-top: 4px;
+    margin-left: 10px;
+}
+label[for="fields-input"] {
+    float: left;
+    margin-top: 4px;
+}
+.help-link {
+    color: #6cd02f;
+    text-decoration: none;
 }
