@@ -153,6 +153,13 @@ body {
 .json-panel {
     margin-bottom: 10px;
 }
+#collapse-json {
+    margin-left: 5px;
+}
+.json-panel a {
+    margin-left: 10px;
+    font-size: 0.9em;
+}
 #total-text {
     display: none;
     margin-bottom: 9px;

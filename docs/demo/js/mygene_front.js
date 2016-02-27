@@ -14,12 +14,17 @@ function endsWith(str, suffix) {
     return str.indexOf(suffix, str.length - suffix.length) !== -1;
 }
 
-function successHandler(data, textStatus, jqXHR) {
+function successHandler(data, textStatus, jqXHR, searchURL) {
     jQuery('.introduction').hide();
     jQuery('.json-panel button').remove();
     jQuery('.json-panel').remove();
     jQuery('.json-view').remove();
-    jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
+    if(searchURL) {
+        jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button><a href='" + searchURL + "' target='_blank'>" + searchURL + "</a></div><div class='json-view'></div>").show();
+    }
+    else { 
+        jQuery('.results').html("<div class='json-panel'><p id='total-text'></p><button id='expand-json'>Expand</button><button id='collapse-json'>Collapse</button></div><div class='json-view'></div>").show();
+    }
     jQuery('.json-panel button').button();
     jQuery('.json-view').JSONView(data); //, {collapsed: true});
     jQuery('.json-view').JSONView('expand');
@@ -129,33 +134,38 @@ jQuery(document).ready(function() {
         if(!(fieldsText)) {fieldsText = 'all';}
         if(endsWith(fieldsText, ', ')) {fieldsText = fieldsText.substring(0, fieldsText.length - 2);}
         if(endsWith(fieldsText, ',')) {fieldsText = fieldsText.substring(0, fieldsText.length - 1);}
+        var searchURL = '';
         if(searchType == 1) {
             // HGVS ID query
             errorHandler("Query executing . . .", "executing");
             if(queryText.indexOf(",") == -1) {
                 // get to gene endpoint
-                jQuery.get(endpointBase + '/gene/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText)).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
+                searchURL = endpointBase + '/gene/' + encodeURIComponent(queryText) + '?fields=' + encodeURIComponent(fieldsText);
+                jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve annotation " + jQuery('#main-input').val() + ".  ", "error");});
             }
             else {
                 // post to gene endpoint
-                jQuery.post(endpointBase + '/gene', {'ids': queryText, 'fields': fieldsText}).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
+                jQuery.post(endpointBase + '/gene', {'ids': queryText, 'fields': fieldsText}).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Error retrieving annotations.", "error");});
             }
         }
         else if(searchType == 2) {
             var querySize = jQuery('#size-input').val();
             // Full text query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize).done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
+            searchURL = endpointBase + '/query?q=' + encodeURIComponent(queryText) + '&fields=' + encodeURIComponent(fieldsText) + '&size=' + querySize;
+            jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve results for query " + jQuery('#main-input').val() + ".", "error");});
         }
         else if(searchType == 3) {
             // metadata query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/metadata').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyGene database metadata.  API error.", "error");});
+            searchURL = endpointBase + '/metadata';
+            jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve MyGene database metadata.  API error.", "error");});
         }
         else if(searchType == 4) {
             // available fields query
             errorHandler("Query executing . . .", "executing");
-            jQuery.get(endpointBase + '/metadata/fields').done(successHandler).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
+            searchURL = endpointBase + '/metadata/fields';
+            jQuery.get(searchURL).done(function(data, textStatus, jqXHR) {successHandler(data, textStatus, jqXHR, searchURL);}).fail(function(jqXHR, statusText, errorThrown) {errorHandler("Couldn't retrieve available fields.  API error.", "error");});
         }
     });
     // Select menu is a widget
