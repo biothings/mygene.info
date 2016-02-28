@@ -100,7 +100,7 @@ APP_LIST = [
     (r"/metadata", MetaDataHandler),
     (r"/v2a/metadata", MetaDataHandler),
     (r"/metadata/fields", FieldsHandler),
-    (r"/demo", DemoHandler),
+    (r"/demo/?$", DemoHandler),
 ]
 
 APP_LIST += add_apps('', api_v2_app_list)
