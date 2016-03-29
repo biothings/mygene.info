@@ -14,6 +14,7 @@ import json
 import re
 import time
 import copy
+import requests
 
 # from pyes import ES
 # from pyes.exceptions import NotFoundException, ElasticSearchException
@@ -339,8 +340,13 @@ class ESQuery:
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         include_tax_tree = kwargs.pop('include_tax_tree', False)
         if include_tax_tree:
-            tq = TaxonomyQuery()
-            kwargs['species'] = tq.get_expanded_species_li(kwargs['species'])
+            headers = {'content-type': 'application/x-www-form-urlencoded',
+                      'user-agent': "Python-requests_mygene.info/%s (gzip)" % requests.__version__}
+            res = requests.post('http://s.biothings.io/v1/species?ids=' + 
+                                ','.join(['{}'.format(sid) for sid in kwargs['species']]) +
+                                '&expand_species=true', headers=headers)
+            if res.status_code == requests.codes.ok:
+                kwargs['species'] = res.json()
 
         #this parameter is to add species filter without changing facet counts.
         kwargs['species_facet_filter'] = self._cleaned_species(kwargs.get('species_facet_filter', None),
