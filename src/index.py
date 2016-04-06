@@ -58,11 +58,11 @@ if options.debug:
 
 
 def _get_rev():
-    '''return current mercurial rev number.
+    '''return current git rev number.
         e.g.
-           72:a8ef9f842af7
+           9d9811e21a878bed4c8d7de5ab20bf0baa5aa87f
     '''
-    pipe = subprocess.Popen(["hg", "id", "-n", "-i"],
+    pipe = subprocess.Popen(["git", "rev-parse", "HEAD"],
                             stdout=subprocess.PIPE)
     output = pipe.stdout.read().strip()
     if PY3:

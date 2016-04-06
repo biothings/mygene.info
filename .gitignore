@@ -1,1 +1,4 @@
 __pycache__
+*.swp
+# ignore config file being actually used to force setup during install
+src/config.py

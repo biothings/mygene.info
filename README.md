@@ -6,12 +6,12 @@ This project is a web front-end of next generation (v2) of MyGene.info (Gene Ann
 #### 1. Prerequisites
 
     python (>=2.7)
-    mercurial
+    git 
 
    In Ubuntu/Debian system, you can install all prerequisites by
 
 
-    sudo apt-get install python-dev python-setuptools mercurial
+    sudo apt-get install python-dev python-setuptools git 
 
 
 
