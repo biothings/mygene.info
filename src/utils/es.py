@@ -16,11 +16,6 @@ import time
 import copy
 import requests
 
-# from pyes import ES
-# from pyes.exceptions import NotFoundException, ElasticSearchException
-# from pyes.utils import make_path
-# from pyes.query import MatchAllQuery, StringQuery
-
 from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL,
                     ES_INDEX_TYPE)
 from utils.common import (ask, is_int, is_str, is_seq, timesofar,

@@ -1,4 +1,4 @@
-ES_HOST = 'localhost:9500'
+ES_HOST = 'su07:9200'
 #Can specify a EC2 host using name tag:
 #ES_HOST = 'ec2:us-west-2:ES_http'
 if ES_HOST.startswith('ec2:'):
@@ -12,35 +12,34 @@ if ES_HOST.startswith('ec2:'):
     else:
         raise ValueError('EC2 instance "{}" is not running'.format(ES_HOST[4:]))
 
-ES_INDEX_NAME_TIER1 = 'genedoc_mygene'
-ES_INDEX_NAME_ALL = 'genedoc_mygene_allspecies'
+ES_INDEX_NAME_TIER1 = None #'genedoc_mygene_current'
+ES_INDEX_NAME_ALL = None #'genedoc_mygene_allspecies_current'
 ES_INDEX_TYPE = 'gene'
 
 if ES_HOST and ES_INDEX_NAME_TIER1 is None and ES_INDEX_NAME_ALL is None:
-    def get_lastest_indices():
-        from pyes import ES
+    
+    import logging
+
+    def get_aliases_indices():
+        from elasticsearch import Elasticsearch
         import re
-        conn = ES(ES_HOST)
-        index_li = conn.get_indices().keys()
+        conn = Elasticsearch(ES_HOST)
+        aliases = conn.indices.get_aliases()
         latest_indices = []
         for prefix in ('genedoc_mygene', 'genedoc_mygene_allspecies'):
-            pat = prefix + '_(\d{8})_\w{8}'
-            _li = []
-            for index in index_li:
-                mat = re.match(pat, index)
-                if mat:
-                    _li.append((mat.group(1), index))
-            latest_indices.append(sorted(_li)[-1])
-        if latest_indices[0][0] != latest_indices[1][0]:
-            print "Warning: unmatched timestamp:"
-            print '\n'.join([x[1] for x in latest_indices])
-        latest_indices = [x[1] for x in latest_indices]
+            pat = prefix + '_current_(\d+)'
+            for index in aliases.keys():
+                if aliases[index].get("aliases") and re.match(pat,index):
+                    latest_indices.append(index)
+                    # found, next one
+                    break
+
         return latest_indices
 
-    ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL = get_lastest_indices()
+    ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL = get_aliases_indices()
 
 
 #relevant for running in prod
 GA_ACCOUNT = 'UA-xxxxxxxx-x'
 RUN_IN_PROD = False   # set to True in prod
-INCLUDE_DOCS = True   # if True, include the links to mygene.info docs
+INCLUDE_DOCS = False# if True, include the links to mygene.info docs
