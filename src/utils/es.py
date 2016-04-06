@@ -459,9 +459,13 @@ class ESQuery:
             else:
                 # normal text query
                 _q = qbdr.build(q, mode=1)
-        except MGQueryError as err:
+        except MGQueryError as e:
+            if PY3:
+                msg = str(e)
+            else:
+                msg = e.message
             return {'success': False,
-                    'error': err.message}
+                    'error': msg}
 
         if _q:
             if options.rawquery:
