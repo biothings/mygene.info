@@ -18,7 +18,7 @@ This project is a web front-end of next generation (v2) of MyGene.info (Gene Ann
 #### 2. Clone this repo:
 
 
-    hg clone ssh://hg@bitbucket.org/sulab/mygene.info
+    git clone https://github.com/SuLab/mygene.info.git
 
 
 #### 3. Setup a Python "virtualenv" (optional, but highly recommended):
