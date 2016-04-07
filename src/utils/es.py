@@ -15,6 +15,7 @@ import re
 import time
 import copy
 import requests
+import logging
 
 from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL,
                     ES_INDEX_TYPE)
@@ -206,8 +207,26 @@ class ESQuery:
 
             This method is used for self.query method.
         '''
+        if 'aggregations' in res:
+            # need to normalize back to what "facets" used to return
+            # (mostly key renaming + total computation)
+            res["facets"] = res.pop("aggregations")
+            for facet in res["facets"]:
+                # restuls always coming from terms aggregations
+                res["facets"][facet]["_type"] = "terms"
+                res["facets"][facet]["terms"] = res["facets"][facet].pop("buckets")
+                res["facets"][facet]["other"] = res["facets"][facet].pop("sum_other_doc_count")
+                res["facets"][facet]["missing"] = res["facets"][facet].pop("doc_count_error_upper_bound")
+                count = 0
+                for term in res["facets"][facet]["terms"]:
+                    # modif in-place
+                    term["count"] = term.pop("doc_count")
+                    term["term"] = term.pop("key")
+                    count += term["count"]
+                res["facets"][facet]["total"] = count
+           
         _res = res['hits']
-        for attr in ['took', 'facets', 'aggregations', '_scroll_id']:
+        for attr in ['took', 'facets', '_scroll_id']:
             if attr in res:
                 _res[attr] = res[attr]
         _res['hits'] = [self._get_genedoc_2(hit) for hit in _res['hits']]
@@ -431,6 +450,7 @@ class ESQuery:
         _q = None
         scroll_options = {}
         if options.fetch_all:
+            # TODO: ES2 compatible ?
             scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
@@ -470,7 +490,8 @@ class ESQuery:
                 res = self._search(_q, species=kwargs['species'], scroll_options=scroll_options)
             except Exception as e:
                 if PY3:
-                    msg = str(e)
+                    # TODO: critical/sensitive data in exception message ? 
+                    msg = str(e.info)
                 else:
                     msg = e.message
                 return {'success': False, 'error': msg}
@@ -638,7 +659,7 @@ class ESQueryBuilder():
         self._parse_sort_option(self.options)
         self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
-                                 'sort', 'explain', 'version', 'facets']
+                                 'sort', 'explain', 'version', 'aggs']
         for key in set(self.options) - set(self._allowed_options):
             del self.options[key]
         # convert "fields" option to "_source"
@@ -672,12 +693,13 @@ class ESQueryBuilder():
         return options
 
     def _parse_facets_option(self, options):
-        facets = options.get('facets', None)
-        if facets:
-            _facets = {}
-            for field in facets.split(','):
-                _facets[field] = {"terms": {"field": field}}
-            options["facets"] = _facets
+        aggs = options.get('aggs', None)
+        if aggs:
+            _aggs = {}
+            for field in aggs.split(','):
+                # this is always "terms" aggregations
+                _aggs[field] = {"terms": {"field": field}}
+            options["aggs"] = _aggs
         return options
 
     def dis_max_query(self, q):

@@ -42,9 +42,9 @@ except ImportError:
 
 host = os.getenv("MG_HOST")
 if not host:
-    #host = 'http://localhost:8000'
+    host = 'http://localhost:8000'
     #host = 'http://dev.mygene.info:8000'
-    host = 'http://mygene.info'
+    #host = 'http://mygene.info'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -299,6 +299,14 @@ def test_query_size():
     #print [x['_id'] for x in res1['hits']]
     #eq_(res['hits'][0], res1['hits'][10])
     assert res['hits'][0] in res1['hits']
+
+    # API doc says cap 1000
+    res = json_ok(get_ok(api + '/query?q=*&size=1000'))
+    eq_(len(res['hits']), 1000)
+    res = json_ok(get_ok(api + '/query?q=*&size=1001'))
+    eq_(len(res['hits']), 1000)
+    res = json_ok(get_ok(api + '/query?q=*&size=2000'))
+    eq_(len(res['hits']), 1000)
 
     #assert 1==0
     res = json_ok(get_ok(api + '/query?q=cdk?&size=1a'), checkerror=False)  # invalid size parameter
