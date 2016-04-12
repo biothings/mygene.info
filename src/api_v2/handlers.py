@@ -7,7 +7,7 @@ from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHa
 from biothings.settings import BiothingSettings
 from utils.es import ESQuery
 from utils.taxonomy import TaxonomyQuery
-from utils.common import split_ids
+from biothings.utils.common import split_ids
 import os, logging
 
 mygene_settings = BiothingSettings()

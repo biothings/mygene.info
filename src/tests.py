@@ -327,7 +327,8 @@ def test_gene():
     res = json_ok(get_ok(api + '/gene/1017?fields=symbol,name,entrezgene'))
     eq_(set(res), set(['_id', 'symbol', 'name', 'entrezgene']))
     res = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF'))
-    eq_(set(res), set(['_id', 'symbol', 'go.MF']))
+    eq_(set(res), set(['_id', 'symbol', 'go']))
+    assert "MF" in res["go"]
     #eq_(res['go'].keys(), ['MF'])
 
     get_404(api + '/gene')
@@ -354,7 +355,8 @@ def test_gene_post():
     res = json_ok(post_ok(api + '/gene', {'ids': '1017,1018', 'filter': 'symbol,go.MF'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'symbol', 'go.MF']))
+        eq_(set(_g), set(['_id', 'query', 'symbol', 'go']))
+        assert "MF" in _g["go"]
 
 
 def test_status():
@@ -499,3 +501,27 @@ def test_fetch_all():
     res2 = json_ok(get_ok(api + '/query?scroll_id=' + res['_scroll_id']))
     assert 'hits' in res2
     ok_(len(res2['hits']) >= 2)
+
+def test_dotfield():
+    # /query service
+    resdefault = json_ok(get_ok(api + '/query?q=cdk&fields=refseq.rna')) # default dotfield=0
+    resfalse = json_ok(get_ok(api + '/query?q=cdk&fields=refseq.rna&dotfield=false')) # force no dotfield
+    restrue = json_ok(get_ok(api + '/query?q=cdk&fields=refseq.rna&dotfield=true')) # force dotfield
+    # check defaults and bool params
+    eq_(resdefault["hits"],resfalse["hits"])
+    # check struct
+    assert "refseq.rna" in restrue["hits"][0].keys()
+    assert "refseq" in resdefault["hits"][0].keys()
+    assert "rna" in resdefault["hits"][0]["refseq"].keys()
+# TODO: no fields but dotfield => dotfield results
+# TODO: fields with dot but no dotfield => dotfield results
+
+    # /gene service
+    resdefault = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF'))
+    restrue = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF&dotfield=true'))
+    resfalse = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF&dotfield=false'))
+    eq_(resdefault["hits"],resfalse["hits"])
+    assert "go.MF" in restrue["hits"][0].keys()
+    assert "go" in resdefault["hits"][0].keys()
+    assert "MF" in resdefault["hits"][0]["go"].keys()
+    

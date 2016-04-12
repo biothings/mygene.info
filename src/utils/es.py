@@ -15,8 +15,7 @@ import logging
 
 from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME,
                     ES_DOC_TYPE)
-from utils.common import (ask, is_int, is_str, is_seq, timesofar,
-                          safe_genome_pos, dotdict, taxid_d)
+from biothings.utils.common import (ask, is_int, is_str, is_seq, timesofar, dotdict)
 from utils.dotfield import parse_dot_fields
 from utils.taxonomy import TaxonomyQuery
 from elasticsearch import Elasticsearch
@@ -50,6 +49,29 @@ TAXONOMY = {
     "pig": 9823
 }
 
+TAXID = {'human': 9606,
+        'mouse': 10090,
+        'rat':   10116,
+        'fruitfly': 7227,
+        'nematode':   6239,
+        'zebrafish':   7955,
+        'thale-cress':   3702,
+        'frog':   8364,
+        'pig': 9823,
+}
+
+def safe_genome_pos(s):
+    '''
+       safe_genome_pos(1000) = 1000
+       safe_genome_pos('1000') = 1000
+       safe_genome_pos('10,000') = 100000
+    '''
+    if isinstance(s, int):
+        return s
+    elif isinstance(s, str):
+        return int(s.replace(',', ''))
+    else:
+        raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
 
 
 
@@ -60,7 +82,7 @@ class ESQuery(ESQuery):
         super( ESQuery, self ).__init__()
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
         self._default_species = [9606, 10090, 10116] # human, mouse, rat
-        self._tier_1_species = set(taxid_d.values())
+        self._tier_1_species = set(TAXID.values())
 
     def _search(self, q, species='all', scroll_options={}):
         self._set_index(species)
@@ -87,7 +109,7 @@ class ESQuery(ESQuery):
         else:
             self._index = ES_INDEX_NAME_TIER1
 
-    def _get_genedoc(self, hit, dotfield=True):
+    def _get_genedoc(self, hit, dotfield=False):
         doc = hit.get('_source', hit.get('fields', {}))
         doc.setdefault('_id', hit['_id'])
         if '_version' in hit:
@@ -96,7 +118,7 @@ class ESQuery(ESQuery):
             doc = parse_dot_fields(doc)
         return doc
 
-    def _get_genedoc_2(self, hit, dotfield=True, fields=None):
+    def _get_genedoc_2(self, hit, dotfield=False, fields=None):
         """
         use ES _source to support fields/filter argument,
         by default ES response is not dotted.
@@ -109,7 +131,7 @@ class ESQuery(ESQuery):
             doc = compose_dot_fields(doc, fields)
         return doc
 
-    def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=True):
+    def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=False):
         '''res is the dictionary returned from a query.'''
         if 'error' in res:
             return error
@@ -124,7 +146,7 @@ class ESQuery(ESQuery):
             return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
 
     def _cleaned_res_2(self, res, empty=[], error={'error': True},
-                       single_hit=False, dotfield=True, fields=None):
+                       single_hit=False, dotfield=False, fields=None):
         if 'error' in res:
             return error
 
@@ -140,7 +162,7 @@ class ESQuery(ESQuery):
                                         dotfield=dotfield, fields=fields)
                     for hit in hits['hits']]
 
-    def _cleaned_res_3(self, res):
+    def _cleaned_res_3(self, res, dotfield=False, fields=None):
         ''' res is the dictionary returned from a query.
             do some reformating of raw ES results before returning.
 
@@ -168,7 +190,7 @@ class ESQuery(ESQuery):
         for attr in ['took', 'facets', '_scroll_id']:
             if attr in res:
                 _res[attr] = res[attr]
-        _res['hits'] = [self._get_genedoc_2(hit) for hit in _res['hits']]
+        _res['hits'] = [self._get_genedoc_2(hit,dotfield,fields) for hit in _res['hits']]
         return _res
 
     # keepit (?)
@@ -197,8 +219,8 @@ class ESQuery(ESQuery):
         for s in species:
             if is_int(s):
                 _species.append(int(s))
-            elif s in taxid_d:
-                _species.append(taxid_d[s])
+            elif s in TAXID:
+                _species.append(TAXID[s])
         return _species
 
     # keepit (?)
@@ -242,23 +264,23 @@ class ESQuery(ESQuery):
     # keepit but refactor
     def _get_cleaned_query_options(self, kwargs):
         """common helper for processing fields, kwargs and other options passed to ESQueryBuilder."""
+        #TODO: kwargs is used to fill options dict, some keys are popped, not all, then
+        # options.kwargs = kwargs. from caller perspective, kwargs changes, not the same in options.kwargs, which is weird.
         options = dotdict()
         options.raw = kwargs.pop('raw', False)
         options.rawquery = kwargs.pop('rawquery', False)
         #if dofield is false, returned fields contains dot notation will be restored as an object.
-        options.dotfield = kwargs.pop('dotfield', True) not in [False, 'false']
+        options.dotfield = kwargs.pop('dotfield', False) not in [False, 'false']
         options.fetch_all = kwargs.pop('fetch_all', False)
         scopes = kwargs.pop('scopes', None)
         if scopes:
             options.scopes = self._cleaned_scopes(scopes)
         kwargs["fields"] = self._cleaned_fields(kwargs.get("fields"))
 
-        logging.error("kwargs: %s" % kwargs)
         #if no dotfield in "fields", set dotfield always be True, i.e., no need to parse dotfield
         if not options.dotfield:
             _found_dotfield = False
             if kwargs.get('fields'):
-                logging.error("onela")
                 for _f in kwargs['fields']:
                     if _f.find('.') != -1:
                         _found_dotfield = True
@@ -266,7 +288,7 @@ class ESQuery(ESQuery):
             if not _found_dotfield:
                 options.dotfield = True
 
-        # TODO: something is wrong is...
+        # TODO: something is wrong here...
         #options = super( ESQuery, self )._get_cleaned_query_options(kwargs)
 
         #this species parameter is added to the query, thus will change facet counts.
@@ -286,7 +308,6 @@ class ESQuery(ESQuery):
                                                                default_to_none=True)
 
         options.kwargs = kwargs
-        logging.error("options: %s" % options)
         return options
 
     def get_gene(self, geneid, fields='all', **kwargs):
@@ -396,21 +417,19 @@ class ESQuery(ESQuery):
                     'error': msg}
 
         if _q:
-            logging.error("q: %s" % json.dumps(_q))
             if options.rawquery:
-                logging.error("onela")
                 return _q
 
             try:
                 res = self._search(_q, species=kwargs['species'], scroll_options=scroll_options)
-                #logging.error("res: %s" % res)
             except Exception as e:
                 # TODO: critical/sensitive data in exception message ? 
                 msg = str(e.info)
                 return {'success': False, 'error': msg}
 
             if not options.raw:
-                res = self._cleaned_res_3(res)
+                res = self._cleaned_res_3(res,options.get("dotfield"),kwargs.get("fields"))
+                ###res = self._cleaned_res2(res,options)
                 #_res = res['hits']
                 #_res['took'] = res['took']
                 #if "facets" in res:
@@ -558,10 +577,11 @@ class ESQueryBuilder():
         # missing filter
         missingfilter = self.options.pop('missing', None)
         self.missingfilter = missingfilter.split(',') if missingfilter else None
+
         self._parse_sort_option(self.options)
         self._parse_facets_option(self.options)
         self._allowed_options = ['fields', 'start', 'from', 'size',
-                                 'sort', 'explain', 'version', 'aggs']
+                                 'sort', 'explain', 'version', 'aggs','dotfield']
         for key in set(self.options) - set(self._allowed_options):
             del self.options[key]
         # convert "fields" option to "_source"

@@ -1,0 +1,3 @@
+- dotfield parameter is False by default. This means result's structure is full-depth dictionary by default.
+  Eg. fields=refseq.rna parameter will generate the following structure: ["refseq"]["rna"] ...  by default
+      if dotfield=true is also passed, then the following structure will be used: ["refseq.rna"]
