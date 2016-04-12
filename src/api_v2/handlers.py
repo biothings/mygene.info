@@ -2,15 +2,33 @@ import re
 import json
 
 from tornado.web import HTTPError
-
-from helper import BaseHandler
+from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, \
+                                       FieldsHandler
+from biothings.settings import BiothingSettings
 from utils.es import ESQuery
 from utils.taxonomy import TaxonomyQuery
 from utils.common import split_ids
-import os
+import os, logging
+
+mygene_settings = BiothingSettings()
+
+class MyGeneMetaDataHandler(MetaDataHandler):
+    '''Return db metadata in json string.'''
+    disable_caching = True
+    esq = ESQuery()
+
+    def get(self):
+        metadata = self.esq.metadata()
+        metadata["app_revision"] = os.environ["MYGENE_REVISION"]
+        self.return_json(metadata, indent=2)
+
+class MyGeneFieldsHandler(FieldsHandler):
+    ''' This class is for the /metadata/fields endpoint. '''
+    esq = ESQuery()
 
 
-class GeneHandler(BaseHandler):
+
+class GeneHandler(BiothingHandler):
     esq = ESQuery()
 
     def get(self, geneid=None):
@@ -60,7 +78,7 @@ class GeneHandler(BaseHandler):
                              'value': len(ids) if ids else 0})
 
 
-class QueryHandler(BaseHandler):
+class QueryHandler(BiothingHandler):
     esq = ESQuery()
 
     def get(self):
@@ -146,7 +164,7 @@ class QueryHandler(BaseHandler):
                              'value': len(q) if q else 0})
 
 
-class SpeciesHandler(BaseHandler):
+class SpeciesHandler(BiothingHandler):
     tq = TaxonomyQuery()
 
     def get(self, taxid):
@@ -160,57 +178,11 @@ class SpeciesHandler(BaseHandler):
             raise HTTPError(404)
 
 
-class MetaDataHandler(BaseHandler):
-    '''Return db metadata in json string.'''
-    disable_caching = True
-
-    def get(self):
-        esq = ESQuery()
-        metadata = esq.metadata()
-        metadata["app_revision"] = os.environ["MYGENE_REVISION"]
-        self.return_json(metadata, indent=2)
-
-
-class FieldsHandler(BaseHandler):
-    esq = ESQuery()
-
-    def get(self):
-        #notes = json.load(open(config.FIELD_NOTES_PATH, 'r'))
-        es_mapping = self.esq.query_fields()
-        kwargs = self.get_query_params()
-
-        def get_indexed_properties_in_dict(d, prefix):
-            r = {}
-            for (k, v) in d.items():
-                r[prefix + '.' + k] = {}
-                r[prefix + '.' + k]['indexed'] = False
-                if 'properties' not in v:
-                    r[prefix + '.' + k]['type'] = v['type']
-                    if ('index' not in v) or ('index' in v and v['index'] != 'no'):
-                        # indexed field
-                        r[prefix + '.' + k]['indexed'] = True
-                else:
-                    r[prefix + '.' + k]['type'] = 'object'
-                    r.update(get_indexed_properties_in_dict(v['properties'], prefix + '.' + k))
-            return r
-
-        r = {}
-        search = kwargs.pop('search', None)
-        prefix = kwargs.pop('prefix', None)
-        for (k, v) in get_indexed_properties_in_dict(es_mapping, '').items():
-            k1 = k.lstrip('.')
-            if (search and search in k1) or (prefix and k1.startswith(prefix)) or (not search and not prefix):
-                r[k1] = v
-                #if k1 in notes:
-                #    r[k1]['notes'] = notes[k1]
-        self.return_json(r, indent=2)
-
-
 APP_LIST = [
     (r"/gene/([\w\-\.]+)/?", GeneHandler),   # for gene get request
     (r"/gene/?$", GeneHandler),              # for gene post request
     (r"/query/?", QueryHandler),
     (r"/species/(\d+)/?", SpeciesHandler),
-    (r"/metadata", MetaDataHandler),
+    (r"/metadata", MyGeneMetaDataHandler),
     (r"/metadata/fields", FieldsHandler),
 ]

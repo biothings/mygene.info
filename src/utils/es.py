@@ -5,10 +5,6 @@
 #http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
 #http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
 import sys
-if sys.version > '3':
-    PY3 = True
-else:
-    PY3 = False
 
 import json
 import re
@@ -17,8 +13,8 @@ import copy
 import requests
 import logging
 
-from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME_ALL,
-                    ES_INDEX_TYPE)
+from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME,
+                    ES_DOC_TYPE)
 from utils.common import (ask, is_int, is_str, is_seq, timesofar,
                           safe_genome_pos, dotdict, taxid_d)
 from utils.dotfield import parse_dot_fields
@@ -26,6 +22,9 @@ from utils.taxonomy import TaxonomyQuery
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 from src.utils.dotfield import compose_dot_fields_by_fields as compose_dot_fields
+
+
+
 
 
 GENOME_ASSEMBLY = {
@@ -52,99 +51,39 @@ TAXONOMY = {
 }
 
 
-def get_es(es_host=None):
-    es_host = es_host or ES_HOST
-    # create es connection
-    # conn = ES(es_host, default_indices=[ES_INDEX_NAME_ALL],
-    #           timeout=120.0, max_retries=10)
-    conn = Elasticsearch(es_host)
-    return conn
 
 
-es = get_es()
-dummy_model = lambda es, res: res
-# set it to dummy_model, so that
-# the query will return the raw object.
-es.model = dummy_model
+from biothings.www.api.es import ESQuery, QueryError
 
-
-# seems not working, and not used
-def get_lastest_indices(es_host=None):
-    # conn = get_es(es_host)
-    conn = Elasticsearch(es_host)
-    # get all indices from es connection
-    index_li = list(conn.indices.get('*').keys())
-
-    latest_indices = []
-    for prefix in ('genedoc_mygene', 'genedoc_mygene_allspecies'):
-        pat = prefix + '_(\d{8})_\w{8}'
-        _li = []
-        for index in index_li:
-            mat = re.match(pat, index)
-            if mat:
-                _li.append((mat.group(1), index))
-        latest_indices.append(sorted(_li)[-1])
-    if latest_indices[0][0] != latest_indices[1][0]:
-        print("Warning: unmatched timestamp:")
-        print('\n'.join([x[1] for x in latest_indices]))
-    latest_indices = [x[1] for x in latest_indices]
-    return latest_indices
-
-
-class MGQueryError(Exception):
-    pass
-
-
-class MGScrollSetupError(Exception):
-    pass
-
-
-class ESQuery:
+class ESQuery(ESQuery):
     def __init__(self):
-        # self.conn0 = es0
-        self.conn = es
-        # self.conn.model = dummy_model
-        # self._index = 'genedoc_mygene'
-        # self._index = 'genedoc_mygene_allspecies'
-        # self._doc_type = 'gene'
-        self._index = ES_INDEX_NAME_ALL
-        self._doc_type = ES_INDEX_TYPE
-
-        # Scroll setup
-        self._scroll_time = '1m'
-        self._total_scroll_size = 1000
-        if self._total_scroll_size % self.get_number_of_shards() == 0:
-            self._scroll_size = int(self._total_scroll_size / self.get_number_of_shards())
-        else:
-            raise MGScrollSetupError("_total_scroll_size of {} can't be ".format(self._total_scroll_size) +
-                                     "divided evenly among {} shards.".format(self.get_number_of_shards()))
-
-        # self._doc_type = 'gene_sample'
+        super( ESQuery, self ).__init__()
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
-        # self._default_species = [9606, 10090, 10116, 7227, 6239]  # human, mouse, rat, fruitfly, celegan
-        self._default_species = [9606, 10090, 10116]               # human, mouse, rat
+        self._default_species = [9606, 10090, 10116] # human, mouse, rat
         self._tier_1_species = set(taxid_d.values())
 
     def _search(self, q, species='all', scroll_options={}):
         self._set_index(species)
         # body = '{"query" : {"term" : { "_all" : ' + q + ' }}}'
-        res = self.conn.search(index=self._index, doc_type=self._doc_type,
+        #logging.error("in search q: %s -- index: %s -- doc_type: %s" % (json.dumps(q),self._index,self._doc_type))
+        res = self._es.search(index=self._index, doc_type=self._doc_type,
                                body=q, **scroll_options)
-        self._index = ES_INDEX_NAME_ALL     # reset self._index
+        #logging.error("in search: %s" % res)
+        self._index = ES_INDEX_NAME # reset self._index
         return res
 
     def _msearch(self, q, species='all'):
         self._set_index(species)
         # path = make_path(self._index, self._doc_type, '_msearch')
-        res = self.conn.msearch(index=self._index, doc_type=self._doc_type,
+        res = self._es.msearch(index=self._index, doc_type=self._doc_type,
                                 body=q)
-        self._index = ES_INDEX_NAME_ALL     # reset self._index
+        self._index = ES_INDEX_NAME     # reset self._index
         return res
 
     def _set_index(self, species):
         '''set proper index for given species parameter.'''
         if species == 'all' or len(set(species)-self._tier_1_species) > 0:
-            self._index = ES_INDEX_NAME_ALL
+            self._index = ES_INDEX_NAME
         else:
             self._index = ES_INDEX_NAME_TIER1
 
@@ -224,7 +163,7 @@ class ESQuery:
                     term["term"] = term.pop("key")
                     count += term["count"]
                 res["facets"][facet]["total"] = count
-           
+
         _res = res['hits']
         for attr in ['took', 'facets', '_scroll_id']:
             if attr in res:
@@ -232,37 +171,7 @@ class ESQuery:
         _res['hits'] = [self._get_genedoc_2(hit) for hit in _res['hits']]
         return _res
 
-    def _cleaned_scopes(self, scopes):
-        '''return a cleaned scopes parameter.
-            should be either a string or a list of scope fields.
-        '''
-        if scopes:
-            if is_str(scopes):
-                scopes = [x.strip() for x in scopes.split(',')]
-            if is_seq(scopes):
-                scopes = [x for x in scopes if x]
-                if len(scopes) == 1:
-                    scopes = scopes[0]
-            else:
-                scopes = None
-        else:
-            scopes = None
-        return scopes
-
-    def _cleaned_fields(self, fields):
-        '''return a cleaned fields parameter.
-            should be either None (return all fields) or a list fields.
-        '''
-        if fields:
-            if is_str(fields):
-                if fields.lower() == 'all':
-                    fields = None     # all fields will be returned.
-                else:
-                    fields = [x.strip() for x in fields.split(',')]
-        else:
-            fields = self._default_fields
-        return fields
-
+    # keepit (?)
     def _cleaned_species(self, species, default_to_none=False):
         '''return a cleaned species parameter.
            should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
@@ -292,6 +201,7 @@ class ESQuery:
                 _species.append(taxid_d[s])
         return _species
 
+    # keepit (?)
     def _parse_interval_query(self, query):
         '''Check if the input query string matches interval search regex,
            if yes, return a dictionary with three key-value pairs:
@@ -314,10 +224,12 @@ class ESQuery:
 
                 return d
 
+    # keepit (?)
     def _is_wildcard_query(self, query):
         '''Return True if input query is a wildcard query.'''
         return query.find('*') != -1 or query.find('?') != -1
 
+    # keepit (?)
     def _is_raw_string_query(self, query):
         '''Return True if input query is a wildchar/fielded/boolean query.'''
         for v in [':', '~', ' AND ', ' OR ', 'NOT ']:
@@ -327,7 +239,8 @@ class ESQuery:
             return True
         return False
 
-    def _get_cleaned_query_options(self, fields, kwargs):
+    # keepit but refactor
+    def _get_cleaned_query_options(self, kwargs):
         """common helper for processing fields, kwargs and other options passed to ESQueryBuilder."""
         options = dotdict()
         options.raw = kwargs.pop('raw', False)
@@ -338,17 +251,23 @@ class ESQuery:
         scopes = kwargs.pop('scopes', None)
         if scopes:
             options.scopes = self._cleaned_scopes(scopes)
-        kwargs["fields"] = self._cleaned_fields(fields)
+        kwargs["fields"] = self._cleaned_fields(kwargs.get("fields"))
+
+        logging.error("kwargs: %s" % kwargs)
         #if no dotfield in "fields", set dotfield always be True, i.e., no need to parse dotfield
         if not options.dotfield:
             _found_dotfield = False
-            if kwargs['fields']:
+            if kwargs.get('fields'):
+                logging.error("onela")
                 for _f in kwargs['fields']:
                     if _f.find('.') != -1:
                         _found_dotfield = True
                         break
             if not _found_dotfield:
                 options.dotfield = True
+
+        # TODO: something is wrong is...
+        #options = super( ESQuery, self )._get_cleaned_query_options(kwargs)
 
         #this species parameter is added to the query, thus will change facet counts.
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
@@ -367,20 +286,14 @@ class ESQuery:
                                                                default_to_none=True)
 
         options.kwargs = kwargs
+        logging.error("options: %s" % options)
         return options
-
-    def get_number_of_shards(self):
-        r = self.conn.indices.get_settings(self._index)
-        n_shards = r[list(r.keys())[0]]['settings']['index']['number_of_shards']
-        n_shards = int(n_shards)
-        return n_shards
 
     def get_gene(self, geneid, fields='all', **kwargs):
         kwargs['fields'] = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
-        #res = self.conn0.get(self._index, self._doc_type, geneid, **kwargs)
         try:
-            res = self.conn.get(index=self._index, doc_type=self._doc_type,
+            res = self._es.get(index=self._index, doc_type=self._doc_type,
                                 id=geneid, **kwargs)
         except NotFoundError:
             return None
@@ -389,12 +302,13 @@ class ESQuery:
     def mget_gene(self, geneid_list, fields=None, **kwargs):
         kwargs['fields'] = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
-        res = self.conn.mget(geneid_list, self._index, self._doc_type, **kwargs)
+        res = self._es.mget(geneid_list, self._index, self._doc_type, **kwargs)
         return res if raw else [self._get_genedoc(doc) for doc in res]
 
     def get_gene2(self, geneid, fields='all', **kwargs):
         '''for /gene/<geneid>'''
-        options = self._get_cleaned_query_options(fields, kwargs)
+        kwargs["fields"] = fields
+        options = self._get_cleaned_query_options(kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
         _q = qbdr.build_id_query(geneid, options.scopes)
         if options.rawquery:
@@ -408,11 +322,12 @@ class ESQuery:
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
         '''for /query post request'''
-        options = self._get_cleaned_query_options(fields, kwargs)
+        kwargs["fields"] = fields
+        options = self._get_cleaned_query_options(kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
         try:
             _q = qbdr.build_multiple_id_query(geneid_list, options.scopes)
-        except MGQueryError as err:
+        except QueryError as err:
             return {'success': False,
                     'error': err.message}
         if options.rawquery:
@@ -443,7 +358,8 @@ class ESQuery:
 
     def query(self, q, fields=None, **kwargs):
         '''for /query?q=<query>'''
-        options = self._get_cleaned_query_options(fields, kwargs)
+        kwargs["fields"] = fields
+        options = self._get_cleaned_query_options(kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
         q = re.sub(u'[\t\n\x0b\x0c\r\x00]+', ' ', q)
         q = q.strip()
@@ -474,26 +390,23 @@ class ESQuery:
             else:
                 # normal text query
                 _q = qbdr.build(q, mode=1)
-        except MGQueryError as e:
-            if PY3:
-                msg = str(e)
-            else:
-                msg = e.message
+        except QueryError as e:
+            msg = str(e)
             return {'success': False,
                     'error': msg}
 
         if _q:
+            logging.error("q: %s" % json.dumps(_q))
             if options.rawquery:
+                logging.error("onela")
                 return _q
 
             try:
                 res = self._search(_q, species=kwargs['species'], scroll_options=scroll_options)
+                #logging.error("res: %s" % res)
             except Exception as e:
-                if PY3:
-                    # TODO: critical/sensitive data in exception message ? 
-                    msg = str(e.info)
-                else:
-                    msg = e.message
+                # TODO: critical/sensitive data in exception message ? 
+                msg = str(e.info)
                 return {'success': False, 'error': msg}
 
             if not options.raw:
@@ -520,8 +433,9 @@ class ESQuery:
         return res
 
     def scroll(self, scroll_id, fields=None, **kwargs):
-        options = self._get_cleaned_query_options(fields, kwargs)
-        r = self.conn.scroll(scroll_id, scroll=self._scroll_time)
+        kwargs["fields"] = fields
+        options = self._get_cleaned_query_options(kwargs)
+        r = self._es.scroll(scroll_id, scroll=self._scroll_time)
         scroll_id = r.get('_scroll_id')
         if scroll_id is None or not r['hits']['hits']:
             return {'success': False, 'error': 'No results to return.'}
@@ -533,16 +447,7 @@ class ESQuery:
             res.update({'_warning': 'Scroll request has failed on {} shards out of {}.'.format(r['_shards']['failed'], r['_shards']['total'])})
         return res
 
-    def query_interval(self, taxid, chr, gstart, gend, **kwargs):
-        '''deprecated! Use query method with interval query string.'''
-        kwargs.setdefault('fields', ['symbol', 'name', 'taxid'])
-        rawquery = kwargs.pop('rawquery', None)
-        qbdr = ESQueryBuilder(**kwargs)
-        _q = qbdr.build_genomic_pos_query(taxid, chr, gstart, gend)
-        if rawquery:
-            return _q
-        return self._search(_q)
-
+    # keepit
     def doc_feeder(self, step=1000, s=None, e=None, inbatch=False, query=None, **kwargs):
         '''deprecated! A iterator for returning docs in a ES index with batch query.
            additional filter query can be passed via "query", e.g.,
@@ -561,13 +466,13 @@ class ESQuery:
         while 1:
             t1 = time.time()
             if raw_res is None:
-                raw_res = self.conn.search_raw(q, self._index, self._doc_type,
+                raw_res = self._es.search_raw(q, self._index, self._doc_type,
                                                start=s, size=step, scan=True,
                                                scroll='5m', **kwargs)
                 n = raw_res['hits']['total']
                 print('Retrieving %d documents from index "%s/%s".' % (n, self._index, self._doc_type))
             else:
-                raw_res = self.conn.search_scroll(raw_res._scroll_id, scroll='5m')
+                raw_res = self._es.search_scroll(raw_res._scroll_id, scroll='5m')
             hits_cnt = len(raw_res['hits']['hits'])
             if hits_cnt == 0:
                 break
@@ -587,9 +492,10 @@ class ESQuery:
 
         print('Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0)))
 
+    # keepit
     def metadata(self, raw=False):
         '''return metadata about the index.'''
-        mapping = self.conn.indices.get_mapping(self._index, self._doc_type)
+        mapping = self._es.indices.get_mapping(self._index, self._doc_type)
         if raw:
             return mapping
 
@@ -607,6 +513,7 @@ class ESQuery:
         #field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
             #'available_fields': sorted(field_set)
+            # TODO: http://mygene.info as config
             'available_fields': 'http://mygene.info/metadata/fields'
         }
         if '_meta' in mapping[self._doc_type]:
@@ -614,11 +521,6 @@ class ESQuery:
         metadata['genome_assembly'] = GENOME_ASSEMBLY
         metadata['taxonomy'] = TAXONOMY
         return metadata
-
-    def query_fields(self, **kwargs):
-        # query the metadata to get the available fields for a variant object
-        r = self.conn.indices.get(index=self._index)
-        return r[list(r.keys())[0]]['mappings'][self._doc_type]['properties']
 
 
 class ESQueryBuilder():
@@ -675,33 +577,7 @@ class ESQueryBuilder():
             }
         }
 
-    def _parse_sort_option(self, options):
-        sort = options.get('sort', None)
-        if sort:
-            _sort_array = []
-            for field in sort.split(','):
-                field = field.strip()
-                if field == 'name' or field[1:] == 'name':
-                    # sorting on "name" field is ignored, as it is a multi-text field.
-                    continue
-                if field.startswith('-'):
-                    _f = {"%s" % field[1:]: "desc"}
-                else:
-                    _f = {"%s" % field: "asc"}
-                _sort_array.append(_f)
-            options["sort"] = _sort_array
-        return options
-
-    def _parse_facets_option(self, options):
-        aggs = options.get('aggs', None)
-        if aggs:
-            _aggs = {}
-            for field in aggs.split(','):
-                # this is always "terms" aggregations
-                _aggs[field] = {"terms": {"field": field}}
-            options["aggs"] = _aggs
-        return options
-
+    # keepit (?)
     def dis_max_query(self, q):
         #remove '"' and '\' from q, they will break json decoder.
         q = q.replace('"', '').replace('\\', '')
@@ -820,6 +696,8 @@ class ESQueryBuilder():
 
         return _query
 
+
+    # keepit (?)
     def wildcard_query(self, q):
         '''q should contains either * or ?, but not the first character.'''
         _query = {
@@ -871,10 +749,11 @@ class ESQueryBuilder():
         try:
             _query = json.loads(_query % {'q': q.lower()})
         except ValueError:
-            raise MGQueryError("invalid query term.")
+            raise QueryError("invalid query term.")
 
         return _query
 
+    # keepit (?)
     def string_query(self, q):
         _query = {
             "query_string": {
@@ -889,6 +768,7 @@ class ESQueryBuilder():
         _query = json.loads(_query % {'q': q})
         return _query
 
+    # keepit (?)
     def raw_string_query(self, q):
         _query = {
             "query_string": {
@@ -902,9 +782,10 @@ class ESQueryBuilder():
         try:
             _query = json.loads(_query % {'q': q.replace('"', '\\"')})
         except ValueError:
-            raise MGQueryError("invalid query term.")
+            raise QueryError("invalid query term.")
         return _query
 
+    # keepit (?)
     def add_species_filter(self, _query):
         """deprecated! replaced by  """
         if self.species == 'all':
@@ -923,6 +804,7 @@ class ESQueryBuilder():
         }
         return _query
 
+    # keepit (?)
     def get_query_filters(self):
         '''filters added here will be applied in a filtered query,
            thus will affect the facet counts.
@@ -974,6 +856,7 @@ class ESQueryBuilder():
 
         return filters
 
+    # keepit (?)
     def add_query_filters(self, _query):
         '''filters added here will be applied in a filtered query,
            thus will affect the facet counts.
@@ -993,6 +876,7 @@ class ESQueryBuilder():
 
         return _query
 
+    # keepit
     def add_facet_filters(self, _query):
         """To add filters (e.g. taxid) to restrict returned hits,
             but does not change the scope for facet counts.
@@ -1020,6 +904,7 @@ class ESQueryBuilder():
 
         return _query
 
+    # keepit
     def add_species_custom_filters_score(self, _query):
         _query = {
             "function_score": {
@@ -1048,6 +933,7 @@ class ESQueryBuilder():
         }
         return _query
 
+    # keepit (?)
     def build(self, q, mode=1):
         '''mode:
                 1    match query
@@ -1076,6 +962,7 @@ class ESQueryBuilder():
             _q.update(self.options)
         return _q
 
+    # keepit (but similar)
     def build_id_query(self, id, scopes=None):
         id_is_int = is_int(id)
         if scopes is None:
@@ -1179,6 +1066,7 @@ class ESQueryBuilder():
         _q.append('')
         return '\n'.join(_q)
 
+    # TODO: used ?
     def build_multiple_id_query2(self, id_list, scopes=None):
         _query = {
             "terms": {
@@ -1193,6 +1081,7 @@ class ESQueryBuilder():
             _q.update(self.options)
         return _q
 
+    # keepit
     def build_genomic_pos_query(self, chr, gstart, gend, assembly=None):
         '''By default if assembly is None, the lastest assembly is used.
            for some species (e.g. human) we support multiple assemblies,
@@ -1244,12 +1133,43 @@ class ESQueryBuilder():
             _q.update(self.options)
         return _q
 
+    # same exist in biothings.ESQuery ?
+    def _parse_sort_option(self, options):
+        sort = options.get('sort', None)
+        if sort:
+            _sort_array = []
+            for field in sort.split(','):
+                field = field.strip()
+                if field == 'name' or field[1:] == 'name':
+                    # sorting on "name" field is ignored, as it is a multi-text field.
+                    continue
+                if field.startswith('-'):
+                    _f = {"%s" % field[1:]: "desc"}
+                else:
+                    _f = {"%s" % field: "asc"}
+                _sort_array.append(_f)
+            options["sort"] = _sort_array
+        return options
 
-class UserFilters:
+    # same exist in biothings.ESQuery ?
+    def _parse_facets_option(self, options):
+        facets = options.get('facets', None)
+        if facets:
+            _facets = {}
+            for field in facets.split(','):
+                _facets[field] = {"terms": {"field": field}}
+            options["facets"] = _facets
+        return options
+
+
+from biothings.settings import BiothingSettings
+from biothings.utils.es import get_es
+biothing_settings = BiothingSettings()
+class UserFilters(object):
     def __init__(self):
-        self.conn = es
+        self.conn = get_es(biothing_settings.es_host) 
         self.ES_INDEX_NAME = 'userfilters'
-        self.ES_INDEX_TYPE = 'filter'
+        self.ES_DOC_TYPE = 'filter'
         self._MAPPING = {
             "dynamic": False,
             "properties": {}
@@ -1259,7 +1179,7 @@ class UserFilters:
         print("Creating index...",)
         print(self.conn.create_index(self.ES_INDEX_NAME))
         print("Updating mapping...",)
-        print(self.conn.put_mapping(self.ES_INDEX_TYPE,
+        print(self.conn.put_mapping(self.ES_DOC_TYPE,
                                     self._MAPPING,
                                     [self.ES_INDEX_NAME]))
 
@@ -1277,7 +1197,7 @@ class UserFilters:
             _doc = {'_id': name,
                     'filter': _filter}
             print(self.conn.index(_doc, self.ES_INDEX_NAME,
-                                  self.ES_INDEX_TYPE,
+                                  self.ES_DOC_TYPE,
                                   id=_doc['_id']))
         else:
             print("No filter to add.")
@@ -1285,19 +1205,19 @@ class UserFilters:
     def get(self, name):
         '''get a named filter.'''
         try:
-            return self.conn.get(self.ES_INDEX_NAME, name, self.ES_INDEX_TYPE)['_source']
+            return self.conn.get(self.ES_INDEX_NAME, name, self.ES_DOC_TYPE)['_source']
         except NotFoundError:
             return None
 
     def count(self):
-        n = self.conn.count(None, self.ES_INDEX_NAME, self.ES_INDEX_TYPE)['count']
+        n = self.conn.count(None, self.ES_INDEX_NAME, self.ES_DOC_TYPE)['count']
         return n
 
     def get_all(self, skip=0, size=1000):
         '''get all named filter.'''
         print('\ttotal filters: {}'.format(self.count()))
         q = {"query": {"match_all": {}}}
-        res = self.conn.search_raw(q, indices=self.ES_INDEX_NAME, doc_types=self.ES_INDEX_TYPE,
+        res = self.conn.search_raw(q, indices=self.ES_INDEX_NAME, doc_types=self.ES_DOC_TYPE,
                                    **{"from": str(skip), "size": str(1000)})
         return [hit['_source'] for hit in res.hits.hits]
 
@@ -1308,7 +1228,7 @@ class UserFilters:
             msg = 'Found filter "{}". Continue to delete it?'.format(name)
             if noconfirm or ask(msg) == 'Y':
                 print('Deleting filter "{}"...'.format(name),)
-                print(self.conn.delete(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, name))
+                print(self.conn.delete(self.ES_INDEX_NAME, self.ES_DOC_TYPE, name))
         else:
             print('Filter "{}" does not exist. Abort now.'.format(name))
 

@@ -42,9 +42,9 @@ except ImportError:
 
 host = os.getenv("MG_HOST")
 if not host:
-    host = 'http://localhost:8000'
+    #host = 'http://localhost:8000'
     #host = 'http://dev.mygene.info:8000'
-    #host = 'http://mygene.info'
+    host = 'http://mygene.info'
 api = host + '/v2'
 sys.stderr.write('URL base: {}\n'.format(api))
 
@@ -79,7 +79,7 @@ def truncate(s, limit):
 def json_ok(s, checkerror=True):
     d = _d(s.decode('utf-8'))
     if checkerror:
-        ok_(not (isinstance(d, dict) and 'error' in d), truncate(str(d), 100))
+        ok_(not (isinstance(d, dict) and 'error' in d), truncate(str(d), 1000000))
     return d
 
 
@@ -364,8 +364,9 @@ def test_status():
 
 
 def test_metadata():
-    get_ok(host + '/metadata')
-    get_ok(api + '/metadata')
+    root = json_ok(get_ok(host + '/metadata'))
+    v2 = json_ok(get_ok(api + '/metadata'))
+    eq_(root,v2)
 
 
 def test_query_facets():

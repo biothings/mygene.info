@@ -19,6 +19,9 @@ tornadoes>=1.4.1
 #for tracking API on Google Analytics
 -e git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
 
+# biothings
+git+https://github.com/SuLab/biothings.api.git#egg=biothings
+
 #for build sphinx docs
 Sphinx>=1.2.3
 #sphinx-bootstrap-theme==0.3.1

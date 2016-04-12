@@ -8,54 +8,39 @@ Currently available URLs:
 
 '''
 import sys
-if sys.version > '3':
-    PY3 = True
-else:
-    PY3 = False
 
 #import os.path
-import os
+import os, logging
 import subprocess
 #import json
 
-import tornado.httpserver
-import tornado.ioloop
 import tornado.options
 import tornado.web
-import tornado.escape
-from tornado.options import define, options
+from tornado.options import options
 
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 if src_path not in sys.path:
     sys.path.append(src_path)
 
-from config import INCLUDE_DOCS
+#TODO: move to a "common api" module (not specific to an API version)
+#*******#
+from biothings.www.api.handlers import StatusHandler, BiothingHandler
 from utils.es import ESQuery
-from helper import add_apps
-from api_v1.handlers import APP_LIST as api_v1_app_list
-from api_v2.handlers import APP_LIST as api_v2_app_list
-from api_v2.handlers import MetaDataHandler
-from api_v2.handlers import FieldsHandler
-#from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
-from demo.handlers import APP_LIST as demo_app_list
-#from auth.handlers import APP_LIST as auth_app_list
+class MyGeneStatusHandler(StatusHandler):
+    ''' This class is for the /status endpoint. '''
+    esq = ESQuery()
 
-__USE_WSGI__ = False
-DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
-if INCLUDE_DOCS and not os.path.exists(DOCS_STATIC_PATH):
-    raise IOError('Run "make html" to generate sphinx docs first.')
-STATIC_PATH = os.path.join(src_path, 'src/static')
+class MainHandler(BiothingHandler):
+    def get(self):
+        if INCLUDE_DOCS:
+            self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
 
-define("port", default=8000, help="run on the given port", type=int)
-define("address", default="127.0.0.1", help="run on localhost")
-define("debug", default=False, type=bool, help="run in debug mode")
-tornado.options.parse_command_line()
-if options.debug:
-    import tornado.autoreload
-    import logging
-    logging.getLogger().setLevel(logging.DEBUG)
-    options.address = '0.0.0.0'
-
+DEMO_STATIC_FILE = os.path.join(src_path, 'docs/demo/index.html')
+class DemoHandler(BiothingHandler):
+    def get(self):
+        with open(DEMO_STATIC_FILE,'r') as demo_file:
+            self.write(demo_file.read())
+#*******#
 
 def _get_rev():
     '''return current git rev number.
@@ -64,52 +49,47 @@ def _get_rev():
     '''
     pipe = subprocess.Popen(["git", "rev-parse", "HEAD"],
                             stdout=subprocess.PIPE)
-    output = pipe.stdout.read().strip()
-    if PY3:
-        output = output.decode()
+    output = pipe.stdout.read().strip().decode()
     return ':'.join(reversed(output.replace('+', '').split(' ')))
 __revision__ = _get_rev()
 os.environ["MYGENE_REVISION"] = __revision__
 
 
-class StatusCheckHandler(tornado.web.RequestHandler):
-    '''This reponses to a HEAD request of /status for status check.'''
-    def head(self):
-        esq = ESQuery()
-        esq.get_gene2('1017')
+from biothings.www.index_base import main, settings
+from biothings.www.helper import add_apps
 
-    def get(self):
-        self.head()
-        self.write('OK')
-
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        if INCLUDE_DOCS:
-            self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
+# build API routes
+from api_v2.handlers import APP_LIST as api_v2_app_list
+#from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
+from demo.handlers import APP_LIST as demo_app_list
+#from auth.handlers import APP_LIST as auth_app_list
+from api_v2.handlers import MyGeneMetaDataHandler
+from api_v2.handlers import FieldsHandler
 
 
-class DemoHandler(tornado.web.RequestHandler):
-    def get(self):
-        with open('../docs/demo/index.html', 'r') as demo_file:
-            self.write(demo_file.read())
+from config import INCLUDE_DOCS
+__USE_WSGI__ = False
+DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
+if INCLUDE_DOCS and not os.path.exists(DOCS_STATIC_PATH):
+    raise IOError('Run "make html" to generate sphinx docs first.')
+STATIC_PATH = os.path.join(src_path, 'src/static')
+
 
 APP_LIST = [
     (r"/", MainHandler),
-    (r"/status", StatusCheckHandler),
-    (r"/metadata", MetaDataHandler),
-    (r"/v2a/metadata", MetaDataHandler),
+    (r"/status", MyGeneStatusHandler),
+    (r"/metadata", MyGeneMetaDataHandler),
+    #TODO: what is v2a ?
+    (r"/v2a/metadata", MyGeneMetaDataHandler),
     (r"/metadata/fields", FieldsHandler),
     (r"/demo/?$", DemoHandler),
 ]
-
 APP_LIST += add_apps('', api_v2_app_list)
 APP_LIST += add_apps('v2', api_v2_app_list)
-APP_LIST += add_apps('v1', api_v1_app_list)
 #APP_LIST += add_apps('demo', demo_app_list)
-
 #APP_LIST += add_apps('v2a', api_v2_async_app_list)
 #APP_LIST += add_apps('auth', auth_app_list)
+
 if options.debug:
     APP_LIST += [
         #/widget/* static path
@@ -118,7 +98,13 @@ if options.debug:
         (r"/?(.*)", tornado.web.StaticFileHandler, {'path': DOCS_STATIC_PATH}),
     ]
 
-settings = {}
+
+# TODO: in config ? (prod = wsgi app)
+if __USE_WSGI__:
+    import tornado.wsgi
+    wsgi_app = tornado.wsgi.WSGIApplication(APP_LIST)
+
+# TODO: should we move static dir to www/static to use biothings default ?
 if options.debug:
     #     from config import STATIC_PATH
     settings.update({
@@ -128,24 +114,9 @@ if options.debug:
     #    settings.update(auth_settings)
 
 
-def main():
-    application = tornado.web.Application(APP_LIST, **settings)
-    http_server = tornado.httpserver.HTTPServer(application)
-    http_server.listen(options.port, address=options.address)
-    loop = tornado.ioloop.IOLoop.instance()
-    if options.debug:
-        tornado.autoreload.start(loop)
-        logging.info('Server is running on "%s:%s"...' % (options.address, options.port))
-        import config
-        for attr in ['ES_HOST', 'ES_INDEX_NAME_TIER1', 'ES_INDEX_NAME_ALL']:
-            logging.info('\t{0:<20}: {1}'.format(attr, getattr(config, attr)))
 
-    loop.start()
-
-if __USE_WSGI__:
-    import tornado.wsgi
-    wsgi_app = tornado.wsgi.WSGIApplication(APP_LIST)
+if __name__ == '__main__':
+    main(APP_LIST)
 
 
-if __name__ == "__main__":
-    main()
+
