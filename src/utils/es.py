@@ -16,13 +16,10 @@ import logging
 from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME,
                     ES_DOC_TYPE)
 from biothings.utils.common import (ask, is_int, is_str, is_seq, timesofar, dotdict)
-from utils.dotfield import parse_dot_fields
-from utils.taxonomy import TaxonomyQuery
+from biothings.utils.dotfield import parse_dot_fields, compose_dot_fields_by_fields as compose_dot_fields
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
-from src.utils.dotfield import compose_dot_fields_by_fields as compose_dot_fields
-
-
+#from src.utils.dotfield import compose_dot_fields_by_fields as compose_dot_fields
 
 
 
@@ -49,16 +46,6 @@ TAXONOMY = {
     "pig": 9823
 }
 
-TAXID = {'human': 9606,
-        'mouse': 10090,
-        'rat':   10116,
-        'fruitfly': 7227,
-        'nematode':   6239,
-        'zebrafish':   7955,
-        'thale-cress':   3702,
-        'frog':   8364,
-        'pig': 9823,
-}
 
 def safe_genome_pos(s):
     '''
@@ -82,7 +69,7 @@ class ESQuery(ESQuery):
         super( ESQuery, self ).__init__()
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
         self._default_species = [9606, 10090, 10116] # human, mouse, rat
-        self._tier_1_species = set(TAXID.values())
+        self._tier_1_species = set(TAXONOMY.values())
 
     def _search(self, q, species='all', scroll_options={}):
         self._set_index(species)
@@ -219,8 +206,8 @@ class ESQuery(ESQuery):
         for s in species:
             if is_int(s):
                 _species.append(int(s))
-            elif s in TAXID:
-                _species.append(TAXID[s])
+            elif s in TAXONOMY:
+                _species.append(TAXONOMY[s])
         return _species
 
     # keepit (?)

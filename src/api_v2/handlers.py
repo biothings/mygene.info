@@ -6,7 +6,6 @@ from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHa
                                        FieldsHandler
 from biothings.settings import BiothingSettings
 from utils.es import ESQuery
-from utils.taxonomy import TaxonomyQuery
 from biothings.utils.common import split_ids
 import os, logging
 
@@ -165,17 +164,9 @@ class QueryHandler(BiothingHandler):
 
 
 class SpeciesHandler(BiothingHandler):
-    tq = TaxonomyQuery()
 
     def get(self, taxid):
-        kwargs = self.get_query_params()
-        include_children = kwargs.get('include_children', False)
-        has_gene = kwargs.get('has_gene', False)
-        res = self.tq.get_species_info(taxid, include_children=include_children, has_gene=has_gene)
-        if res:
-            self.return_json(res)
-        else:
-            raise HTTPError(404)
+        self.redirect("http://s.biothings.io/v1/species/%s?include_children=1" % taxid)
 
 
 APP_LIST = [

@@ -513,8 +513,8 @@ def test_dotfield():
     assert "refseq.rna" in restrue["hits"][0].keys()
     assert "refseq" in resdefault["hits"][0].keys()
     assert "rna" in resdefault["hits"][0]["refseq"].keys()
-# TODO: no fields but dotfield => dotfield results
-# TODO: fields with dot but no dotfield => dotfield results
+    # TODO: no fields but dotfield => dotfield results
+    # TODO: fields with dot but no dotfield => dotfield results
 
     # /gene service
     resdefault = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF'))
