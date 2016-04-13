@@ -14,6 +14,9 @@ if ES_HOST.startswith('ec2:'):
     else:
         raise ValueError('EC2 instance "{}" is not running'.format(ES_HOST[4:]))
 
+ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'sort', 'explain', 'version', 'aggs', \
+                   'fetch_all','species','fields','userfilter','exists','missing','include_tax_tree']
+
 #ES_INDEX_NAME = "genedoc_mygene_allspecies_current_3" #'genedoc_allspecies_current'
 #ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_3" #'genedoc_current'
 ES_INDEX_NAME = "genedoc_mygene_allspecies_current_2" #'genedoc_allspecies_current'

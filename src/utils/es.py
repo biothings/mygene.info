@@ -251,32 +251,20 @@ class ESQuery(ESQuery):
     # keepit but refactor
     def _get_cleaned_query_options(self, kwargs):
         """common helper for processing fields, kwargs and other options passed to ESQueryBuilder."""
-        #TODO: kwargs is used to fill options dict, some keys are popped, not all, then
-        # options.kwargs = kwargs. from caller perspective, kwargs changes, not the same in options.kwargs, which is weird.
+        
         options = dotdict()
-        options.raw = kwargs.pop('raw', False)
-        options.rawquery = kwargs.pop('rawquery', False)
-        #if dofield is false, returned fields contains dot notation will be restored as an object.
-        options.dotfield = kwargs.pop('dotfield', False) not in [False, 'false']
-        options.fetch_all = kwargs.pop('fetch_all', False)
-        scopes = kwargs.pop('scopes', None)
-        if scopes:
-            options.scopes = self._cleaned_scopes(scopes)
-        kwargs["fields"] = self._cleaned_fields(kwargs.get("fields"))
-
+        options = super( ESQuery, self )._get_cleaned_query_options(kwargs)
+        
         #if no dotfield in "fields", set dotfield always be True, i.e., no need to parse dotfield
         if not options.dotfield:
             _found_dotfield = False
-            if kwargs.get('fields'):
-                for _f in kwargs['fields']:
+            if kwargs.get('_source'):
+                for _f in kwargs['_source']:
                     if _f.find('.') != -1:
                         _found_dotfield = True
                         break
             if not _found_dotfield:
                 options.dotfield = True
-
-        # TODO: something is wrong here...
-        #options = super( ESQuery, self )._get_cleaned_query_options(kwargs)
 
         #this species parameter is added to the query, thus will change facet counts.
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
@@ -297,6 +285,7 @@ class ESQuery(ESQuery):
         options.kwargs = kwargs
         return options
 
+    #TODO: remove ?
     def get_gene(self, geneid, fields='all', **kwargs):
         kwargs['fields'] = self._cleaned_fields(fields)
         raw = kwargs.pop('raw', False)
@@ -325,7 +314,7 @@ class ESQuery(ESQuery):
         if not options.raw:
             res = self._cleaned_res_2(res, empty=None, single_hit=True,
                                       dotfield=options.dotfield,
-                                      fields=options.kwargs['fields'])
+                                      fields=options.kwargs.get('_source'))
         return res
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
@@ -351,7 +340,7 @@ class ESQuery(ESQuery):
             qterm = geneid_list[i]
             hits = self._cleaned_res_2(hits, empty=[], single_hit=False,
                                        dotfield=options.dotfield,
-                                       fields=options.kwargs['fields'])
+                                       fields=options.kwargs.get('_source'))
             if len(hits) == 0:
                 _res.append({u'query': qterm,
                              u'notfound': True})
@@ -415,7 +404,7 @@ class ESQuery(ESQuery):
                 return {'success': False, 'error': msg}
 
             if not options.raw:
-                res = self._cleaned_res_3(res,options.get("dotfield"),kwargs.get("fields"))
+                res = self._cleaned_res_3(res,options.get("dotfield"),kwargs.get("_source"))
                 ###res = self._cleaned_res2(res,options)
                 #_res = res['hits']
                 #_res['took'] = res['took']
@@ -567,7 +556,7 @@ class ESQueryBuilder():
 
         self._parse_sort_option(self.options)
         self._parse_facets_option(self.options)
-        self._allowed_options = ['fields', 'start', 'from', 'size',
+        self._allowed_options = ['fields', '_source', 'start', 'from', 'size',
                                  'sort', 'explain', 'version', 'aggs','dotfield']
         for key in set(self.options) - set(self._allowed_options):
             del self.options[key]
