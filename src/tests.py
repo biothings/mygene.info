@@ -520,8 +520,8 @@ def test_dotfield():
     resdefault = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF'))
     restrue = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF&dotfield=true'))
     resfalse = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF&dotfield=false'))
-    eq_(resdefault["hits"],resfalse["hits"])
-    assert "go.MF" in restrue["hits"][0].keys()
-    assert "go" in resdefault["hits"][0].keys()
-    assert "MF" in resdefault["hits"][0]["go"].keys()
+    eq_(resdefault,resfalse)
+    assert "go.MF" in restrue.keys()
+    assert "go" in resdefault.keys()
+    assert "MF" in resdefault["go"].keys()
     
