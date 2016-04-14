@@ -352,6 +352,7 @@ class ESQuery(ESQuery):
 
     def query(self, q, **kwargs):
         '''for /query?q=<query>'''
+        aggs = parse_facets_option(kwargs)
         options = self._get_cleaned_query_options(kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
         q = re.sub(u'[\t\n\x0b\x0c\r\x00]+', ' ', q)
@@ -387,6 +388,9 @@ class ESQuery(ESQuery):
             msg = str(e)
             return {'success': False,
                     'error': msg}
+
+        if aggs:
+            _q['aggs'] = aggs 
 
         if _q:
             if options.rawquery:
