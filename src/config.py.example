@@ -27,6 +27,32 @@ ES_DOC_TYPE = 'gene'
 STATUS_CHECK_ID = '1017'
 
 #relevant for running in prod
-GA_ACCOUNT = 'UA-xxxxxxxx-x'
-RUN_IN_PROD = False   # set to True in prod
 INCLUDE_DOCS = False# if True, include the links to mygene.info docs
+
+# *****************************************************************************
+# Google Analytics Settings
+# *****************************************************************************
+# Google Analytics Account ID
+GA_ACCOUNT = 'UA-xxxxxxxx-x'
+# Turn this to True to start google analytics tracking
+GA_RUN_IN_PROD = False
+
+# 'category' in google analytics event object
+GA_EVENT_CATEGORY = 'v2_api'
+# 'action' for get request in google analytics event object
+GA_EVENT_GET_ACTION = 'get'
+# 'action' for post request in google analytics event object
+GA_EVENT_POST_ACTION = 'post'
+# url for google analytics tracker
+GA_TRACKER_URL = 'mygene.info'
+
+# *****************************************************************************
+# URL settings
+# *****************************************************************************
+# For URL stuff
+ANNOTATION_ENDPOINT = 'gene'
+QUERY_ENDPOINT = 'query'
+API_VERSION = 'v2'
+
+# Module that contains the nosetest config
+NOSETEST_SETTINGS = 'tests.nosetest_config'

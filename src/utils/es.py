@@ -148,37 +148,6 @@ class ESQuery(ESQuery):
                                         dotfield=dotfield, fields=fields)
                     for hit in hits['hits']]
 
-    def _cleaned_res_3(self, res, dotfield=False, fields=None):
-        ''' res is the dictionary returned from a query.
-            do some reformating of raw ES results before returning.
-
-            This method is used for self.query method.
-        '''
-        if 'aggregations' in res:
-            # need to normalize back to what "facets" used to return
-            # (mostly key renaming + total computation)
-            res["facets"] = res.pop("aggregations")
-            for facet in res["facets"]:
-                # restuls always coming from terms aggregations
-                res["facets"][facet]["_type"] = "terms"
-                res["facets"][facet]["terms"] = res["facets"][facet].pop("buckets")
-                res["facets"][facet]["other"] = res["facets"][facet].pop("sum_other_doc_count")
-                res["facets"][facet]["missing"] = res["facets"][facet].pop("doc_count_error_upper_bound")
-                count = 0
-                for term in res["facets"][facet]["terms"]:
-                    # modif in-place
-                    term["count"] = term.pop("doc_count")
-                    term["term"] = term.pop("key")
-                    count += term["count"]
-                res["facets"][facet]["total"] = count
-
-        _res = res['hits']
-        for attr in ['took', 'facets', '_scroll_id']:
-            if attr in res:
-                _res[attr] = res[attr]
-        _res['hits'] = [self._get_genedoc_2(hit,dotfield,fields) for hit in _res['hits']]
-        return _res
-
     def _cleaned_species(self, species, default_to_none=False):
         '''return a cleaned species parameter.
            should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
@@ -246,29 +215,14 @@ class ESQuery(ESQuery):
             return True
         return False
 
-    def _get_cleaned_query_options(self, kwargs):
-        """common helper for processing fields, kwargs and other options passed to ESQueryBuilder."""
-        
-        options = super( ESQuery, self )._get_cleaned_query_options(kwargs)
-        
-        
-        #if no dotfield in "fields", set dotfield always be True, i.e., no need to parse dotfield
-        if not options.dotfield:
-            _found_dotfield = False
-            if kwargs.get('_source'):
-                for _f in kwargs['_source']:
-                    if _f.find('.') != -1:
-                        _found_dotfield = True
-                        break
-            if not _found_dotfield:
-                options.dotfield = True
-
+    def _get_options(self,options,kwargs):
         #this species parameter is added to the query, thus will change facet counts.
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         include_tax_tree = kwargs.pop('include_tax_tree', False)
         if include_tax_tree:
             headers = {'content-type': 'application/x-www-form-urlencoded',
                       'user-agent': "Python-requests_mygene.info/%s (gzip)" % requests.__version__}
+            #TODO: URL as config param
             res = requests.post('http://s.biothings.io/v1/species?ids=' + 
                                 ','.join(['{}'.format(sid) for sid in kwargs['species']]) +
                                 '&expand_species=true', headers=headers)
@@ -278,7 +232,6 @@ class ESQuery(ESQuery):
         #this parameter is to add species filter without changing facet counts.
         kwargs['species_facet_filter'] = self._cleaned_species(kwargs.get('species_facet_filter', None),
                                                                default_to_none=True)
-
         options.kwargs = kwargs
         return options
 
@@ -298,21 +251,6 @@ class ESQuery(ESQuery):
         raw = kwargs.pop('raw', False)
         res = self._es.mget(geneid_list, self._index, self._doc_type, **kwargs)
         return res if raw else [self._get_genedoc(doc) for doc in res]
-
-    def get_gene2(self, geneid, fields='all', **kwargs):
-        '''for /gene/<geneid>'''
-        kwargs["fields"] = fields
-        options = self._get_cleaned_query_options(kwargs)
-        qbdr = ESQueryBuilder(**options.kwargs)
-        _q = qbdr.build_id_query(geneid, options.scopes)
-        if options.rawquery:
-            return _q
-        res = self._search(_q, species=options.kwargs['species'])
-        if not options.raw:
-            res = self._cleaned_res_2(res, empty=None, single_hit=True,
-                                      dotfield=options.dotfield,
-                                      fields=options.kwargs.get('_source'))
-        return res
 
     def mget_gene2(self, geneid_list, fields=None, **kwargs):
         '''for /query post request'''
@@ -404,26 +342,11 @@ class ESQuery(ESQuery):
                 return {'success': False, 'error': msg}
 
             if not options.raw:
-                res = self._cleaned_res_3(res,options.get("dotfield"),kwargs.get("_source"))
+                res = self._cleaned_res2(res,options)
         else:
             res = {'success': False,
                    'error': "Invalid query. Please check parameters."}
 
-        return res
-
-    def scroll(self, scroll_id, fields=None, **kwargs):
-        kwargs["fields"] = fields
-        options = self._get_cleaned_query_options(kwargs)
-        r = self._es.scroll(scroll_id, scroll=self._scroll_time)
-        scroll_id = r.get('_scroll_id')
-        if scroll_id is None or not r['hits']['hits']:
-            return {'success': False, 'error': 'No results to return.'}
-        else:
-            if not options.raw:
-                res = self._cleaned_res_3(r)
-        #res.update({'_scroll_id': scroll_id})
-        if r['_shards']['failed']:
-            res.update({'_warning': 'Scroll request has failed on {} shards out of {}.'.format(r['_shards']['failed'], r['_shards']['total'])})
         return res
 
     # keepit

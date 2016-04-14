@@ -325,9 +325,9 @@ def test_gene():
 
     # testing filtering parameters
     res = json_ok(get_ok(api + '/gene/1017?fields=symbol,name,entrezgene'))
-    eq_(set(res), set(['_id', 'symbol', 'name', 'entrezgene']))
+    eq_(set(res), set(['_id', '_version', 'symbol', 'name', 'entrezgene']))
     res = json_ok(get_ok(api + '/gene/1017?filter=symbol,go.MF'))
-    eq_(set(res), set(['_id', 'symbol', 'go']))
+    eq_(set(res), set(['_id', '_version', 'symbol', 'go']))
     assert "MF" in res["go"]
     #eq_(res['go'].keys(), ['MF'])
 
