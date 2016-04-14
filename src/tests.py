@@ -369,6 +369,15 @@ def test_metadata():
     root = json_ok(get_ok(host + '/metadata'))
     v2 = json_ok(get_ok(api + '/metadata'))
     eq_(root,v2)
+    eq_(set(root.keys()),set(['available_fields', 'src_version', 'app_revision', 'timestamp', 'taxonomy',
+        'stats','genome_assembly','source']))
+    fields =json_ok(get_ok(api + '/metadata/fields'))
+    # test random field
+    assert "refseq" in fields
+    assert "accession.rna" in fields
+    assert "interpro.desc" in fields
+    assert "homologene" in fields
+    assert "reporter.snowball" in fields
 
 
 def test_query_facets():
@@ -550,6 +559,12 @@ def test_raw():
     assert "_shards" in raw1
     assert not "_shards" in raw0
 
-
-
+def test_species():
+    res, con = h.request(api + "/species/9606")
+    eq_(res.status, 200)
+    eq_(res["content-location"],'http://s.biothings.io/v1/species/9606?include_children=1')
+    d = _d(con.decode('utf-8'))
+    eq_(set(d.keys()),set(['taxid', 'authority', 'lineage', '_id', 'common_name', 'genbank_common_name', '_version',
+        'parent_taxid', 'scientific_name', 'has_gene', 'children', 'rank', 'uniprot_name']))
+    
 

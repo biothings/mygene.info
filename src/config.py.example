@@ -26,6 +26,10 @@ ES_DOC_TYPE = 'gene'
 
 STATUS_CHECK_ID = '1017'
 
+FIELD_NOTES_PATH = ''
+JSONLD_CONTEXT_PATH = ''
+
+
 #relevant for running in prod
 INCLUDE_DOCS = False# if True, include the links to mygene.info docs
 

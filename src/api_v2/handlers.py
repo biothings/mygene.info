@@ -1,15 +1,15 @@
 import re
 import json
 
-from tornado.web import HTTPError
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, \
-                                       FieldsHandler
+                                       FieldsHandler, BaseHandler
 from biothings.settings import BiothingSettings
 from utils.es import ESQuery
 from biothings.utils.common import split_ids
 import os, logging
 
 mygene_settings = BiothingSettings()
+
 
 class MyGeneMetaDataHandler(MetaDataHandler):
     '''Return db metadata in json string.'''
@@ -34,7 +34,7 @@ class QueryHandler(QueryHandler):
     esq = ESQuery()
 
 
-class SpeciesHandler(BiothingHandler):
+class SpeciesHandler(BaseHandler):
 
     def get(self, taxid):
         self.redirect("http://s.biothings.io/v1/species/%s?include_children=1" % taxid)
@@ -46,5 +46,5 @@ APP_LIST = [
     (r"/query/?", QueryHandler),
     (r"/species/(\d+)/?", SpeciesHandler),
     (r"/metadata", MyGeneMetaDataHandler),
-    (r"/metadata/fields", FieldsHandler),
+    (r"/metadata/fields", MyGeneFieldsHandler),
 ]

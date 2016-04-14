@@ -64,7 +64,7 @@ from api_v2.handlers import APP_LIST as api_v2_app_list
 from demo.handlers import APP_LIST as demo_app_list
 #from auth.handlers import APP_LIST as auth_app_list
 from api_v2.handlers import MyGeneMetaDataHandler
-from api_v2.handlers import FieldsHandler
+from api_v2.handlers import MyGeneFieldsHandler
 
 
 from config import INCLUDE_DOCS
@@ -81,7 +81,7 @@ APP_LIST = [
     (r"/metadata", MyGeneMetaDataHandler),
     #TODO: what is v2a ?
     (r"/v2a/metadata", MyGeneMetaDataHandler),
-    (r"/metadata/fields", FieldsHandler),
+    (r"/metadata/fields", MyGeneFieldsHandler),
     (r"/demo/?$", DemoHandler),
 ]
 APP_LIST += add_apps('', api_v2_app_list)
