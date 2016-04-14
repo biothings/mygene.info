@@ -17,6 +17,7 @@ from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME,
                     ES_DOC_TYPE)
 from biothings.utils.common import (ask, is_int, is_str, is_seq, timesofar, dotdict)
 from biothings.utils.dotfield import parse_dot_fields, compose_dot_fields_by_fields as compose_dot_fields
+from biothings.www.api.es import ESQuery, QueryError, ESQueryBuilder, parse_facets_option
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import NotFoundError
 #from src.utils.dotfield import compose_dot_fields_by_fields as compose_dot_fields
@@ -61,8 +62,6 @@ def safe_genome_pos(s):
         raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
 
 
-
-from biothings.www.api.es import ESQuery, QueryError
 
 class ESQuery(ESQuery):
     def __init__(self):
@@ -180,7 +179,6 @@ class ESQuery(ESQuery):
         _res['hits'] = [self._get_genedoc_2(hit,dotfield,fields) for hit in _res['hits']]
         return _res
 
-    # keepit (?)
     def _cleaned_species(self, species, default_to_none=False):
         '''return a cleaned species parameter.
            should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
@@ -248,12 +246,11 @@ class ESQuery(ESQuery):
             return True
         return False
 
-    # keepit but refactor
     def _get_cleaned_query_options(self, kwargs):
         """common helper for processing fields, kwargs and other options passed to ESQueryBuilder."""
         
-        options = dotdict()
         options = super( ESQuery, self )._get_cleaned_query_options(kwargs)
+        
         
         #if no dotfield in "fields", set dotfield always be True, i.e., no need to parse dotfield
         if not options.dotfield:
@@ -353,9 +350,8 @@ class ESQuery(ESQuery):
                     _res.append(hit)
         return _res
 
-    def query(self, q, fields=None, **kwargs):
+    def query(self, q, **kwargs):
         '''for /query?q=<query>'''
-        kwargs["fields"] = fields
         options = self._get_cleaned_query_options(kwargs)
         qbdr = ESQueryBuilder(**options.kwargs)
         q = re.sub(u'[\t\n\x0b\x0c\r\x00]+', ' ', q)
@@ -405,22 +401,6 @@ class ESQuery(ESQuery):
 
             if not options.raw:
                 res = self._cleaned_res_3(res,options.get("dotfield"),kwargs.get("_source"))
-                ###res = self._cleaned_res2(res,options)
-                #_res = res['hits']
-                #_res['took'] = res['took']
-                #if "facets" in res:
-                #    _res['facets'] = res['facets']
-                #for v in _res['hits']:
-                #    del v['_type']
-                #    del v['_index']
-                #    for attr in ['fields', '_source']:
-                #        if attr in v:
-                #            v.update(v[attr])
-                #            del v[attr]
-                #            break
-                #    if not options.dotfield:
-                #        parse_dot_fields(v)
-                #res = _res
         else:
             res = {'success': False,
                    'error': "Invalid query. Please check parameters."}
@@ -518,7 +498,7 @@ class ESQuery(ESQuery):
         return metadata
 
 
-class ESQueryBuilder():
+class ESQueryBuilder(ESQueryBuilder):
     def __init__(self, **query_options):
         """You can pass these options:
             fields     default ['name', 'symbol', 'taxid', 'entrezgene']
@@ -539,32 +519,32 @@ class ESQueryBuilder():
                                   genes must have NO given field(s).
 
         """
-        self.options = query_options
-        self.species = self.options.pop('species', 'all')   # species should be either 'all' or a list of taxids.
-        self.species_facet_filter = self.options.pop('species_facet_filter', None)
-        self.entrezonly = self.options.pop('entrezonly', False)
-        self.ensemblonly = self.options.pop('ensemblonly', False)
+        super( ESQueryBuilder, self ).__init__()
+        self._query_options = query_options
+        self.species = self._query_options.pop('species', 'all')   # species should be either 'all' or a list of taxids.
+        self.species_facet_filter = self._query_options.pop('species_facet_filter', None)
+        self.entrezonly = self._query_options.pop('entrezonly', False)
+        self.ensemblonly = self._query_options.pop('ensemblonly', False)
         # userfilter
-        userfilter = self.options.pop('userfilter', None)
+        userfilter = self._query_options.pop('userfilter', None)
         self.userfilter = userfilter.split(',') if userfilter else None
         # exist filter
-        existsfilter = self.options.pop('exists', None)
+        existsfilter = self._query_options.pop('exists', None)
         self.existsfilter = existsfilter.split(',') if existsfilter else None
         # missing filter
-        missingfilter = self.options.pop('missing', None)
+        missingfilter = self._query_options.pop('missing', None)
         self.missingfilter = missingfilter.split(',') if missingfilter else None
 
-        self._parse_sort_option(self.options)
-        self._parse_facets_option(self.options)
+        parse_facets_option(self._query_options)
         self._allowed_options = ['fields', '_source', 'start', 'from', 'size',
                                  'sort', 'explain', 'version', 'aggs','dotfield']
-        for key in set(self.options) - set(self._allowed_options):
-            del self.options[key]
+        for key in set(self._query_options) - set(self._allowed_options):
+            del self._query_options[key]
         # convert "fields" option to "_source"
         # use "_source" instead of "fields" for ES v1.x and up
-        if 'fields' in self.options and self.options['fields'] is not None:
-            self.options['_source'] = self.options['fields']
-            del self.options['fields']
+        if 'fields' in self._query_options and self._query_options['fields'] is not None:
+            self._query_options['_source'] = self._query_options['fields']
+            del self._query_options['fields']
 
         # this is a fake query to make sure to return empty hits
         self._nohits_query = {
@@ -954,8 +934,8 @@ class ESQueryBuilder():
         _query = self.add_species_custom_filters_score(_query)
         _q = {'query': _query}
         _q = self.add_facet_filters(_q)
-        if self.options:
-            _q.update(self.options)
+        if self._query_options:
+            _q.update(self._query_options)
         return _q
 
     # keepit (but similar)
@@ -1046,21 +1026,13 @@ class ESQueryBuilder():
         _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
-        if self.options:
-            _q.update(self.options)
+        if self._query_options:
+            _q.update(self._query_options)
 
         # if 'fields' in _q and _q['fields'] is not None:
         #     _q['_source'] = _q['fields']
         #     del _q['fields']
         return _q
-
-    def build_multiple_id_query(self, id_list, scopes=None):
-        """make a query body for msearch query."""
-        _q = []
-        for id in id_list:
-            _q.extend(['{}', json.dumps(self.build_id_query(id, scopes))])
-        _q.append('')
-        return '\n'.join(_q)
 
     # TODO: used ?
     def build_multiple_id_query2(self, id_list, scopes=None):
@@ -1073,8 +1045,8 @@ class ESQueryBuilder():
         _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
-        if self.options:
-            _q.update(self.options)
+        if self._query_options:
+            _q.update(self._query_options)
         return _q
 
     # keepit
@@ -1125,38 +1097,9 @@ class ESQueryBuilder():
         # }
         _query = self.add_query_filters(_query)
         _q = {'query': _query}
-        if self.options:
-            _q.update(self.options)
+        if self._query_options:
+            _q.update(self._query_options)
         return _q
-
-    # same exist in biothings.ESQuery ?
-    def _parse_sort_option(self, options):
-        sort = options.get('sort', None)
-        if sort:
-            _sort_array = []
-            for field in sort.split(','):
-                field = field.strip()
-                if field == 'name' or field[1:] == 'name':
-                    # sorting on "name" field is ignored, as it is a multi-text field.
-                    continue
-                if field.startswith('-'):
-                    _f = {"%s" % field[1:]: "desc"}
-                else:
-                    _f = {"%s" % field: "asc"}
-                _sort_array.append(_f)
-            options["sort"] = _sort_array
-        return options
-
-    # same exist in biothings.ESQuery ?
-    def _parse_facets_option(self, options):
-        facets = options.get('facets', None)
-        if facets:
-            _facets = {}
-            for field in facets.split(','):
-                _facets[field] = {"terms": {"field": field}}
-            options["facets"] = _facets
-        return options
-
 
 from biothings.settings import BiothingSettings
 from biothings.utils.es import get_es
