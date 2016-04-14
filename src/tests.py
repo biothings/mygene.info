@@ -350,12 +350,12 @@ def test_gene_post():
     res = json_ok(post_ok(api + '/gene', {'ids': '1017,1018', 'fields': 'symbol,name,entrezgene'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'symbol', 'name', 'entrezgene']))
+        eq_(set(_g), set(['_id', '_score', 'query', 'symbol', 'name', 'entrezgene']))
 
     res = json_ok(post_ok(api + '/gene', {'ids': '1017,1018', 'filter': 'symbol,go.MF'}))
     eq_(len(res), 2)
     for _g in res:
-        eq_(set(_g), set(['_id', 'query', 'symbol', 'go']))
+        eq_(set(_g), set(['_id', '_score', 'query', 'symbol', 'go']))
         assert "MF" in _g["go"]
 
 
@@ -525,3 +525,31 @@ def test_dotfield():
     assert "go" in resdefault.keys()
     assert "MF" in resdefault["go"].keys()
     
+def test_raw():
+    # /gene
+    raw1 = json_ok(get_ok(api + '/gene/1017?raw=1'))
+    rawtrue = json_ok(get_ok(api + '/gene/1017?raw=true'))
+    raw0  = json_ok(get_ok(api + '/gene/1017?raw=0'))
+    rawfalse  = json_ok(get_ok(api + '/gene/1017?raw=false'))
+    eq_(raw1,rawtrue)
+    eq_(raw0,rawfalse)
+    assert "_index" in raw1
+    assert not "_index" in raw0
+    assert "_source" in raw1
+    assert not "_source" in raw0
+    # /query
+    raw1 = json_ok(get_ok(api + '/query?q=cdk&raw=1'))
+    rawtrue = json_ok(get_ok(api + '/query?q=cdk&raw=true'))
+    raw0  = json_ok(get_ok(api + '/query?q=cdk&raw=0'))
+    rawfalse  = json_ok(get_ok(api + '/query?q=cdk&raw=false'))
+    # this may vary so remove in comparison
+    for d in [raw1,rawtrue,raw0,rawfalse]:
+        del d["took"]
+    eq_(raw1,rawtrue)
+    eq_(raw0,rawfalse)
+    assert "_shards" in raw1
+    assert not "_shards" in raw0
+
+
+
+

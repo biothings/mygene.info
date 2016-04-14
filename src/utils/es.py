@@ -80,11 +80,13 @@ class ESQuery(ESQuery):
         self._index = ES_INDEX_NAME # reset self._index
         return res
 
-    def _msearch(self, q, species='all'):
-        self._set_index(species)
+    def _msearch(self, **kwargs):
+        self._set_index(kwargs.get('species','all'))
         # path = make_path(self._index, self._doc_type, '_msearch')
-        res = self._es.msearch(index=self._index, doc_type=self._doc_type,
-                                body=q)
+        #res = self._es.msearch(index=self._index, doc_type=self._doc_type,
+        #                        body=kwargs.get("body"))
+        res = super(ESQuery,self)._msearch(**kwargs)
+        logging.debug("res in _msearch: %s" % res)
         self._index = ES_INDEX_NAME     # reset self._index
         return res
 
@@ -94,6 +96,10 @@ class ESQuery(ESQuery):
             self._index = ES_INDEX_NAME
         else:
             self._index = ES_INDEX_NAME_TIER1
+
+    def _get_query_builder(self,**kwargs):
+        '''Subclass to get a custom query builder'''
+        return ESQueryBuilder(**kwargs) 
 
     def _get_genedoc(self, hit, dotfield=False):
         doc = hit.get('_source', hit.get('fields', {}))
@@ -117,19 +123,19 @@ class ESQuery(ESQuery):
             doc = compose_dot_fields(doc, fields)
         return doc
 
-    def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=False):
-        '''res is the dictionary returned from a query.'''
-        if 'error' in res:
-            return error
+    #def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=False):
+    #    '''res is the dictionary returned from a query.'''
+    #    if 'error' in res:
+    #        return error
 
-        hits = res['hits']
-        total = hits['total']
-        if total == 0:
-            return empty
-        elif total == 1 and single_hit:
-            return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
-        else:
-            return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
+    #    hits = res['hits']
+    #    total = hits['total']
+    #    if total == 0:
+    #        return empty
+    #    elif total == 1 and single_hit:
+    #        return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
+    #    else:
+    #        return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
 
     def _cleaned_res_2(self, res, empty=[], error={'error': True},
                        single_hit=False, dotfield=False, fields=None):
@@ -264,7 +270,7 @@ class ESQuery(ESQuery):
                     'error': err.message}
         if options.rawquery:
             return _q
-        res = self._msearch(_q, kwargs['species'])['responses']
+        res = self._msearch(body=_q,species=kwargs['species'])['responses']
         if options.raw:
             return res
 
@@ -959,6 +965,7 @@ class ESQueryBuilder(ESQueryBuilder):
         # if 'fields' in _q and _q['fields'] is not None:
         #     _q['_source'] = _q['fields']
         #     del _q['fields']
+        logging.debug("mg build_id_query: %s" % _q)
         return _q
 
     # TODO: used ?
