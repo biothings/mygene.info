@@ -19,8 +19,8 @@ from biothings.utils.common import (ask, is_int, is_str, is_seq, timesofar, dotd
 from biothings.utils.dotfield import parse_dot_fields, compose_dot_fields_by_fields as compose_dot_fields
 from biothings.www.api.es import ESQuery, QueryError, ESQueryBuilder, parse_facets_option
 from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import NotFoundError
-#from src.utils.dotfield import compose_dot_fields_by_fields as compose_dot_fields
+from .userfilters import UserFilters
+
 
 
 
@@ -70,10 +70,11 @@ class ESQuery(ESQuery):
         self._default_species = [9606, 10090, 10116] # human, mouse, rat
         self._tier_1_species = set(TAXONOMY.values())
 
-    def _search(self, q, species='all', scroll_options={}):
+    def _search(self, q, species='all', scroll_options={},**kwargs):
         self._set_index(species)
         # body = '{"query" : {"term" : { "_all" : ' + q + ' }}}'
         #logging.error("in search q: %s -- index: %s -- doc_type: %s" % (json.dumps(q),self._index,self._doc_type))
+
         res = self._es.search(index=self._index, doc_type=self._doc_type,
                                body=q, **scroll_options)
         #logging.error("in search: %s" % res)
@@ -98,61 +99,7 @@ class ESQuery(ESQuery):
             self._index = ES_INDEX_NAME_TIER1
 
     def _get_query_builder(self,**kwargs):
-        '''Subclass to get a custom query builder'''
         return ESQueryBuilder(**kwargs) 
-
-    def _get_genedoc(self, hit, dotfield=False):
-        doc = hit.get('_source', hit.get('fields', {}))
-        doc.setdefault('_id', hit['_id'])
-        if '_version' in hit:
-            doc.setdefault('_version', hit['_version'])
-        if not dotfield:
-            doc = parse_dot_fields(doc)
-        return doc
-
-    def _get_genedoc_2(self, hit, dotfield=False, fields=None):
-        """
-        use ES _source to support fields/filter argument,
-        by default ES response is not dotted.
-        """
-        doc = hit.get('_source', hit.get('fields', {}))
-        doc.setdefault('_id', hit['_id'])
-        if '_version' in hit:
-            doc.setdefault('_version', hit['_version'])
-        if dotfield and fields:
-            doc = compose_dot_fields(doc, fields)
-        return doc
-
-    #def _cleaned_res(self, res, empty=[], error={'error': True}, single_hit=False, dotfield=False):
-    #    '''res is the dictionary returned from a query.'''
-    #    if 'error' in res:
-    #        return error
-
-    #    hits = res['hits']
-    #    total = hits['total']
-    #    if total == 0:
-    #        return empty
-    #    elif total == 1 and single_hit:
-    #        return self._get_genedoc(hits['hits'][0], dotfield=dotfield)
-    #    else:
-    #        return [self._get_genedoc(hit, dotfield=dotfield) for hit in hits['hits']]
-
-    def _cleaned_res_2(self, res, empty=[], error={'error': True},
-                       single_hit=False, dotfield=False, fields=None):
-        if 'error' in res:
-            return error
-
-        hits = res['hits']
-        total = hits['total']
-        if total == 0:
-            return empty
-        elif total == 1 and single_hit:
-            return self._get_genedoc_2(hits['hits'][0],
-                                       dotfield=dotfield, fields=fields)
-        else:
-            return [self._get_genedoc_2(hit,
-                                        dotfield=dotfield, fields=fields)
-                    for hit in hits['hits']]
 
     def _cleaned_species(self, species, default_to_none=False):
         '''return a cleaned species parameter.
@@ -183,43 +130,6 @@ class ESQuery(ESQuery):
                 _species.append(TAXONOMY[s])
         return _species
 
-    # keepit (?)
-    def _parse_interval_query(self, query):
-        '''Check if the input query string matches interval search regex,
-           if yes, return a dictionary with three key-value pairs:
-              chr
-              gstart
-              gend
-            , otherwise, return None.
-        '''
-        pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
-        if query:
-            mat = re.search(pattern, query)
-            if mat:
-                d = mat.groupdict()
-                if query.startswith('hg19.'):
-                    # support hg19 for human (default is hg38)
-                    d['assembly'] = 'hg19'
-                if query.startswith('mm9.'):
-                    # support mm9 for mouse (default is mm10)
-                    d['assembly'] = 'mm9'
-
-                return d
-
-    # keepit (?)
-    def _is_wildcard_query(self, query):
-        '''Return True if input query is a wildcard query.'''
-        return query.find('*') != -1 or query.find('?') != -1
-
-    # keepit (?)
-    def _is_raw_string_query(self, query):
-        '''Return True if input query is a wildchar/fielded/boolean query.'''
-        for v in [':', '~', ' AND ', ' OR ', 'NOT ']:
-            if query.find(v) != -1:
-                return True
-        if query.startswith('"') and query.endswith('"'):
-            return True
-        return False
 
     def _get_options(self,options,kwargs):
         #this species parameter is added to the query, thus will change facet counts.
@@ -241,166 +151,7 @@ class ESQuery(ESQuery):
         options.kwargs = kwargs
         return options
 
-    #TODO: remove ?
-    def get_gene(self, geneid, fields='all', **kwargs):
-        kwargs['fields'] = self._cleaned_fields(fields)
-        raw = kwargs.pop('raw', False)
-        try:
-            res = self._es.get(index=self._index, doc_type=self._doc_type,
-                                id=geneid, **kwargs)
-        except NotFoundError:
-            return None
-        return res if raw else self._get_genedoc(res)
 
-    def mget_gene(self, geneid_list, fields=None, **kwargs):
-        kwargs['fields'] = self._cleaned_fields(fields)
-        raw = kwargs.pop('raw', False)
-        res = self._es.mget(geneid_list, self._index, self._doc_type, **kwargs)
-        return res if raw else [self._get_genedoc(doc) for doc in res]
-
-    def mget_gene2(self, geneid_list, fields=None, **kwargs):
-        '''for /query post request'''
-        kwargs["fields"] = fields
-        options = self._get_cleaned_query_options(kwargs)
-        qbdr = ESQueryBuilder(**options.kwargs)
-        try:
-            _q = qbdr.build_multiple_id_query(geneid_list, options.scopes)
-        except QueryError as err:
-            return {'success': False,
-                    'error': err.message}
-        if options.rawquery:
-            return _q
-        res = self._msearch(body=_q,species=kwargs['species'])['responses']
-        if options.raw:
-            return res
-
-        assert len(res) == len(geneid_list)
-        _res = []
-        for i in range(len(res)):
-            hits = res[i]
-            qterm = geneid_list[i]
-            hits = self._cleaned_res_2(hits, empty=[], single_hit=False,
-                                       dotfield=options.dotfield,
-                                       fields=options.kwargs.get('_source'))
-            if len(hits) == 0:
-                _res.append({u'query': qterm,
-                             u'notfound': True})
-            elif 'error' in hits:
-                _res.append({u'query': qterm,
-                             u'error': True})
-            else:
-                for hit in hits:
-                    hit[u'query'] = qterm
-                    _res.append(hit)
-        return _res
-
-    def query(self, q, **kwargs):
-        '''for /query?q=<query>'''
-        aggs = parse_facets_option(kwargs)
-        options = self._get_cleaned_query_options(kwargs)
-        qbdr = ESQueryBuilder(**options.kwargs)
-        q = re.sub(u'[\t\n\x0b\x0c\r\x00]+', ' ', q)
-        q = q.strip()
-        _q = None
-        scroll_options = {}
-        if options.fetch_all:
-            # TODO: ES2 compatible ?
-            scroll_options.update({'search_type': 'scan', 'size': self._scroll_size, 'scroll': self._scroll_time})
-        # Check if special interval query pattern exists
-        interval_query = self._parse_interval_query(q)
-        try:
-            if interval_query:
-                # should also passing a "taxid" along with interval.
-                if qbdr.species != 'all':
-                    qbdr.species = [qbdr.species[0]]
-                    _q = qbdr.build_genomic_pos_query(**interval_query)
-                else:
-                    return {'success': False,
-                            'error': 'genomic interval query cannot be combined with "species=all" parameter. Specify a single species.'}
-
-            # Check if fielded/boolean query, excluding special goid query
-            # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
-            # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
-            elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
-                _q = qbdr.build(q, mode=3)   # raw string query
-            elif self._is_wildcard_query(q):
-                _q = qbdr.build(q, mode=2)   # wildcard query
-            else:
-                # normal text query
-                _q = qbdr.build(q, mode=1)
-        except QueryError as e:
-            msg = str(e)
-            return {'success': False,
-                    'error': msg}
-
-        if aggs:
-            _q['aggs'] = aggs 
-
-        if _q:
-            if options.rawquery:
-                return _q
-
-            try:
-                res = self._search(_q, species=kwargs['species'], scroll_options=scroll_options)
-            except Exception as e:
-                # TODO: critical/sensitive data in exception message ? 
-                msg = str(e.info)
-                return {'success': False, 'error': msg}
-
-            if not options.raw:
-                res = self._cleaned_res2(res,options)
-        else:
-            res = {'success': False,
-                   'error': "Invalid query. Please check parameters."}
-
-        return res
-
-    # keepit
-    def doc_feeder(self, step=1000, s=None, e=None, inbatch=False, query=None, **kwargs):
-        '''deprecated! A iterator for returning docs in a ES index with batch query.
-           additional filter query can be passed via "query", e.g.,
-           doc_feeder(query='taxid:9606'}})
-           other parameters can be passed via "**kwargs":
-                fields, from, size etc.
-        '''
-        if query:
-            q = StringQuery(query)
-        else:
-            q = MatchAllQuery()
-        raw_res = None
-
-        cnt = 0
-        t0 = time.time()
-        while 1:
-            t1 = time.time()
-            if raw_res is None:
-                raw_res = self._es.search_raw(q, self._index, self._doc_type,
-                                               start=s, size=step, scan=True,
-                                               scroll='5m', **kwargs)
-                n = raw_res['hits']['total']
-                print('Retrieving %d documents from index "%s/%s".' % (n, self._index, self._doc_type))
-            else:
-                raw_res = self._es.search_scroll(raw_res._scroll_id, scroll='5m')
-            hits_cnt = len(raw_res['hits']['hits'])
-            if hits_cnt == 0:
-                break
-            else:
-
-                print("Processing %d-%d documents..." % (cnt+1, cnt + hits_cnt),)
-                res = self._cleaned_res(raw_res)
-                if inbatch:
-                    yield res
-                else:
-                    for hit in res:
-                        yield hit
-                cnt += hits_cnt
-                print('Done.[%.1f%%,%s]' % (cnt*100./n, timesofar(t1)))
-                if e and cnt > e:
-                    break
-
-        print('Finished.[total docs: %s, total time: %s]' % (cnt, timesofar(t0)))
-
-    # keepit
     def metadata(self, raw=False):
         '''return metadata about the index.'''
         mapping = self._es.indices.get_mapping(self._index, self._doc_type)
@@ -486,7 +237,43 @@ class ESQueryBuilder(ESQueryBuilder):
             }
         }
 
-    # keepit (?)
+    def _is_wildcard_query(self, query):
+        '''Return True if input query is a wildcard query.'''
+        return query.find('*') != -1 or query.find('?') != -1
+
+
+    def _is_raw_string_query(self, query):
+        '''Return True if input query is a wildchar/fielded/boolean query.'''
+        for v in [':', '~', ' AND ', ' OR ', 'NOT ']:
+            if query.find(v) != -1:
+                return True
+        if query.startswith('"') and query.endswith('"'):
+            return True
+        return False
+
+    def _parse_interval_query(self, query):
+        '''Check if the input query string matches interval search regex,
+           if yes, return a dictionary with three key-value pairs:
+              chr
+              gstart
+              gend
+            , otherwise, return None.
+        '''
+        pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
+        if query:
+            mat = re.search(pattern, query)
+            if mat:
+                d = mat.groupdict()
+                if query.startswith('hg19.'):
+                    # support hg19 for human (default is hg38)
+                    d['assembly'] = 'hg19'
+                if query.startswith('mm9.'):
+                    # support mm9 for mouse (default is mm10)
+                    d['assembly'] = 'mm9'
+
+                return d
+
+
     def dis_max_query(self, q):
         #remove '"' and '\' from q, they will break json decoder.
         q = q.replace('"', '').replace('\\', '')
@@ -606,7 +393,6 @@ class ESQueryBuilder(ESQueryBuilder):
         return _query
 
 
-    # keepit (?)
     def wildcard_query(self, q):
         '''q should contains either * or ?, but not the first character.'''
         _query = {
@@ -662,7 +448,6 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return _query
 
-    # keepit (?)
     def string_query(self, q):
         _query = {
             "query_string": {
@@ -677,7 +462,6 @@ class ESQueryBuilder(ESQueryBuilder):
         _query = json.loads(_query % {'q': q})
         return _query
 
-    # keepit (?)
     def raw_string_query(self, q):
         _query = {
             "query_string": {
@@ -694,7 +478,6 @@ class ESQueryBuilder(ESQueryBuilder):
             raise QueryError("invalid query term.")
         return _query
 
-    # keepit (?)
     def add_species_filter(self, _query):
         """deprecated! replaced by  """
         if self.species == 'all':
@@ -713,7 +496,6 @@ class ESQueryBuilder(ESQueryBuilder):
         }
         return _query
 
-    # keepit (?)
     def get_query_filters(self):
         '''filters added here will be applied in a filtered query,
            thus will affect the facet counts.
@@ -765,7 +547,6 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return filters
 
-    # keepit (?)
     def add_query_filters(self, _query):
         '''filters added here will be applied in a filtered query,
            thus will affect the facet counts.
@@ -785,7 +566,6 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return _query
 
-    # keepit
     def add_facet_filters(self, _query):
         """To add filters (e.g. taxid) to restrict returned hits,
             but does not change the scope for facet counts.
@@ -813,7 +593,6 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return _query
 
-    # keepit
     def add_species_custom_filters_score(self, _query):
         _query = {
             "function_score": {
@@ -842,8 +621,7 @@ class ESQueryBuilder(ESQueryBuilder):
         }
         return _query
 
-    # keepit (?)
-    def build(self, q, mode=1):
+    def default_query(self, q):
         '''mode:
                 1    match query
                 2    wildcard query
@@ -851,17 +629,37 @@ class ESQueryBuilder(ESQueryBuilder):
 
                else  string_query (for test)
         '''
+
+        # normal text query
+        mode = 1
+
+        # Check if special interval query pattern exists
+        interval_query = self._parse_interval_query(q)
+        if interval_query:
+            # should also passing a "taxid" along with interval.
+            logging.debug("%s ...." % self.species)
+            if self.species != 'all':
+                self.species = [self.species[0]] #TODO: where is it used ?
+                _q = self.build_genomic_pos_query(**interval_query)
+                return _q
+            else:
+                raise QueryError('genomic interval query cannot be combined with "species=all" parameter. ' + \
+                        'Specify a single species.')
+
+        # Check if fielded/boolean query, excluding special goid query
+        # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
+        # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
         if q == '__all__':
             _query = {"match_all": {}}
+        elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
+            _query = self.raw_string_query(q)
+        elif self._is_wildcard_query(q):
+            _query = self.wildcard_query(q)
         else:
-            if mode == 1:
-                _query = self.dis_max_query(q)
-            elif mode == 2:
-                _query = self.wildcard_query(q)
-            elif mode == 3:
-                _query = self.raw_string_query(q)
-            else:
-                _query = self.string_query(q)
+            _query = self.dis_max_query(q)
+
+        #TODO: this is actually not used, how useful ?
+        #_query = self.string_query(q)
 
         _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
@@ -965,25 +763,8 @@ class ESQueryBuilder(ESQueryBuilder):
         # if 'fields' in _q and _q['fields'] is not None:
         #     _q['_source'] = _q['fields']
         #     del _q['fields']
-        logging.debug("mg build_id_query: %s" % _q)
         return _q
 
-    # TODO: used ?
-    def build_multiple_id_query2(self, id_list, scopes=None):
-        _query = {
-            "terms": {
-                ("%s" % scopes): id_list,
-            }
-        }
-        #_query = self.add_species_filter(_query)
-        _query = self.add_query_filters(_query)
-        _query = self.add_species_custom_filters_score(_query)
-        _q = {"query": _query}
-        if self._query_options:
-            _q.update(self._query_options)
-        return _q
-
-    # keepit
     def build_genomic_pos_query(self, chr, gstart, gend, assembly=None):
         '''By default if assembly is None, the lastest assembly is used.
            for some species (e.g. human) we support multiple assemblies,
@@ -1034,89 +815,6 @@ class ESQueryBuilder(ESQueryBuilder):
         if self._query_options:
             _q.update(self._query_options)
         return _q
-
-from biothings.settings import BiothingSettings
-from biothings.utils.es import get_es
-biothing_settings = BiothingSettings()
-class UserFilters(object):
-    def __init__(self):
-        self.conn = get_es(biothing_settings.es_host) 
-        self.ES_INDEX_NAME = 'userfilters'
-        self.ES_DOC_TYPE = 'filter'
-        self._MAPPING = {
-            "dynamic": False,
-            "properties": {}
-        }   # this mapping disables indexing completely since we don't need it.
-
-    def create(self):
-        print("Creating index...",)
-        print(self.conn.create_index(self.ES_INDEX_NAME))
-        print("Updating mapping...",)
-        print(self.conn.put_mapping(self.ES_DOC_TYPE,
-                                    self._MAPPING,
-                                    [self.ES_INDEX_NAME]))
-
-    def add(self, name, id_list=[], id_field="entrezgene", raw_filter=None):
-        '''add a named filter.'''
-        _filter = None
-        if raw_filter:
-            _filter = raw_filter
-        elif id_list and id_field:
-            _filter = {
-                "terms": {id_field: id_list}
-            }
-        if _filter:
-            print('Adding filter "{}"...'.format(name),)
-            _doc = {'_id': name,
-                    'filter': _filter}
-            print(self.conn.index(_doc, self.ES_INDEX_NAME,
-                                  self.ES_DOC_TYPE,
-                                  id=_doc['_id']))
-        else:
-            print("No filter to add.")
-
-    def get(self, name):
-        '''get a named filter.'''
-        try:
-            return self.conn.get(self.ES_INDEX_NAME, name, self.ES_DOC_TYPE)['_source']
-        except NotFoundError:
-            return None
-
-    def count(self):
-        n = self.conn.count(None, self.ES_INDEX_NAME, self.ES_DOC_TYPE)['count']
-        return n
-
-    def get_all(self, skip=0, size=1000):
-        '''get all named filter.'''
-        print('\ttotal filters: {}'.format(self.count()))
-        q = {"query": {"match_all": {}}}
-        res = self.conn.search_raw(q, indices=self.ES_INDEX_NAME, doc_types=self.ES_DOC_TYPE,
-                                   **{"from": str(skip), "size": str(1000)})
-        return [hit['_source'] for hit in res.hits.hits]
-
-    def delete(self, name, noconfirm=False):
-        '''delete a named filter.'''
-        _filter = self.get(name)
-        if _filter:
-            msg = 'Found filter "{}". Continue to delete it?'.format(name)
-            if noconfirm or ask(msg) == 'Y':
-                print('Deleting filter "{}"...'.format(name),)
-                print(self.conn.delete(self.ES_INDEX_NAME, self.ES_DOC_TYPE, name))
-        else:
-            print('Filter "{}" does not exist. Abort now.'.format(name))
-
-    def rename(self, name, newname):
-        '''"rename" a named filter.
-           Basically, this needs to create a new doc and delete the old one.
-        '''
-        _filter = self.get(name)
-        if _filter:
-            msg = 'Found filter "{}". Rename it to "{}"?'.format(name, newname)
-            if ask(msg) == 'Y':
-                self.add(newname, raw_filter=_filter['filter'])
-                self.delete(name, noconfirm=True)
-        else:
-            print('Filter "{}" does not exist. Abort now.'.format(name))
 
 
 def make_test_index():
