@@ -101,6 +101,11 @@ class ESQuery(ESQuery):
     def _get_query_builder(self,**kwargs):
         return ESQueryBuilder(**kwargs) 
 
+    def _build_query(self, q, kwargs):
+        # can override this function if more query types are to be added
+        esqb = self._get_query_builder(**kwargs)
+        return esqb.query(q)
+
     def _cleaned_species(self, species, default_to_none=False):
         '''return a cleaned species parameter.
            should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
@@ -237,19 +242,6 @@ class ESQueryBuilder(ESQueryBuilder):
             }
         }
 
-    def _is_wildcard_query(self, query):
-        '''Return True if input query is a wildcard query.'''
-        return query.find('*') != -1 or query.find('?') != -1
-
-
-    def _is_raw_string_query(self, query):
-        '''Return True if input query is a wildchar/fielded/boolean query.'''
-        for v in [':', '~', ' AND ', ' OR ', 'NOT ']:
-            if query.find(v) != -1:
-                return True
-        if query.startswith('"') and query.endswith('"'):
-            return True
-        return False
 
     def _parse_interval_query(self, query):
         '''Check if the input query string matches interval search regex,
@@ -448,53 +440,39 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return _query
 
-    def string_query(self, q):
-        _query = {
-            "query_string": {
-                "query": "%(q)s",
-                "analyzer": "string_lowercase",
-                "default_operator": "AND",
-                "auto_generate_phrase_queries": True
-            }
-        }
-        _query = json.dumps(_query)
-        q = "symbol:%(q)s OR name:%(q)s OR %(q)s" % {'q': q}
-        _query = json.loads(_query % {'q': q})
-        return _query
+    #TODO: remove ?
+    #def string_query(self, q):
+    #    _query = {
+    #        "query_string": {
+    #            "query": "%(q)s",
+    #            "analyzer": "string_lowercase",
+    #            "default_operator": "AND",
+    #            "auto_generate_phrase_queries": True
+    #        }
+    #    }
+    #    _query = json.dumps(_query)
+    #    q = "symbol:%(q)s OR name:%(q)s OR %(q)s" % {'q': q}
+    #    _query = json.loads(_query % {'q': q})
+    #    return _query
 
-    def raw_string_query(self, q):
-        _query = {
-            "query_string": {
-                "query": "%(q)s",
-                # "analyzer": "string_lowercase",
-                "default_operator": "AND",
-                "auto_generate_phrase_queries": True
-            }
-        }
-        _query = json.dumps(_query)
-        try:
-            _query = json.loads(_query % {'q': q.replace('"', '\\"')})
-        except ValueError:
-            raise QueryError("invalid query term.")
-        return _query
+    #TOO: remove ?
+    #def add_species_filter(self, _query):
+    #    """deprecated! replaced by  """
+    #    if self.species == 'all':
+    #        #do not apply species filter
+    #        return _query
 
-    def add_species_filter(self, _query):
-        """deprecated! replaced by  """
-        if self.species == 'all':
-            #do not apply species filter
-            return _query
-
-        _query = {
-            'filtered': {
-                'query': _query,
-                'filter': {
-                    "terms": {
-                        "taxid": self.species
-                    }
-                }
-            }
-        }
-        return _query
+    #    _query = {
+    #        'filtered': {
+    #            'query': _query,
+    #            'filter': {
+    #                "terms": {
+    #                    "taxid": self.species
+    #                }
+    #            }
+    #        }
+    #    }
+    #    return _query
 
     def get_query_filters(self):
         '''filters added here will be applied in a filtered query,
@@ -546,25 +524,6 @@ class ESQueryBuilder(ESQueryBuilder):
                 filters = {"and": filters}
 
         return filters
-
-    def add_query_filters(self, _query):
-        '''filters added here will be applied in a filtered query,
-           thus will affect the facet counts.
-        '''
-        filters = self.get_query_filters()
-        if not filters:
-            return _query
-
-        #add filters as filtered query
-        #this will apply to facet counts
-        _query = {
-            'filtered': {
-                'query': _query,
-                'filter': filters
-            }
-        }
-
-        return _query
 
     def add_facet_filters(self, _query):
         """To add filters (e.g. taxid) to restrict returned hits,
@@ -621,7 +580,7 @@ class ESQueryBuilder(ESQueryBuilder):
         }
         return _query
 
-    def default_query(self, q):
+    def query(self, q):
         '''mode:
                 1    match query
                 2    wildcard query
@@ -629,9 +588,6 @@ class ESQueryBuilder(ESQueryBuilder):
 
                else  string_query (for test)
         '''
-
-        # normal text query
-        mode = 1
 
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
@@ -646,28 +602,18 @@ class ESQueryBuilder(ESQueryBuilder):
                 raise QueryError('genomic interval query cannot be combined with "species=all" parameter. ' + \
                         'Specify a single species.')
 
-        # Check if fielded/boolean query, excluding special goid query
-        # raw_string_query should be checked ahead of wildcard query, as raw_string may contain wildcard as well
-        # e.g., a query "symbol:CDK?", should be treated as raw_string_query.
-        if q == '__all__':
-            _query = {"match_all": {}}
-        elif self._is_raw_string_query(q) and not q.lower().startswith('go:'):
-            _query = self.raw_string_query(q)
-        elif self._is_wildcard_query(q):
-            _query = self.wildcard_query(q)
         else:
-            _query = self.dis_max_query(q)
+            _query = self.generate_query(q)
 
-        #TODO: this is actually not used, how useful ?
-        #_query = self.string_query(q)
+            #TODO: this is actually not used, how useful ?
+            #_query = self.string_query(q)
 
-        _query = self.add_query_filters(_query)
-        _query = self.add_species_custom_filters_score(_query)
-        _q = {'query': _query}
-        _q = self.add_facet_filters(_q)
-        if self._query_options:
-            _q.update(self._query_options)
-        return _q
+            _query = self.add_species_custom_filters_score(_query)
+            _q = {'query': _query}
+            _q = self.add_facet_filters(_q)
+            if self._query_options:
+                _q.update(self._query_options)
+            return _q
 
     # keepit (but similar)
     def build_id_query(self, id, scopes=None):
