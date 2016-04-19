@@ -18,9 +18,6 @@ import tornado.options
 import tornado.web
 from tornado.options import options
 
-src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
-if src_path not in sys.path:
-    sys.path.append(src_path)
 
 #TODO: move to a "common api" module (not specific to an API version)
 #*******#
@@ -35,7 +32,7 @@ class MainHandler(BiothingHandler):
         if INCLUDE_DOCS:
             self.render(os.path.join(DOCS_STATIC_PATH, 'index.html'))
 
-DEMO_STATIC_FILE = os.path.join(src_path, 'docs/demo/index.html')
+DEMO_STATIC_FILE = '../docs/demo/index.html'
 class DemoHandler(BiothingHandler):
     def get(self):
         with open(DEMO_STATIC_FILE,'r') as demo_file:
@@ -55,8 +52,10 @@ __revision__ = _get_rev()
 os.environ["MYGENE_REVISION"] = __revision__
 
 
-from biothings.www.index_base import main, settings
+from biothings.www.index_base import main, settings, get_app
 from biothings.www.helper import add_apps
+from biothings.settings import BiothingSettings
+btsettings = BiothingSettings()
 
 # build API routes
 from api_v2.handlers import APP_LIST as api_v2_app_list
@@ -69,10 +68,9 @@ from api_v2.handlers import MyGeneFieldsHandler
 
 from config import INCLUDE_DOCS
 __USE_WSGI__ = False
-DOCS_STATIC_PATH = os.path.join(src_path, 'docs/_build/html')
+DOCS_STATIC_PATH = '../docs/_build/html'
 if INCLUDE_DOCS and not os.path.exists(DOCS_STATIC_PATH):
     raise IOError('Run "make html" to generate sphinx docs first.')
-STATIC_PATH = os.path.join(src_path, 'src/static')
 
 
 APP_LIST = [
@@ -93,7 +91,7 @@ APP_LIST += add_apps('v2', api_v2_app_list)
 if options.debug:
     APP_LIST += [
         #/widget/* static path
-        (r"/widget/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(STATIC_PATH, 'widget')}),
+        (r"/widget/(.*)", tornado.web.StaticFileHandler, {'path': os.path.join(btsettings.static_path, 'widget')}),
         #this should be the last one
         (r"/?(.*)", tornado.web.StaticFileHandler, {'path': DOCS_STATIC_PATH}),
     ]
@@ -103,16 +101,6 @@ if options.debug:
 if __USE_WSGI__:
     import tornado.wsgi
     wsgi_app = tornado.wsgi.WSGIApplication(APP_LIST)
-
-# TODO: should we move static dir to www/static to use biothings default ?
-if options.debug:
-    #     from config import STATIC_PATH
-    settings.update({
-        "static_path": STATIC_PATH,
-    })
-    #    from config import auth_settings
-    #    settings.update(auth_settings)
-
 
 
 if __name__ == '__main__':

@@ -1,5 +1,5 @@
 
-from biothings.tests.tests import BiothingTestHelper, _d, _e
+from biothings.tests.tests import BiothingTestHelper, _d, _e, TornadoRequestHelper
 from biothings.tests.settings import NosetestSettings
 from nose.tools import ok_, eq_
 
@@ -437,9 +437,32 @@ class MyGeneTest(BiothingTestHelper):
     def test_species(self):
         res, con = self.h.request(self.api + "/species/9606")
         eq_(res.status, 200)
-        eq_(res["content-location"],'http://s.biothings.io/v1/species/9606?include_children=1')
         d = _d(con.decode('utf-8'))
         eq_(set(d.keys()),set(['taxid', 'authority', 'lineage', '_id', 'common_name', 'genbank_common_name', '_version',
             'parent_taxid', 'scientific_name', 'has_gene', 'children', 'rank', 'uniprot_name']))
 
+
+
+# Self contained test class, used for CI tools such as Travis
+# This will start a Tornado server on its own and perform tests
+# against this server.
+from tornado.testing import AsyncHTTPTestCase
+import index
+from biothings.settings import BiothingSettings
+btsettings = BiothingSettings()
+# force static path, as if we were in debug mode
+index.settings.update({
+    "static_path": btsettings.static_path
+})
+
+class MyGeneTestTornadoClient(AsyncHTTPTestCase,MyGeneTest):
+    __test__ = True
+
+    def __init__(self,methodName='runTest',**kwargs):
+        super(AsyncHTTPTestCase,self).__init__(methodName,**kwargs)
+        super(MyGeneTest,self).__init__(**kwargs)
+        self.h = TornadoRequestHelper(self)
+
+    def get_app(self):
+        return index.get_app(index.APP_LIST)
 
