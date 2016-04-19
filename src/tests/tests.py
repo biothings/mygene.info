@@ -1,9 +1,7 @@
 
 from biothings.tests.tests import BiothingTestHelper, _d, _e, TornadoRequestHelper
-from biothings.tests.settings import NosetestSettings
 from nose.tools import ok_, eq_
 
-ns = NosetestSettings()
 
 
 class MyGeneTest(BiothingTestHelper):
