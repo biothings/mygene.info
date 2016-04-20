@@ -30,6 +30,10 @@ FIELD_NOTES_PATH = ''
 JSONLD_CONTEXT_PATH = ''
 
 
+ES_SCROLL_TIME = '10'
+ES_SCROLL_SIZE = 10
+
+
 #relevant for running in prod
 INCLUDE_DOCS = False# if True, include the links to mygene.info docs
 
