@@ -6,8 +6,7 @@ from nose.tools import ok_, eq_
 
 class MyGeneTest(BiothingTestHelper):
     __test__ = True # explicitly set this to be a test class
-    # Add extra nosetests here
-    pass
+
 
     #############################################################
     # Test functions                                            #
@@ -197,9 +196,6 @@ class MyGeneTest(BiothingTestHelper):
         res = self.json_ok(self.get_ok(self.api + '/gene/1017?fields=symbol,name,entrezgene'))
         eq_(set(res), set(['_id', '_version', 'symbol', 'name', 'entrezgene']))
         res = self.json_ok(self.get_ok(self.api + '/gene/1017?filter=symbol,go.MF'))
-        fout = open("bla","w")
-        fout.write("%s" % res)
-        fout.close()
         eq_(set(res), set(['_id', '_version', 'symbol', 'go']))
         assert "MF" in res["go"]
         #eq_(res['go'].keys(), ['MF'])
@@ -438,6 +434,108 @@ class MyGeneTest(BiothingTestHelper):
         d = _d(con.decode('utf-8'))
         eq_(set(d.keys()),set(['taxid', 'authority', 'lineage', '_id', 'common_name', 'genbank_common_name', '_version',
             'parent_taxid', 'scientific_name', 'has_gene', 'children', 'rank', 'uniprot_name']))
+
+    def test_query_dotstar_refseq(self):
+        protein = self.json_ok(self.get_ok(self.api + "/query?q=refseq:NP_001670&fields=refseq"))
+        rna = self.json_ok(self.get_ok(self.api + "/query?q=refseq:NM_001679&fields=refseq"))
+        genomic = self.json_ok(self.get_ok(self.api + "/query?q=refseq:NT_005612&fields=refseq"))
+        explicit_protein = self.json_ok(self.get_ok(self.api + "/query?q=refseq.protein:NP_001670&fields=refseq"))
+        explicit_rna = self.json_ok(self.get_ok(self.api + "/query?q=refseq.rna:NM_001679&fields=refseq"))
+        explicit_genomic = self.json_ok(self.get_ok(self.api + "/query?q=refseq.genomic:NT_005612&fields=refseq"))
+        eq_(protein["hits"],explicit_protein["hits"])
+        eq_(rna["hits"],explicit_rna["hits"])
+        eq_(genomic["hits"],explicit_genomic["hits"])
+        eq_(protein["hits"],rna["hits"]) # same result whatever the query
+        eq_(genomic["hits"],[]) # genomic not indexed
+        eq_(rna["total"],1)
+        hit = rna["hits"][0]
+        eq_(hit["refseq"]["protein"],"NP_001670")
+        eq_(hit["refseq"]["rna"],"NM_001679")
+
+    def test_query_dotstar_accession(self):
+        protein = self.json_ok(self.get_ok(self.api + "/query?q=accession:AAH68303&fields=accession"))
+        rna = self.json_ok(self.get_ok(self.api + "/query?q=accession:BC068303&fields=accession"))
+        genomic = self.json_ok(self.get_ok(self.api + "/query?q=accession:FJ497232&fields=accession"))
+        explicit_protein = self.json_ok(self.get_ok(self.api + "/query?q=accession.protein:AAH68303&fields=accession"))
+        explicit_rna = self.json_ok(self.get_ok(self.api + "/query?q=accession.rna:BC068303&fields=accession"))
+        explicit_genomic = self.json_ok(self.get_ok(self.api + "/query?q=accession.genomic:FJ497232&fields=accession"))
+        eq_(protein["hits"],explicit_protein["hits"])
+        eq_(rna["hits"],explicit_rna["hits"])
+        eq_(genomic["hits"],explicit_genomic["hits"])
+        eq_(protein["hits"],rna["hits"]) # same result whatever the query
+        eq_(genomic["hits"],[]) # genomic not indexed
+        eq_(rna["total"],1)
+        hit = rna["hits"][0]
+        assert "AAH68303" in hit["accession"]["protein"]
+        assert "BC068303" in hit["accession"]["rna"]
+
+    def test_query_dotstar_reporter(self):
+        human = self.json_ok(self.get_ok(self.api + "/query?q=reporter:2842429&fields=reporter"))
+        mouse = self.json_ok(self.get_ok(self.api + "/query?q=reporter:1452128_a_at&fields=reporter"))
+        rat = self.json_ok(self.get_ok(self.api + "/query?q=reporter:1387540_at&fields=reporter"))
+        # human
+        eq_(human["total"],3)
+        eq_(human["hits"][0]["reporter"]["HuGene-1_1"],"8110147")
+        assert "2889211" in human["hits"][0]["reporter"]["HuEx-1_0"]
+        assert "TC05002114.hg.1" in human["hits"][0]["reporter"]["HTA-2_0"]
+        eq_(human["hits"][0]["reporter"]["HG-U133_Plus_2"],"228805_at")
+        assert "gnf1h08801_at" in human["hits"][0]["reporter"]["GNF1H"]
+        eq_(human["hits"][0]["reporter"]["HuGene-1_1"],"8110147")
+        eq_(human["hits"][0]["reporter"]["HuGene-2_1"],"16992761")
+        # rat
+        eq_(rat["total"],1)
+        eq_(rat["hits"][0]["reporter"]["RaEx-1_0"],"7082865")
+        eq_(rat["hits"][0]["reporter"]["Rat230_2"],"1387540_at")
+        eq_(rat["hits"][0]["reporter"]["RaGene-2_1"],"17661681")
+        eq_(rat["hits"][0]["reporter"]["RaGene-1_1"],"10747640")
+        assert "AF036760_at" in rat["hits"][0]["reporter"]["RG-U34A"]
+        # rat
+        eq_(mouse["total"],1)
+        assert "1456141_x_at" in mouse["hits"][0]["reporter"]["Mouse430_2"]
+        eq_(mouse["hits"][0]["reporter"]["MTA-1_0"],"TC0X00000742.mm.1")
+        assert "165150_i_at" in mouse["hits"][0]["reporter"]["MG-U74Bv2"]
+        eq_(mouse["hits"][0]["reporter"]["MoEx-1_0"],"7012082")
+        eq_(mouse["hits"][0]["reporter"]["GNF1M"],"gnf1m11626_at")
+        eq_(mouse["hits"][0]["reporter"]["MoGene-2_1"],"17535957")
+        eq_(mouse["hits"][0]["reporter"]["MoGene-1_1"],"10600512")
+
+    def test_query_dotstar_interpro(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=interpro:IPR008389&fields=interpro"))
+        eq_(res["total"],6)
+        assert set([pro["id"] for hit in res["hits"] for pro in hit["interpro"] ]) == set(['IPR008389', 'IPR017385'])
+
+    def test_query_dotstar_go(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=go:0016324&fields=go&sorted=true"))
+        assert res["total"] > 800
+        eq_(res["hits"][0]["go"]["BP"]["id"],"GO:0008150") # make sure we're looking at proper
+        cc = res["hits"][0]["go"]["CC"]
+        eq_(len(cc),4)
+        assert set([c["evidence"] for c in cc]),set(["ISO","IDA"])
+
+    def test_query_dotstar_homologene(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=homologene:44221&fields=homologene"))
+        eq_(res["total"],3)
+        h = res["hits"][0]
+        assert set([i[0] for i in h["homologene"]["genes"]]) == set([7955, 8364, 9031, 9598, 9606, 9615, 9913, 10090,10116])
+
+    def test_query_dotstar_reagent(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=reagent:GNF190467&fields=reagent"))
+        eq_(res["total"],1)
+        hit = res["hits"][0]
+        assert {"relationship" : "is", "id" : "GNF168655"} in hit["reagent"]["GNF_Qia_hs-genome_v1_siRNA"]
+        assert {"relationship" : "is", "id" : "GNF277345"} in hit["reagent"]["GNF_mm+hs-MGC"]
+        assert {"relationship" : "is", "id" : "GNF110093"} in hit["reagent"]["NOVART_hs-genome_siRNA"]
+
+    def test_query_dotstar_uniprot(self):
+        swissid = self.json_ok(self.get_ok(self.api + "/query?q=uniprot:Q8NEB7&fields=uniprot"))
+        trembid = self.json_ok(self.get_ok(self.api + "/query?q=uniprot:F5H2C2&fields=uniprot"))
+        eq_(swissid["hits"],trembid["hits"])
+        eq_(trembid["total"],1)
+        eq_(trembid["hits"][0]["uniprot"]["Swiss-Prot"],"Q8NEB7")
+        assert set(trembid["hits"][0]["uniprot"]["TrEMBL"]),set(["E7EP66", "F5H2C2", "F5H3P4", "F5H5S8"])
+
+
+
 
 
 

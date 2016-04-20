@@ -58,5 +58,11 @@ ANNOTATION_ENDPOINT = 'gene'
 QUERY_ENDPOINT = 'query'
 API_VERSION = 'v2'
 
-# Module that contains the nosetest config
-NOSETEST_SETTINGS = 'tests.nosetest_config'
+# *****************************************************************************
+# Tests
+# *****************************************************************************
+# use this file as nosetest config file
+NOSETEST_SETTINGS = "config"
+# Env. var containing root URL to services
+HOST_ENVAR_NAME = "MG_HOST"
+
