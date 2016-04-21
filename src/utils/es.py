@@ -13,8 +13,8 @@ import copy
 import requests
 import logging
 
-from config import (ES_HOST, ES_INDEX_NAME_TIER1, ES_INDEX_NAME,
-                    ES_DOC_TYPE)
+from config import (ES_INDEX_NAME_TIER1, ES_INDEX_NAME,
+                    ES_DOC_TYPE, SOURCE_TRANSLATORS)
 from biothings.utils.common import (ask, is_int, is_str, is_seq, timesofar, dotdict)
 from biothings.utils.dotfield import parse_dot_fields, compose_dot_fields_by_fields as compose_dot_fields
 from biothings.www.api.es import ESQuery, QueryError, ESQueryBuilder, parse_facets_option
@@ -82,12 +82,9 @@ class ESQuery(ESQuery):
         return res
 
     def _msearch(self, **kwargs):
-        self._set_index(kwargs.get('species','all'))
-        # path = make_path(self._index, self._doc_type, '_msearch')
-        #res = self._es.msearch(index=self._index, doc_type=self._doc_type,
-        #                        body=kwargs.get("body"))
-        res = super(ESQuery,self)._msearch(**kwargs)
-        logging.debug("res in _msearch: %s" % res)
+        self._set_index(kwargs.get('species', 'all'))
+        logging.debug("_msearch: %s" % kwargs['body'])
+        res = super(ESQuery, self)._msearch(**kwargs)
         self._index = ES_INDEX_NAME     # reset self._index
         return res
 
@@ -242,6 +239,13 @@ class ESQueryBuilder(ESQueryBuilder):
             }
         }
 
+    def _translate_datasource(self, q):
+        for src in SOURCE_TRANSLATORS.keys():
+            q = re.sub(src, SOURCE_TRANSLATORS[src], q)
+        logging.debug(q)
+        return q
+        pass
+
 
     def _parse_interval_query(self, query):
         '''Check if the input query string matches interval search regex,
@@ -384,7 +388,6 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return _query
 
-
     def wildcard_query(self, q):
         '''q should contains either * or ?, but not the first character.'''
         _query = {
@@ -439,40 +442,6 @@ class ESQueryBuilder(ESQueryBuilder):
             raise QueryError("invalid query term.")
 
         return _query
-
-    #TODO: remove ?
-    #def string_query(self, q):
-    #    _query = {
-    #        "query_string": {
-    #            "query": "%(q)s",
-    #            "analyzer": "string_lowercase",
-    #            "default_operator": "AND",
-    #            "auto_generate_phrase_queries": True
-    #        }
-    #    }
-    #    _query = json.dumps(_query)
-    #    q = "symbol:%(q)s OR name:%(q)s OR %(q)s" % {'q': q}
-    #    _query = json.loads(_query % {'q': q})
-    #    return _query
-
-    #TOO: remove ?
-    #def add_species_filter(self, _query):
-    #    """deprecated! replaced by  """
-    #    if self.species == 'all':
-    #        #do not apply species filter
-    #        return _query
-
-    #    _query = {
-    #        'filtered': {
-    #            'query': _query,
-    #            'filter': {
-    #                "terms": {
-    #                    "taxid": self.species
-    #                }
-    #            }
-    #        }
-    #    }
-    #    return _query
 
     def get_query_filters(self):
         '''filters added here will be applied in a filtered query,
@@ -589,18 +558,25 @@ class ESQueryBuilder(ESQueryBuilder):
                else  string_query (for test)
         '''
 
+        # translate data source to provide back-compatibility for
+        # some query fields running on ES2
+        logging.debug("lkjlkj %s" % repr(q))
+        q = self._translate_datasource(q)
+        logging.debug("now lkjlkj %s" % repr(q))
+
         # Check if special interval query pattern exists
         interval_query = self._parse_interval_query(q)
         if interval_query:
             # should also passing a "taxid" along with interval.
             logging.debug("%s ...." % self.species)
             if self.species != 'all':
-                self.species = [self.species[0]] #TODO: where is it used ?
+                self.species = [self.species[0]]  # TODO: where is it used ?
                 _q = self.build_genomic_pos_query(**interval_query)
                 return _q
             else:
-                raise QueryError('genomic interval query cannot be combined with "species=all" parameter. ' + \
-                        'Specify a single species.')
+                raise QueryError('genomic interval query cannot be combined ' +
+                                 'with "species=all" parameter. ' +
+                                 'Specify a single species.')
 
         else:
             _query = self.generate_query(q)
@@ -613,6 +589,7 @@ class ESQueryBuilder(ESQueryBuilder):
             _q = self.add_facet_filters(_q)
             if self._query_options:
                 _q.update(self._query_options)
+            logging.debug("_q = %s" % json.dumps(_q))
             return _q
 
     # keepit (but similar)

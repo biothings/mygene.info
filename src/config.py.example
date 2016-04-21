@@ -1,8 +1,8 @@
-#ES_HOST = 'su07:9200'
+# ES_HOST = 'su07:9200'
 ES_HOST = '52.32.23.166:9200'
 
-#Can specify a EC2 host using name tag:
-#ES_HOST = 'ec2:us-west-2:ES_http'
+# Can specify a EC2 host using name tag:
+# ES_HOST = 'ec2:us-west-2:ES_http'
 if ES_HOST.startswith('ec2:'):
     from boto.ec2 import connect_to_region
     region, name = ES_HOST[4:].split(':')
@@ -12,16 +12,18 @@ if ES_HOST.startswith('ec2:'):
     if ins.state == 'running':
         ES_HOST = '{}:9200'.format(ins.ip_address)
     else:
-        raise ValueError('EC2 instance "{}" is not running'.format(ES_HOST[4:]))
+        raise ValueError('EC2 instance "{}" is not running'
+                         .format(ES_HOST[4:]))
 
-ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'sort', 'explain', 'version', 'aggs',
-                   'fetch_all','species','fields','userfilter','exists','missing','include_tax_tree',
+ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'sort', 'explain',
+                   'version', 'aggs', 'fetch_all', 'species', 'fields',
+                   'userfilter', 'exists', 'missing', 'include_tax_tree',
                    'species_facet_filter']
 
-#ES_INDEX_NAME = "genedoc_mygene_allspecies_current_3" #'genedoc_allspecies_current'
-#ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_3" #'genedoc_current'
-ES_INDEX_NAME = "genedoc_mygene_allspecies_current_2" #'genedoc_allspecies_current'
-ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_2" #'genedoc_current'
+# ES_INDEX_NAME = "genedoc_mygene_allspecies_current_3"
+# ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_3"
+ES_INDEX_NAME = "genedoc_mygene_allspecies_current_2"
+ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_2"
 ES_DOC_TYPE = 'gene'
 
 STATUS_CHECK_ID = '1017'
@@ -34,8 +36,8 @@ ES_SCROLL_TIME = '10'
 ES_SCROLL_SIZE = 10
 
 
-#relevant for running in prod
-INCLUDE_DOCS = False# if True, include the links to mygene.info docs
+# relevant for running in prod
+INCLUDE_DOCS = False  # if True, include the links to mygene.info docs
 
 # *****************************************************************************
 # Google Analytics Settings
@@ -69,4 +71,3 @@ API_VERSION = 'v2'
 NOSETEST_SETTINGS = "config"
 # Env. var containing root URL to services
 HOST_ENVAR_NAME = "MG_HOST"
-
