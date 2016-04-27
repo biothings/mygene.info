@@ -58,12 +58,12 @@ from biothings.settings import BiothingSettings
 btsettings = BiothingSettings()
 
 # build API routes
-from api_v2.handlers import APP_LIST as api_v2_app_list
-#from api_v2.handlers_async import APP_LIST as api_v2_async_app_list
+from www.api.handlers import APP_LIST as api_v2_app_list
+#from api.handlers_async import APP_LIST as api_v2_async_app_list
 from demo.handlers import APP_LIST as demo_app_list
 #from auth.handlers import APP_LIST as auth_app_list
-from api_v2.handlers import MyGeneMetaDataHandler
-from api_v2.handlers import MyGeneFieldsHandler
+from www.api.handlers import MyGeneMetaDataHandler
+from www.api.handlers import MyGeneFieldsHandler
 
 
 from config import INCLUDE_DOCS

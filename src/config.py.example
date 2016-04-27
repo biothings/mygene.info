@@ -1,35 +1,12 @@
-# ES_HOST = 'su07:9200'
-ES_HOST = '52.32.23.166:9200'
+from config_common import *
 
-# Can specify a EC2 host using name tag:
-# ES_HOST = 'ec2:us-west-2:ES_http'
-if ES_HOST.startswith('ec2:'):
-    from boto.ec2 import connect_to_region
-    region, name = ES_HOST[4:].split(':')
-    ec2 = connect_to_region(region)
-    reservations = ec2.get_all_instances(filters={'tag:Name': name})
-    ins = reservations[0].instances[0]
-    if ins.state == 'running':
-        ES_HOST = '{}:9200'.format(ins.ip_address)
-    else:
-        raise ValueError('EC2 instance "{}" is not running'
-                         .format(ES_HOST[4:]))
-
-ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'sort', 'explain',
-                   'version', 'aggs', 'fetch_all', 'species', 'fields',
-                   'userfilter', 'exists', 'missing', 'include_tax_tree',
-                   'species_facet_filter']
+ES_HOST = 'localhost:9200'
 
 # ES_INDEX_NAME = "genedoc_mygene_allspecies_current_3"
 # ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_3"
 ES_INDEX_NAME = "genedoc_mygene_allspecies_current_2"
 ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_2"
-ES_DOC_TYPE = 'gene'
-
-STATUS_CHECK_ID = '1017'
-
-FIELD_NOTES_PATH = ''
-JSONLD_CONTEXT_PATH = ''
+ES_INDEX_TYPE = "gene"
 
 
 ES_SCROLL_TIME = '10'
@@ -47,27 +24,42 @@ GA_ACCOUNT = 'UA-xxxxxxxx-x'
 # Turn this to True to start google analytics tracking
 GA_RUN_IN_PROD = False
 
-# 'category' in google analytics event object
-GA_EVENT_CATEGORY = 'v2_api'
-# 'action' for get request in google analytics event object
-GA_EVENT_GET_ACTION = 'get'
-# 'action' for post request in google analytics event object
-GA_EVENT_POST_ACTION = 'post'
-# url for google analytics tracker
-GA_TRACKER_URL = 'mygene.info'
 
-# *****************************************************************************
-# URL settings
-# *****************************************************************************
-# For URL stuff
-ANNOTATION_ENDPOINT = 'gene'
-QUERY_ENDPOINT = 'query'
-API_VERSION = 'v2'
+# ################ #
+# MYGENE HUB VARS  #
+# ################ #
 
-# *****************************************************************************
-# Tests
-# *****************************************************************************
-# use this file as nosetest config file
-NOSETEST_SETTINGS = "config"
-# Env. var containing root URL to services
-HOST_ENVAR_NAME = "MG_HOST"
+DATA_SRC_SERVER = 'localhost'
+DATA_SRC_PORT = 27117
+
+DATA_TARGET_SERVER = 'localhost'
+DATA_TARGET_PORT = 27117
+DATA_TARGET_DATABASE = 'genedoc'
+
+DATA_SERVER_USERNAME = ''
+DATA_SERVER_PASSWORD = ''
+
+LOG_FOLDER = 'logs'
+
+species_li = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish',
+              'thale-cress', 'frog', 'pig']
+
+taxid_d = {'human': 9606,
+           'mouse': 10090,
+           'rat': 10116,
+           'fruitfly': 7227,
+           'nematode': 6239,
+           'zebrafish': 7955,
+           'thale-cress': 3702,
+           'frog': 8364,
+           'pig': 9823,
+           }
+
+# Absolute path !
+DATA_ARCHIVE_ROOT = '/path/to/data'
+
+HIPCHAT_CONFIG = {
+        'token': 'mytoken',
+        'roomid': 1234567890,
+        'from': 'myuser'
+}

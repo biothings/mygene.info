@@ -3,7 +3,7 @@ from biothings.tests.tests import BiothingTestHelper, _d, TornadoRequestHelper
 from nose.tools import ok_, eq_
 
 from tornado.testing import AsyncHTTPTestCase
-import index
+import www.index as index
 from biothings.settings import BiothingSettings
 
 
