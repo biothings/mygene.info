@@ -1,11 +1,11 @@
 from __future__ import print_function
 import os.path
-from config import species_li, taxid_d
+from config import SPECIES_LI, TAXONOMY
 from utils.common import file_newer, loadobj, dump
 from dataload import get_data_folder
 from utils.dataload import (load_start, load_done,
-                            tab2dict, tab2list, value_convert, normalized_value,
-                            dict_convert, dict_to_list,
+                            tab2dict, tab2list, value_convert,
+                            normalized_value, dict_convert, dict_to_list,
                             )
 
 DATA_FOLDER = get_data_folder('entrez')
@@ -15,7 +15,7 @@ print('DATA_FOLDER: ' + DATA_FOLDER)
 class EntrezParserBase(object):
     def __init__(self):
         # if species_li is None, include all species
-        self.set_species_li(species_li)
+        self.set_species_li(SPECIES_LI)
         self.DATA_FOLDER = DATA_FOLDER
         self.datafile = os.path.join(self.DATA_FOLDER, self.DATAFILE)
 
@@ -29,7 +29,7 @@ class EntrezParserBase(object):
         '''To load only specied species if species_li is not None.'''
         if species_li:
             self.species_li = species_li
-            self.taxid_set = set([taxid_d[species] for species in species_li])
+            self.taxid_set = set([TAXONOMY[species] for species in species_li])
             self.species_filter = lambda ld: int(ld[0]) in self.taxid_set
         else:
             self.set_all_species()
@@ -49,13 +49,16 @@ class GeneInfoParser(EntrezParserBase):
         with all basic fields, e.g., name, symbol, synonyms, etc.
 
         format of gene_info file:
-        #Format: tax_id GeneID Symbol LocusTag Synonyms dbXrefs chromosome map_location description type_of_gene Symbol_from
-        _nomenclature_authority Full_name_from_nomenclature_authority Nomenclature_status Other_designations Modification_da
+        #Format: tax_id GeneID Symbol LocusTag Synonyms dbXrefs chromosome
+                 map_location description type_of_gene Symbol_from
+                 nomenclature_authority Full_name_from_nomenclature_authority
+        Nomenclature_status Other_designations Modification_da
         te (tab is used as a separator, pound sign - start of a comment)
 
         '''
         load_start(self.datafile)
-        gene_d = tab2dict(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9), key=1, alwayslist=0, includefn=self.species_filter)
+        gene_d = tab2dict(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9), key=1,
+                          alwayslist=0, includefn=self.species_filter)
 
         def _ff(d):
             (
@@ -75,21 +78,27 @@ class GeneInfoParser(EntrezParserBase):
             if locus_tag != '-':
                 out['locus_tag'] = locus_tag
 
-
             for x in dbxrefs.split('|'):
                 if x == '-':
                     continue
                 xd = x.split(':')
-                if len(xd) == 3 and xd[0] == xd[1] and xd[0] in ['HGNC', 'MGI']:
-                    xd = xd[1:]      # a fix for NCBI bug for dup xref prefix, 'HGNC:HGNC:36328'
+                if len(xd) == 3 and xd[0] == xd[1] and \
+                        xd[0] in ['HGNC', 'MGI']:
+                    # a fix for NCBI bug for dup xref prefix, 'HGNC:HGNC:36328'
+                    xd = xd[1:]
                 try:
                     _db, _id = xd
                 except:
                     print(x)
                     raise
-                if _db.lower() in ['ensembl', 'imgt/gene-db']:      # we don't need ensembl xref from here, we will get it from Ensembl directly
-                    continue                                        # we don't need 'IMGT/GENE-DB" xref either, because they are mostly the same as gene symbol
-                if _db.lower() == 'mgi':            # add "MGI:" prefix for MGI ids.
+                # we don't need ensembl xref from here, we will get it from
+                # Ensembl directly
+                if _db.lower() in ['ensembl', 'imgt/gene-db']:
+                    # we don't need 'IMGT/GENE-DB" xref either, because they
+                    # are mostly the same as gene symbol
+                    continue
+                # add "MGI:" prefix for MGI ids.
+                if _db.lower() == 'mgi':
                     _id = "MGI:"+_id
                 out[_db] = _id
             return out
@@ -112,15 +121,15 @@ class GeneInfoParser(EntrezParserBase):
 
 def get_geneid_d(species_li=None, load_cache=True, save_cache=True):
     '''return a dictionary of current/retired geneid to current geneid mapping.
-       This is useful, when other annotations were mapped to geneids may contain
-       retired gene ids.
+       This is useful, when other annotations were mapped to geneids may
+       contain retired gene ids.
 
        if species_li is None, genes from all species are loaded.
 
        Note that all ids are int type.
     '''
     if species_li:
-        taxid_set = set([taxid_d[species] for species in species_li])
+        taxid_set = set([TAXONOMY[species] for species in species_li])
     else:
         taxid_set = None
 
@@ -156,12 +165,14 @@ def get_geneid_d(species_li=None, load_cache=True, save_cache=True):
         _includefn = lambda ld: int(ld[0]) in taxid_set and ld[1] in geneid_li
     else:
         _includefn = lambda ld: ld[1] in geneid_li    # include all species
-    retired2gene = tab2dict(DATAFILE, (1, 2), 1, alwayslist=0, includefn=_includefn)
-    # includefn above makes sure taxid is for species_li and filters out those mapped_to geneid exists in gene_info list
+    retired2gene = tab2dict(DATAFILE, (1, 2), 1, alwayslist=0,
+                            includefn=_includefn)
+    # includefn above makes sure taxid is for species_li and filters out those
+    # mapped_to geneid exists in gene_info list
 
     load_done('[%d]' % len(retired2gene))
-
-    out_d = dict_convert(retired2gene, keyfn=int, valuefn=int)    # convert key/value to int
+    # convert key/value to int
+    out_d = dict_convert(retired2gene, keyfn=int, valuefn=int)
     for g in geneid_li:
         _g = int(g)
         out_d[_g] = _g
@@ -185,9 +196,10 @@ class HomologeneParser(EntrezParserBase):
             defined in species_li.
         '''
         d = {}
-        for i, species in enumerate(species_li):
-            d[taxid_d[species]] = i
-        gene_li = [(d.get(taxid, taxid), taxid, geneid) for taxid, geneid in homologenes]
+        for i, species in enumerate(SPECIES_LI):
+            d[TAXONOMY[species]] = i
+        gene_li = [(d.get(taxid, taxid), taxid, geneid)
+                   for taxid, geneid in homologenes]
         return [g[1:] for g in sorted(gene_li)]
 
     def load(self, aslist=False):
@@ -197,7 +209,7 @@ class HomologeneParser(EntrezParserBase):
         '''
 
         load_start(self.datafile)
-        with file(self.datafile) as df:
+        with open(self.datafile) as df:
             homologene_d = {}
             doc_li = []
             print()
@@ -206,18 +218,24 @@ class HomologeneParser(EntrezParserBase):
             for line in df:
                 ld = line.strip().split('\t')
                 hm_id, tax_id, geneid = [int(x) for x in ld[:3]]
-                if (self.taxid_set is None or tax_id in self.taxid_set) and geneid in geneid_d:
+                if (self.taxid_set is None or tax_id in self.taxid_set) and \
+                        geneid in geneid_d:
                     # for selected species only
-                    # and also ignore those geneid does not match any existing gene doc
-                    geneid = geneid_d[geneid]   # in case of orignal geneid is retired, replaced with the new one, if available.
+                    # and also ignore those geneid does not match any
+                    # existing gene doc
+                    # in case of orignal geneid is retired, replaced with the
+                    # new one, if available.
+                    geneid = geneid_d[geneid]
                     genes = homologene_d.get(hm_id, [])
                     genes.append((tax_id, geneid))
                     homologene_d[hm_id] = genes
 
-                    doc_li.append(dict(_id=str(geneid), taxid=tax_id, homologene={'id': hm_id}))
+                    doc_li.append(dict(_id=str(geneid), taxid=tax_id,
+                                       homologene={'id': hm_id}))
 
             for i, gdoc in enumerate(doc_li):
-                gdoc['homologene']['genes'] = self._sorted_homologenes(set(homologene_d[gdoc['homologene']['id']]))
+                gdoc['homologene']['genes'] = self._sorted_homologenes(
+                                set(homologene_d[gdoc['homologene']['id']]))
                 doc_li[i] = gdoc
 
             load_done('[%d]' % len(doc_li))
@@ -235,13 +253,13 @@ class GeneSummaryParser(EntrezParserBase):
 
     def load(self, aslist=False):
         load_start(self.datafile)
-        with file(self.datafile) as df:
+        with open(self.datafile) as df:
             geneid_set = set()
             doc_li = []
             for line in df:
                 geneid, summary = line.strip().split('\t')
                 if geneid not in geneid_set:
-                    doc_li.append(dict(_id=geneid, summary=unicode(summary)))
+                    doc_li.append(dict(_id=geneid, summary=str(summary)))
                     geneid_set.add(geneid)
         load_done('[%d]' % len(doc_li))
 
@@ -415,16 +433,16 @@ class Gene2ECParser(EntrezParserBase):
 
     def load(self, aslist=False):
         load_start(self.datafile)
-        with file(self.datafile) as df:
+        with open(self.datafile) as df:
             geneid_set = set()
             doc_li = []
             for line in df:
                 geneid, ec = line.strip().split('\t')
                 if ec.find(',') != -1:
                     # there are multiple EC numbers
-                    ec = [unicode(x) for x in ec.split(',')]
+                    ec = [str(x) for x in ec.split(',')]
                 else:
-                    ec = unicode(ec)
+                    ec = str(ec)
                 if geneid not in geneid_set:
                     doc_li.append(dict(_id=geneid, ec=ec))
                     geneid_set.add(geneid)
@@ -445,6 +463,7 @@ class Gene2GeneRifParser(EntrezParserBase):
     def load(self):
         load_start(self.datafile)
         gene2generif = tab2dict(self.datafile, (1, 2, 4), 0, alwayslist=1)
-        gene2generif = dict_convert(gene2generif, valuefn=lambda v: {'generif': [dict(pubmed=int(x[0]), text=x[1]) for x in v]})
+        gene2generif = dict_convert(gene2generif, valuefn=lambda v: {
+                    'generif': [dict(pubmed=int(x[0]), text=x[1]) for x in v]})
         load_done('[%d]' % len(gene2generif))
         return gene2generif

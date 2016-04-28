@@ -2,10 +2,8 @@ from config_common import *
 
 ES_HOST = 'localhost:9200'
 
-# ES_INDEX_NAME = "genedoc_mygene_allspecies_current_3"
-# ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_3"
-ES_INDEX_NAME = "genedoc_mygene_allspecies_current_2"
-ES_INDEX_NAME_TIER1 = "genedoc_mygene_current_2"
+ES_INDEX_NAME = "genedoc_mygene_allspecies_current"
+ES_INDEX_NAME_TIER1 = "genedoc_mygene_current"
 ES_INDEX_TYPE = "gene"
 
 
@@ -29,6 +27,7 @@ GA_RUN_IN_PROD = False
 # MYGENE HUB VARS  #
 # ################ #
 
+
 DATA_SRC_SERVER = 'localhost'
 DATA_SRC_PORT = 27117
 
@@ -41,22 +40,14 @@ DATA_SERVER_PASSWORD = ''
 
 LOG_FOLDER = 'logs'
 
-species_li = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish',
-              'thale-cress', 'frog', 'pig']
-
-taxid_d = {'human': 9606,
-           'mouse': 10090,
-           'rat': 10116,
-           'fruitfly': 7227,
-           'nematode': 6239,
-           'zebrafish': 7955,
-           'thale-cress': 3702,
-           'frog': 8364,
-           'pig': 9823,
-           }
-
 # Absolute path !
 DATA_ARCHIVE_ROOT = '/path/to/data'
+
+# fill with "host", "username" and "key" keys
+# to create a SSH tunnel to feed ES
+ES_HOST_TUNNEL_CFG = {}
+
+TARGET_ES_INDEX_SUFFIX = '_current'
 
 HIPCHAT_CONFIG = {
         'token': 'mytoken',

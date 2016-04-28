@@ -1,7 +1,7 @@
 # Required python modules for this project.
 # To install all requirement, run
 #    pip install -r requirements.txt
-pymongo>=3.2
+pymongo==2.8
 mongokit>=0.8.2
 #anyjson>=0.3.1
 #yajl>=0.3.5

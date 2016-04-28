@@ -2,10 +2,10 @@
 
 from __future__ import print_function
 
-#http://www.elasticsearch.org/guide/reference/query-dsl/custom-filters-score-query.html
-#http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html
-#http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
-#http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
+# http://www.elasticsearch.org/guide/reference/query-dsl/custom-filters-score-query.html
+# http://www.elasticsearch.org/guide/reference/query-dsl/custom-score-query.html
+# http://www.elasticsearch.org/guide/reference/query-dsl/custom-boost-factor-query.html
+# http://www.elasticsearch.org/guide/reference/query-dsl/boosting-query.html
 import sys
 
 import json
@@ -13,41 +13,34 @@ import re
 import time
 import copy
 import requests
-import logging
 
 from config import (ES_INDEX_NAME_TIER1, ES_INDEX_NAME,
-                    ES_DOC_TYPE, SOURCE_TRANSLATORS)
-from biothings.utils.common import (ask, is_int, is_str, is_seq, timesofar, dotdict)
-from biothings.utils.dotfield import parse_dot_fields, compose_dot_fields_by_fields as compose_dot_fields
-from biothings.www.api.es import ESQuery, QueryError, ESQueryBuilder, parse_facets_option
+                    SOURCE_TRANSLATORS, GENOME_ASSEMBLY,
+                    TAXONOMY, ES_HOST,  ES_INDEX_TYPE)
+from biothings.utils.common import (ask, is_int, is_str,
+                                    is_seq, timesofar)
+from biothings.www.api.es import ESQuery, QueryError, ESQueryBuilder, \
+                                 parse_facets_option
 from elasticsearch import Elasticsearch
 from .userfilters import UserFilters
 
+from elasticsearch import helpers
+from utils.mongo import doc_feeder
 
 
+import logging
+formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
+es_logger = logging.getLogger('elasticsearch')
+es_logger.setLevel(logging.WARNING)
+ch = logging.StreamHandler()
+ch.setFormatter(formatter)
+es_logger.addHandler(ch)
 
-GENOME_ASSEMBLY = {
-    "human": "hg38",
-    "mouse": "mm10",
-    "rat": "rn4",
-    "fruitfly": "dm3",
-    "nematode": "ce10",
-    "zebrafish": "zv9",
-    "frog": "xenTro3",
-    "pig": "susScr2"
-}
-
-TAXONOMY = {
-    "human": 9606,
-    "mouse": 10090,
-    "rat": 10116,
-    "fruitfly": 7227,
-    "nematode": 6239,
-    "zebrafish": 7955,
-    "thale-cress": 3702,
-    "frog": 8364,
-    "pig": 9823
-}
+es_tracer = logging.getLogger('elasticsearch.trace')
+es_tracer.setLevel(logging.WARNING)
+ch = logging.StreamHandler()
+ch.setFormatter(formatter)
+es_tracer.addHandler(ch)
 
 
 def safe_genome_pos(s):
@@ -64,23 +57,19 @@ def safe_genome_pos(s):
         raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
 
 
-
 class ESQuery(ESQuery):
     def __init__(self):
-        super( ESQuery, self ).__init__()
+        super(ESQuery, self).__init__()
         self._default_fields = ['name', 'symbol', 'taxid', 'entrezgene']
-        self._default_species = [9606, 10090, 10116] # human, mouse, rat
+        self._default_species = [9606, 10090, 10116]  # human, mouse, rat
         self._tier_1_species = set(TAXONOMY.values())
 
-    def _search(self, q, species='all', scroll_options={},**kwargs):
+    def _search(self, q, species='all', scroll_options={}, **kwargs):
         self._set_index(species)
-        # body = '{"query" : {"term" : { "_all" : ' + q + ' }}}'
-        #logging.error("in search q: %s -- index: %s -- doc_type: %s" % (json.dumps(q),self._index,self._doc_type))
-
         res = self._es.search(index=self._index, doc_type=self._doc_type,
-                               body=q, **scroll_options)
-        #logging.error("in search: %s" % res)
-        self._index = ES_INDEX_NAME # reset self._index
+                              body=q, **scroll_options)
+        # logging.error("in search: %s" % res)
+        self._index = ES_INDEX_NAME  # reset self._index
         return res
 
     def _msearch(self, **kwargs):
@@ -97,8 +86,8 @@ class ESQuery(ESQuery):
         else:
             self._index = ES_INDEX_NAME_TIER1
 
-    def _get_query_builder(self,**kwargs):
-        return ESQueryBuilder(**kwargs) 
+    def _get_query_builder(self, **kwargs):
+        return ESQueryBuilder(**kwargs)
 
     def _build_query(self, q, kwargs):
         # can override this function if more query types are to be added
@@ -107,24 +96,29 @@ class ESQuery(ESQuery):
 
     def _cleaned_species(self, species, default_to_none=False):
         '''return a cleaned species parameter.
-           should be either "all" or a list of taxids/species_names, or a single taxid/species_name.
-           returned species is always a list of taxids (even when only one species)
+           should be either "all" or a list of taxids/species_names
+           or a single taxid/species_name
+           returned species is always a list of taxids (even when
+           only one species)
         '''
         if species is None:
-            #set to default_species
+            # set to default_species
             return None if default_to_none else self._default_species
         if isinstance(species, int):
             return [species]
 
         if is_str(species):
             if species.lower() == 'all':
-                #if self.species == 'all': do not apply species filter, all species is included.
+                # if self.species == 'all': do not apply species filter,
+                # all species is included.
                 return species.lower()
             else:
                 species = [s.strip().lower() for s in species.split(',')]
 
         if not is_seq(species):
-            raise ValueError('"species" parameter must be a string, integer or a list/tuple, not "{}".'.format(type(species)))
+            raise ValueError('"species" parameter must be a string, integer ' +
+                             'or a list/tuple, not "{}".'.format(
+                                                          type(species)))
 
         _species = []
         for s in species:
@@ -134,27 +128,29 @@ class ESQuery(ESQuery):
                 _species.append(TAXONOMY[s])
         return _species
 
-
-    def _get_options(self,options,kwargs):
-        #this species parameter is added to the query, thus will change facet counts.
+    def _get_options(self, options, kwargs):
+        # this species parameter is added to the query, thus will
+        # change facet counts.
         kwargs['species'] = self._cleaned_species(kwargs.get('species', None))
         include_tax_tree = kwargs.pop('include_tax_tree', False)
         if include_tax_tree:
             headers = {'content-type': 'application/x-www-form-urlencoded',
-                      'user-agent': "Python-requests_mygene.info/%s (gzip)" % requests.__version__}
-            #TODO: URL as config param
-            res = requests.post('http://s.biothings.io/v1/species?ids=' + 
-                                ','.join(['{}'.format(sid) for sid in kwargs['species']]) +
+                       'user-agent': "Python-requests_mygene.info/%s (gzip)"
+                       % requests.__version__}
+            # TODO: URL as config param
+            res = requests.post('http://s.biothings.io/v1/species?ids=' +
+                                ','.join(['{}'.format(sid) for sid in
+                                          kwargs['species']]) +
                                 '&expand_species=true', headers=headers)
             if res.status_code == requests.codes.ok:
                 kwargs['species'] = res.json()
 
-        #this parameter is to add species filter without changing facet counts.
-        kwargs['species_facet_filter'] = self._cleaned_species(kwargs.get('species_facet_filter', None),
-                                                               default_to_none=True)
+        # this parameter is to add species filter without
+        # changing facet counts.
+        kwargs['species_facet_filter'] = self._cleaned_species(
+                kwargs.get('species_facet_filter', None), default_to_none=True)
         options.kwargs = kwargs
         return options
-
 
     def metadata(self, raw=False):
         '''return metadata about the index.'''
@@ -173,9 +169,9 @@ class ESQuery(ESQuery):
                     f = v.get('index_name', k)
                     yield f
         mapping = list(mapping.values())[0]['mappings']
-        #field_set = set(get_fields(mapping[self._doc_type]['properties']))
+        # field_set = set(get_fields(mapping[self._doc_type]['properties']))
         metadata = {
-            #'available_fields': sorted(field_set)
+            # 'available_fields': sorted(field_set)
             # TODO: http://mygene.info as config
             'available_fields': 'http://mygene.info/metadata/fields'
         }
@@ -200,17 +196,20 @@ class ESQueryBuilder(ESQueryBuilder):
             species_facet_filter
             entrezonly  default false
             ensemblonly default false
-            userfilter  optional, provide the name of a saved user filter (in "userfilters" index)
-            exists      optional, passing field, comma-separated fields, returned
-                                  genes must have given field(s).
-            missing     optional, passing field, comma-separated fields, returned
-                                  genes must have NO given field(s).
+            userfilter  optional, provide the name of a saved user filter
+                                  (in "userfilters" index)
+            exists      optional, passing field, comma-separated fields,
+                                  returned genes must have given field(s).
+            missing     optional, passing field, comma-separated fields,
+                                  returned genes must have NO given field(s).
 
         """
-        super( ESQueryBuilder, self ).__init__()
+        super(ESQueryBuilder, self).__init__()
         self._query_options = query_options
-        self.species = self._query_options.pop('species', 'all')   # species should be either 'all' or a list of taxids.
-        self.species_facet_filter = self._query_options.pop('species_facet_filter', None)
+        # species should be either 'all' or a list of taxids.
+        self.species = self._query_options.pop('species', 'all')
+        self.species_facet_filter = self._query_options.pop(
+                    'species_facet_filter', None)
         self.entrezonly = self._query_options.pop('entrezonly', False)
         self.ensemblonly = self._query_options.pop('ensemblonly', False)
         # userfilter
@@ -221,16 +220,20 @@ class ESQueryBuilder(ESQueryBuilder):
         self.existsfilter = existsfilter.split(',') if existsfilter else None
         # missing filter
         missingfilter = self._query_options.pop('missing', None)
-        self.missingfilter = missingfilter.split(',') if missingfilter else None
+        self.missingfilter = missingfilter.split(',') \
+            if missingfilter else None
 
         parse_facets_option(self._query_options)
+        # TODO: taken from config file ?
         self._allowed_options = ['fields', '_source', 'start', 'from', 'size',
-                                 'sort', 'explain', 'version', 'aggs','dotfield']
+                                 'sort', 'explain', 'version', 'aggs',
+                                 'dotfield']
         for key in set(self._query_options) - set(self._allowed_options):
             del self._query_options[key]
         # convert "fields" option to "_source"
         # use "_source" instead of "fields" for ES v1.x and up
-        if 'fields' in self._query_options and self._query_options['fields'] is not None:
+        if 'fields' in self._query_options and \
+                self._query_options['fields'] is not None:
             self._query_options['_source'] = self._query_options['fields']
             del self._query_options['fields']
 
@@ -247,7 +250,6 @@ class ESQueryBuilder(ESQueryBuilder):
         # logging.debug(q)
         return q
         pass
-
 
     def _parse_interval_query(self, query):
         '''Check if the input query string matches interval search regex,
@@ -271,9 +273,8 @@ class ESQueryBuilder(ESQueryBuilder):
 
                 return d
 
-
     def dis_max_query(self, q):
-        #remove '"' and '\' from q, they will break json decoder.
+        # remove '"' and '\' from q, they will break json decoder.
         q = q.replace('"', '').replace('\\', '')
         _query = {
             "dis_max": {
@@ -296,7 +297,8 @@ class ESQueryBuilder(ESQueryBuilder):
                     {
                         "function_score": {
                             "query": {
-                                #This makes phrase match of "cyclin-dependent kinase 2" appears first
+                                # This makes phrase match of "cyclin-dependent
+                                # kinase 2" appears first
                                 "match_phrase": {"name": "%(q)s"},
                             },
                             "weight": 4
@@ -347,8 +349,8 @@ class ESQueryBuilder(ESQueryBuilder):
                     # "custom_boost_factor": {
                     #     "query" : {
                     #         "match" : { "_all" : {
-                    #                         "query": "%(q)s",
-                    #                         "analyzer": "whitespace_lowercase"
+                    #                     "query": "%(q)s",
+                    #                     "analyzer": "whitespace_lowercase"
                     #             }
                     #         },
                     #     },
@@ -450,7 +452,7 @@ class ESQueryBuilder(ESQueryBuilder):
            thus will affect the facet counts.
         '''
         filters = []
-        #species filter
+        # species filter
         if self.species and self.species != 'all':
             if len(self.species) == 1:
                 filters.append({
@@ -491,7 +493,7 @@ class ESQueryBuilder(ESQueryBuilder):
             if len(filters) == 1:
                 filters = filters[0]
             else:
-                #concatenate multiple filters with "and" filter
+                # concatenate multiple filters with "and" filter
                 filters = {"and": filters}
 
         return filters
@@ -501,7 +503,7 @@ class ESQueryBuilder(ESQueryBuilder):
             but does not change the scope for facet counts.
         """
         filters = []
-        #species_facet_filter
+        # species_facet_filter
         if self.species_facet_filter:
             if len(self.species) == 1:
                 filters.append({
@@ -515,10 +517,10 @@ class ESQueryBuilder(ESQueryBuilder):
             if len(filters) == 1:
                 filters = filters[0]
             else:
-                #concatenate multiple filters with "and" filter
+                # concatenate multiple filters with "and" filter
                 filters = {"and": filters}
 
-            #this will not change facet counts
+            # this will not change facet counts
             _query["filter"] = filters
 
         return _query
@@ -528,7 +530,7 @@ class ESQueryBuilder(ESQueryBuilder):
             "function_score": {
                 "query": _query,
                 "functions": [
-                    #downgrade "pseudogene" matches
+                    # downgrade "pseudogene" matches
                     {
                         "filter": {"term": {"name": "pseudogene"}},
                         "boost_factor": "0.5"
@@ -595,7 +597,8 @@ class ESQueryBuilder(ESQueryBuilder):
     def build_id_query(self, id, scopes=None):
         id_is_int = is_int(id)
         if scopes is None:
-            #by default search three fields ['entrezgene', 'ensemblgene', 'retired']
+            # by default search three fields:
+            # ['entrezgene', 'ensemblgene', 'retired']
             if id_is_int:
                 _query = {
                     "multi_match": {
@@ -623,8 +626,8 @@ class ESQueryBuilder(ESQueryBuilder):
                             }
                         }
                     else:
-                        #raise ValueError('fields "%s" requires an integer id to query' % _field)
-                        #using a fake query here to make sure return empty hits
+                        # using a fake query here to make sure
+                        # return empty hits
                         _query = self._nohits_query
                 else:
                     _query = {
@@ -675,7 +678,7 @@ class ESQueryBuilder(ESQueryBuilder):
             else:
                 raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 
-        #_query = self.add_species_filter(_query)
+        # _query = self.add_species_filter(_query)
         _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}
@@ -710,15 +713,12 @@ class ESQueryBuilder(ESQueryBuilder):
                 "query": {
                     "bool": {
                         "must": [
-                            {
-                                "term": {genomic_pos_field + ".chr": chr.lower()}
-                            },
-                            {
-                                "range": {genomic_pos_field + ".start": {"lte": gend}}
-                            },
-                            {
-                                "range": {genomic_pos_field + ".end": {"gte": gstart}}
-                            }
+                            {"term": {
+                                genomic_pos_field + ".chr": chr.lower()}},
+                            {"range": {
+                                genomic_pos_field + ".start": {"lte": gend}}},
+                            {"range": {
+                                genomic_pos_field + ".end": {"gte": gstart}}}
                         ]
                     }
                 }
@@ -742,33 +742,6 @@ class ESQueryBuilder(ESQueryBuilder):
 # FROM MYGENE.HUB   #
 # ################# #
 
-import sys
-import time
-import re
-
-from elasticsearch import Elasticsearch
-from elasticsearch import helpers
-
-from config import ES_HOST, ES_INDEX_NAME, ES_INDEX_TYPE
-from utils.common import ask, timesofar
-from utils.mongo import doc_feeder
-
-# setup ES loggingre
-import logging
-formatter = logging.Formatter("%(levelname)s:%(name)s:%(message)s")
-es_logger = logging.getLogger('elasticsearch')
-es_logger.setLevel(logging.WARNING)
-ch = logging.StreamHandler()
-ch.setFormatter(formatter)
-es_logger.addHandler(ch)
-
-es_tracer = logging.getLogger('elasticsearch.trace')
-es_tracer.setLevel(logging.WARNING)
-ch = logging.StreamHandler()
-ch.setFormatter(formatter)
-es_tracer.addHandler(ch)
-
-
 def get_es(es_host=None):
     es_host = es_host or ES_HOST
     es = Elasticsearch(es_host, timeout=600, max_retries=100)
@@ -789,19 +762,21 @@ def lastexception():
 
 
 class ESIndexer(object):
-    def __init__(self, es_index_name=None, es_index_type=None, mapping=None, es_host=None, step=5000):
+    def __init__(self, es_index_name=None, es_index_type=None, mapping=None,
+                 es_host=None, step=5000):
         self.conn = get_es(es_host)
         self.ES_INDEX_NAME = es_index_name or ES_INDEX_NAME
         self.ES_INDEX_TYPE = es_index_type or ES_INDEX_TYPE
-        #if self.ES_INDEX_NAME:
+        # if self.ES_INDEX_NAME:
         #    self.conn.default_indices = [self.ES_INDEX_NAME]
-        #if self.ES_INDEX_TYPE:
+        # if self.ES_INDEX_TYPE:
         #    self.conn.default_types = [self.ES_INDEX_TYPE]
         self.step = step
-        #self.conn.bulk_size = self.step
+        # self.conn.bulk_size = self.step
         self.number_of_shards = 5      # set number_of_shards when create_index
-        self.s = None   # optionally, can specify number of records to skip,
-                        # useful to continue indexing after an error.
+        # optionally, can specify number of records to skip,
+        # useful to continue indexing after an error.
+        self.s = None
         self.use_parallel = False
         self._mapping = mapping
 
@@ -812,7 +787,8 @@ class ESIndexer(object):
     def check(self):
         '''print out ES server info for verification.'''
         # print "Servers:", self.conn.servers
-        print("Servers:", '|'.join(["{host}:{port}".format(**h) for h in self.conn.transport.hosts]))
+        print("Servers:", '|'.join(["{host}:{port}".format(**h)
+                                    for h in self.conn.transport.hosts]))
         print("Default indices:", self.ES_INDEX_NAME)
         print("ES_INDEX_TYPE:", self.ES_INDEX_TYPE)
 
@@ -822,9 +798,10 @@ class ESIndexer(object):
             body = {
                 'settings': {
                     'number_of_shards': self.number_of_shards,
-                    "number_of_replicas": 0,    # set this to 0 to boost indexing
-                                                # after indexing, set "auto_expand_replicas": "0-all",
-                                                #   to make additional replicas.
+                    # set this to 0 to boost indexing
+                    # after indexing, set "auto_expand_replicas": "0-all",
+                    #   to make additional replicas.
+                    "number_of_replicas": 0,
                 }
             }
             if mapping:
@@ -841,11 +818,14 @@ class ESIndexer(object):
         # Check if index_type exists
         m = self.conn.indices.get_mapping(index_name, index_type)
         if not m:
-            print('Error: index type "%s" does not exist in index "%s".' % (index_type, index_name))
+            print('Error: index type "%s" does not exist in index "%s".'
+                  % (index_type, index_name))
             return
         path = '/%s/%s' % (index_name, index_type)
-        if noconfirm or ask('Confirm to delete all data under "%s":' % path) == 'Y':
-            return self.conn.indices.delete_mapping(index=index_name, doc_type=index_type)
+        if noconfirm or ask(
+                'Confirm to delete all data under "%s":' % path) == 'Y':
+            return self.conn.indices.delete_mapping(
+                    index=index_name, doc_type=index_type)
 
     def verify_mapping(self, update_mapping=False):
         '''Verify if index and mapping exist, update mapping if mapping does not exist,
@@ -857,22 +837,24 @@ class ESIndexer(object):
 
         # Test if index exists
         if not self.exists_index(index_name):
-            print('Error: index "%s" does not exist. Create it first.' % index_name)
+            print('Error: index "%s" does not exist. Create it first.'
+                  % index_name)
             return -1
 
         mapping = conn.indices.get_mapping(index=index_name, doc_type=doc_type)
         empty_mapping = mapping == {}
 
         if empty_mapping:
-            #if no existing mapping available for index_type
-            #force update_mapping to True
+            # if no existing mapping available for index_type
+            # force update_mapping to True
             update_mapping = True
 
         if update_mapping:
             print("Updating mapping...", end='')
             if not empty_mapping:
                 print("\n\tRemoving existing mapping...", end='')
-                print(conn.indices.delete_mapping(index=index_name, doc_type=doc_type))
+                print(conn.indices.delete_mapping(
+                    index=index_name, doc_type=doc_type))
             self.get_field_mapping()
             print(conn.indices.put_mapping(index=index_name,
                                            doc_type=doc_type,
@@ -882,7 +864,8 @@ class ESIndexer(object):
         index_name = self.ES_INDEX_NAME
         doc_type = self.ES_INDEX_TYPE
 
-        if isinstance(meta, dict) and len(set(meta) - set(['_meta', '_timestamp'])) == 0:
+        if isinstance(meta, dict) and len(set(meta) - set(
+                      ['_meta', '_timestamp'])) == 0:
             body = {doc_type: meta}
             print(self.conn.indices.put_mapping(
                 index=index_name,
@@ -890,7 +873,8 @@ class ESIndexer(object):
                 body=body)
             )
         else:
-            raise ValueError('Input "meta" should have and only have "_meta" field.')
+            raise ValueError(
+                    'Input "meta" should have and only have "_meta" field.')
 
     def count(self, query=None, index_type=None):
         conn = self.conn
@@ -922,7 +906,8 @@ class ESIndexer(object):
         for i in range(0, len(ids), step):
             _ids = ids[i:i + step]
             body = {'ids': _ids}
-            res = conn.mget(body=body, index=index_name, doc_type=index_type, **kwargs)
+            res = conn.mget(
+                    body=body, index=index_name, doc_type=index_type, **kwargs)
             for doc in res['docs']:
                 if doc['found']:
                     yield doc['_source']
@@ -933,7 +918,8 @@ class ESIndexer(object):
         '''add a doc to the index. If id is not None, the existing doc will be
            updated.
         '''
-        return self.conn.index(self.ES_INDEX_NAME, self.ES_INDEX_TYPE, doc, id=id)
+        return self.conn.index(
+                self.ES_INDEX_NAME, self.ES_INDEX_TYPE, doc, id=id)
 
     def index_bulk(self, docs, step=None):
         index_name = self.ES_INDEX_NAME
@@ -972,7 +958,8 @@ class ESIndexer(object):
             }
             return doc
         actions = (_get_bulk(_id) for _id in ids)
-        return helpers.bulk(self.conn, actions, chunk_size=step, stats_only=True, raise_on_error=False)
+        return helpers.bulk(self.conn, actions, chunk_size=step,
+                            stats_only=True, raise_on_error=False)
 
     def update(self, id, extra_doc, index_type=None, bulk=False):
         '''update an existing doc with extra_doc.'''
@@ -1036,18 +1023,20 @@ class ESIndexer(object):
         # raise NotImplementedError
         return self._mapping
 
-    def build_index(self, collection, update_mapping=False, verbose=False, query=None, bulk=True):
+    def build_index(self, collection, update_mapping=False, verbose=False,
+                    query=None, bulk=True):
         conn = self.conn
         index_name = self.ES_INDEX_NAME
-        #index_type = self.ES_INDEX_TYPE
+        # index_type = self.ES_INDEX_TYPE
 
         self.verify_mapping(update_mapping=update_mapping)
-        #update some settings for bulk indexing
+        # update some settings for bulk indexing
         body = {
             "index": {
-                #"refresh_interval": "-1",              # disable refresh temporarily
+                # disable refresh temporarily
+                # "refresh_interval": "-1",
                 "auto_expand_replicas": "0-all",
-                #"number_of_replicas": 0,
+                # "number_of_replicas": 0,
                 "refresh_interval": "30s",
             }
         }
@@ -1057,9 +1046,10 @@ class ESIndexer(object):
             if self.use_parallel:
                 cnt = self._build_index_parallel(collection, verbose)
             else:
-                cnt = self._build_index_sequential(collection, verbose, query=query, bulk=bulk)
+                cnt = self._build_index_sequential(collection, verbose,
+                                                   query=query, bulk=bulk)
         finally:
-            #restore some settings after bulk indexing is done.
+            # restore some settings after bulk indexing is done.
             body = {
                 "index": {
                     "refresh_interval": "1s"              # default settings
@@ -1080,13 +1070,15 @@ class ESIndexer(object):
             if target_cnt == es_cnt:
                 print("OK [total count={}]".format(target_cnt))
             else:
-                print("\nWarning: total count of gene documents does not match [{}, should be {}]".format(es_cnt, target_cnt))
+                print("\nWarning: total count of gene documents does not " +
+                      "match [{}, should be {}]".format(es_cnt, target_cnt))
 
         if cnt:
             print('Done! - {} docs indexed.'.format(cnt))
             print("Optimizing...", self.optimize())
 
-    def _build_index_sequential(self, collection, verbose=False, query=None, bulk=True):
+    def _build_index_sequential(self, collection, verbose=False,
+                                query=None, bulk=True):
 
         def rate_control(cnt, t):
             delay = 0
@@ -1099,7 +1091,8 @@ class ESIndexer(object):
                 time.sleep(delay)
                 print("done.")
 
-        src_docs = doc_feeder(collection, step=self.step, s=self.s, batch_callback=rate_control, query=query)
+        src_docs = doc_feeder(collection, step=self.step, s=self.s,
+                              batch_callback=rate_control, query=query)
         if bulk:
             res = self.index_bulk(src_docs)
             if len(res[1]) > 0:
@@ -1128,9 +1121,9 @@ class ESIndexer(object):
             kwargs.update(kwargs_common)
             task_list.append(kwargs)
 
-        @require('mongokit', 'pyes')
+        @require('pymongo', 'pyes')
         def worker(kwargs):
-            import mongokit
+            import pymongo
             import pyes
             server = kwargs['server']
             port = kwargs['port']
@@ -1139,7 +1132,7 @@ class ESIndexer(object):
             skip = kwargs['skip']
             limit = kwargs['limit']
 
-            mongo_conn = mongokit.Connection(server, port)
+            mongo_conn = pymongo.MongoClient(server, port)
             src = mongo_conn[src_db]
 
             ES_HOST = kwargs['ES_HOST']
@@ -1149,12 +1142,14 @@ class ESIndexer(object):
             es_conn = pyes.ES(ES_HOST, default_indices=[ES_INDEX_NAME],
                               timeout=120.0, max_retries=10)
 
-            cur = src[src_collection].find(skip=skip, limit=limit, timeout=False)
+            cur = src[src_collection].find(skip=skip, limit=limit,
+                                           timeout=False)
             cur.batch_size(1000)
             cnt = 0
             try:
                 for doc in cur:
-                    es_conn.index(doc, ES_INDEX_NAME, ES_INDEX_TYPE, doc['_id'], bulk=True)
+                    es_conn.index(doc, ES_INDEX_NAME, ES_INDEX_TYPE,
+                                  doc['_id'], bulk=True)
                     cnt += 1
             finally:
                 cur.close()
@@ -1167,7 +1162,8 @@ class ESIndexer(object):
             cnt = sum(job_results)
             return cnt
 
-    def doc_feeder(self, index_type=None, index_name=None, step=10000, verbose=True, query=None, scroll='10m', **kwargs):
+    def doc_feeder(self, index_type=None, index_name=None, step=10000,
+                   verbose=True, query=None, scroll='10m', **kwargs):
         conn = self.conn
         index_name = index_name or self.ES_INDEX_NAME
         doc_type = index_type or self.ES_INDEX_TYPE
@@ -1194,12 +1190,15 @@ class ESIndexer(object):
             print('done.[%.1f%%,%s]' % (cnt*100./n, timesofar(t1)))
             print("Finished! [{}]".format(timesofar(t0)))
 
-    def get_id_list(self, index_type=None, index_name=None, step=100000, verbose=True):
-        cur = self.doc_feeder(index_type=index_type, index_name=index_name, step=step, fields=[], verbose=verbose)
+    def get_id_list(self, index_type=None, index_name=None, step=100000,
+                    verbose=True):
+        cur = self.doc_feeder(index_type=index_type, index_name=index_name,
+                              step=step, fields=[], verbose=verbose)
         id_li = [doc['_id'] for doc in cur]
         return id_li
 
-    def get_id_list_parallel(self, taxid_li, index_type=None, index_name=None, step=1000, verbose=True):
+    def get_id_list_parallel(self, taxid_li, index_type=None, index_name=None,
+                             step=1000, verbose=True):
         '''return a list of all doc ids in an index_type.'''
         raise NotImplementedError
         from utils.parallel import run_jobs_on_ipythoncluster
@@ -1233,14 +1232,17 @@ class ESIndexer(object):
             assert len(xli) == res.total
             return xli
 
-        es_kwargs = {'es_index_name': self.ES_INDEX_NAME, 'es_host': 'su02:9200'}
+        es_kwargs = {'es_index_name': self.ES_INDEX_NAME,
+                     'es_host': 'su02:9200'}
         task_li = [(es_kwargs, taxid, step) for taxid in taxid_li]
-        #print task_li
-        job_results = run_jobs_on_ipythoncluster(_get_ids_worker_by_taxid, task_li)
+        # print task_li
+        job_results = run_jobs_on_ipythoncluster(
+                _get_ids_worker_by_taxid, task_li)
         return job_results
 
-    def clone_index(self, src_index, target_index, target_es_host=None, step=10000, scroll='10m',
-                    target_index_settings=None, number_of_shards=None):
+    def clone_index(self, src_index, target_index, target_es_host=None,
+                    step=10000, scroll='10m', target_index_settings=None,
+                    number_of_shards=None):
         '''clone src_index to target_index on the same es_host, or another one given
            by target_es_host.
 
@@ -1248,7 +1250,8 @@ class ESIndexer(object):
         '''
 
 
-def es_clean_indices(keep_last=2, es_host=None, verbose=True, noconfirm=False, dryrun=False):
+def es_clean_indices(keep_last=2, es_host=None, verbose=True, noconfirm=False,
+                     dryrun=False):
     '''clean up es indices, only keep last <keep_last> number of indices.'''
     conn = get_es(es_host)
     index_li = list(conn.indices.get_aliases().keys())
@@ -1263,12 +1266,14 @@ def es_clean_indices(keep_last=2, es_host=None, verbose=True, noconfirm=False, d
             if mat:
                 _li.append((mat.group(1), index))
         _li.sort()   # older collection appears first
-        index_to_remove = [x[1] for x in _li[:-keep_last]]   # keep last # of newer indices
+        # keep last # of newer indices
+        index_to_remove = [x[1] for x in _li[:-keep_last]]
         if len(index_to_remove) > 0:
-            print ("{} \"{}*\" indices will be removed.".format(len(index_to_remove), prefix))
+            print("{} \"{}*\" indices will be removed.".format(
+                  len(index_to_remove), prefix))
             if verbose:
                 for index in index_to_remove:
-                    print ('\t', index)
+                    print('\t', index)
             if noconfirm or ask("Continue?") == 'Y':
                 for index in index_to_remove:
                     if dryrun:
@@ -1302,7 +1307,7 @@ def get_latest_indices(es_host=None):
 
     if len(latest_indices) == 2:
         if latest_indices[0][0] != latest_indices[1][0]:
-            print ("Warning: unmatched timestamp:")
-            print ('\n'.join([x[1] for x in latest_indices]))
+            print("Warning: unmatched timestamp:")
+            print('\n'.join([x[1] for x in latest_indices]))
         latest_indices = [x[1] for x in latest_indices]
         return latest_indices

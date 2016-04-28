@@ -79,7 +79,7 @@ def doc_feeder0(collection, step=1000, s=None, e=None, inbatch=False):
                 yield doc
         print('Done.[%s]' % timesofar(t0))
 
-
+# TODO: use biothjngs.utils.mongo.doc_feeder()
 def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None, batch_callback=None, fields=None):
     '''A iterator for returning docs in a collection, with batch query.
        additional filter query can be passed via "query", e.g.,

@@ -11,6 +11,34 @@ STATUS_CHECK_ID = '1017'
 FIELD_NOTES_PATH = ''
 JSONLD_CONTEXT_PATH = ''
 
+GENOME_ASSEMBLY = {
+    "human": "hg38",
+    "mouse": "mm10",
+    "rat": "rn4",
+    "fruitfly": "dm3",
+    "nematode": "ce10",
+    "zebrafish": "zv9",
+    "frog": "xenTro3",
+    "pig": "susScr2"
+}
+
+TAXONOMY = {
+    "human": 9606,
+    "mouse": 10090,
+    "rat": 10116,
+    "fruitfly": 7227,
+    "nematode": 6239,
+    "zebrafish": 7955,
+    "thale-cress": 3702,
+    "frog": 8364,
+    "pig": 9823
+}
+
+SPECIES_LI = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish',
+              'thale-cress', 'frog', 'pig']
+
+
+
 # 'category' in google analytics event object
 GA_EVENT_CATEGORY = 'v2_api'
 # 'action' for get request in google analytics event object
