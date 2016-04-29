@@ -1,8 +1,8 @@
-from entrez_base import GeneSummaryParser
+from .entrez_base import GeneSummaryParser
 
 __metadata__ = {
     '__collection__': 'entrez_genesummary',
-    'structure': {'summary': unicode},
+    #'structure': {'summary': unicode},
 }
 
 def load_genedoc(self=None):

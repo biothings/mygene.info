@@ -1,16 +1,17 @@
 # Required python modules for this project.
 # To install all requirement, run
 #    pip install -r requirements.txt
-pymongo==2.8
-mongokit>=0.8.2
+pymongo>=3.2
 #anyjson>=0.3.1
 #yajl>=0.3.5
 pyes>=0.90.1
 tornado>=2.4.1
-dispatcher>=1.0
+git+https://github.com/olivierverdier/dispatch.git#egg=dispatcher
 pexpect>=2.4
 #parsing entrez genebank flatfile requires BioPython module, which can be installed via apt-get
 #sudo apt-get install python-biopython
+
+git+https://github.com/SuLab/biothings.api.git#egg=biothings
 
 httplib2
 elasticsearch

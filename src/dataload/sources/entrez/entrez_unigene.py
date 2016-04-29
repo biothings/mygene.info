@@ -1,4 +1,4 @@
-from entrez_base import Gene2UnigeneParser
+from .entrez_base import Gene2UnigeneParser
 
 
 __metadata__ = {

@@ -1,10 +1,8 @@
-from ensembl_base import EnsemblParser
-from mongokit import OR
+from .ensembl_base import EnsemblParser
 
 __metadata__ = {
     '__collection__': 'ensembl_pfam',
-    'structure': {'pfam': OR(unicode, list)},
-    # 'id_type': 'ensembl_gene',
+    'structure': {'pfam': None},
 }
 
 

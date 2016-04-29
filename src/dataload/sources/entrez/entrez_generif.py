@@ -1,4 +1,4 @@
-from entrez_base import Gene2GeneRifParser
+from .entrez_base import Gene2GeneRifParser
 
 __metadata__ = {
     '__collection__': 'entrez_generif',

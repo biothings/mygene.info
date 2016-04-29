@@ -22,7 +22,7 @@ def main(source):
 def main_test(src):
     import time, random
     for i in range(100+random.randint(0, 50)):
-        print src, i
+        print((src, i))
         time.sleep(random.random()+0.5)
 
 def main_test(src):
@@ -37,7 +37,7 @@ def main_test(src):
             if j > limit:
                 break
             else:
-                print src, j
+                print((src, j))
                 i = j
 
 if __name__ == '__main__':

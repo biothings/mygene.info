@@ -1,4 +1,4 @@
-from ucsc_base import load_ucsc_exons
+from .ucsc_base import load_ucsc_exons
 
 __metadata__ = {
     '__collection__' : 'ucsc_exons',

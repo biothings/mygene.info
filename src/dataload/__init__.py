@@ -6,9 +6,8 @@ import types
 import time
 import datetime
 import importlib
-from mongokit import Document, CustomType
 from utils.mongo import get_src_conn, get_src_dump
-from utils.common import get_timestamp, get_random_string, timesofar, dump2gridfs, iter_n
+from biothings.utils.common import get_timestamp, get_random_string, timesofar, dump2gridfs, iter_n
 from config import DATA_SRC_DATABASE, DATA_SRC_MASTER_COLLECTION
 
 
@@ -50,6 +49,7 @@ __sources_dict__ = {
 __sources__ = None   # should be a list defined at runtime
 
 conn = get_src_conn()
+doc_register = {}
 
 
 def get_data_folder(src_name):
@@ -59,30 +59,25 @@ def get_data_folder(src_name):
     return src_doc['data_folder']
 
 
-class CustomField(CustomType):
-    pass
-
-
-@conn.register
-class GeneDocSourceMaster(Document):
+class GeneDocSourceMaster(dict):
     '''A class to manage various genedoc data sources.'''
     __collection__ = DATA_SRC_MASTER_COLLECTION
     __database__ = DATA_SRC_DATABASE
     use_dot_notation = True
     use_schemaless = True
     structure = {
-        'name': unicode,
+        'name': str,
         'timestamp': datetime.datetime,
     }
 
 
-class GeneDocSource(Document):
+class GeneDocSource(dict):
     '''A base class for all source data.'''
     __collection__ = None      # should be specified individually
     __database__ = DATA_SRC_DATABASE
     use_dot_notation = True
     use_schemaless = True
-    DEFAULT_FIELDTYPE = unicode
+    DEFAULT_FIELDTYPE = str 
 
     temp_collection = None     # temp collection is for dataloading
 
@@ -97,7 +92,7 @@ class GeneDocSource(Document):
         self.temp_collection = self.db[new_collection]
         return new_collection
 
-    def doc_iterator(self, genedoc_d, batch=True, step=10000, validate=True):
+    def doc_iterator(self, genedoc_d, batch=True, step=10000):  #, validate=True):
         if isinstance(genedoc_d, types.GeneratorType) and batch:
             for doc_li in iter_n(genedoc_d, n=step):
                 yield doc_li
@@ -110,8 +105,8 @@ class GeneDocSource(Document):
                 _doc = copy.copy(self)
                 _doc.clear()
                 _doc.update(doc)
-                if validate:
-                    _doc.validate()
+                #if validate:
+                #    _doc.validate()
                 if batch:
                     doc_li.append(_doc)
                     i += 1
@@ -160,8 +155,8 @@ class GeneDocSource(Document):
         if update_master:
             # update src_master collection
             if not test:
-                _doc = {"_id": unicode(self.__collection__),
-                        "name": unicode(self.__collection__),
+                _doc = {"_id": str(self.__collection__),
+                        "name": str(self.__collection__),
                         "timestamp": datetime.datetime.now()}
                 for attr in ['ENTREZ_GENEDOC_ROOT', 'ENSEMBL_GENEDOC_ROOT', 'id_type']:
                     if hasattr(self, attr):
@@ -169,7 +164,13 @@ class GeneDocSource(Document):
                 if hasattr(self, 'get_mapping'):
                     _doc['mapping'] = getattr(self, 'get_mapping')()
 
-                conn.GeneDocSourceMaster(_doc).save()
+                coll = conn[GeneDocSourceMaster.__database__][GeneDocSourceMaster.__collection__]
+                dkey = {"_id" : _doc["_id"]}
+                prev = coll.find_one(dkey)
+                if prev:
+                    coll.replace_one(dkey,_doc)
+                else:
+                    coll.insert_one(_doc)
 
     def switch_collection(self):
         '''after a successful loading, rename temp_collection to regular collection name,
@@ -184,11 +185,15 @@ class GeneDocSource(Document):
         else:
             print("Error: load data first.")
 
-    def validate_all(self, genedoc_d=None):
-        """validate all genedoc_d."""
-        genedoc_d = genedoc_d or self.load_genedoc()
-        for doc in self.doc_iterator(genedoc_d, batch=False, validate=True):
-            pass
+    @property
+    def collection(self):
+        return self.db[self.__collection__]
+
+    #def validate_all(self, genedoc_d=None):
+    #    """validate all genedoc_d."""
+    #    genedoc_d = genedoc_d or self.load_genedoc()
+    #    for doc in self.doc_iterator(genedoc_d, batch=False, validate=True):
+    #        pass
 
 
 def register_sources():
@@ -202,7 +207,10 @@ def register_sources():
             metadata['get_geneid_d'] = src_m.get_geneid_d
         if metadata.get('ENSEMBL_GENEDOC_ROOT', False):
             metadata['get_mapping_to_entrez'] = src_m.get_mapping_to_entrez
-        src_cls = types.ClassType(name, (GeneDocSource,), metadata)
+        src_cls = type(name, (GeneDocSource,),metadata)
+        # manually propagate db attr
+        src_cls.db = conn[src_cls.__database__]
+        doc_register[name] = src_cls
         conn.register(src_cls)
 
 
@@ -213,8 +221,7 @@ def get_src(src):
 
 
 def load_src(src, **kwargs):
-    print("Loading %s..." % src)
-    _src = conn[src + '_doc']()
+    _src = doc_register[src + '_doc']()
     _src.load(**kwargs)
 
 

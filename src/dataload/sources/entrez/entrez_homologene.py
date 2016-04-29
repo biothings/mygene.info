@@ -1,4 +1,4 @@
-from entrez_base import HomologeneParser
+from .entrez_base import HomologeneParser
 
 __metadata__ = {
     '__collection__' : 'entrez_homologene',

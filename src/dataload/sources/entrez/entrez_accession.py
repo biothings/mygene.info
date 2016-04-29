@@ -1,4 +1,4 @@
-from entrez_base import Gene2AccessionParser
+from .entrez_base import Gene2AccessionParser
 
 __metadata__ = {
     '__collection__': 'entrez_accession',

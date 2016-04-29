@@ -7,8 +7,28 @@ from config import (DATA_SRC_SERVER, DATA_SRC_PORT, DATA_SRC_DATABASE,
                     DATA_SERVER_USERNAME, DATA_SERVER_PASSWORD,
                     DATA_TARGET_SERVER, DATA_TARGET_PORT, DATA_TARGET_DATABASE,
                     DATA_TARGET_MASTER_COLLECTION)
-from utils.common import timesofar
+from biothings.utils.common import timesofar
 
+
+class Connection(MongoClient):
+    """
+    This class mimicks / is a mock for mongokit.Connection class,
+    used to keep used interface (registering document model for instance)
+    """
+    def __init__(self, *args, **kwargs):
+        super(Connection,self).__init__(*args,**kwargs)
+        self._registered_documents = {}
+    def register(self, obj):
+        self._registered_documents[obj.__name__] = obj
+    def __getattr__(self,key):
+        if key in self._registered_documents:
+            document = self._registered_documents[key]
+            return document
+        else:
+            try:
+                return self[key]
+            except Exception:
+                raise AttributeError(key)
 
 def get_conn(server, port):
     if DATA_SERVER_USERNAME and DATA_SERVER_PASSWORD:
@@ -17,8 +37,7 @@ def get_conn(server, port):
                                              server, port)
     else:
         uri = "mongodb://{}:{}".format(server, port)
-    print("URI: %s" % uri)
-    conn = MongoClient(uri)
+    conn = Connection(uri)
     return conn
 
 
@@ -139,7 +158,7 @@ def src_clean_archives(keep_last=1, src=None, verbose=True, noconfirm=False):
        number of archive.
     '''
     from utils.dataload import list2dict
-    from utils.common import ask
+    from biothings.utils.common import ask
 
     src = src or get_src_db()
 
@@ -176,7 +195,7 @@ def src_clean_archives(keep_last=1, src=None, verbose=True, noconfirm=False):
 def target_clean_collections(keep_last=2, target=None, verbose=True, noconfirm=False):
     '''clean up collections in target db, only keep last <keep_last> number of collections.'''
     import re
-    from utils.common import ask
+    from biothings.utils.common import ask
 
     target = target or get_target_db()
     coll_list = target.collection_names()

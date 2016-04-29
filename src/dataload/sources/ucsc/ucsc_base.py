@@ -1,6 +1,6 @@
 import os.path
 import time
-from utils.common import timesofar
+from biothings.utils.common import timesofar
 from utils.dataload import (load_start, load_done, tab2dict,
                             tabfile_feeder, list2dict)
 
@@ -24,8 +24,8 @@ def load_exons_for_species(species, exons_key='exons'):
         chr = ld[2]
         if chr.startswith('chr'):
             chr = chr[3:]
-        exons = zip([int(x) for x in ld[9].split(',') if x],
-                    [int(x) for x in ld[10].split(',') if x])
+        exons = list(zip([int(x) for x in ld[9].split(',') if x],
+                    [int(x) for x in ld[10].split(',') if x]))
         assert len(exons) == int(ld[8]), (len(exons), int(ld[8]))
         ref2exons.append((refseq, {
             'chr': chr,
@@ -88,11 +88,11 @@ def load_exons_for_mouse():
 def load_ucsc_exons():
     print('DATA_FOLDER: ' + DATA_FOLDER)
     species_li = os.listdir(DATA_FOLDER)
-    print "Found {} species folders.".format(len(species_li))
+    print("Found {} species folders.".format(len(species_li)))
     t0 = time.time()
     gene2exons = {}
     for species in species_li:
-        print species, '...'
+        print(species,end='...')
         if species == 'Homo_sapiens':
             gene2exons.update(load_exons_for_human())
         elif species == 'Mus_musculus':

@@ -20,11 +20,12 @@ import os
 import os.path
 import time
 from datetime import datetime
-from urllib2 import urlparse
+from urllib.request import urlparse
 from ftplib import FTP, error_perm
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
-from utils.common import safewfile, LogPrint, timesofar
+from utils.common import safewfile, LogPrint
+from biothings.utils.common import timesofar
 from utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT
 
@@ -91,7 +92,7 @@ def get_file_list_for_download():
 
 
 def download_ftp_file(url, outfile):
-    url_parsed = urlparse.urlparse(url)
+    url_parsed = urlparse(url)
     assert url_parsed.scheme == 'ftp'
     ftp = FTP(url_parsed.hostname)
     ftp.login()

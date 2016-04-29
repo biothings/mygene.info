@@ -157,9 +157,9 @@ class EnsemblParser:
         entrez2ensembl = list2dict(self.ensembl2entrez_li, 1)
 
         #Now make a dictionary indexed by entrez gene id
-        print '# of ensembl IDs in total: %d' % len(set(ensembl2x) | set(ensembl2entrez))
-        print '# of ensembl IDs match entrez Gene IDs: %d' % len(set(ensembl2x) & set(ensembl2entrez))
-        print '# of ensembl IDs DO NOT match entrez Gene IDs: %d' % len(set(ensembl2x) - set(ensembl2entrez))
+        print('# of ensembl IDs in total: %d' % len(set(ensembl2x) | set(ensembl2entrez)))
+        print('# of ensembl IDs match entrez Gene IDs: %d' % len(set(ensembl2x) & set(ensembl2entrez)))
+        print('# of ensembl IDs DO NOT match entrez Gene IDs: %d' % len(set(ensembl2x) - set(ensembl2entrez)))
 
         #all genes with matched entrez
         def _fn(eid, taxid=None):

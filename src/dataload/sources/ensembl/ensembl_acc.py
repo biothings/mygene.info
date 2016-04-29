@@ -1,13 +1,13 @@
-from ensembl_base import EnsemblParser
+from .ensembl_base import EnsemblParser
 
 structure = {
                 'ensembl': None,
             }
 __metadata__ = {
     '__collection__' : 'ensembl_acc',
-    'structure': structure,
-    'required_fields' : ['ensembl'],
-#    'id_type': 'ensembl_gene',
+    #'structure': structure,
+    #'required_fields' : ['ensembl'],
+    #'id_type': 'ensembl_gene',
 }
 
 def load_genedoc(self=None):

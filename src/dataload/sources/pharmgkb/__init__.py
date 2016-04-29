@@ -1,4 +1,4 @@
-from pharmgkb_base import load_pharmgkb
+from .pharmgkb_base import load_pharmgkb
 
 __metadata__ = {
     '__collection__': 'pharmgkb',

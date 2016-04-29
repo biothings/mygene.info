@@ -16,7 +16,8 @@ import os.path
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 sys.path.append(src_path)
 from utils.mongo import get_src_dump
-from utils.common import safewfile, timesofar
+from utils.common import safewfile
+from biothings.utils.common import timesofar
 
 src_dump = get_src_dump()
 
@@ -24,7 +25,8 @@ def check_mongo():
     '''Check for "pending_to_upload" flag in src_dump collection.
        And return a list of sources should be uploaded.
     '''
-    return [src['_id'] for src in src_dump.find({'pending_to_upload': True})]
+    # filter some more: _id is supposed to be a user-defined string, not an ObjectId()
+    return [src['_id'] for src in src_dump.find({'pending_to_upload': True}) if type(src['_id']) == str]
 
 def dispatch(src):
     src_doc = src_dump.find_one({'_id': src})
@@ -57,7 +59,7 @@ def get_process_info(running_processes):
     pid_li = name_d.keys()
     if pid_li:
         output = check_output(['ps', '-p', ' '.join(pid_li)])
-        output = output.split('\n')
+        output = output.decode("utf8").split('\n')
         output[0] = '    {:<10}'.format('JOB') + output[0]  #header
         for i in range(1, len(output)):
             line = output[i].strip()
@@ -72,7 +74,7 @@ def main(daemon=False):
     while 1:
         src_to_update_li = check_mongo()
         if src_to_update_li:
-            print '\nDispatcher:  found pending jobs ', src_to_update_li
+            print('\nDispatcher:  found pending jobs ', src_to_update_li)
             for src_to_update in src_to_update_li:
                 if src_to_update not in running_processes:
                     mark_upload_started(src_to_update)
@@ -83,8 +85,8 @@ def main(daemon=False):
 
         jobs_finished = []
         if running_processes:
-            print 'Dispatcher:  {} active job(s)'.format(len(running_processes))
-            print get_process_info(running_processes)
+            print('Dispatcher:  {} active job(s)'.format(len(running_processes)))
+            print(get_process_info(running_processes))
 
         for src in running_processes:
             p = running_processes[src]
@@ -99,10 +101,10 @@ def main(daemon=False):
                      'upload.logfile': p.logfile,
                      }
                 if returncode == 0:
-                    print 'Dispatcher:  {} finished successfully with code {} (time: {}s)'.format(src, returncode, t1)
+                    print('Dispatcher:  {} finished successfully with code {} (time: {}s)'.format(src, returncode, t1))
                     d['upload.status'] = "success"
                 else:
-                    print 'Dispatcher:  {} failed with code {} (time: {}s)'.format(src, returncode, t1)
+                    print('Dispatcher:  {} failed with code {} (time: {}s)'.format(src, returncode, t1))
                     d['upload.status'] = "failed"
 
                 mark_upload_done(src, d)
@@ -118,9 +120,9 @@ def main(daemon=False):
         else:
             if daemon:
                 #continue monitor src_dump collection
-                print '\b'*50,
+                print("{}".format('\b'*50),end='')
                 for i in range(100):
-                    print '\b'*2+[unichr(8212), '\\', '|', '/'][i%4],
+                    print('\b'*2+[chr(8212), '\\', '|', '/'][i%4],end='')
                     time.sleep(0.1)
             else:
                 break

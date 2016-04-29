@@ -1,13 +1,14 @@
-from ensembl_base import EnsemblParser
+from .ensembl_base import EnsemblParser
 
-structure = {
-             'taxid': int,
-             'symbol': unicode,
-             'name': unicode,
-             }
+#structure = {
+#             'taxid': int,
+#             'symbol': unicode,
+#             'name': unicode,
+#             }
+
 __metadata__ = {
     '__collection__' : 'ensembl_gene',
-    'structure': structure,
+    #'structure': structure,
     'required_fields' : ['taxid'],
     'ENSEMBL_GENEDOC_ROOT' : True,
     'id_type': 'ensembl_gene',

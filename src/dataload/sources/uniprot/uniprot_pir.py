@@ -1,9 +1,8 @@
-from mongokit import OR
-from uniprot_base import load_pir
+from .uniprot_base import load_pir
 
 __metadata__ = {
     '__collection__': 'uniprot_pir',
-    'structure': {'pir': OR(unicode, list)},
+    'structure': {'pir': None},
 }
 
 

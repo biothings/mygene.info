@@ -11,14 +11,8 @@ import json
 from itertools import islice
 
 
-if sys.version_info.major == 3:
-    str_types = str
-    import pickle       # noqa
-else:
-    str_types = (str, unicode)    # noqa
-    import cPickle as pickle
-    input = raw_input
-
+str_types = str
+import pickle       # noqa
 
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 
@@ -133,7 +127,7 @@ def SubStr(input_string, start_string='', end_string='', include=0):
 def safe_unicode(s, mask='#'):
     '''replace non-decodable char into "#".'''
     try:
-        _s = unicode(s)
+        _s = str(s)
     except UnicodeDecodeError as e:
         pos = e.args[2]
         _s = s.replace(s[pos], mask)
@@ -198,17 +192,11 @@ def loadobj(filename, mode='file'):
             fobj = filename   # input is a file-like handler
     gzfobj = gzip.GzipFile(fileobj=fobj)
     try:
-        buffer = ""
-        while 1:
-            data = gzfobj.read()
-            if data == "":
-                break
-            buffer += data
-        object = pickle.loads(buffer)
+        obj = pickle.load(gzfobj)
     finally:
         gzfobj.close()
         fobj.close()
-    return object
+    return obj
 
 
 def is_int(s):
@@ -243,6 +231,8 @@ def newer(t0, t1, format='%Y%m%d'):
 def hipchat_msg(msg, color='yellow', message_format='text'):
     import httplib2
     from config import HIPCHAT_CONFIG
+    if not HIPCHAT_CONFIG:
+        return
 
     h = httplib2.Http()
     url = 'https://api.hipchat.com/v1/rooms/message?format=json&auth_token=' + HIPCHAT_CONFIG['token']

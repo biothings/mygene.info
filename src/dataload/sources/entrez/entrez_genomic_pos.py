@@ -6,7 +6,7 @@ run get_ref_microbe_taxids function to get an updated file for TAXIDS_FILE
 when it's necessary.
 '''
 import os.path
-from utils.common import (dump, loadobj, get_timestamp)
+from biothings.utils.common import (dump, loadobj, get_timestamp)
 from utils.dataload import (tab2list, load_start, load_done)
 from dataload import get_data_folder
 

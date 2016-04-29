@@ -1,9 +1,8 @@
-from mongokit import OR
-from uniprot_base import load_ipi
+from .uniprot_base import load_ipi
 
 __metadata__ = {
     '__collection__': 'uniprot_ipi',
-    'structure': {'ipi': OR(unicode, list)},
+    'structure': {'ipi': None},
 }
 
 

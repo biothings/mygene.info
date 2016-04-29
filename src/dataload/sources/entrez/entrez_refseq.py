@@ -1,4 +1,4 @@
-from entrez_base import Gene2RefseqParser
+from .entrez_base import Gene2RefseqParser
 
 
 __metadata__ = {

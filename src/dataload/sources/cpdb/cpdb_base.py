@@ -1,7 +1,7 @@
 import os.path
 import time
 
-from utils.common import get_timestamp, timesofar
+from biothings.utils.common import get_timestamp, timesofar
 from utils.dataload import (load_start, load_done, tabfile_feeder,
                             list2dict, value_convert, dict_convert)
 from dataload import get_data_folder

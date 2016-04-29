@@ -1,5 +1,4 @@
-from ensembl_base import EnsemblParser
-# from mongokit import OR, IS
+from .ensembl_base import EnsemblParser
 
 
 __metadata__ = {
@@ -8,15 +7,6 @@ __metadata__ = {
         'genomic_pos': None,
         'genomic_pos_hg19': None
     },
-    # 'structure': {
-    #               'genomic_pos': {
-    #                     "chr": unicode,
-    #                     "start": OR(int, long),
-    #                     "end": OR(int, long),
-    #                     "strand": IS(1, -1),
-    #                }
-    #              },
-    # 'id_type': 'ensembl_gene',
 }
 
 

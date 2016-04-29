@@ -1,4 +1,4 @@
-from uniprot_base import load_uniprot
+from .uniprot_base import load_uniprot
 
 #UniProt id mapping source from UniProt directly
 #ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/idmapping_selected.tab

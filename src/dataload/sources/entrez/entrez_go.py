@@ -1,4 +1,4 @@
-from entrez_base import Gene2GOParser
+from .entrez_base import Gene2GOParser
 
 __metadata__ = {
     '__collection__': 'entrez_go',

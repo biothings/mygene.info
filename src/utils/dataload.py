@@ -19,8 +19,8 @@ import csv
 csv.field_size_limit(10000000)   # default is 131072, too small for some big files
 import json
 
-from utils.common import ask, safewfile
-
+from utils.common import safewfile
+from biothings.utils.common import ask
 
 #===============================================================================
 # Misc. Utility functions
@@ -145,12 +145,14 @@ def anyfile(infile, mode='r'):
     filetype = os.path.splitext(infile)[1].lower()
     if filetype == '.gz':
         import gzip
-        in_f = gzip.GzipFile(infile, 'r')
+        gzf = gzip.GzipFile(infile, 'r')
+        in_f = iter(lambda: next(gzf).decode(),gzf)
     elif filetype == '.zip':
         import zipfile
-        in_f = zipfile.ZipFile(infile, 'r').open(rawfile, 'r')
+        zf = zipfile.ZipFile(infile, 'r').open(rawfile, 'r')
+        in_f = iter(lambda: next(zf).decode(),zf)
     else:
-        in_f = file(infile, mode)
+        in_f = open(infile, mode)
     return in_f
 
 
@@ -209,7 +211,8 @@ def tabfile_feeder(datafile, header=1, sep='\t',
                    assert_column_no=None):
     '''a generator for each row in the file.'''
 
-    reader = csv.reader(anyfile(datafile), delimiter=sep)
+    in_f = anyfile(datafile)
+    reader = csv.reader(in_f, delimiter=sep)
     lineno = 0
     try:
         for i in range(header):
@@ -225,7 +228,7 @@ def tabfile_feeder(datafile, header=1, sep='\t',
             if not includefn or includefn(ld):
                 lineno += 1
                 if coerce_unicode:
-                    yield [unicode(x, encoding='utf-8', errors='replace') for x in ld]
+                    yield [str(x) for x in ld]
                 else:
                     yield ld
     except ValueError:
@@ -369,14 +372,16 @@ def normalized_value(value, sort=True):
     if isinstance(value, list):
         value = [x for x in value if x]   # remove empty values
         try:
-            _v = set(value)
+            _v = list(set(value))
         except TypeError:
             #use alternative way
             _v = [json.loads(x) for x in set([json.dumps(x) for x in value])]
         if sort:
-            _v = sorted(_v)
-        else:
-            _v = list(_v)
+            # py3 won't sort dict anymore...
+            if isinstance(_v[0],dict):
+                _v = sorted(_v,key=lambda x: sorted(x.keys()))
+            else:
+                _v = sorted(_v)
         if len(_v) == 1:
             _v = _v[0]
     else:

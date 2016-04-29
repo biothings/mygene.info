@@ -4,7 +4,8 @@ from subprocess import Popen
 from datetime import datetime
 import dispatch
 
-from utils.common import timesofar, src_path
+from biothings.utils.common import timesofar
+from utils.common import src_path
 from utils.mongo import src_clean_archives, target_clean_collections
 from dataload.dispatch import (check_mongo, get_process_info, src_dump,
                                mark_upload_started, mark_upload_done)
@@ -165,7 +166,7 @@ class GeneDocDispatcher:
             if self.idle:
                 print('\b' * 50, end='')
                 for i in range(100):
-                    print('\b' * 2 + [unichr(8212), '\\', '|', '/'][i % 4], end='')
+                    print('\b' * 2 + [chr(8212), '\\', '|', '/'][i % 4], end='')
                     time.sleep(0.1)
             else:
                 time.sleep(10)

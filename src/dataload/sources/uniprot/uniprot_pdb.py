@@ -1,9 +1,8 @@
-from mongokit import OR
-from uniprot_base import load_pdb
+from .uniprot_base import load_pdb
 
 __metadata__ = {
     '__collection__': 'uniprot_pdb',
-    'structure': {'pdb': OR(unicode, list)},
+    #'structure': {'pdb': OR(unicode, list)},
 }
 
 

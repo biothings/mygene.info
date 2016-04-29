@@ -1,6 +1,6 @@
 import os.path
 import time
-from utils.common import timesofar
+from biothings.utils.common import timesofar
 from utils.dataload import (load_start, load_done,
                             listitems, dupline_seperator,
                             tabfile_feeder, list2dict, list_nondup,

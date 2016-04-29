@@ -21,9 +21,10 @@ import re
 from ftplib import FTP, error_temp
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
-from utils.common import ask, safewfile, LogPrint, timesofar
+from utils.common import safewfile, LogPrint
+from biothings.utils.common import ask, timesofar
 from utils.mongo import get_src_dump
-from config import DATA_ARCHIVE_ROOT
+from config import DATA_ARCHIVE_ROOT, ASCP_ROOT
 
 timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez', timestamp)
@@ -72,7 +73,9 @@ def _get_ascp_cmdline(url):
     ~/opt/aspera_connect/bin/ascp -QT -l640M -i  \
       ~/opt/aspera_connect/etc/asperaweb_id_dsa.putty anonftp@ftp.ncbi.nih.gov:/refseq/H_sapiens/mRNA_Prot/human.rna.gbff.gz .
     '''
-    cmd = '~/opt/aspera_connect/bin/ascp -QT -l640M -i  ~/opt/aspera_connect/etc/asperaweb_id_dsa.putty anonftp@'
+    execpath = ASCP_ROOT + '/bin/ascp'
+    keypath = ASCP_ROOT + '/etc/asperaweb_id_dsa.putty'
+    cmd = execpath + ' -QT -l640M -i ' + keypath + ' anonftp@'
     _url = url[6:]   # remove 'ftp://'
     _url = _url.replace('.gov/', '.gov:/')
     cmd = cmd + _url + ' .'

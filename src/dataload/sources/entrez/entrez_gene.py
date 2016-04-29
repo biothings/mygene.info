@@ -1,5 +1,5 @@
-from entrez_base import GeneInfoParser
-from entrez_base import get_geneid_d as _get_geneid_d
+from .entrez_base import GeneInfoParser
+from .entrez_base import get_geneid_d as _get_geneid_d
 
 structure = {
     'taxid': int,
@@ -17,13 +17,10 @@ Extra_fileds = ['APHIDBASE', 'AnimalQTLdb', 'ApiDB_CryptoDB', 'BEEBASE',
                 'dictyBase', 'miRBase']
 string_fields += Extra_fileds
 
-for field in string_fields:
-    structure[field] = unicode
-
 __metadata__ = {
     '__collection__': 'entrez_gene',
-    'structure': structure,
-    'required_fields': ['taxid', 'entrezgene', 'symbol'],
+    #'structure': structure,
+    #'required_fields': ['taxid', 'entrezgene', 'symbol'],
     'ENTREZ_GENEDOC_ROOT': True
 }
 

@@ -7,7 +7,7 @@ import copy
 from IPython.parallel import Client
 
 from config import CLUSTER_CLIENT_JSON
-from utils.common import timesofar, ask
+from biothings.utils.common import timesofar, ask
 
 
 def run_jobs_on_ipythoncluster(worker, task_list, shutdown_ipengines_after_done=False):

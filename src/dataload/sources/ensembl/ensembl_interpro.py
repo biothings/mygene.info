@@ -1,16 +1,9 @@
-from ensembl_base import EnsemblParser
+from .ensembl_base import EnsemblParser
 
 __metadata__ = {
     '__collection__': 'ensembl_interpro',
     'structure': {'interpro': None},
-    # 'structure': {
-    #               'interpro': {
-    #                     "id": unicode,
-    #                     "desc": unicode,
-    #                     "short_desc": unicode,
-    #                }
-    #              },
-    # 'id_type': 'ensembl_gene',
+    'id_type': 'ensembl_gene'
 }
 
 

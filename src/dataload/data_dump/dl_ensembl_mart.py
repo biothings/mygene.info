@@ -25,7 +25,8 @@ import time
 from ftplib import FTP
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
-from utils.common import ask, safewfile, LogPrint, timesofar
+from utils.common import safewfile, LogPrint
+from biothings.utils.common import ask, timesofar
 from utils.mongo import get_src_dump
 from utils.dataload import tab2list
 from config import DATA_ARCHIVE_ROOT
