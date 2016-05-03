@@ -376,7 +376,7 @@ def normalized_value(value, sort=True):
         except TypeError:
             #use alternative way
             _v = [json.loads(x) for x in set([json.dumps(x) for x in value])]
-        if sort:
+        if len(_v) and sort:
             # py3 won't sort dict anymore...
             if isinstance(_v[0],dict):
                 _v = sorted(_v,key=lambda x: sorted(x.keys()))

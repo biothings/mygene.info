@@ -96,7 +96,7 @@ def download_ftp_file(url, outfile):
     assert url_parsed.scheme == 'ftp'
     ftp = FTP(url_parsed.hostname)
     ftp.login()
-    with file(outfile, 'wb') as out_f:
+    with open(outfile, 'wb') as out_f:
         ftp.retrbinary('RETR %s' % url_parsed.path, out_f.write)
 
     # set the mtime to match remote ftp server

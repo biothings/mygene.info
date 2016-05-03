@@ -94,7 +94,7 @@ def get_all_species(release):
     outfile = tempfile.mktemp() + '.txt.gz'
     try:
         print('Downloading "species.txt.gz"...', end=' ')
-        out_f = file(outfile, 'w')
+        out_f = open(outfile, 'wb')
         ftp = FTP('ftp.ensembl.org')
         ftp.login()
         species_file = '/pub/release-%s/mysql/ensembl_production_%s/species.txt.gz' % (release, release)

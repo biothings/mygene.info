@@ -460,10 +460,19 @@ class Gene2GeneRifParser(EntrezParserBase):
     '''
     DATAFILE = 'generif/generifs_basic.gz'
 
+
+    def _cvt_pubmed(self, pubmed_str):
+        """input is a string of one or multiple pubmed ids, sep by comma"""
+        _li = [int(x) for x in pubmed_str.split(',')]
+        if len(_li) == 1:
+            return _li[0]
+        else:
+            return _li
+
     def load(self):
         load_start(self.datafile)
         gene2generif = tab2dict(self.datafile, (1, 2, 4), 0, alwayslist=1)
         gene2generif = dict_convert(gene2generif, valuefn=lambda v: {
-                    'generif': [dict(pubmed=int(x[0]), text=x[1]) for x in v]})
+            'generif': [dict(pubmed=self._cvt_pubmed(x[0]), text=x[1]) for x in v]})
         load_done('[%d]' % len(gene2generif))
         return gene2generif
