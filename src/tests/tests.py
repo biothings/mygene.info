@@ -1,4 +1,4 @@
-
+import random
 from biothings.tests.tests import BiothingTestHelper, _d, TornadoRequestHelper
 from nose.tools import ok_, eq_
 
@@ -137,6 +137,14 @@ class MyGeneTest(BiothingTestHelper):
         res = self.json_ok(self.get_ok(self.api + '/query?q=tRNA:Y1:85Ae'),
                            checkerror=False)
         assert 'error' in res
+        # ensure returned fields by default
+        res = self.json_ok(self.get_ok(self.api + '/query?q=cdk'))
+        # pick one
+        idx = random.randrange(0, 10)
+        deffields = res["hits"][idx].keys()  # pick one...
+        expected = ["_id", "_score", "taxid", "entrezgene", "name", "symbol"]
+        assert sorted(list(deffields)) == sorted(expected), \
+            "%s != %s" % (sorted(list(deffields)), sorted(expected))
 
     def test_query_post(self):
         # /query via post
