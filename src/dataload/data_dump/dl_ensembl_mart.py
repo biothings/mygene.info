@@ -31,7 +31,7 @@ from utils.mongo import get_src_dump
 from utils.dataload import tab2list
 from config import DATA_ARCHIVE_ROOT
 
-import httplib2
+import requests
 
 
 ENSEMBL_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ensembl')
@@ -130,13 +130,13 @@ class BioMart(object):
             self.get_species_list()
 
     def _query(self, *args, **kwargs):
-        h = httplib2.Http()
-        res, con = h.request(*args, **kwargs)
-        if res.status != 200:
+        req = requests.Request(*args, **kwargs)
+        res = requests.session().send(req.prepare())
+        if res.status_code != 200:
             raise MartException(res)
-        if con.startswith('Query ERROR:'):
-            raise MartException(con)
-        return con
+        if res.text.startswith('Query ERROR:'):
+            raise MartException(res.text)
+        return res.text
 
     def _make_query_xml(self, dataset, attributes, filters=None):
         attrib_xml = '\n'.join(['<Attribute name = "%s" />' % attrib for attrib in attributes])
@@ -167,13 +167,13 @@ class BioMart(object):
         pass
 
     def query_mart(self, xml):
-        return self._query(self.url, 'POST', body='query=%s\n' % xml)
+        return self._query('POST', self.url, data='query=%s\n' % xml)
 
     def get_registry(self):
-        return self._query(self.url + '?type=registry')
+        return self._query('GET', self.url + '?type=registry')
 
     def get_datasets(self):
-        con = self._query(self.url + '?type=datasets&mart=ensembl')
+        con = self._query('GET', self.url + '?type=datasets&mart=ensembl')
         out = []
         for line in con.split('\n'):
             line = line.strip()
@@ -199,7 +199,8 @@ class BioMart(object):
             try:
                 con = self.query_mart(xml)
             except MartException:
-                err_msg = sys.exc_value.args[0]
+                import traceback
+                err_msg = traceback.format_exc()  #sys.exc_value.args[0]
                 print(species[0], err_msg)
                 continue
             cnt = 0

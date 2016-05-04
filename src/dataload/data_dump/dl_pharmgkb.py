@@ -18,13 +18,14 @@ import os
 import os.path
 import time
 from datetime import datetime
-import httplib2
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
+import requests
 from utils.common import safewfile, LogPrint
 from biothings.utils.common import ask, timesofar
 from utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT
+
+src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
+sys.path.append(src_path)
 
 timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/pharmgkb', timestamp)
@@ -53,16 +54,16 @@ def download(no_confirm=False):
             print("Success.")
         else:
             print("Failed with return code (%s)." % return_code)
-        print("="*50)
+        print("=" * 50)
     finally:
         os.chdir(orig_path)
 
 
 def check_header():
-    h = httplib2.Http()
-    res, con = h.request(GENES_URL, 'HEAD')
-    assert res.status == 200, "Error: fail to access download url."
-    lastmodified = res.get('last-modified', '')
+    req = requests.Request('HEAD', GENES_URL)
+    res = requests.session().send(req.prepare())
+    assert res.status_code == 200, "Error: fail to access download url."
+    lastmodified = res.headers.get('last-modified', '')
     if lastmodified:
         # an example: 'last-modified': 'Thu, 06 Dec 2012 11:01:50 GMT'
         lastmodified = datetime.strptime(lastmodified, "%a, %d %b %Y %H:%M:%S %Z")

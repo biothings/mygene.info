@@ -14,13 +14,15 @@
 from __future__ import print_function
 import os
 import os.path
+import io
 import itertools
 import csv
-csv.field_size_limit(10000000)   # default is 131072, too small for some big files
 import json
-
 from utils.common import safewfile
 from biothings.utils.common import ask
+
+csv.field_size_limit(10000000)   # default is 131072, too small for some big files
+
 
 #===============================================================================
 # Misc. Utility functions
@@ -145,12 +147,10 @@ def anyfile(infile, mode='r'):
     filetype = os.path.splitext(infile)[1].lower()
     if filetype == '.gz':
         import gzip
-        gzf = gzip.GzipFile(infile, 'r')
-        in_f = iter(lambda: next(gzf).decode(),gzf)
+        in_f = io.TextIOWrapper(gzip.GzipFile(infile, 'r'))
     elif filetype == '.zip':
         import zipfile
-        zf = zipfile.ZipFile(infile, 'r').open(rawfile, 'r')
-        in_f = iter(lambda: next(zf).decode(),zf)
+        in_f = io.TextIOWrapper(zipfile.ZipFile(infile, 'r').open(rawfile, 'r'))
     else:
         in_f = open(infile, mode)
     return in_f
