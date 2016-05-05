@@ -1,11 +1,6 @@
 from .entrez_base import GeneInfoParser
 from .entrez_base import get_geneid_d as _get_geneid_d
 
-structure = {
-    'taxid': int,
-    'entrezgene': int,
-    'alias': None
-}
 string_fields = ['name', 'symbol', 'map_location', 'type_of_gene',
                  'HGNC', 'HPRD', 'MIM', 'MGI', 'RATMAP', 'RGD', 'FLYBASE',
                  'WormBase', 'TAIR', 'ZFIN', 'Xenbase']
@@ -19,8 +14,6 @@ string_fields += Extra_fileds
 
 __metadata__ = {
     '__collection__': 'entrez_gene',
-    #'structure': structure,
-    #'required_fields': ['taxid', 'entrezgene', 'symbol'],
     'ENTREZ_GENEDOC_ROOT': True
 }
 

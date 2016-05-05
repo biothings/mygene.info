@@ -1,12 +1,7 @@
 from .ucsc_base import load_ucsc_exons
 
 __metadata__ = {
-    '__collection__' : 'ucsc_exons',
-    'structure': {
-      'exons': None,
-      'exons_hg19': None    # For human genes, default exons are on hg38,
-                            # exons_hg19 were still kept there.
-      },
+    '__collection__': 'ucsc_exons',
 }
 
 

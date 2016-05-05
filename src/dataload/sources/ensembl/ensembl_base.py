@@ -14,7 +14,8 @@ print('DATA_FOLDER: ' + DATA_FOLDER)
 
 
 #fn to skip lines with LRG records.'''
-_not_LRG = lambda ld: not ld[1].startswith("LRG_")
+def _not_LRG(ld):
+    return not ld[1].startswith("LRG_")
 
 
 class EnsemblParser:

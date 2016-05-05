@@ -225,11 +225,11 @@ def run_stats(total_ensembl_IDs, ensembl_dict, ensembl_map_count, total_mapped):
     print("--------------")
     print("Total Ensembl gene IDs", total_ensembl_IDs)
     print("Total Ensembl gene IDs with multiple NCBI gene IDs: ", len(ensembl_dict))
-    print("Percent of Ensembl gene IDs with multiple NCBI gene IDs: ", round((len(ensembl_dict)*1./(total_ensembl_IDs))*100, 1))
+    print("Percent of Ensembl gene IDs with multiple NCBI gene IDs: ", round((len(ensembl_dict) * 1. / (total_ensembl_IDs)) * 100, 1))
     print("Total Ensembl gene IDs successfully and uniquely mapped to 1 NCBI gene ID: ", total_mapped)
     print("Total mapped using gene2ensembl: ", ensembl_map_count)
-    print("Total mapped from mygene.info: ", total_mapped-ensembl_map_count)
-    print("Percent of Ensembl IDs uniquely mapped out of Ensembl IDs with > 1 NCBI gene ID: ", round((total_mapped*1./(len(ensembl_dict)))*100, 1))
+    print("Total mapped from mygene.info: ", total_mapped - ensembl_map_count)
+    print("Percent of Ensembl IDs uniquely mapped out of Ensembl IDs with > 1 NCBI gene ID: ", round((total_mapped * 1. / (len(ensembl_dict))) * 100, 1))
 
 
 # def main(gene_ensembl_1, gene_ensembl_2, gene2ensembl):

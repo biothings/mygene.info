@@ -5,7 +5,6 @@ from .uniprot_base import load_uniprot
 
 __metadata__ = {
     '__collection__': 'uniprot',
-    'structure': {'uniprot': None},
 }
 
 

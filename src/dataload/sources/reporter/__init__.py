@@ -2,13 +2,12 @@ from utils.dataload import merge_dict, value_convert
 
 __metadata__ = {
     '__collection__': 'reporter',
-    'structure': {'reporter': None},
 }
 
 reporter_modules = ['affy_reporter', 'affy_reporter2', 'gnf_reporter', 'pigatlas_reporter']
 platform_li = []
 for i, module in enumerate(reporter_modules):
-    module = __import__('dataload.sources.reporter.'+module, fromlist=[module])
+    module = __import__('dataload.sources.reporter.' + module, fromlist=[module])
     reporter_modules[i] = module
     platform_li.extend(module.platform_li)
 

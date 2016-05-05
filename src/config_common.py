@@ -38,7 +38,6 @@ SPECIES_LI = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish',
               'thale-cress', 'frog', 'pig']
 
 
-
 # 'category' in google analytics event object
 GA_EVENT_CATEGORY = 'v2_api'
 # 'action' for get request in google analytics event object
@@ -73,28 +72,28 @@ HOST_ENVAR_NAME = "MG_HOST"
 # Also, make sure using raw python string so there's no
 # need to actually escape here again...
 SOURCE_TRANSLATORS = {
-        "refseq:":      r"refseq.\\\*:",
-        "accession:":   r"accession.\\\*:",
-        "reporter:":    r"reporter.\\\*:",
-        "interpro:":    r"interpro.\\\*:",
-        # "GO:":          r"GO.\\\*:",
-        "homologene:":  r"homologene.\\\*:",
-        "reagent:":     r"reagent.\\\*:",
-        "uniprot:":     r"uniprot.\\\*:",
+    "refseq:":  r"refseq.\\\*:",
+    "accession:":   r"accession.\\\*:",
+    "reporter:":    r"reporter.\\\*:",
+    "interpro:":    r"interpro.\\\*:",
+    # "GO:":          r"GO.\\\*:",
+    "homologene:":  r"homologene.\\\*:",
+    "reagent:":     r"reagent.\\\*:",
+    "uniprot:":     r"uniprot.\\\*:",
 
-        "ensemblgene:":         "ensembl.gene:",
-        "ensembltranscript:":   "ensembl.transcript:",
-        "ensemblprotein:":      "ensembl.protein:",
-        }
+    "ensemblgene:":         "ensembl.gene:",
+    "ensembltranscript:":   "ensembl.transcript:",
+    "ensemblprotein:":      "ensembl.protein:",
+}
 
 
 # ################ #
 # MYGENE HUB VARS  #
 # ################ #
 
-DATA_SRC_MASTER_COLLECTION = 'src_master'   #for metadata of each src collections
-DATA_SRC_DUMP_COLLECTION = 'src_dump'       #for src data download information
-DATA_SRC_BUILD_COLLECTION = 'src_build'       #for src data build information
+DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
+DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
+DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
 DATA_SRC_DATABASE = 'genedoc_src'
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'

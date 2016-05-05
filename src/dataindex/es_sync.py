@@ -40,7 +40,7 @@ class ESIndexer2(ESIndexer):
         res = self.conn.search(index=self.ES_INDEX_NAME, doc_type=self.ES_INDEX_TYPE, body=q)
         if debug:
             return res
-        return [(datetime.utcfromtimestamp(x['key']*1./1000), x['doc_count']) for x in res['aggregations']['timestamp']['buckets']]
+        return [(datetime.utcfromtimestamp(x['key'] * 1. / 1000), x['doc_count']) for x in res['aggregations']['timestamp']['buckets']]
 
     def get_latest_timestamp(self):
         ts_stats = self.get_timestamp_stats()

@@ -66,7 +66,7 @@ class GeneDocMemeoryBackend(GeneDocBackendBase):
     def finalize(self):
         '''dump target_dict into a file.'''
         from utils.common import dump
-        dump(self.target_dict, self.target_name+'.pyobj')
+        dump(self.target_dict, self.target_name + '.pyobj')
 
 
 class GeneDocMongoDBBackend(GeneDocBackendBase):
@@ -141,7 +141,7 @@ class GeneDocMongoDBBackend(GeneDocBackendBase):
         del _d
         return iter(doc_li) if asiter else doc_li
 
-        ## This following query can perserve the order of ids, but too slow
+        # This following query can perserve the order of ids, but too slow
         #cur = self.target_collection.find({'$or': [{'_id': _id} for _id in ids]})
         #return cur if asiter else list(cur)
 
@@ -164,7 +164,7 @@ class GeneDocMongoDBBackend(GeneDocBackendBase):
 
     def remove_from_ids(self, ids, step=10000):
         for i in range(0, len(ids), step):
-            self.target_collection.remove({'_id': {'$in': ids[i:i+step]}})
+            self.target_collection.remove({'_id': {'$in': ids[i:i + step]}})
 
 
 class GeneDocESBackend(GeneDocBackendBase):
@@ -272,16 +272,16 @@ class GeneDocCouchDBBackend(GeneDocBackendBase):
         output = []
         t0 = time.time()
         for i in range(0, len(doc_li), step):
-            output.extend(self.target_db.update(doc_li[i:i+step]))
+            output.extend(self.target_db.update(doc_li[i:i + step]))
             if verbose:
-                print('\t%d-%d Done [%s]...' % (i+1, min(i+step, len(doc_li)), timesofar(t0)))
+                print('\t%d-%d Done [%s]...' % (i + 1, min(i + step, len(doc_li)), timesofar(t0)))
 
         res = list2dict(list_itemcnt([x[0] for x in output]), 0)
         print("Done![%s, %d OK, %d Error]" % (timesofar(t0), res.get(True, 0), res.get(False, 0)))
         res = listsort(list_itemcnt([x[2].args[0] for x in output if x[0] is False]), 1, reverse=True)
         print('\n'.join(['\t%s\t%d' % x for x in res[:10]]))
         if len(res) > 10:
-            print("\t%d lines omitted..." % (len(res)-10))
+            print("\t%d lines omitted..." % (len(res) - 10))
 
     def _homologene_trimming(self, species_li):
         '''A special step to remove species not included in <species_li>

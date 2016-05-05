@@ -4,7 +4,6 @@ from config import DATA_ARCHIVE_ROOT
 
 __metadata__ = {
     '__collection__': 'reagent',
-    'structure': {'reagent': None},
 }
 
 platform_li = [

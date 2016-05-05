@@ -14,10 +14,8 @@ from dataload import get_data_folder
 DATA_FOLDER = get_data_folder('entrez')
 print('DATA_FOLDER: ' + DATA_FOLDER)
 
-
 __metadata__ = {
     '__collection__': 'entrez_genomic_pos',
-    'structure': {'genomic_pos': None}
 }
 
 TAXIDS_FILE = os.path.join(DATA_FOLDER, "../ref_microbe_taxids_20151014.pyobj")
@@ -34,7 +32,10 @@ def load_genedoc(self):
     taxids = loadobj(TAXIDS_FILE)
     taxid_set = set(taxids)
     load_start(DATAFILE)
-    _includefn = lambda ld: ld[0] in taxid_set  # match taxid from taxid_set
+
+    def _includefn(ld):
+        return ld[0] in taxid_set  # match taxid from taxid_set
+
     cols_included = [0, 1, 7, 9, 10, 11]  # 0-based col idx
     gene2genomic_pos_li = tab2list(DATAFILE, cols_included, header=1,
                                    includefn=_includefn)

@@ -19,7 +19,7 @@ class GeneDocSyncer:
     def __init__(self, build_config='genedoc_mygene'):
         self.build_config = build_config
         self._db = get_target_db()
-        self._target_col = self._db[self.build_config+'_current']
+        self._target_col = self._db[self.build_config + '_current']
         self.step = 10000
 
     def get_source_list(self):
@@ -162,7 +162,7 @@ class GeneDocSyncer:
             import bz2
         print('Backing up timestamps into "{}"...'.format(outfile))
         t0 = time.time()
-        file_handler = bz2.BZ2File if compress else file
+        file_handler = bz2.BZ2File if compress else open
         with file_handler(outfile, 'w') as out_f:
             for doc in doc_feeder(self._target_col, step=100000, fields=['_timestamp']):
                 out_f.write('{}\t{}\n'.format(doc['_id'], doc['_timestamp'].strftime('%Y%m%d')))
@@ -305,7 +305,7 @@ def main():
             if no_confirm or ask("Continue to apply changes...") == 'Y':
                 sc.apply_changes(changes)
                 sc.verify_changes(changes)
-            print('='*20)
+            print('=' * 20)
             print("Finished.", timesofar(t0))
 
 

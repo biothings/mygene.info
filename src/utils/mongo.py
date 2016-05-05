@@ -52,8 +52,6 @@ def get_src_db(conn=None):
 
 def get_src_master(conn=None):
     conn = conn or get_src_conn()
-    print("conn: %s" % conn)
-    print("? %s" % conn[DATA_SRC_DATABASE][DATA_SRC_MASTER_COLLECTION])
     return conn[DATA_SRC_DATABASE][DATA_SRC_MASTER_COLLECTION]
 
 
@@ -106,7 +104,7 @@ def doc_feeder(collection, step=1000, s=None, e=None, inbatch=False, query=None,
        batch_callback is a callback function as fn(cnt, t), called after every batch
        fields is optional parameter passed to find to restrict fields to return.
     '''
-    cur = collection.find(query, timeout=False, fields=fields)
+    cur = collection.find(query, no_cursor_timeout=False, projection=fields)
     n = cur.count()
     s = s or 0
     e = e or n

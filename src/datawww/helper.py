@@ -4,7 +4,7 @@ import tornado.web
 
 
 class BaseHandler(tornado.web.RequestHandler):
-    jsonp_parameter='callback'
+    jsonp_parameter = 'callback'
 
     def _check_fields_param(self, kwargs):
         '''support "filter" as an alias of "fields" parameter for back-compatability.'''
@@ -20,11 +20,11 @@ class BaseHandler(tornado.web.RequestHandler):
         _args = {}
         for k in self.request.arguments:
             v = self.request.arguments[k]
-            if type(v) is types.ListType and len(v) == 1:
+            if isinstance(v, types.ListType) and len(v) == 1:
                 _args[k] = v[0]
             else:
                 _args[k] = v
-        _args.pop(self.jsonp_parameter, None)   #exclude jsonp parameter if passed.
+        _args.pop(self.jsonp_parameter, None)  # exclude jsonp parameter if passed.
         self._check_fields_param(_args)
         return _args
 
@@ -46,7 +46,7 @@ class BaseHandler(tornado.web.RequestHandler):
         #get etag if data is a dictionary and has "etag" attribute.
         etag = data.get('etag', None) if isinstance(data, dict) else None
         self.set_cacheable(etag=etag)
-        self.support_cors();
+        self.support_cors()
         if jsoncallback:
             self.write('%s(%s)' % (jsoncallback, _json_data))
         else:
@@ -64,7 +64,8 @@ class BaseHandler(tornado.web.RequestHandler):
         '''Provide server side support for CORS request.'''
         self.set_header("Access-Control-Allow-Origin", "*")
         self.set_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-        self.set_header("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control")
+        self.set_header("Access-Control-Allow-Headers",
+                        "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, If-Modified-Since, X-File-Name, Cache-Control")
         self.set_header("Access-Control-Allow-Credentials", "false")
         self.set_header("Access-Control-Max-Age", "60")
 

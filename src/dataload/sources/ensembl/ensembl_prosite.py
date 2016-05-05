@@ -2,7 +2,6 @@ from .ensembl_base import EnsemblParser
 
 __metadata__ = {
     '__collection__': 'ensembl_prosite',
-    'structure': {'prosite': None},
     'id_type': 'ensembl_gene'
 }
 

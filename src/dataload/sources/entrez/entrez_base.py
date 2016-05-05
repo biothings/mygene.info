@@ -99,7 +99,7 @@ class GeneInfoParser(EntrezParserBase):
                     continue
                 # add "MGI:" prefix for MGI ids.
                 if _db.lower() == 'mgi':
-                    _id = "MGI:"+_id
+                    _id = "MGI:" + _id
                 out[_db] = _id
             return out
 
@@ -235,7 +235,7 @@ class HomologeneParser(EntrezParserBase):
 
             for i, gdoc in enumerate(doc_li):
                 gdoc['homologene']['genes'] = self._sorted_homologenes(
-                                set(homologene_d[gdoc['homologene']['id']]))
+                    set(homologene_d[gdoc['homologene']['id']]))
                 doc_li[i] = gdoc
 
             load_done('[%d]' % len(doc_li))
@@ -459,7 +459,6 @@ class Gene2GeneRifParser(EntrezParserBase):
     '''
     '''
     DATAFILE = 'generif/generifs_basic.gz'
-
 
     def _cvt_pubmed(self, pubmed_str):
         """input is a string of one or multiple pubmed ids, sep by comma"""

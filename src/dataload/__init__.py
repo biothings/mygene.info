@@ -77,7 +77,7 @@ class GeneDocSource(dict):
     __database__ = DATA_SRC_DATABASE
     use_dot_notation = True
     use_schemaless = True
-    DEFAULT_FIELDTYPE = str 
+    DEFAULT_FIELDTYPE = str
 
     temp_collection = None     # temp collection is for dataloading
 
@@ -92,7 +92,7 @@ class GeneDocSource(dict):
         self.temp_collection = self.db[new_collection]
         return new_collection
 
-    def doc_iterator(self, genedoc_d, batch=True, step=10000):  #, validate=True):
+    def doc_iterator(self, genedoc_d, batch=True, step=10000):
         if isinstance(genedoc_d, types.GeneratorType) and batch:
             for doc_li in iter_n(genedoc_d, n=step):
                 yield doc_li
@@ -127,6 +127,7 @@ class GeneDocSource(dict):
 
         if update_data:
             genedoc_d = genedoc_d or self.load_genedoc()
+            print("genedoc_d mem: %s" % sys.getsizeof(genedoc_d))
 
             print("Uploading to the DB...", end='')
             t0 = time.time()
@@ -165,10 +166,10 @@ class GeneDocSource(dict):
                     _doc['mapping'] = getattr(self, 'get_mapping')()
 
                 coll = conn[GeneDocSourceMaster.__database__][GeneDocSourceMaster.__collection__]
-                dkey = {"_id" : _doc["_id"]}
+                dkey = {"_id": _doc["_id"]}
                 prev = coll.find_one(dkey)
                 if prev:
-                    coll.replace_one(dkey,_doc)
+                    coll.replace_one(dkey, _doc)
                 else:
                     coll.insert_one(_doc)
 
@@ -207,7 +208,7 @@ def register_sources():
             metadata['get_geneid_d'] = src_m.get_geneid_d
         if metadata.get('ENSEMBL_GENEDOC_ROOT', False):
             metadata['get_mapping_to_entrez'] = src_m.get_mapping_to_entrez
-        src_cls = type(name, (GeneDocSource,),metadata)
+        src_cls = type(name, (GeneDocSource,), metadata)
         # manually propagate db attr
         src_cls.db = conn[src_cls.__database__]
         doc_register[name] = src_cls

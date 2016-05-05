@@ -8,18 +8,20 @@ jobs when new data files are available.
       without "-d", it will quit after all running jobs are done.
 
 '''
-from subprocess import Popen, STDOUT, PIPE, check_output
+from subprocess import Popen, STDOUT, check_output
 import time
 from datetime import datetime
 import sys
 import os.path
-src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
-sys.path.append(src_path)
 from utils.mongo import get_src_dump
 from utils.common import safewfile
 from biothings.utils.common import timesofar
 
+src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
+sys.path.append(src_path)
+
 src_dump = get_src_dump()
+
 
 def check_mongo():
     '''Check for "pending_to_upload" flag in src_dump collection.
@@ -27,6 +29,7 @@ def check_mongo():
     '''
     # filter some more: _id is supposed to be a user-defined string, not an ObjectId()
     return [src['_id'] for src in src_dump.find({'pending_to_upload': True}) if type(src['_id']) == str]
+
 
 def dispatch(src):
     src_doc = src_dump.find_one({'_id': src})
@@ -44,11 +47,13 @@ def dispatch(src):
     p.log_f = log_f
     return p
 
+
 def mark_upload_started(src):
     src_dump.update({'_id': src}, {"$unset": {'pending_to_upload': "",
                                               'upload': ""}})
     src_dump.update({'_id': src}, {"$set": {"upload.status": "uploading",
                                             "upload.started_at": datetime.now()}})
+
 
 def mark_upload_done(src, d):
     src_dump.update({'_id': src}, {"$set": d})
@@ -60,7 +65,7 @@ def get_process_info(running_processes):
     if pid_li:
         output = check_output(['ps', '-p', ' '.join(pid_li)])
         output = output.decode("utf8").split('\n')
-        output[0] = '    {:<10}'.format('JOB') + output[0]  #header
+        output[0] = '    {:<10}'.format('JOB') + output[0]  # header
         for i in range(1, len(output)):
             line = output[i].strip()
             if line:
@@ -92,9 +97,8 @@ def main(daemon=False):
             p = running_processes[src]
             returncode = p.poll()
             if returncode is not None:
-                t1 = round(time.time()-p.t0, 0)
-                d = {
-                     'upload.returncode': returncode,
+                t1 = round(time.time() - p.t0, 0)
+                d = {'upload.returncode': returncode,
                      'upload.timestamp': datetime.now(),
                      'upload.time_in_s': t1,
                      'upload.time': timesofar(p.t0),
@@ -120,9 +124,9 @@ def main(daemon=False):
         else:
             if daemon:
                 #continue monitor src_dump collection
-                print("{}".format('\b'*50),end='')
+                print("{}".format('\b' * 50), end='')
                 for i in range(100):
-                    print('\b'*2+[chr(8212), '\\', '|', '/'][i%4],end='')
+                    print('\b' * 2 + [chr(8212), '\\', '|', '/'][i % 4], end='')
                     time.sleep(0.1)
             else:
                 break

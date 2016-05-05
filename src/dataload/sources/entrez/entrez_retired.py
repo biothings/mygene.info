@@ -2,7 +2,6 @@ from .entrez_base import Gene2RetiredParser
 
 __metadata__ = {
     '__collection__': 'entrez_retired',
-    'structure': {'retired': None},
 }
 
 

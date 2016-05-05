@@ -2,7 +2,6 @@ from .uniprot_base import load_pir
 
 __metadata__ = {
     '__collection__': 'uniprot_pir',
-    'structure': {'pir': None},
 }
 
 

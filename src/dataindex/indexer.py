@@ -17,7 +17,7 @@ def validate(build_config=None):
     src_build = get_src_build()
     _cfg = src_build.find_one({'_id': build_config})
     last_build = _cfg['build'][-1]
-    print "Last build record:"
+    print("Last build record:")
     pprint(last_build)
     target_name = last_build['target']
 
@@ -61,22 +61,22 @@ def main():
             config_li = ['mygene', 'mygene_allspecies']
 
         if not options.noconfirm:
-            print '\n'.join(["Ready to build these ES indices:"] +
-                            ['\t' + conf for conf in config_li])
+            print('\n'.join(["Ready to build these ES indices:"] +
+                            ['\t' + conf for conf in config_li]))
             if ask('Continue?') != 'Y':
-                print "Aborted"
+                print("Aborted")
                 return
 
         for _conf in config_li:
             t0 = time.time()
-            print '>"{}">>>>>>'.format(_conf)
+            print('>"{}">>>>>>'.format(_conf))
             bdr.build_index2(_conf,
                              es_index_name=options.es_index_name,
                              es_host='127.0.0.1:' + str(es_local_tunnel_port))
-            print '<<<<<<"{}"...done. {}'.format(_conf, timesofar(t0))
+            print('<<<<<<"{}"...done. {}'.format(_conf, timesofar(t0)))
 
-        print '=' * 20
-        print "Finished.", timesofar(t00)
+        print('=' * 20)
+        print("Finished.", timesofar(t00))
 
 
 if __name__ == '__main__':

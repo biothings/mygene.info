@@ -118,13 +118,13 @@ def _load_affy(df):
         if len(kk) > 1:
             for kkk in kk:
                 k4 = kkk.split('//')
-                if k4[len(k4)-1].strip() != '---':
-                    dict_apply(gene2affy, k4[len(k4)-1].strip(), dd[k])
+                if k4[len(k4) - 1].strip() != '---':
+                    dict_apply(gene2affy, k4[len(k4) - 1].strip(), dd[k])
         else:
             k4 = k.split('//')
             if len(k4) > 1:
-                if k4[len(k4)-1].strip() != '---':
-                    dict_apply(gene2affy, k4[len(k4)-1].strip(), dd[k])
+                if k4[len(k4) - 1].strip() != '---':
+                    dict_apply(gene2affy, k4[len(k4) - 1].strip(), dd[k])
 
     return gene2affy
 

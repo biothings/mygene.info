@@ -3,10 +3,6 @@ from .ensembl_base import EnsemblParser
 
 __metadata__ = {
     '__collection__': 'ensembl_genomic_pos',
-    'structure': {
-        'genomic_pos': None,
-        'genomic_pos_hg19': None
-    },
 }
 
 

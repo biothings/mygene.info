@@ -22,12 +22,13 @@ import time
 from datetime import datetime
 from urllib.request import urlparse
 from ftplib import FTP, error_perm
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
 from utils.common import safewfile, LogPrint
 from biothings.utils.common import timesofar
 from utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT
+
+src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
+sys.path.append(src_path)
 
 timestamp = time.strftime('%Y%m%d')
 # DATA_FOLDER=os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ucsc', timestamp)
@@ -85,7 +86,7 @@ def get_file_list_for_download():
     for file_path, lastmodified in refflat_file_list:
         local_file = os.path.join(DATA_FOLDER, file_path)
         if not os.path.exists(local_file) or \
-            (time.mktime(lastmodified.timetuple()) > os.stat(local_file)[-2]):
+                (time.mktime(lastmodified.timetuple()) > os.stat(local_file)[-2]):
             download_list.append(file_path)
             download_list.append(file_path.replace('refFlat', 'refLink'))
     return download_list
@@ -131,7 +132,7 @@ def download(download_list=None, no_confirm=False):
                 #else:
                 #    print cmdline
                 #    print "Failed with return code (%s)." % return_code
-                print("="*50)
+                print("=" * 50)
             return len(download_list)
         else:
             return 0

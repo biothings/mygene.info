@@ -26,6 +26,7 @@ from config import DATA_ARCHIVE_ROOT
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
 
+# TODO: what if process is done day after ?
 timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez', timestamp, 'refseq')
 
@@ -98,9 +99,9 @@ class GBFFParser():
 
 
 def dump_object(obj, outfile):
-    '''Dump a python object to a output file using faster cPickle module.
+    '''Dump a python object to a output file
     '''
-    import cPickle as pickle
+    import pickle
     import bz2
 
     protocol = 2
@@ -116,7 +117,7 @@ def output_gene2summary(out_d, outfile):
        gene summary
        (no header line)
     '''
-    out_f = file(outfile, 'w')
+    out_f = open(outfile, 'w')
     for species in out_d:
         out_li = []
         for rec in out_d[species]:
@@ -136,7 +137,7 @@ def output_gene2ec(out_d, outfile):
        (multiple ec_numbers are comma-seperated)
        (no header line)
     '''
-    out_f = file(outfile, 'w')
+    out_f = open(outfile, 'w')
     for species in out_d:
         dd = {}
         for rec in out_d[species]:

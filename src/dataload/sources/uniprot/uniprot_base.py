@@ -32,6 +32,7 @@ def get_uniprot_section(uniprotkb_id):
     #return 'TrEMBL' if len(v[0])==6 else "Swiss-Prot"
     return 'Swiss-Prot' if len(v[0]) <= 5 else "TrEMBL"
 
+
 def _dict_convert(uniprot_li):
     '''
     convert [(u'E7ESI2', 'TrEMBL'), (u'P24941', 'Swiss-Prot'),
@@ -130,6 +131,7 @@ def load_pdb():
 #        Now removed from idmapping_selected.tab.gz file since 2014/06/11 release.
 #     """
 #     return load_x(idx=7, fieldname='ipi')
+
 
 def load_pir():
     return load_x(idx=11, fieldname='pir')

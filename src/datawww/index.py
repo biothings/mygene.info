@@ -168,6 +168,7 @@ class IntervalQueryHandler(tornado.web.RequestHandler):
 
 """
 
+
 class MongoViewer(tornado.web.RequestHandler):
     def get(self, db, collection=None, id=None):
         import random
@@ -188,7 +189,7 @@ class MongoViewer(tornado.web.RequestHandler):
                     out = collection.find_one({"_id": id})
                 elif get_random:
                     cnt = collection.count()
-                    num = random.randint(0, max(cnt-size, 0))
+                    num = random.randint(0, max(cnt - size, 0))
                     out = list(collection.find().skip(num).limit(size))
                 else:
                     out = list(collection.find().limit(size))
@@ -229,7 +230,7 @@ class LogViewer(tornado.web.RequestHandler):
                 logfile = os.path.join(build_dir, logfile)
 
         if logfile and os.path.exists(logfile):
-            with file(logfile) as log_f:
+            with open(logfile) as log_f:
                 self.write('<pre>')
                 self.write(log_f.read())
                 self.write('</pre>')

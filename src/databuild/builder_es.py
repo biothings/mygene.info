@@ -2,6 +2,7 @@ import sys
 import time
 from databuild.builder import DataBuilder, timesofar
 
+
 def main():
     if len(sys.argv) > 1:
         config = sys.argv[1]
@@ -16,10 +17,8 @@ def main():
     #bdr.using_ipython_cluster = use_parallel
     #bdr.target.target_esidxer.number_of_shards = 10   #default 5
     bdr.merge(step=10000)
-    print "Finished.", timesofar(t0)
+    print("Finished.", timesofar(t0))
 
 
 if __name__ == '__main__':
     main()
-
-

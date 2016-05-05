@@ -1,8 +1,12 @@
 import sys
 import os.path
+import dataload
+import time
+import random
+
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 sys.path.append(src_path)
-import dataload
+
 
 def main(source):
     '''
@@ -19,20 +23,14 @@ def main(source):
     dataload.register_sources()
     dataload.load_all()
 
-def main_test(src):
-    import time, random
-    for i in range(100+random.randint(0, 50)):
-        print((src, i))
-        time.sleep(random.random()+0.5)
 
 def main_test(src):
-    import time, random
     t0 = time.time()
     i = 0
     limit = 0 + random.randint(0, 50)
     while True:
         random.random() * random.random()
-        j = int(round(time.time()-t0,0))
+        j = int(round(time.time() - t0, 0))
         if j > i:
             if j > limit:
                 break

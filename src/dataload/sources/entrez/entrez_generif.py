@@ -2,7 +2,6 @@ from .entrez_base import Gene2GeneRifParser
 
 __metadata__ = {
     '__collection__': 'entrez_generif',
-    'structure': {'generif': None},
 }
 
 

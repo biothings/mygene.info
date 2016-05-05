@@ -6,13 +6,11 @@ import copy
 from datetime import datetime
 from pprint import pprint
 
-if sys.version_info.major == 2:
-    input = raw_input
-
 from utils.mongo import (get_src_db, get_target_db, get_src_master,
                          get_src_build, get_src_dump, doc_feeder)
-from utils.common import (loadobj, timesofar, safewfile, LogPrint, ask,
-                          dump2gridfs, get_timestamp, get_random_string)
+from biothings.utils.common import (timesofar, ask,
+                                    dump2gridfs, get_timestamp, get_random_string)
+from utils.common import safewfile, LogPrint, loadobj
 from utils.dataload import list2dict, alwayslist
 from utils.es import ESIndexer
 import databuild.backend
@@ -74,8 +72,6 @@ class DataBuilder():
         self._idmapping_d_cache = {}
 
         self.get_src_master()
-        print("now: %s" % self.src_master)
-
 
         if backend == 'mongodb':
             self.target = databuild.backend.GeneDocMongoDBBackend()
@@ -120,7 +116,7 @@ class DataBuilder():
     def log_building_start(self):
         if self.merge_logging:
             #setup logging
-            logfile = 'databuild_{}_{}.log'.format('genedoc'+'_'+self._build_config['name'],
+            logfile = 'databuild_{}_{}.log'.format('genedoc' + '_' + self._build_config['name'],
                                                    time.strftime('%Y%m%d'))
             log_f, logfile = safewfile(os.path.join(self.log_folder, logfile), prompt=False, default='O')
             sys.stdout = LogPrint(log_f, timestamp=True)
@@ -158,25 +154,18 @@ class DataBuilder():
             self.target.target_esidxer.ES_INDEX_NAME = target_name or self._get_target_name()
             self.target.target_esidxer._mapping = self.get_mapping()
         elif self.target.name == 'couchdb':
-            self.target.db_name = target_name or ('genedoc'+'_'+self._build_config['name'])
+            self.target.db_name = target_name or ('genedoc' + '_' + self._build_config['name'])
         elif self.target.name == 'memory':
-            self.target.target_name = target_name or ('genedoc'+'_'+self._build_config['name'])
+            self.target.target_name = target_name or ('genedoc' + '_' + self._build_config['name'])
 
     def get_src_master(self):
-        print("onela: %s" % self.src.connection)
-        src_master = get_src_master(self.src.connection)
-        print("onela src_master: %s" % repr([c for c in src_master.find()]))
-        print("onela dict: %s" % dict([(src['_id'], src) for src in list(src_master.find())]))
+        src_master = get_src_master(self.src.client)
         self.src_master = dict([(src['_id'], src) for src in list(src_master.find())])
-        print("onela self.src_master: %s" % self.src_master)
 
     def validate_src_collections(self):
-        print("cols: %s" % self.src.collection_names())
         collection_list = set(self.src.collection_names())
         self.get_src_master()
         if self._build_config:
-            print("build config: %s" % self._build_config)
-            print("src_master: %s" % self.src_master)
             for src in self._build_config['sources']:
                 assert src in self.src_master, '"%s" not found in "src_master"' % src
                 assert src in collection_list, '"%s" not an existing collection in "%s"' % (src, self.src.name)
@@ -394,7 +383,7 @@ class DataBuilder():
 
             def load_from_gridfs(filename, db):
                 import gzip
-                import cPickle as pickle
+                import pickle
                 import gridfs
                 fs = gridfs.GridFS(db)
                 fobj = fs.get(filename)
@@ -579,8 +568,8 @@ class DataBuilder():
 
         def partition(lst, n):
             q, r = divmod(len(lst), n)
-            indices = [q*i + min(i, r) for i in range(n+1)]
-            return [lst[indices[i]:indices[i+1]] for i in range(n)]
+            indices = [q * i + min(i, r) for i in range(n + 1)]
+            return [lst[indices[i]:indices[i + 1]] for i in range(n)]
 
         @require('pymongo', 'time')
         def worker(doc_li):
@@ -594,7 +583,7 @@ class DataBuilder():
                 target_collection.update({'_id': __id}, {'$set': doc},
                                          manipulate=False,
                                          upsert=False)  # ,safe=True)
-            print('Done. [%.1fs]' % (time.time()-t0))
+            print('Done. [%.1fs]' % (time.time() - t0))
 
         for doc in doc_feeder(self.src[collection], step=step):
             _id = doc['_id']
@@ -614,7 +603,7 @@ class DataBuilder():
                         print("!", end=' ')
 
     def get_src_version(self):
-        src_dump = get_src_dump(self.src.connection)
+        src_dump = get_src_dump(self.src.client)
         src_version = {}
         for src in src_dump.find():
             version = src.get('release', src.get('timestamp', None))
@@ -650,7 +639,8 @@ class DataBuilder():
         target_collection_list = [target_db[name] for name in sorted(target_db.collection_names()) if name.startswith(target_collection_prefix)]
         if target_collection_list:
             print("Found {} target collections:".format(len(target_collection_list)))
-            print('\n'.join(['\t{0:<5}{1.name:<45}\t{2}'.format(str(i+1)+':', target, target.count()) for (i, target) in enumerate(target_collection_list)]))
+            print('\n'.join(['\t{0:<5}{1.name:<45}\t{2}'.format(
+                str(i + 1) + ':', target, target.count()) for (i, target) in enumerate(target_collection_list)]))
             print()
             while 1:
                 if autoselect:
@@ -664,7 +654,7 @@ class DataBuilder():
                     break
                 except ValueError:
                     continue
-            return target_collection_list[selected_idx-1]
+            return target_collection_list[selected_idx - 1]
         else:
             print("Found no target collections.")
 
@@ -673,7 +663,7 @@ class DataBuilder():
            This is for GeneDocESBackend only.
         '''
         mapping = {}
-        src_master = get_src_master(self.src.connection)
+        src_master = get_src_master(self.src.client)
         for collection in self._build_config['sources']:
             meta = src_master.get_from_id(collection)
             if 'mapping' in meta:
@@ -754,9 +744,9 @@ class DataBuilder():
                 #     print "skipped."
                 #     continue
                 cnt = self.src[src].count()
-                fdr1 = doc_feeder(self.src[src], step=10000, s=cnt-n)
-                rand_s = random.randint(0, cnt-n)
-                fdr2 = doc_feeder(self.src[src], step=n, s=rand_s, e=rand_s+n)
+                fdr1 = doc_feeder(self.src[src], step=10000, s=cnt - n)
+                rand_s = random.randint(0, cnt - n)
+                fdr2 = doc_feeder(self.src[src], step=n, s=rand_s, e=rand_s + n)
                 _first_exception = True
                 for doc in itertools.chain(fdr1, fdr2):
                     _id = doc['_id']

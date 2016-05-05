@@ -2,7 +2,6 @@ from .ensembl_base import EnsemblParser
 
 __metadata__ = {
     '__collection__': 'ensembl_pfam',
-    'structure': {'pfam': None},
 }
 
 

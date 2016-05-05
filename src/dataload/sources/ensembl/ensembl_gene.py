@@ -1,19 +1,14 @@
 from .ensembl_base import EnsemblParser
 
-#structure = {
-#             'taxid': int,
-#             'symbol': unicode,
-#             'name': unicode,
-#             }
 
 __metadata__ = {
-    '__collection__' : 'ensembl_gene',
-    #'structure': structure,
-    'required_fields' : ['taxid'],
-    'ENSEMBL_GENEDOC_ROOT' : True,
+    '__collection__': 'ensembl_gene',
+    'required_fields': ['taxid'],
+    'ENSEMBL_GENEDOC_ROOT': True,
     'id_type': 'ensembl_gene',
 
 }
+
 
 def load_genedoc(self=None):
     ep = EnsemblParser()
@@ -29,13 +24,13 @@ def get_mapping(self=None):
                    "analyzer": "string_lowercase",
                    "boost": 5.0},
         "name":   {"type": "string",
-                   "boost": 0.8},    #downgrade name field a little bit
+                   "boost": 0.8},    # downgrade name field a little bit
 
     }
     return mapping
+
 
 def get_mapping_to_entrez(self=None):
     ep = EnsemblParser()
     ep._load_ensembl2entrez_li()
     return ep.ensembl2entrez_li
-

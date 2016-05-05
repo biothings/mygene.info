@@ -25,7 +25,7 @@ def load_exons_for_species(species, exons_key='exons'):
         if chr.startswith('chr'):
             chr = chr[3:]
         exons = list(zip([int(x) for x in ld[9].split(',') if x],
-                    [int(x) for x in ld[10].split(',') if x]))
+                     [int(x) for x in ld[10].split(',') if x]))
         assert len(exons) == int(ld[8]), (len(exons), int(ld[8]))
         ref2exons.append((refseq, {
             'chr': chr,
@@ -84,7 +84,6 @@ def load_exons_for_mouse():
     return gene2exons
 
 
-
 def load_ucsc_exons():
     print('DATA_FOLDER: ' + DATA_FOLDER)
     species_li = os.listdir(DATA_FOLDER)
@@ -92,7 +91,7 @@ def load_ucsc_exons():
     t0 = time.time()
     gene2exons = {}
     for species in species_li:
-        print(species,end='...')
+        print(species, end='...')
         if species == 'Homo_sapiens':
             gene2exons.update(load_exons_for_human())
         elif species == 'Mus_musculus':

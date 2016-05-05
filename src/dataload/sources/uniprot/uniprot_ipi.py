@@ -2,7 +2,6 @@ from .uniprot_base import load_ipi
 
 __metadata__ = {
     '__collection__': 'uniprot_ipi',
-    'structure': {'ipi': None},
 }
 
 

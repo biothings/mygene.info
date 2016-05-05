@@ -2,7 +2,6 @@ from .uniprot_base import load_pdb
 
 __metadata__ = {
     '__collection__': 'uniprot_pdb',
-    #'structure': {'pdb': OR(unicode, list)},
 }
 
 

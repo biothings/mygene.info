@@ -22,13 +22,13 @@ import time
 from ftplib import FTP
 from io import StringIO
 from dataload.data_dump.dl_entrez import _get_ascp_cmdline, _expand_wildchar_urls
-
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
 from utils.common import safewfile, LogPrint
 from biothings.utils.common import timesofar, ask
 from utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT
+
+src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
+sys.path.append(src_path)
 
 timestamp = time.strftime('%Y%m%d')
 # DATA_FOLDER=os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ucsc', timestamp)
@@ -92,7 +92,7 @@ def download(path, release, no_confirm=False):
             else:
                 print("Failed with return code (%s)." % return_code)
                 out.append((url, return_code))
-            print("="*50)
+            print("=" * 50)
     finally:
         os.chdir(orig_path)
 
