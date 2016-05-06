@@ -442,14 +442,18 @@ class MyGeneTest(BiothingTestHelper):
         # /query service
         # default dotfield=0
         rdefault = self.json_ok(self.get_ok(self.api +
-                                '/query?q=cdk&fields=refseq.rna'))
+                                '/query?q=ccnk&fields=refseq.rna'))
         # force no dotfield
         rfalse = self.json_ok(self.get_ok(self.api +
-                              '/query?q=cdk&fields=refseq.rna&dotfield=false'))
+                              '/query?q=ccnk&fields=refseq.rna&dotfield=false'))
         # force dotfield
         rtrue = self.json_ok(self.get_ok(self.api +
-                             '/query?q=cdk&fields=refseq.rna&dotfield=true'))
+                             '/query?q=ccnk&fields=refseq.rna&dotfield=true'))
         # check defaults and bool params
+        # TODO: put this in json_ok as post-process filter ?
+        for d in [rdefault,rfalse,rtrue]:
+            for h in d["hits"]:
+                del h["_score"]
         eq_(rdefault["hits"], rfalse["hits"])
         # check struct
         assert "refseq.rna" in rtrue["hits"][0].keys()
@@ -476,21 +480,29 @@ class MyGeneTest(BiothingTestHelper):
         rawtrue = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=true'))
         raw0 = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=0'))
         rawfalse = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=false'))
-        eq_(raw1, rawtrue)
+        eq_(sorted(raw1), sorted(rawtrue))
         eq_(raw0, rawfalse)
         assert "_index" in raw1
         assert "_index" not in raw0
         assert "_source" in raw1
         assert "_source" not in raw0
         # /query
-        raw1 = self.json_ok(self.get_ok(self.api + '/query?q=cdk&raw=1'))
-        rawtrue = self.json_ok(self.get_ok(self.api + '/query?q=cdk&raw=true'))
-        raw0 = self.json_ok(self.get_ok(self.api + '/query?q=cdk&raw=0'))
-        rawfalse = self.json_ok(self.get_ok(self.api +
-                                '/query?q=cdk&raw=false'))
+        raw1 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=1'))
+        rawtrue = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=true'))
+        raw0 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=0'))
+        rawfalse = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=false'))
         # this may vary so remove in comparison
         for d in [raw1, rawtrue, raw0, rawfalse]:
             del d["took"]
+        # score should be the same. approx... so remove
+        for d in [raw1,rawtrue]:
+            for h in d["hits"]["hits"]:
+                del h["_score"]
+            del d["hits"]["max_score"]
+        for d in [raw0,rawfalse]:
+            for h in d["hits"]:
+                del h["_score"]
+            del d["max_score"]
         eq_(raw1, rawtrue)
         eq_(raw0, rawfalse)
         assert "_shards" in raw1
@@ -608,8 +620,10 @@ class MyGeneTest(BiothingTestHelper):
         assert res["total"] > 800, \
             "Total is {}, should more than 800".format(res["total"])
         # make sure we're looking at proper
-        eq_(res["hits"][0]["go"]["BP"]["id"], "GO:0008150")
-        cc = res["hits"][0]["go"]["CC"]
+        for (i,h) in enumerate(res["hits"]):
+            if h.get("go",{}).get("BP",{}).get("id") == "GO:0008150":
+                break
+        cc = h["go"]["CC"]
         eq_(len(cc), 4)
         assert set([c["evidence"] for c in cc]), set(["ISO", "IDA"])
 
