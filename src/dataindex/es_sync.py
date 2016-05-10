@@ -9,10 +9,11 @@ from pprint import pprint
 from config import TARGET_ES_INDEX_SUFFIX
 from utils.es import ESIndexer
 from utils.mongo import get_target_db, get_src_build
-from utils.common import iter_n, timesofar, ask, loadobj
+from utils.common import loadobj  # the one from biothings doesn't work for now
+from biothings.utils.common import timesofar, ask, iter_n
 from databuild.backend import GeneDocMongoDBBackend, GeneDocESBackend
 from databuild.sync import get_changes_stats
-from .tunnel import open_tunnel, es_local_tunnel_port
+from tunnel import open_tunnel, es_local_tunnel_port
 
 
 class ESIndexer2(ESIndexer):

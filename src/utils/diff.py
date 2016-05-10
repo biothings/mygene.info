@@ -4,7 +4,7 @@ Utils to compare two list of gene documents
 from __future__ import print_function
 import time
 import os.path
-from utils.common import timesofar
+from biothings.utils.common import timesofar
 from databuild.backend import GeneDocMongoDBBackend, GeneDocESBackend
 from utils.mongo import get_target_db
 from utils.es import ESIndexer

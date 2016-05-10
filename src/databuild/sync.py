@@ -7,11 +7,11 @@ from datetime import datetime
 import time
 
 from utils.mongo import get_target_db, doc_feeder
-from .backend import GeneDocMongoDBBackend
+from backend import GeneDocMongoDBBackend
 from utils.diff import diff_collections
-from utils.common import (iter_n, timesofar, LogPrint,
-                          dump, send_s3_file, ask, safewfile,
-                          is_str)
+from utils.common import (iter_n, LogPrint,
+                          dump, send_s3_file, safewfile)
+from biothings.utils.common import timesofar, ask, is_str
 from config import LOG_FOLDER
 
 
@@ -187,8 +187,11 @@ class GeneDocSyncer:
         return latest_ts
 
     def get_target_latest_timestamp(self):
-        cur = self._target_col.find(fields=['_timestamp']).sort([('_timestamp', -1)]).limit(1)
-        doc = next(cur)
+        cur = self._target_col.find(projection=['_timestamp']).sort([('_timestamp', -1)]).limit(1)
+        try:
+            doc = next(cur)
+        except StopIteration:
+            doc = {'_timestamp': datetime(1970, 1, 1, 0, 0, 0)}  # epoch to bootstrap if no previous
         cur.close()
         latest_ts = doc['_timestamp']
         return latest_ts
@@ -259,7 +262,7 @@ def main():
     if len(sys.argv) > 1:
         config = sys.argv[1]
     else:
-        config = 'mygene'
+        config = 'mygene_allspecies'
         #config = 'mygene_allspecies'
     if not config.startswith('genedoc_'):
         config = 'genedoc_' + config

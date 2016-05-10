@@ -124,7 +124,7 @@ class GeneDocMongoDBBackend(GeneDocBackendBase):
         self.target_collection.drop()
 
     def get_id_list(self):
-        return [x['_id'] for x in self.target_collection.find(fields=[], manipulate=False)]
+        return [x['_id'] for x in self.target_collection.find(projection=[], manipulate=False)]
 
     def get_from_id(self, id):
         return self.target_collection.get_from_id(id)
@@ -160,7 +160,7 @@ class GeneDocMongoDBBackend(GeneDocBackendBase):
 
     def finalize(self):
         '''flush all pending writes.'''
-        self.target_collection.database.connection.fsync(async=True)
+        self.target_collection.database.client.fsync(async=True)
 
     def remove_from_ids(self, ids, step=10000):
         for i in range(0, len(ids), step):
