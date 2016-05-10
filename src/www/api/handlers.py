@@ -1,6 +1,7 @@
 import re
 import json
 
+from tornado.web import HTTPError
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, \
                                        FieldsHandler, BaseHandler
 from biothings.settings import BiothingSettings
@@ -28,6 +29,27 @@ class MyGeneFieldsHandler(FieldsHandler):
 
 class GeneHandler(BiothingHandler):
     esq = ESQuery()
+
+    def get(self, geneid=None):
+        '''/gene/<geneid>
+           geneid can be entrezgene, ensemblgene, retired entrezgene ids.
+           /gene/1017
+           /gene/1017?fields=symbol,name
+           /gene/1017?fields=symbol,name,reporter.HG-U133_Plus_2
+        '''
+        if geneid:
+            kwargs = self.get_query_params()
+            kwargs.setdefault('scopes', 'entrezgene,ensemblgene,retired')
+            kwargs.setdefault('species', 'all')
+            gene = self.esq.get_gene(geneid, **kwargs)
+            if gene:
+                self.return_json(gene)
+                self.ga_track(event={'category': 'v2_api',
+                                     'action': 'gene_get'})
+            else:
+                raise HTTPError(404)
+        else:
+            raise HTTPError(404)
 
 
 class QueryHandler(QueryHandler):

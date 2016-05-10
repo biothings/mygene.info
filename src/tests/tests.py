@@ -234,10 +234,10 @@ class MyGeneTest(BiothingTestHelper):
         # testing filtering parameters
         res = self.json_ok(self.get_ok(self.api +
                            '/gene/1017?fields=symbol,name,entrezgene'))
-        eq_(set(res), set(['_id', '_version', 'symbol', 'name', 'entrezgene']))
+        eq_(set(res), set(['_id', '_score', 'symbol', 'name', 'entrezgene']))
         res = self.json_ok(self.get_ok(self.api +
                            '/gene/1017?filter=symbol,go.MF'))
-        eq_(set(res), set(['_id', '_version', 'symbol', 'go']))
+        eq_(set(res), set(['_id', '_score', 'symbol', 'go']))
         assert "MF" in res["go"]
 
         self.get_404(self.api + '/gene')
@@ -269,6 +269,10 @@ class MyGeneTest(BiothingTestHelper):
         for _g in res:
             eq_(set(_g), set(['_id', '_score', 'query', 'symbol', 'go']))
             assert "MF" in _g["go"]
+
+        # get retired gene (make sure _search ES query is run)
+        res = self.json_ok(self.post_ok(self.api + '/gene',{'ids': '791256'}))
+        eq_(res[0]['_id'], '50846')  # this is the corresponding _id field
 
     def test_status(self):
         # /status
@@ -482,10 +486,10 @@ class MyGeneTest(BiothingTestHelper):
         rawfalse = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=false'))
         eq_(sorted(raw1), sorted(rawtrue))
         eq_(raw0, rawfalse)
-        assert "_index" in raw1
-        assert "_index" not in raw0
-        assert "_source" in raw1
-        assert "_source" not in raw0
+        assert "_shards" in raw1
+        assert "_shards" not in raw0
+        assert "timed_out" in raw1
+        assert "timed_out" not in raw0
         # /query
         raw1 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=1'))
         rawtrue = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=true'))

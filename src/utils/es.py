@@ -181,6 +181,18 @@ class ESQuery(ESQuery):
         metadata['taxonomy'] = TAXONOMY
         return metadata
 
+    def get_gene(self, geneid, **kwargs):
+        '''for /gene/<geneid>'''
+        options = self._get_cleaned_annotation_options(kwargs)
+        qbdr = ESQueryBuilder(**options.kwargs)
+        _q = qbdr.build_id_query(geneid, options.scopes)
+        if options.rawquery:
+            return _q
+        res = self._search(_q, species=options.kwargs['species'])
+        if not options.raw:
+            res = self._cleaned_res(res, empty=None, single_hit=True,options=options)
+        return res
+
 
 class ESQueryBuilder(ESQueryBuilder):
     def __init__(self, **query_options):
