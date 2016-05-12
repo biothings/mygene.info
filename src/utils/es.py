@@ -756,7 +756,7 @@ class ESQueryBuilder(ESQueryBuilder):
 
 def get_es(es_host=None):
     es_host = es_host or ES_HOST
-    es = Elasticsearch(es_host, timeout=600, max_retries=100)
+    es = Elasticsearch(es_host, timeout=600, max_retries=100,retry_on_timeout=True)
     return es
 
 
