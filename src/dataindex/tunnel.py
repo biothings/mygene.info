@@ -22,6 +22,12 @@ class ESTunnelContextManager:
         self.p = None
 
     def __enter__(self):
+        # optional tunnel, if no config found just return a dummy process object
+        if not ES_HOST_TUNNEL_CFG:
+            self.p = subprocess.Popen("true")
+            self.p.ok = False
+            return self.p
+
         assert not port_open('localhost', es_local_tunnel_port), 'localhost:{} is alreay open'.format(es_local_tunnel_port)
         tunnel_cmd = "ssh -4 -o StrictHostKeyChecking=no -N -L {0}:localhost:9200 -C -i {key} {username}@{host}"
         tunnel_cmd = tunnel_cmd.format(es_local_tunnel_port, **ES_HOST_TUNNEL_CFG)

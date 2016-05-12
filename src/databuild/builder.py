@@ -472,7 +472,7 @@ class DataBuilder():
         else:
             if not self._entrez_geneid_d:
                 self._load_entrez_geneid_d()
-            #geneid_set = set([x['_id'] for x in target_collection.find(fields=[], manipulate=False)])
+            #geneid_set = set([x['_id'] for x in target_collection.find(projection=[], manipulate=False)])
             geneid_set = set(self.target.get_id_list())
             print('\t', len(geneid_set))
 

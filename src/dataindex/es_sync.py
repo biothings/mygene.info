@@ -6,7 +6,7 @@ import re
 import os
 from pprint import pprint
 
-from config import TARGET_ES_INDEX_SUFFIX
+from config import TARGET_ES_INDEX_SUFFIX, ES_HOST
 from utils.es import ESIndexer
 from utils.mongo import get_target_db, get_src_build
 from utils.common import loadobj  # the one from biothings doesn't work for now
@@ -195,8 +195,7 @@ def main():
     if len(sys.argv) > 1:
         config = sys.argv[1]
     else:
-        config = 'mygene'
-        #config = 'mygene_allspecies'
+        config = 'mygene_allspecies'
     if not config.startswith('genedoc_'):
         config = 'genedoc_' + config
     assert config in ['genedoc_mygene', 'genedoc_mygene_allspecies']
@@ -214,33 +213,33 @@ def main():
         print("Aborted.")
         return -2
 
-    _es_host = 'localhost:' + str(es_local_tunnel_port)
-    _es_index = config + TARGET_ES_INDEX_SUFFIX    # '_current_1'
-
-    # for test
-    #_es_host = 'localhost:9200'
-    #_es_index = config + TARGET_ES_INDEX_SUFFIX    # '_current_1'
-
+    _es_index = config + TARGET_ES_INDEX_SUFFIX
+    # ES host will be set depending on whether a tunnel is used or not
     with open_tunnel() as tunnel:
         if tunnel.ok:
-            esi = ESIndexer2(_es_index, es_host=_es_host)
-            meta = esi.get_mapping_meta(changes)
-            print('\033[34;06m{}\033[0m:'.format('[Metadata]'))
-            pprint(meta)
-            code = esi.apply_changes(changes, noconfirm=noconfirm)
-            if code != -1:
-                # aborted when code == -1
-                _meta = {'_meta': meta}
-                # somehow when only update "_meta", "_timestamp" get empty
-                # so add "_timestamp" explicitly here. This is an ES bug.
-                _meta['_timestamp'] = {
-                    "path": "_timestamp",
-                    "store": True,
-                    "enabled": True
-                }
-                #esi.update_mapping_meta(_meta)
-                print(esi.conn.indices.put_mapping(esi.ES_INDEX_TYPE, _meta, [esi.ES_INDEX_NAME]))
-                esi.post_verify_changes(changes)
+            _es_host = 'localhost:' + str(es_local_tunnel_port)
+        else:
+            _es_host = ES_HOST
+
+        esi = ESIndexer2(_es_index, es_host=_es_host)
+
+        meta = esi.get_mapping_meta(changes)
+        print('\033[34;06m{}\033[0m:'.format('[Metadata]'))
+        pprint(meta)
+        code = esi.apply_changes(changes, noconfirm=noconfirm)
+        if code != -1:
+            # aborted when code == -1
+            _meta = {'_meta': meta}
+            # somehow when only update "_meta", "_timestamp" get empty
+            # so add "_timestamp" explicitly here. This is an ES bug.
+            _meta['_timestamp'] = {
+                "path": "_timestamp",
+                "store": True,
+                "enabled": True
+            }
+            #esi.update_mapping_meta(_meta)
+            print(esi.conn.indices.put_mapping(esi.ES_INDEX_TYPE, _meta, [esi.ES_INDEX_NAME]))
+            esi.post_verify_changes(changes)
 
 
 if __name__ == '__main__':

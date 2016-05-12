@@ -7,7 +7,7 @@ from datetime import datetime
 import time
 
 from utils.mongo import get_target_db, doc_feeder
-from backend import GeneDocMongoDBBackend
+from .backend import GeneDocMongoDBBackend
 from utils.diff import diff_collections
 from utils.common import (iter_n, LogPrint,
                           dump, send_s3_file, safewfile)
@@ -125,7 +125,7 @@ class GeneDocSyncer:
             print('ERROR!!!\n\t Should be "{}", but get "{}"'.format(_cnt_all, _cnt))
 
         print("Verifying all new docs have updated timestamp...", end='')
-        cur = self._target_col.find({'_timestamp': {'$gte': _timestamp}}, fields={})
+        cur = self._target_col.find({'_timestamp': {'$gte': _timestamp}}, projection={})
         _li1 = sorted(changes['add'] + [x['_id'] for x in changes['update']])
         _li2 = sorted([x['_id'] for x in cur])
         if _li1 == _li2:
