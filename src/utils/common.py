@@ -11,6 +11,8 @@ import json
 import logging
 from itertools import islice
 
+from biothings.utils.common import ask
+
 
 str_types = str
 import pickle       # noqa
