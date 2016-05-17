@@ -665,7 +665,7 @@ class DataBuilder():
         mapping = {}
         src_master = get_src_master(self.src.client)
         for collection in self._build_config['sources']:
-            meta = src_master.get_from_id(collection)
+            meta = src_master.find_one({"_id" : collection})
             if 'mapping' in meta:
                 mapping.update(meta['mapping'])
             else:
@@ -786,6 +786,7 @@ class DataBuilder():
             optional "es_index_name" argument can be used to pass an alternative index name, otherwise same as mongodb collection name
         """
         self.load_build_config(build_config)
+        assert "build" in self._build_config, "Abort. No such build records for config %s" % build_config
         last_build = self._build_config['build'][last_build_idx]
         print("Last build record:")
         pprint(last_build)

@@ -74,7 +74,7 @@ def get_mapping(self):
                 "end": {"type": "long"},
                 "strand": {
                     "type": "byte",
-                    "enabled": False
+                    "index": "no"
                 },
             },
         },

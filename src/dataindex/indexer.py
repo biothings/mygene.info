@@ -5,6 +5,7 @@ from databuild.builder import DataBuilder, timesofar
 # from utils.es import es_clean_indices
 from utils.common import ask
 from .tunnel import open_tunnel, es_local_tunnel_port
+from config import ES_HOST
 
 
 def validate(build_config=None):
@@ -50,7 +51,11 @@ def main():
     #                   help="do not clean up old ES indices")
     (options, args) = parser.parse_args()
 
-    with open_tunnel():
+    with open_tunnel() as tunnel:
+        if tunnel.ok:
+            es_host = '127.0.0.1:' + str(es_local_tunnel_port)
+        else:
+            es_host = ES_HOST
         # if not options.nocleanup:
         #     es_clean_indices(noconfirm=options.noconfirm)
         t00 = time.time()
@@ -61,7 +66,7 @@ def main():
             config_li = ['mygene', 'mygene_allspecies']
 
         if not options.noconfirm:
-            print('\n'.join(["Ready to build these ES indices:"] +
+            print('\n'.join(["Ready to build these ES indices on %s (tunnel=%s):" % (es_host, tunnel.ok)] +
                             ['\t' + conf for conf in config_li]))
             if ask('Continue?') != 'Y':
                 print("Aborted")
@@ -72,7 +77,7 @@ def main():
             print('>"{}">>>>>>'.format(_conf))
             bdr.build_index2(_conf,
                              es_index_name=options.es_index_name,
-                             es_host='127.0.0.1:' + str(es_local_tunnel_port))
+                             es_host=es_host)
             print('<<<<<<"{}"...done. {}'.format(_conf, timesofar(t0)))
 
         print('=' * 20)
