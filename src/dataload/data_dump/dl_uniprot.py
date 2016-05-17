@@ -19,13 +19,15 @@ import os.path
 import time
 from datetime import datetime
 from ftplib import FTP
-from utils.common import safewfile, LogPrint
-from biothings.utils.common import ask, timesofar
-from utils.mongo import get_src_dump
-from config import DATA_ARCHIVE_ROOT
+
+from biothings.utils.common import ask, timesofar, safewfile
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
+from utils.common import LogPrint
+from utils.mongo import get_src_dump
+from config import DATA_ARCHIVE_ROOT
+
 
 timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot', timestamp)

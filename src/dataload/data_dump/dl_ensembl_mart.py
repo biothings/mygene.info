@@ -23,15 +23,17 @@ import sys
 import os
 import time
 from ftplib import FTP
-from utils.common import safewfile, LogPrint
-from biothings.utils.common import ask, timesofar
-from utils.mongo import get_src_dump
-from utils.dataload import tab2list
-from config import DATA_ARCHIVE_ROOT
+
 import requests
+from biothings.utils.common import ask, timesofar, safewfile
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
+from utils.common import LogPrint
+from utils.mongo import get_src_dump
+from utils.dataload import tab2list
+from config import DATA_ARCHIVE_ROOT
+
 
 
 ENSEMBL_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ensembl')

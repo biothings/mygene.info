@@ -19,13 +19,15 @@ import os.path
 import time
 import re
 from ftplib import FTP, error_temp
-from utils.common import safewfile, LogPrint
-from biothings.utils.common import ask, timesofar
-from utils.mongo import get_src_dump
-from config import DATA_ARCHIVE_ROOT, ASCP_ROOT
+
+from biothings.utils.common import ask, timesofar, safewfile
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
+from utils.common import LogPrint
+from utils.mongo import get_src_dump
+from config import DATA_ARCHIVE_ROOT, ASCP_ROOT
+
 
 timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez', timestamp)
@@ -160,7 +162,7 @@ def download(path, no_confirm=False):
 
 def parse_gbff(path):
     import glob
-    from .parse_refseq_gbff import main
+    from parse_refseq_gbff import main
     refseq_folder = os.path.join(path, 'refseq')
     gbff_files = glob.glob(os.path.join(refseq_folder, '*.rna.gbff.gz'))
     assert len(gbff_files) >= 30, 'Missing "*.gbff.gz" files? Found %d:\n%s' % (len(gbff_files), '\n'.join(gbff_files))
