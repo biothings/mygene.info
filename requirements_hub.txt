@@ -17,3 +17,4 @@ httplib2
 requests
 elasticsearch
 biopython
+ipyparallel

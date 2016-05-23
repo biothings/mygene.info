@@ -4,7 +4,7 @@ Utils for running parallel jobs on IPython cluster.
 from __future__ import print_function
 import time
 import copy
-from IPython.parallel import Client
+from ipyparallel import Client
 
 from config import CLUSTER_CLIENT_JSON
 from biothings.utils.common import timesofar, ask
@@ -17,11 +17,11 @@ def run_jobs_on_ipythoncluster(worker, task_list, shutdown_ipengines_after_done=
     lview = rc.load_balanced_view()
     cnt_nodes = len(lview.targets or rc.ids)
     print("\t# nodes in use: {}".format(cnt_nodes))
-    lview.block = False
+    lview.block = True
 
     print("\t# of tasks: {}".format(len(task_list)))
     print("\tsubmitting...", end='')
-    job = lview.map_async(worker, task_list)
+    job = lview.map_async(worker,task_list)
     print("done.")
     try:
         job.wait_interactive()
@@ -34,15 +34,15 @@ def run_jobs_on_ipythoncluster(worker, task_list, shutdown_ipengines_after_done=
             print("Aborted, but your jobs are still running on the cluster.")
         return
 
-    if len(job.result) != len(task_list):
-        print("WARNING:\t# of results returned ({}) != # of tasks ({}).".format(len(job.result), len(task_list)))
+    if len(job.result()) != len(task_list):
+        print("WARNING:\t# of results returned ({}) != # of tasks ({}).".format(len(job.result()), len(task_list)))
     print("\ttotal time: {}".format(timesofar(t0)))
 
     if shutdown_ipengines_after_done:
         print("\tshuting down all ipengine nodes...", end='')
         lview.shutdown()
         print('Done.')
-    return job.result
+    return job.result()
 
 
 def collection_partition(src_collection_list, step=100000):

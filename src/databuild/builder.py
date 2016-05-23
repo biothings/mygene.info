@@ -341,7 +341,7 @@ class DataBuilder():
 
     def _merge_ipython_cluster(self, step=100000):
         '''Do the merging on ipython cluster.'''
-        from IPython.parallel import Client, require
+        from ipyparallel import Client, require
         from config import CLUSTER_CLIENT_JSON
 
         t0 = time.time()
@@ -350,7 +350,7 @@ class DataBuilder():
 
         self.target.drop()
         self.target.prepare()
-        #geneid_set = self.make_genedoc_root()
+        geneid_set = self.make_genedoc_root()
 
         idmapping_gridfs_d = self._save_idmapping_gridfs()
 
@@ -362,8 +362,7 @@ class DataBuilder():
         lview.block = False
         kwargs = {}
         target_collection = self.target.target_collection
-        kwargs['server'] = target_collection.database.connection.host
-        kwargs['port'] = target_collection.database.connection.port
+        kwargs['server'], kwargs['port'] = target_collection.database.client.address
         kwargs['src_db'] = self.src.name
         kwargs['target_db'] = target_collection.database.name
         kwargs['target_collection_name'] = target_collection.name
@@ -389,13 +388,7 @@ class DataBuilder():
                 fobj = fs.get(filename)
                 gzfobj = gzip.GzipFile(fileobj=fobj)
                 try:
-                    buffer = ""
-                    while 1:
-                        data = gzfobj.read()
-                        if data == "":
-                            break
-                        buffer += data
-                    object = pickle.loads(buffer)
+                    object = pickle.load(gzfobj)
                 finally:
                     gzfobj.close()
                     fobj.close()
@@ -426,13 +419,13 @@ class DataBuilder():
                     _id = doc['_id']
                     if idmapping_d:
                         _id = idmapping_d.get(_id, None) or _id
-                    for __id in alwayslist(_id):    # there could be cases that idmapping returns multiple entrez_gene ids.
+                    # there could be cases that idmapping returns multiple entrez_gene id.
+                    for __id in alwayslist(_id): 
                         __id = str(__id)
                         doc.pop('_id', None)
                         doc.pop('taxid', None)
-                        target_collection.update({'_id': __id}, {'$set': doc},
-                                                 manipulate=False,
-                                                 upsert=False)
+                        target_collection.update({'_id': __id}, doc, manipulate=False, upsert=False)
+                        #target_collection.update({'_id': __id}, {'$set': doc},
             finally:
                 cur.close()
 
@@ -456,7 +449,7 @@ class DataBuilder():
         job = lview.map_async(worker, task_list)
         print("done.")
         job.wait_interactive()
-        print("\t# of results returned: {}".format(len(job.result)))
+        print("\t# of results returned: {}".format(len(job.result())))
         print("\ttotal time: {}".format(timesofar(t0)))
 
         if self.shutdown_ipengines_after_done:
@@ -561,8 +554,7 @@ class DataBuilder():
         #dview = rc.load_balanced_view()
         dview.block = False
         target_collection = self.target.target_collection
-        dview['server'] = target_collection.database.connection.host
-        dview['port'] = target_collection.database.connection.port
+        dview['server'], dview['port'] = target_collection.database.client.address
         dview['database'] = target_collection.database.name
         dview['collection_name'] = target_collection.name
 

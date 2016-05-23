@@ -31,6 +31,7 @@ class Connection(MongoClient):
                 raise AttributeError(key)
 
 def get_conn(server, port):
+    # TODO: split username/passwd for src/target server
     if DATA_SERVER_USERNAME and DATA_SERVER_PASSWORD:
         uri = "mongodb://{}:{}@{}:{}".format(DATA_SERVER_USERNAME,
                                              DATA_SERVER_PASSWORD,
@@ -70,7 +71,7 @@ def get_target_conn():
 
 
 def get_target_db(conn=None):
-    conn = conn or get_src_conn()
+    conn = conn or get_target_conn()
     return conn[DATA_TARGET_DATABASE]
 
 
