@@ -109,7 +109,7 @@ class GeneDocMongoDBBackend(GeneDocBackendBase):
             updated doc, e.g. a timestamp.
         '''
         _updates = {}
-        _add_d = dict(diff.get('add', {}).items() + diff.get('update', {}).items())
+        _add_d = dict(list(diff.get('add', {}).items()) + list(diff.get('update', {}).items()))
         if _add_d or extra:
             if extra:
                 _add_d.update(extra)

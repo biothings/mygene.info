@@ -17,7 +17,7 @@ def run_jobs_on_ipythoncluster(worker, task_list, shutdown_ipengines_after_done=
     lview = rc.load_balanced_view()
     cnt_nodes = len(lview.targets or rc.ids)
     print("\t# nodes in use: {}".format(cnt_nodes))
-    lview.block = True
+    lview.block = False
 
     print("\t# of tasks: {}".format(len(task_list)))
     print("\tsubmitting...", end='')
