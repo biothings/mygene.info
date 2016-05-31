@@ -1,18 +1,27 @@
-import random
-from biothings.tests.tests import BiothingTestHelper, _d, TornadoRequestHelper
+import random, os, httplib2
+from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
 from nose.tools import ok_, eq_
 
 from tornado.testing import AsyncHTTPTestCase
 import www.index as index
 from biothings.settings import BiothingSettings
+import config
 
 
-class MyGeneTest(BiothingTestHelper):
+class MyGeneTest(BiothingTestHelperMixin):
     __test__ = True  # explicitly set this to be a test class
 
     #############################################################
     # Test functions                                            #
     #############################################################
+
+    def __init__(self):
+        self.host = os.getenv(config.HOST_ENVAR_NAME)
+        if not self.host:
+            raise ValueError("Missing HOST_ENVAR_NAME")
+        self.host = self.host.rstrip('/')
+        self.api = self.host + '/' + config.API_VERSION
+        self.h = httplib2.Http()
 
     def _filter_hits(self, res, field=None):
         for hit in res.get("hits"):
@@ -34,6 +43,7 @@ class MyGeneTest(BiothingTestHelper):
         return res
 
     def test_main(self):
+        print("sekf %s" % self.host)
         self.get_ok(self.host)
 
     def test_gene_object(self):
@@ -111,17 +121,17 @@ class MyGeneTest(BiothingTestHelper):
         # self.json_ok(self.get_ok(self.api + '/query?q=cdk2'))
         # self.json_ok(self.get_ok(self.api + '/query?q=GO:0004693'))
         # self.json_ok(self.get_ok(self.api + '/query?q=211803_at'))
-        self.has_hits('cdk2')
-        self.has_hits('GO:0004693')
-        self.has_hits('211803_at')
-        self.has_hits('IPR008351')
-        self.has_hits('hsa-mir-503')
-        self.has_hits('hsa-miR-503')
+        self.query_has_hits('cdk2')
+        self.query_has_hits('GO:0004693')
+        self.query_has_hits('211803_at')
+        self.query_has_hits('IPR008351')
+        self.query_has_hits('hsa-mir-503')
+        self.query_has_hits('hsa-miR-503')
 
         # test fielded query
-        self.has_hits('symbol:cdk2')
+        self.query_has_hits('symbol:cdk2')
         # test interval query
-        self.has_hits('chr1:151,073,054-151,383,976&species=human')
+        self.query_has_hits('chr1:151,073,054-151,383,976&species=human')
 
         con = self.get_ok(self.api + '/query?q=cdk2&callback=mycallback')
         ok_(con.startswith(b'mycallback('))
@@ -680,6 +690,14 @@ class MyGeneTest(BiothingTestHelper):
         eq_(hit["ensembl"]["gene"], "ENSG00000100373")
         assert "ENSP00000216211" in hit["ensembl"]["protein"]
         assert "ENST00000216211" in hit["ensembl"]["transcript"]
+
+    #def test_sort_by_fields(self):
+    #    res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene"))
+    #    hits = res["hits"]
+    #    assert len(hits) == 3
+    #    eq_(hits[0]["entrezgene"],69606)
+    #    eq_(hits[1]["entrezgene"],123263)
+    #    eq_(hits[2]["entrezgene"],315763)
 
 
 # Self contained test class, used for CI tools such as Travis
