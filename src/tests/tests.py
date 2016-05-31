@@ -15,13 +15,14 @@ class MyGeneTest(BiothingTestHelperMixin):
     # Test functions                                            #
     #############################################################
 
-    def __init__(self):
-        self.host = os.getenv(config.HOST_ENVAR_NAME)
-        if not self.host:
-            raise ValueError("Missing HOST_ENVAR_NAME")
-        self.host = self.host.rstrip('/')
-        self.api = self.host + '/' + config.API_VERSION
-        self.h = httplib2.Http()
+    print("onononon")
+    host = os.getenv(config.HOST_ENVAR_NAME)
+    if not host:
+        raise ValueError("Missing HOST_ENVAR_NAME")
+    host = host.rstrip('/')
+    api = host + '/' + config.API_VERSION
+    print("api: %s" % api)
+    h = httplib2.Http()
 
     def _filter_hits(self, res, field=None):
         for hit in res.get("hits"):
@@ -43,7 +44,6 @@ class MyGeneTest(BiothingTestHelperMixin):
         return res
 
     def test_main(self):
-        print("sekf %s" % self.host)
         self.get_ok(self.host)
 
     def test_gene_object(self):
@@ -715,7 +715,6 @@ class MyGeneTestTornadoClient(AsyncHTTPTestCase, MyGeneTest):
 
     def __init__(self, methodName='runTest', **kwargs):
         super(AsyncHTTPTestCase, self).__init__(methodName, **kwargs)
-        super(MyGeneTest, self).__init__(**kwargs)
         self.h = TornadoRequestHelper(self)
 
     def get_app(self):
