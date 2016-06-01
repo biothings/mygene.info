@@ -15,13 +15,11 @@ class MyGeneTest(BiothingTestHelperMixin):
     # Test functions                                            #
     #############################################################
 
-    print("onononon")
-    host = os.getenv(config.HOST_ENVAR_NAME)
-    if not host:
-        raise ValueError("Missing HOST_ENVAR_NAME")
+    host = os.getenv(config.HOST_ENVAR_NAME,"")
+    #if not host:
+    #    raise ValueError("Missing HOST_ENVAR_NAME")
     host = host.rstrip('/')
     api = host + '/' + config.API_VERSION
-    print("api: %s" % api)
     h = httplib2.Http()
 
     def _filter_hits(self, res, field=None):
@@ -691,13 +689,13 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "ENSP00000216211" in hit["ensembl"]["protein"]
         assert "ENST00000216211" in hit["ensembl"]["transcript"]
 
-    #def test_sort_by_fields(self):
-    #    res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene"))
-    #    hits = res["hits"]
-    #    assert len(hits) == 3
-    #    eq_(hits[0]["entrezgene"],69606)
-    #    eq_(hits[1]["entrezgene"],123263)
-    #    eq_(hits[2]["entrezgene"],315763)
+    def test_sort_by_fields(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene"))
+        hits = res["hits"]
+        assert len(hits) == 3
+        eq_(hits[0]["entrezgene"],69606)
+        eq_(hits[1]["entrezgene"],123263)
+        eq_(hits[2]["entrezgene"],315763)
 
 
 # Self contained test class, used for CI tools such as Travis
