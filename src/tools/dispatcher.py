@@ -11,6 +11,8 @@ from dataload.dispatch import (check_mongo, get_process_info, src_dump,
                                mark_upload_started, mark_upload_done)
 from dataload.dispatch import dispatch as dispatch_src_upload
 
+from config import DATA_WWW_ROOT_URL
+
 source_update_available = dispatch.Signal(providing_args=["src_to_update"])
 source_upload_success = dispatch.Signal(providing_args=["src_name"])
 source_upload_failed = dispatch.Signal(providing_args=["src_name"])
@@ -73,8 +75,8 @@ class GeneDocDispatcher:
                     msg = 'Dispatcher:  "{}" uploader finished successfully with code {} (time: {})'.format(src, returncode, timesofar(p.t0, t1=t1))
                     print(msg)
                     if hipchat_msg:
-                        msg += '<a href="http://su07:8000/log/dump/{}">dump log</a>'.format(src)
-                        msg += '<a href="http://su07:8000/log/upload/{}">upload log</a>'.format(src)
+                        msg += '<a href="{}/log/dump/{}">dump log</a>'.format(DATA_WWW_ROOT_URL,src)
+                        msg += '<a href="{}/log/upload/{}">upload log</a>'.format(DATA_WWW_ROOT_URL,src)
                         hipchat_msg(msg, message_format='html',color="green")
                     source_upload_success.send(self, src_name=src)
                 else:
@@ -117,7 +119,7 @@ class GeneDocDispatcher:
                 color = "red"
             print(msg)
             if hipchat_msg:
-                msg += '<a href="http://su07:8000/log/build/{}">build log</a>'.format(config)
+                msg += '<a href="{}/log/build/{}">build log</a>'.format(DATA_WWW_ROOT_URL,config)
                 hipchat_msg(msg, message_format='html',color=color)
 
             assert returncode == 0, "Subprocess failed. Check error above."
@@ -138,7 +140,7 @@ class GeneDocDispatcher:
                 color = "red"
             print(msg)
             if hipchat_msg:
-                msg += '<a href="http://su07:8000/log/sync/{}">sync log</a>'.format(config)
+                msg += '<a href="{}/log/sync/{}">sync log</a>'.format(DATA_WWW_ROOT_URL,config)
                 hipchat_msg(msg, message_format='html',color=color)
 
             assert returncode == 0, "Subprocess failed. Check error above."

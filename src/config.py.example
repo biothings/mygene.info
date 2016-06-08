@@ -27,6 +27,8 @@ GA_RUN_IN_PROD = False
 # MYGENE HUB VARS  #
 # ################ #
 
+# webserver to show hub status
+DATA_WWW_ROOT_URL = "http://localhost:8000"
 
 DATA_SRC_SERVER = 'localhost'
 DATA_SRC_PORT = 27117

@@ -22,6 +22,8 @@ import tornado.web
 import tornado.escape
 from tornado.options import define, options
 
+import config
+
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 if src_path not in sys.path:
     sys.path.append(src_path)
@@ -48,125 +50,10 @@ def _get_rev():
     '''
     pipe = subprocess.Popen(["git", "rev-parse", "HEAD"],
                             stdout=subprocess.PIPE)
-    output = pipe.stdout.read().strip()
+    output = pipe.stdout.read().strip().decode()
     print(output)
     return ':'.join(reversed(output.replace('+', '').split(' ')))
 __revision__ = _get_rev()
-
-"""
-class StatusCheckHandler(tornado.web.RequestHandler):
-    '''This reponses to a HEAD request of /status for status check.'''
-    def head(self):
-        bs = BoCServiceLayer()
-        bs.get_genedoc('1017')
-
-    def get(self):
-        self.head()
-
-
-class MetaDataHandler(tornado.web.RequestHandler):
-    '''Return db metadata in json string.'''
-    def get(self):
-        bs = BoCServiceLayer()
-        self.set_header("Content-Type", "application/json; charset=UTF-8")
-        metadata = bs.get_metadata(raw=True)
-        metadata = '{"app_revision": "%s",' % __revision__ + metadata[1:]
-        self.write(metadata)
-
-
-class GeneHandler(BaseHandler):
-    esq = ESQuery()
-
-    def get(self, geneid=None):
-        '''/gene/<geneid>
-           geneid can be entrezgene, ensemblgene, retired entrezgene ids.
-           /gene/1017
-           /gene/1017?filter=symbol,name
-           /gene/1017?filter=symbol,name,reporter.HG-U133_Plus_2
-        '''
-        if geneid:
-            kwargs = self.get_query_params()
-            gene = self.esq.get_gene2(geneid, **kwargs)
-            self.return_json(gene)
-        else:
-            raise tornado.web.HTTPError(404)
-
-    def post(self):
-        '''
-           post to /gene
-
-           with parameters of
-            {'ids': '1017,1018',
-             'filter': 'symbol,name'}
-
-            {'ids': '1017',
-             'filter': 'symbol,name,reporter.HG-U133_Plus_2'}
-        '''
-        kwargs = self.get_query_params()
-        geneids = kwargs.pop('ids', None)
-        if geneids:
-            geneids = [_id.strip() for _id in geneids.split(',')]
-            res = self.esq.mget_gene2(geneids, **kwargs)
-            self.return_json(res)
-        else:
-            raise tornado.web.HTTPError(404)
-
-
-class QueryHandler(BaseHandler):
-    esq = ESQuery()
-
-    def get(self):
-        kwargs = self.get_query_params()
-        q = kwargs.pop('q', None)
-        if q:
-            # fields = kwargs.get('fields', None)
-            explain = self.get_argument('explain', None)
-            if explain and explain.lower() == 'true':
-                kwargs['explain'] = True
-            for arg in ['from', 'size', 'mode']:
-                value = kwargs.get(arg, None)
-                if value:
-                    kwargs[arg] = int(value)
-            sample = kwargs.get('sample', None) == 'true'
-
-            if sample:
-                res = self.esq.query_sample(q, **kwargs)
-            else:
-                res = self.esq.query(q, **kwargs)
-            self.return_json(res)
-
-
-class IntervalQueryHandler(tornado.web.RequestHandler):
-    def get(self):
-        #/interval?interval=chr12:56350553-56367568&taxid=9606
-        interval = self.get_argument('interval', None)
-        taxid = self.get_argument('taxid', None)
-        kwargs = {}
-        if interval and taxid:
-            kwargs['taxid'] = int(taxid)
-            pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
-            mat = re.search(pattern, interval)
-            if mat:
-                kwargs.update(mat.groupdict())
-            fields = self.get_argument('fields', None)
-            if fields:
-                fields = fields.split(',')
-                kwargs['fields'] = fields
-            explain = self.get_argument('explain', None)
-            if explain and explain.lower() == 'true':
-                kwargs['explain'] = True
-            for arg in ['from', 'size', 'mode']:
-                value = self.get_argument(arg, None)
-                if value:
-                    kwargs[arg] = int(value)
-            # sample = self.get_argument('sample', None) == 'true'
-            esq = ESQuery()
-            res = esq.query_interval(**kwargs)
-            _json_data = json.dumps(res)
-            self.set_header("Content-Type", "application/json; charset=UTF-8")
-            self.write(_json_data)
-
-"""
 
 
 class MongoViewer(tornado.web.RequestHandler):
@@ -206,14 +93,14 @@ class MongoViewer(tornado.web.RequestHandler):
 
 class LogViewer(tornado.web.RequestHandler):
     def get(self, kind, src, timestamp=None):
-        dump_dir = '/opt/genedoc-hub/load_archive/by_resources/'
-        build_dir = '/home/cwu/prj/genedoc-hub/logs/'
+        dump_dir = os.path.join(config.DATA_ARCHIVE_ROOT,"by_resources")
+        build_dir = config.LOG_FOLDER
         logfile = None
         if kind in ['dump', 'upload']:
-            dir_base = dump_dir + src
+            dir_base = os.path.join(dump_dir,src)
             if os.path.exists(dir_base):
                 if not timestamp:
-                    timestamp = timestamp or sorted(os.walk(dir_base).next()[1])[-1]
+                    timestamp = timestamp or sorted(next(os.walk(dir_base))[1])[-1]
                 if src == 'ucsc':
                     timestamp = ''
                 logfile = os.path.join(dir_base, timestamp,
@@ -226,7 +113,7 @@ class LogViewer(tornado.web.RequestHandler):
             if timestamp:
                 logfile = os.path.join(build_dir, '{}_{}_{}.log'.format(_prefix, src, timestamp))
             else:
-                logfile = sorted([fn for fn in os.walk(build_dir).next()[2] if re.match('{}_{}_\d+.log'.format(_prefix, src), fn)])[-1]
+                logfile = sorted([fn for fn in next(os.walk(build_dir))[2] if re.match('{}_{}_\d+.log'.format(_prefix, src), fn)])[-1]
                 logfile = os.path.join(build_dir, logfile)
 
         if logfile and os.path.exists(logfile):
@@ -239,27 +126,11 @@ class LogViewer(tornado.web.RequestHandler):
 
 
 APP_LIST = [
-    #    (r"/status", StatusCheckHandler),
-    #    (r"/metadata", MetaDataHandler),
-    #    (r"/release_notes", ReleaseNotesHandler),
-    #(r"/gene/([\w\-\.]+)/?", GeneHandler),   # for get request
-    #(r"/gene/?", GeneHandler),               # for post request
-    #(r"/query/?", QueryHandler),
-    #(r"/interval/?", IntervalQueryHandler),
     (r"/mongo/(\w+)/?(\w*)/?(\w*)/?", MongoViewer),
     (r"/log/(\w+)/(\w+)/?(\w*)/?", LogViewer),
 ]
 
 settings = {}
-# if options.debug:
-#     from boccfg import STATIC_PATH
-#     settings.update({
-#         "static_path": STATIC_PATH,
-# #        "cookie_secret": COOKIE_SECRET,
-# #        "login_url": LOGIN_URL,
-# #        "xsrf_cookies": True,
-#     })
-
 
 def main():
     application = tornado.web.Application(APP_LIST, **settings)
