@@ -4,6 +4,8 @@ import json
 from tornado.web import HTTPError
 from biothings.www.api.handlers import MetaDataHandler, BiothingHandler, QueryHandler, \
                                        FieldsHandler, BaseHandler
+
+from biothings.utils.version import get_software_info
 from biothings.settings import BiothingSettings
 from utils.es import ESQuery
 from biothings.utils.common import split_ids
@@ -19,6 +21,7 @@ class MyGeneMetaDataHandler(MetaDataHandler):
 
     def get(self):
         metadata = self.esq.metadata()
+        metadata['software'] = get_software_info()
         metadata["app_revision"] = os.environ["MYGENE_REVISION"]
         self.return_json(metadata, indent=2)
 
