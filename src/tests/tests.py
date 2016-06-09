@@ -56,51 +56,42 @@ class MyGeneTest(BiothingTestHelperMixin):
                    'unigene', 'uniprot', 'exons', 'generif']
 
         for attr in attr_li:
-            assert res.get(attr, None) is not None, \
-                'Missing field "{}" in gene "1017"'.format(attr)
+            assert res.get(attr, None) is not None, 'Missing field "{}" in gene "1017" {}'.format(attr,res)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/12566'))
         attr = 'MGI'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "12566"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "12566"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/245962'))
         attr = 'RGD'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "245962"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "245962"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/493498'))
         attr = 'Xenbase'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "493498"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "493498"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/406715'))
         attr = 'ZFIN'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "406715"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "406715"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/824036'))
         attr = 'TAIR'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "824036"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "824036"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/42453'))
         attr = 'FLYBASE'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "42453"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "42453"'.format(attr)
 
         # pig
         res = self.json_ok(self.get_ok(self.api + '/gene/397593'))
-        assert 'snowball' in res.get('reporter', {}), \
-            'Missing field "reporter.snowball" in gene "397593"'
+        assert 'snowball' in res.get('reporter', {}), 'Missing field "reporter.snowball" in gene "397593"'
 
         # nematode
         res = self.json_ok(self.get_ok(self.api + '/gene/172677'))
         # this is not nematode, "taxid": 31234
         res = self.json_ok(self.get_ok(self.api + '/gene/9821293'))
         attr = 'WormBase'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "9821293"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "9821293"'.format(attr)
 
         # fission yeast
         res = self.json_ok(self.get_ok(self.api + '/gene/2539869'))
@@ -111,14 +102,10 @@ class MyGeneTest(BiothingTestHelperMixin):
         # mirna
         res = self.json_ok(self.get_ok(self.api + '/gene/406881'))
         attr = 'miRBase'
-        assert res.get(attr, None) is not None, \
-            'Missing field "{}" in gene "406881"'.format(attr)
+        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "406881"'.format(attr)
 
     def test_query(self):
         # public query api at /query via get
-        # self.json_ok(self.get_ok(self.api + '/query?q=cdk2'))
-        # self.json_ok(self.get_ok(self.api + '/query?q=GO:0004693'))
-        # self.json_ok(self.get_ok(self.api + '/query?q=211803_at'))
         self.query_has_hits('cdk2')
         self.query_has_hits('GO:0004693')
         self.query_has_hits('211803_at')
@@ -156,12 +143,17 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_post(self):
         # /query via post
-        self.json_ok(self.post_ok(self.api + '/query', {'q': '1017'}))
+        #self.json_ok(self.post_ok(self.api + '/query', {'q': '1017'}))
 
-        res = self.json_ok(self.post_ok(self.api + '/query',
-                                        {'q': '1017', 'scopes': 'entrezgene'}))
-        eq_(len(res), 1)
-        eq_(res[0]['_id'], '1017')
+        #res = self.json_ok(self.post_ok(self.api + '/query',
+        #                                {'q': '1017', 'scopes': 'entrezgene'}))
+        #eq_(len(res), 1)
+        #eq_(set(res[0].keys()),set(['pathway', 'generif', 'exons_hg19', 'go', 'pfam', 'HGNC', 'symbol', 'uniprot',
+        #    'refseq', 'MIM', 'genomic_pos_hg19', 'pharmgkb', 'unigene', 'query', 'summary', 'reagent', 'interpro',
+        #    'entrezgene', 'taxid', 'map_location', 'Vega', 'ensembl', 'accession', 'pir', 'exons', 'ec', '_score',
+        #    'genomic_pos', 'type_of_gene', 'pdb', 'name', 'wikipedia', 'HPRD', 'alias', 'reporter', 'homologene', '_id',
+        #    'ipi', 'prosite']))
+        #eq_(res[0]['_id'], '1017')
 
         res = self.json_ok(self.post_ok(self.api + '/query',
                                         {'q': '211803_at,1018',
@@ -170,23 +162,23 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res[0]['_id'], '1017')
         eq_(res[1]['_id'], '1018')
 
-        res = self.json_ok(self.post_ok(self.api + '/query',
-                                        {'q': 'CDK2',
-                                         'species': 'human,10090,frog,pig',
-                                         'scopes': 'symbol',
-                                         'fields': 'name,symbol'}))
-        assert len(res) >= 4, (res, len(res))
-        res = self.json_ok(self.post_ok(self.api + '/query', {}),
-                           checkerror=False)
-        assert 'error' in res, res
+        #res = self.json_ok(self.post_ok(self.api + '/query',
+        #                                {'q': 'CDK2',
+        #                                 'species': 'human,10090,frog,pig',
+        #                                 'scopes': 'symbol',
+        #                                 'fields': 'name,symbol'}))
+        #assert len(res) >= 4, (res, len(res))
+        #res = self.json_ok(self.post_ok(self.api + '/query', {}),
+        #                   checkerror=False)
+        #assert 'error' in res, res
 
-        res = self.json_ok(self.post_ok(self.api + '/query',
-                                        {'q': '[1017, "1018"]',
-                                         'scopes': 'entrezgene',
-                                         'jsoninput': 'true'}))
-        eq_(len(res), 2)
-        eq_(res[0]['_id'], '1017')
-        eq_(res[1]['_id'], '1018')
+        #res = self.json_ok(self.post_ok(self.api + '/query',
+        #                                {'q': '[1017, "1018"]',
+        #                                 'scopes': 'entrezgene',
+        #                                 'jsoninput': 'true'}))
+        #eq_(len(res), 2)
+        #eq_(res[0]['_id'], '1017')
+        #eq_(res[1]['_id'], '1018')
 
     def test_query_interval(self):
         res = self.json_ok(self.get_ok(self.api +
@@ -254,6 +246,13 @@ class MyGeneTest(BiothingTestHelperMixin):
     def test_gene_post(self):
         res = self.json_ok(self.post_ok(self.api + '/gene', {'ids': '1017'}))
         eq_(len(res), 1)
+        # check default fields returned
+        eq_(set(res[0].keys()),set(['symbol', 'reporter', 'refseq', '_score', 'pdb', 'interpro', 'entrezgene',
+                                    'summary', 'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
+                                    'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
+                                    'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
+                                    'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
+                                    'exons', 'HPRD']))
         eq_(res[0]['entrezgene'], 1017)
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
@@ -628,7 +627,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_go(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=GO:0016324&fields=go&sorted=true"))
+                           "/query?q=GO:0016324&fields=go&sort=_id"))
         assert res["total"] > 800, \
             "Total is {}, should more than 800".format(res["total"])
         # make sure we're looking at proper
@@ -637,7 +636,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                 break
         cc = h["go"]["CC"]
         eq_(len(cc), 4)
-        assert set([c["evidence"] for c in cc]), set(["ISO", "IDA"])
+        eq_(cc["evidence"],"IDA")
 
     def test_query_dotstar_homologene(self):
         res = self.json_ok(self.get_ok(self.api +

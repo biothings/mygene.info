@@ -259,12 +259,17 @@ class ESQueryBuilder(ESQueryBuilder):
             }
         }
 
-    def _translate_datasource(self, q):
+    def _translate_datasource(self, q, trim_from="", unescape=False):
         for src in SOURCE_TRANSLATORS.keys():
-            q = re.sub(src, SOURCE_TRANSLATORS[src], q)
-        # logging.debug(q)
+            regex = SOURCE_TRANSLATORS[src]
+            if trim_from:
+                regex = re.sub(trim_from + ".*","",regex)
+                src = re.sub(trim_from + ".*","",src)
+            if unescape:
+                regex = regex.replace("\\","")
+                src = src.replace("\\","")
+            q = re.sub(src, regex, q, flags=re.I)
         return q
-        pass
 
     def _parse_interval_query(self, query):
         '''Check if the input query string matches interval search regex,
@@ -630,68 +635,68 @@ class ESQueryBuilder(ESQueryBuilder):
                         }
                     }
                 }
-        else:
-            if is_str(scopes):
-                _field = scopes
-                if _field in ['entrezgene', 'retired']:
-                    if id_is_int:
-                        _query = {
-                            "match": {
-                                _field: id
-                            }
-                        }
-                    else:
-                        # using a fake query here to make sure
-                        # return empty hits
-                        _query = self._nohits_query
-                else:
+
+        elif is_str(scopes):
+            _field = scopes
+            if _field in ['entrezgene', 'retired']:
+                if id_is_int:
                     _query = {
                         "match": {
-                            _field: {
-                                "query": u"{}".format(id),
-                                "operator": "and"
-                            }
+                            _field: id
                         }
                     }
-            elif is_seq(scopes):
-                int_fields = []
-                str_fields = copy.copy(scopes)
-                if 'entrezgene' in str_fields:
-                    int_fields.append('entrezgene')
-                    str_fields.remove('entrezgene')
-                if 'retired' in str_fields:
-                    int_fields.append('retired')
-                    str_fields.remove('retired')
+                else:
+                    # using a fake query here to make sure
+                    # return empty hits
+                    _query = self._nohits_query
+            else:
+                _query = {
+                    "multi_match": {
+                        "query": u"{}".format(id),
+                        "fields": self._translate_datasource(scopes,trim_from=":",unescape=True),
+                        "operator": "and"
+                    }
+                }
+        elif is_seq(scopes):
+            int_fields = []
+            str_fields = copy.copy(scopes)
+            if 'entrezgene' in str_fields:
+                int_fields.append('entrezgene')
+                str_fields.remove('entrezgene')
+            if 'retired' in str_fields:
+                int_fields.append('retired')
+                str_fields.remove('retired')
 
-                if id_is_int:
-                    if len(int_fields) == 1:
-                        _query = {
-                            "match": {
-                                int_fields[0]: id
-                            }
+            if id_is_int:
+                if len(int_fields) == 1:
+                    _query = {
+                        "match": {
+                            int_fields[0]: id
                         }
-                    elif len(int_fields) == 2:
-                        _query = {
-                            "multi_match": {
-                                "query": id,
-                                "fields": int_fields
-                            }
-                        }
-                    else:
-                        _query = self._nohits_query
-                elif str_fields:
+                    }
+                elif len(int_fields) == 2:
                     _query = {
                         "multi_match": {
-                            "query": u"{}".format(id),
-                            "fields": str_fields,
-                            "operator": "and"
+                            "query": id,
+                            "fields": int_fields
                         }
                     }
                 else:
                     _query = self._nohits_query
-
+            elif str_fields:
+                _query = {
+                    "multi_match": {
+                        "query": u"{}".format(id),
+                        # dotstar to match any key 
+                        "fields": [self._translate_datasource(f,trim_from=":",unescape=True) for f in str_fields],
+                        "operator": "and"
+                    }
+                }
             else:
-                raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
+                _query = self._nohits_query
+
+        else:
+            raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 
         # _query = self.add_species_filter(_query)
         _query = self.add_query_filters(_query)
@@ -700,9 +705,6 @@ class ESQueryBuilder(ESQueryBuilder):
         if self._query_options:
             _q.update(self._query_options)
 
-        # if 'fields' in _q and _q['fields'] is not None:
-        #     _q['_source'] = _q['fields']
-        #     del _q['fields']
         return _q
 
     def build_genomic_pos_query(self, chr, gstart, gend, assembly=None):
