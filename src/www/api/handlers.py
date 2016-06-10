@@ -9,7 +9,7 @@ from biothings.utils.version import get_software_info
 from biothings.settings import BiothingSettings
 from utils.es import ESQuery
 from biothings.utils.common import split_ids
-from config import GA_EVENT_CATEGORY, GA_EVENT_GET_ACTION, GA_EVENT_POST_ACTION
+from config import GA_EVENT_CATEGORY
 import os, logging
 
 mygene_settings = BiothingSettings()
