@@ -7,7 +7,7 @@ ES_INDEX_NAME_TIER1 = "genedoc_mygene_current"
 ES_INDEX_TYPE = "gene"
 
 
-ES_SCROLL_TIME = '10'
+ES_SCROLL_TIME = '1m'
 ES_SCROLL_SIZE = 10
 
 
