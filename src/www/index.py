@@ -16,6 +16,7 @@ import tornado.options
 import tornado.web
 from tornado.options import options
 
+from config import API_VERSION
 
 #TODO: move to a "common api" module (not specific to an API version)
 #*******#
