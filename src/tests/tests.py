@@ -631,13 +631,6 @@ class MyGeneTest(BiothingTestHelperMixin):
                            "/query?q=GO:0016324&fields=go&sort=_id"))
         assert res["total"] > 800, \
             "Total is {}, should more than 800".format(res["total"])
-        # make sure we're looking at proper
-        for (i,h) in enumerate(res["hits"]):
-            if h.get("go",{}).get("BP",{}).get("id") == "GO:0008150":
-                break
-        cc = h["go"]["CC"]
-        eq_(len(cc), 4)
-        eq_(cc["evidence"],"IDA")
 
     def test_query_dotstar_homologene(self):
         res = self.json_ok(self.get_ok(self.api +
