@@ -292,7 +292,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(root, v2)
         eq_(set(root.keys()), set(['available_fields', 'src_version',
                                    'app_revision', 'timestamp', 'taxonomy',
-                                   'stats', 'genome_assembly', 'source']))
+                                   'stats', 'genome_assembly', 'source',
+                                   'software']))
         fields = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
         # test random field
         assert "refseq" in fields
