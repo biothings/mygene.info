@@ -9,6 +9,7 @@ from biothings.utils.version import get_software_info
 from biothings.settings import BiothingSettings
 from utils.es import ESQuery
 from biothings.utils.common import split_ids
+from config import GA_EVENT_CATEGORY, GA_EVENT_GET_ACTION, GA_EVENT_POST_ACTION
 import os, logging
 
 mygene_settings = BiothingSettings()
@@ -47,7 +48,7 @@ class GeneHandler(BiothingHandler):
             gene = self.esq.get_gene(geneid, **kwargs)
             if gene:
                 self.return_json(gene)
-                self.ga_track(event={'category': 'v2_api',
+                self.ga_track(event={'category': GA_EVENT_CATEGORY,
                                      'action': 'gene_get'})
             else:
                 raise HTTPError(404)

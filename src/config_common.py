@@ -39,11 +39,11 @@ SPECIES_LI = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish',
 
 
 # 'category' in google analytics event object
-GA_EVENT_CATEGORY = 'v2_api'
+GA_EVENT_CATEGORY = 'v3_api'
 # 'action' for get request in google analytics event object
-GA_EVENT_GET_ACTION = 'get'
+GA_EVENT_GET_ACTION = 'gene_get'
 # 'action' for post request in google analytics event object
-GA_EVENT_POST_ACTION = 'post'
+GA_EVENT_POST_ACTION = 'gene_post'
 # url for google analytics tracker
 GA_TRACKER_URL = 'mygene.info'
 
@@ -53,7 +53,7 @@ GA_TRACKER_URL = 'mygene.info'
 # For URL stuff
 ANNOTATION_ENDPOINT = 'gene'
 QUERY_ENDPOINT = 'query'
-API_VERSION = 'v2'
+API_VERSION = 'v3'
 
 # *****************************************************************************
 # Tests

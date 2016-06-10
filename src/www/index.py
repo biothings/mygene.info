@@ -9,10 +9,8 @@ Currently available URLs:
 '''
 import sys
 
-#import os.path
 import os, logging
 import subprocess
-#import json
 
 import tornado.options
 import tornado.web
@@ -58,8 +56,7 @@ from biothings.settings import BiothingSettings
 btsettings = BiothingSettings()
 
 # build API routes
-from www.api.handlers import APP_LIST as api_v2_app_list
-#from api.handlers_async import APP_LIST as api_v2_async_app_list
+from www.api.handlers import APP_LIST as api_app_list
 from demo.handlers import APP_LIST as demo_app_list
 #from auth.handlers import APP_LIST as auth_app_list
 from www.api.handlers import MyGeneMetaDataHandler
@@ -82,8 +79,8 @@ APP_LIST = [
     (r"/metadata/fields", MyGeneFieldsHandler),
     (r"/demo/?$", DemoHandler),
 ]
-APP_LIST += add_apps('', api_v2_app_list)
-APP_LIST += add_apps('v2', api_v2_app_list)
+APP_LIST += add_apps('', api_app_list)
+APP_LIST += add_apps(API_VERSION, api_app_list)
 #APP_LIST += add_apps('demo', demo_app_list)
 #APP_LIST += add_apps('v2a', api_v2_async_app_list)
 #APP_LIST += add_apps('auth', auth_app_list)
