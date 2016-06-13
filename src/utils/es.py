@@ -64,11 +64,14 @@ class ESQuery(ESQuery):
         self._default_species = [9606, 10090, 10116]  # human, mouse, rat
         self._tier_1_species = set(TAXONOMY.values())
 
-    def _search(self, q, species='all', scroll_options={}, **kwargs):
+    def _search(self, q, species='all', **kwargs):
+        scroll_options = {}
+        if kwargs.get("scroll"):
+            scroll_options["size"] = kwargs.get("size")
+            scroll_options["scroll"] = kwargs.get("scroll")
         self._set_index(species)
         res = self._es.search(index=self._index, doc_type=self._doc_type,
                               body=q, **scroll_options)
-        # logging.error("in search: %s" % res)
         self._index = ES_INDEX_NAME  # reset self._index
         return res
 
@@ -89,7 +92,7 @@ class ESQuery(ESQuery):
     def _get_query_builder(self, **kwargs):
         return ESQueryBuilder(**kwargs)
 
-    def _build_query(self, q, kwargs):
+    def _build_query(self, q, **kwargs):
         # can override this function if more query types are to be added
         esqb = self._get_query_builder(**kwargs)
         return esqb.query(q)
@@ -244,6 +247,7 @@ class ESQueryBuilder(ESQueryBuilder):
                                  'sort', 'explain', 'version', 'aggs',
                                  'dotfield']
         for key in set(self._query_options) - set(self._allowed_options):
+            logging.debug("Removing query option %s" % repr(key))
             del self._query_options[key]
         # convert "fields" option to "_source"
         # use "_source" instead of "fields" for ES v1.x and up
