@@ -665,31 +665,13 @@ class DataBuilder():
         mapping = {"properties": mapping,
                    "dynamic": False}
         if enable_timestamp:
-            #mapping['_timestamp'] = {
-            #    "enabled": True,
-            #    "store": True,        # set store to true, so it can be returned with the doc
-            #    "path": "_timestamp"
-            #}
-            mapping["properties"]["timestamp"] = {
-                "include_in_all": False,
-                "type": "date"
+            mapping['_timestamp'] = {
+                "enabled": True,
             }
         #allow source Compression
         #Note: no need of source compression due to "Store Level Compression"
         #mapping['_source'] = {'compress': True,}
         #                      'compress_threshold': '1kb'}
-
-        # #updating metadata
-        # _meta = {}
-        # src_version = self.get_src_version()
-        # src_build_stats = self.get_last_src_build_stats()
-        # if src_version:
-        #     _meta['src_version'] = src_version
-        # if src_build_stats:
-        #     _meta['stats'] = src_build_stats
-        # if _meta:
-        #     mapping['_meta'] = _meta
-
         return mapping
 
     def update_mapping_meta(self):
@@ -772,7 +754,7 @@ class DataBuilder():
         else:
             print("Error: target collection is not ready yet or failed to build.")
 
-    def build_index2(self, build_config='mygene_allspecies', last_build_idx=-1, use_parallel=False, es_host=None, es_index_name=None):
+    def build_index2(self, build_config='mygene_allspecies', last_build_idx=-1, use_parallel=False, es_host=None, es_index_name=None, noconfirm=False):
         """Build ES index from last successfully-merged mongodb collection.
             optional "es_host" argument can be used to specified another ES host, otherwise default ES_HOST.
             optional "es_index_name" argument can be used to pass an alternative index name, otherwise same as mongodb collection name
@@ -822,11 +804,11 @@ class DataBuilder():
         if build_config == 'mygene_allspecies':
             es_idxer.number_of_shards = 10   # default 5
         es_idxer.check()
-        if ask("Continue to build ES index?") == 'Y':
+        if noconfirm or ask("Continue to build ES index?") == 'Y':
             es_idxer.use_parallel = use_parallel
             #es_idxer.s = 609000
             if es_idxer.exists_index(es_idxer.ES_INDEX_NAME):
-                if ask('Index "{}" exists. Delete?'.format(es_idxer.ES_INDEX_NAME)) == 'Y':
+                if noconfirm or ask('Index "{}" exists. Delete?'.format(es_idxer.ES_INDEX_NAME)) == 'Y':
                     es_idxer.conn.indices.delete(es_idxer.ES_INDEX_NAME)
                 else:
                     print("Abort.")
