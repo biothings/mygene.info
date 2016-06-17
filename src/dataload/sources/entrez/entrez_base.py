@@ -57,18 +57,20 @@ class GeneInfoParser(EntrezParserBase):
 
         '''
         load_start(self.datafile)
-        gene_d = tab2dict(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9), key=1,
+        gene_d = tab2dict(self.datafile, (0, 1, 2, 3, 4, 5, 6, 7, 8, 9), key=1,
                           alwayslist=0, includefn=self.species_filter)
 
         def _ff(d):
             (
                 taxid, symbol, locus_tag, synonyms,
-                dbxrefs, map_location,
+                dbxrefs, chromosome, map_location,
                 description, type_of_gene
             ) = d
             out = dict(taxid=int(taxid),
                        symbol=symbol,
                        name=description)
+            if chromosome != '-':
+                out['chr'] = chromosome
             if map_location != '-':
                 out['map_location'] = map_location
             if type_of_gene != '-':
