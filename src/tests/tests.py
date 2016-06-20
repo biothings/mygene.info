@@ -553,8 +553,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(genomic["hits"], [])  # genomic not indexed
         eq_(rna["total"], 1)
         hit = rna["hits"][0]
-        eq_(hit["refseq"]["protein"], "NP_001670")
-        eq_(hit["refseq"]["rna"], "NM_001679")
+        eq_(hit["refseq"]["protein"], "NP_001670.1")
+        eq_(hit["refseq"]["rna"], "NM_001679.2")
 
     def test_query_dotstar_accession(self):
         protein = self.json_ok(self.get_ok(self.api +
@@ -579,8 +579,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(genomic["hits"], [])  # genomic not indexed
         eq_(rna["total"], 1)
         hit = rna["hits"][0]
-        assert "AAH68303" in hit["accession"]["protein"]
-        assert "BC068303" in hit["accession"]["rna"]
+        assert "AAH68303.1" in hit["accession"]["protein"]
+        assert "BC068303.1" in hit["accession"]["rna"]
 
     def test_query_dotstar_reporter(self):
         human = self.json_ok(self.get_ok(self.api +
