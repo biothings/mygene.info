@@ -21,10 +21,10 @@ class MyGeneMetaDataHandler(MetaDataHandler):
     esq = ESQuery()
 
     def get(self):
-        metadata = self.esq.metadata()
-        metadata['software'] = get_software_info()
-        metadata["app_revision"] = os.environ["MYGENE_REVISION"]
-        self.return_json(metadata, indent=2)
+        _meta = self.esq.metadata()
+        self._fill_software_info(_meta)
+        _meta["app_revision"] = os.environ["MYGENE_REVISION"]
+        self.return_json(_meta, indent=2)
 
 class MyGeneFieldsHandler(FieldsHandler):
     ''' This class is for the /metadata/fields endpoint. '''
