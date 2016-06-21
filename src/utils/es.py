@@ -359,6 +359,21 @@ class ESQueryBuilder(ESQueryBuilder):
                     {
                         "function_score": {
                             "query": {
+                                "multi_match": {
+                                    "query": "%(q)s",
+                                    "fields": [
+                                        self._translate_datasource("refseq",trim_from=":",unescape=True),
+                                        self._translate_datasource("accession",trim_from=":",unescape=True)
+                                    ],
+                                    "operator": "or"
+                                }
+                            },
+                            "weight": 1.1
+                        }
+                    },
+                    {
+                        "function_score": {
+                            "query": {
                                 "match": {
                                     "go": {
                                         "query": "%(q)s",

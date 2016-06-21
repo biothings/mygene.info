@@ -695,6 +695,23 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(hits[1]["entrezgene"],123263)
         eq_(hits[2]["entrezgene"],315763)
 
+    def test_refseq_versioning(self):
+        # no version, _all
+        res = self.json_ok(self.get_ok(self.api + "/query?q=NM_001798&fields=refseq"),filter=True)
+        hits = res["hits"]
+        assert len(hits) == 1
+        assert "NM_001798.4" in hits[0]["refseq"]["rna"]
+        # with version, _all
+        sameres = self.json_ok(self.get_ok(self.api + "/query?q=NM_001798.4&fields=refseq"),filter=True)
+        assert sameres["hits"] == res["hits"]
+        # using protein ID
+        sameres = self.json_ok(self.get_ok(self.api + "/query?q=XP_011536034&fields=refseq"),filter=True)
+        assert sameres["hits"] == res["hits"]
+        # using explicit field
+        sameres = self.json_ok(self.get_ok(self.api + "/query?q=refseq:XP_011536034&fields=refseq"),filter=True)
+        assert sameres["hits"] == res["hits"]
+
+
 
 # Self contained test class, used for CI tools such as Travis
 # This will start a Tornado server on its own and perform tests
