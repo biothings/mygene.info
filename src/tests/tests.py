@@ -288,12 +288,11 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_metadata(self):
         root = self.json_ok(self.get_ok(self.host + '/metadata'))
-        v2 = self.json_ok(self.get_ok(self.api + '/metadata'))
-        eq_(root, v2)
+        v3 = self.json_ok(self.get_ok(self.api + '/metadata'))
+        eq_(root, v3)
         eq_(set(root.keys()), set(['available_fields', 'src_version',
                                    'app_revision', 'timestamp', 'taxonomy',
-                                   'stats', 'genome_assembly', 'source',
-                                   'software']))
+                                   'stats', 'genome_assembly', 'source']))
         fields = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
         # test random field
         assert "refseq" in fields
@@ -301,6 +300,12 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "interpro.desc" in fields
         assert "homologene" in fields
         assert "reporter.snowball" in fields
+        # debug info
+        debug = self.json_ok(self.get_ok(self.api + '/metadata?debug=1'))
+        print(debug.keys())
+        assert "software" in debug.keys()
+        nodebug = self.json_ok(self.get_ok(self.api + '/metadata?debug=0'))
+        assert not "software" in nodebug.keys()
 
     def test_query_facets(self):
         res = self.json_ok(self.get_ok(self.api +
