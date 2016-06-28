@@ -7,7 +7,7 @@
                     "MethodName": "Gene query service",
                     "Synopsis": "Make gene query and return matching gene list. Support JSONP and CORS as well.",
                     "HTTPMethod": "GET",
-                    "URI": "/v2/query",
+                    "URI": "/v3/query",
                     "RequiresOAuth": "N",
                     "parameters": [
                         {
@@ -19,7 +19,7 @@
                         {
                             "Name": "fields",
                             "Type": "string",
-                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v3/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
                         },
                         {
                             "Name": "species",
@@ -99,7 +99,7 @@
                     "MethodName": "Gene query service via POST",
                     "Synopsis": "Make gene queries in batch",
                     "HTTPMethod": "POST",
-                    "URI": "/v2/query",
+                    "URI": "/v3/query",
                     "RequiresOAuth": "N",
                     "parameters": [
                         {
@@ -116,7 +116,7 @@
                         {
                             "Name": "fields",
                             "Type": "string",
-                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v3/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
                         },
                         {
                             "Name": "species",
@@ -140,7 +140,7 @@
                     "MethodName": "Gene query service by genome interval",
                     "Synopsis": "Make gene query by genome interval and return genes within that region. Support JSONP and CORS as well.",
                     "HTTPMethod": "GET",
-                    "URI": "/v2/query",
+                    "URI": "/v3/query",
                     "RequiresOAuth": "N",
                     "parameters": [
                         {
@@ -152,7 +152,7 @@
                         {
                             "Name": "fields",
                             "Type": "string",
-                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v3/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
                         },
                         {
                             "Name": "species",
@@ -226,7 +226,7 @@
                     "MethodName": "Gene annotation service",
                     "Synopsis": "Retrieve gene annotation based on Entrez or Ensembl gene id, support JSONP and CORS as well.",
                     "HTTPMethod": "GET",
-                    "URI": "/v2/gene/:geneid",
+                    "URI": "/v3/gene/:geneid",
                     "RequiresOAuth": "N",
                     "parameters": [
                         {
@@ -238,7 +238,7 @@
                         {
                             "Name": "fields",
                             "Type": "string",
-                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v3/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
                         },
                         {
                             "Name": "callback",
@@ -267,7 +267,7 @@
                     "MethodName": "Gene annotation service via POST",
                     "Synopsis": "Make gene queries in batch for a list of Entrez or Ensembl gene ids",
                     "HTTPMethod": "POST",
-                    "URI": "/v2/gene",
+                    "URI": "/v3/gene",
                     "RequiresOAuth": "N",
                     "parameters": [
                         {
@@ -279,7 +279,7 @@
                         {
                             "Name": "fields",
                             "Type": "string",
-                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v2/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
+                            "Description": "a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. http://mygene.info/v3/gene/1017). Note that it supports dot notation as well, e.g., you can pass \"refseq.rna\". If \"fields=all\", all available fields will be returned. Default: \"symbol,name,taxid,entrezgene,ensemblgene\"."
                         },
                         {
                             "Name": "species",
@@ -309,7 +309,7 @@
                     "MethodName": "Metadata service",
                     "Synopsis": "Get metadata about the data available from MyGene.info.",
                     "HTTPMethod": "GET",
-                    "URI": "/v2/metadata",
+                    "URI": "/v3/metadata",
                     "parameters": [
                         {
                             "Name": "callback",
