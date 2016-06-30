@@ -108,7 +108,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         # public query api at /query via get
         self.query_has_hits('cdk2')
         self.query_has_hits('GO:0004693')
-        self.query_has_hits('211803_at')
+        self.query_has_hits('reporter:211803_at')
         self.query_has_hits('IPR008351')
         self.query_has_hits('hsa-mir-503')
         self.query_has_hits('hsa-miR-503')
@@ -559,7 +559,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(rna["total"], 1)
         hit = rna["hits"][0]
         eq_(hit["refseq"]["protein"], "NP_001670.1")
-        eq_(hit["refseq"]["rna"], "NM_001679.2")
+        eq_(hit["refseq"]["rna"], "NM_001679.3")
 
     def test_query_dotstar_accession(self):
         protein = self.json_ok(self.get_ok(self.api +
