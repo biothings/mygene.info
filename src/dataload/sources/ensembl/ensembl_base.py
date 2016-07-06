@@ -96,11 +96,12 @@ class EnsemblParser:
         ensembl2acc = tab2dict(DATAFILE, (1, 2, 3), 0, includefn=_not_LRG)
 
         def _fn(x, eid):
-            out = {'gene': eid, 'mapping' : []}
+            out = {'gene': eid, 'translation' : []}
             def mapping(transcript_id, protein_id):
                 trid = transcript_id and transcript_id != '\\N' and transcript_id or None
                 pid = protein_id and protein_id != '\\N' and protein_id or None
-                out['mapping'].append((trid,pid))
+                if trid and pid:
+                    out['translation'].append({"rna" : trid, "protein" : pid})
 
             if isinstance(x, list):
                 transcript_li = []

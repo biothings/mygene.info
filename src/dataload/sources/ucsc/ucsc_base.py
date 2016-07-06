@@ -35,7 +35,7 @@ def load_exons_for_species(species, exons_key='exons'):
             'txend': int(ld[5]),
             'cdsstart': int(ld[6]),
             'cdsend': int(ld[7]),
-            'exons': exons
+            'position': exons
         })
 
     gene2exons = {}

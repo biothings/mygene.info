@@ -284,7 +284,7 @@ class Gene2AccessionParserBase(EntrezParserBase):
                 'rna': [],
                 'protein': [],
                 'genomic': [],
-                'mapping': []
+                'translation': []
             }
             for rna, prot, dna in d:
                 if rna == '-': rna = None
@@ -296,8 +296,8 @@ class Gene2AccessionParserBase(EntrezParserBase):
                     out['protein'].append(prot)
                 if dna is not None:
                     out['genomic'].append(dna)
-                if rna is not None or prot is not None:
-                    out['mapping'].append((rna,prot))
+                if rna and prot:
+                    out['translation'].append({'rna' : rna, 'protein' : prot})
             # remove dup
             for k in out:
                 out[k] = normalized_value(out[k])
