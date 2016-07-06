@@ -15,26 +15,31 @@ def load_genedoc(self):
 
 def get_mapping(self):
     mapping = {
-        "refseq": {
-            "dynamic": False,
-            #"path": "just_name",      #make both fields, refseq, refseq.rna, work
-            "properties": {
-                "genomic": {
-                    "type": "string",
-                    "index": "no",
-                    "include_in_all": False,
-                },
-                "rna": {
-                    "type": "string",
-                    "analyzer": "refseq_analyzer",
-                    "copy_to": "refseq",
-                },
-                'protein': {
-                    "type": "string",
-                    "analyzer": "refseq_analyzer",
-                    "copy_to": "refseq",
+            "refseq": {
+                "dynamic": False,
+                #"path": "just_name",      #make both fields, refseq, refseq.rna, work
+                "properties": {
+                    "genomic": {
+                        "type": "string",
+                        "index": "no",
+                        "include_in_all": False,
+                        },
+                    "rna": {
+                        "type": "string",
+                        "analyzer": "refseq_analyzer",
+                        "copy_to": "refseq",
+                        },
+                    'protein': {
+                        "type": "string",
+                        "analyzer": "refseq_analyzer",
+                        "copy_to": "refseq",
+                        },
+                    'translation': {
+                        "type": "object",
+                        "index": "no",
+                        "include_in_all": False,
+                        },
+                    }
                 }
             }
-        }
-    }
     return mapping

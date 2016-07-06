@@ -252,6 +252,24 @@ def get_mapping():
 
     return mapping
 
+def update_mapping():
+    for src in __sources__:
+        colname = src.split(".")[-1]
+        col = conn[colname]
+        regdoc = doc_register[src + '_doc']
+        mastercol = conn[GeneDocSourceMaster.__database__][GeneDocSourceMaster.__collection__]
+        _doc = {"_id": str(colname),
+                "name": str(colname),
+                "timestamp": datetime.datetime.now(),
+                "mapping" : regdoc.get_mapping(regdoc)}
+        print("Updating mapping for source: %s" % repr(colname))
+        dkey = {"_id": _doc["_id"]}
+        prev = mastercol.find_one(dkey)
+        if prev:
+            mastercol.replace_one(dkey, _doc)
+        else:
+            mastercol.insert_one(_doc)
+
 
 def main():
     '''

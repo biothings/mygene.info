@@ -14,25 +14,30 @@ def load_genedoc(self):
 
 def get_mapping(self):
     mapping = {
-        "accession": {
-            "dynamic": False,
-            #"path": "just_name",      #make both fields, accession.rna and rna, work
-            "properties": {
-                "genomic": {
-                    "type": "string",
-                    "index": "no",
-                    "include_in_all": False,
-                },
-                "rna": {
-                    "type": "string",
-                    "analyzer": "refseq_analyzer",
-                },
-                'protein': {
-                    "type": "string",
-                    "analyzer": "refseq_analyzer",
-                    #"index_name": "accession",
+            "accession": {
+                "dynamic": False,
+                #"path": "just_name",      #make both fields, accession.rna and rna, work
+                "properties": {
+                    "genomic": {
+                        "type": "string",
+                        "index": "no",
+                        "include_in_all": False,
+                        },
+                    "rna": {
+                        "type": "string",
+                        "analyzer": "refseq_analyzer",
+                        },
+                    'protein': {
+                        "type": "string",
+                        "analyzer": "refseq_analyzer",
+                        #"index_name": "accession",
+                        },
+                    'translation': {
+                        "type": "object",
+                        "index": "no",
+                        "include_in_all": False,
+                        },
+                    }
                 }
             }
-        }
-    }
     return mapping

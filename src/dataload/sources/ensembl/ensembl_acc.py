@@ -14,26 +14,31 @@ def load_genedoc(self=None):
 
 def get_mapping(self=None):
     mapping = {
-        "ensembl": {
-            "dynamic": False,
-            #"path": "just_name",
-            "properties": {
-                "transcript": {
-                    "type": "string",
-                    "analyzer": "string_lowercase",
-                    #"index_name": "ensembltranscript",
-                },
-                "gene": {
-                    "type": "string",
-                    "analyzer": "string_lowercase",
-                    #"index_name": "ensemblgene",
-                },
-                "protein": {
-                    "type": "string",
-                    "analyzer": "string_lowercase",
-                    #"index_name": "ensemblprotein",
+            "ensembl": {
+                "dynamic": False,
+                #"path": "just_name",
+                "properties": {
+                    "transcript": {
+                        "type": "string",
+                        "analyzer": "string_lowercase",
+                        #"index_name": "ensembltranscript",
+                        },
+                    "gene": {
+                        "type": "string",
+                        "analyzer": "string_lowercase",
+                        #"index_name": "ensemblgene",
+                        },
+                    "protein": {
+                        "type": "string",
+                        "analyzer": "string_lowercase",
+                        #"index_name": "ensemblprotein",
+                        },
+                    'translation': {
+                        "type": "object",
+                        "index": "no",
+                        "include_in_all": False,
+                        },
+                    }
                 }
             }
-        }
-    }
     return mapping
