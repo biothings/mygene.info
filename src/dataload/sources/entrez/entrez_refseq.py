@@ -21,7 +21,7 @@ def get_mapping(self):
                 "properties": {
                     "genomic": {
                         "type": "string",
-                        "index": "no",
+			"index": "no",
                         "include_in_all": False,
                         },
                     "rna": {
@@ -36,7 +36,7 @@ def get_mapping(self):
                         },
                     'translation': {
                         "type": "object",
-                        "index": "no",
+                        "enabled": False,
                         "include_in_all": False,
                         },
                     }

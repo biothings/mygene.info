@@ -21,21 +21,18 @@ def get_mapping(self=None):
                     "transcript": {
                         "type": "string",
                         "analyzer": "string_lowercase",
-                        #"index_name": "ensembltranscript",
                         },
                     "gene": {
                         "type": "string",
                         "analyzer": "string_lowercase",
-                        #"index_name": "ensemblgene",
                         },
                     "protein": {
                         "type": "string",
                         "analyzer": "string_lowercase",
-                        #"index_name": "ensemblprotein",
                         },
                     'translation': {
                         "type": "object",
-                        "index": "no",
+                        "enabled": False,
                         "include_in_all": False,
                         },
                     }
