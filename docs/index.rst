@@ -47,26 +47,31 @@ Introduction
     <style>
     #twitter-widget-0 {
           width: 100% !important;
-          height: 180px !important;
+          height: 380px !important;
+          border: solid thin gray;
+          margin-top: 2em;
     }
     </style>
-    <a class="twitter-timeline" Width="100%" height="200px" data-chrome="noborders nofooter transparent noscrollbar" href="https://twitter.com/mygeneinfo" data-widget-id="372882575196299264">Tweets by @mygeneinfo</a>
+
+    <a class="twitter-timeline" Width="100%" height="400px" data-chrome="noborders nofooter transparent noscrollbar" href="https://twitter.com/mygeneinfo" data-widget-id="372882575196299264">Tweets by @mygeneinfo</a>
     <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 
 
 
-What's new in v2 API
+What's new in v3 API
 ------------------------
 
-* **ALL** species are supported now! That's more than 14,000 in total. [`more <doc/data.html#species>`_]
-* Gene annotation data are even more `up-to-date <doc/data.html#data-sources>`_ (weekly updates).
-* Gene query service supports `"fields" parameter <doc/query_service.html#fields>`_ to return any fields. Previously, you need to call gene query service separately if you need more than gene symbols and names.
-* Fine-tuned query algorithm to return relevant gene hits first.
-* Our query backend is more scalable and extensible. Ready to expand more annotation data as we go.
+* Refseq accession number now contains version
+* "ensembl", "refseq" and "accession" contains associations between RNA and protein
+* Better mapping between Ensembl and Entrez gene IDs
+* JSON structure slightly changed
+* and more bugfixes
 
-`Migration guide from v1 to v2 API <doc/migration_from_v1.html>`_
+You can read more details about this version on our `blog http://mygene.info/mygene-info-v3-is-out`_
 
-Still want to stick with v1 API for a while? It's still there: `v1 API <http://mygene.info/v1/doc>`_, but annotation data there won't be updated any more.
+`Migration guide from v2 to v3 API <doc/migration_from_v2.html>`_
+
+Still want to stick with v2 API for a while? It's still there: `v2 API <http://mygene.info/v2/doc>`_, but annotation data there won't be updated any more.
 
 .. include :: doc/quick_start.rst
 
@@ -77,8 +82,8 @@ Documentation
 .. toctree::
    :maxdepth: 3
 
-   Try it live on interactive API page <http://mygene.info/v2/api>
-   doc/migration_from_v1
+   Try it live on interactive API page <http://mygene.info/v3/api>
+   doc/migration_from_v2
    doc/data
    doc/query_service
    doc/annotation_service
@@ -100,7 +105,7 @@ See FAQ page here: http://mygene.info/faq/
 Related links
 -------------
 
-* `mygene.hub <https://bitbucket.org/sulab/mygene.hub>`_
+* `mygene.info on Github <https://github.com/SuLab/mygene.info>`_
 
 
 Contact us

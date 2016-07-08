@@ -1,30 +1,30 @@
 Gene annotation service
 ***********************************
 
-This page describes the reference for MyGene.info gene annotation web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/v2/api>`_.
+This page describes the reference for MyGene.info gene annotation web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/v3/api>`_.
 
 Service endpoint
 =================
 ::
 
-    http://mygene.info/v2/gene
+    http://mygene.info/v3/gene
 
 GET request
 ==================
 
 To obtain the gene annotation via our web service is as simple as calling this URL::
 
-    http://mygene.info/v2/gene/<geneid>
+    http://mygene.info/v3/gene/<geneid>
 
 **geneid** above can be either Entrez gene id ("1017") or Ensembl gene id ("ENSG00000123374").
 By default, this will return the complete gene annotation object in JSON format. See `here <#returned-object>`_ for an example and :ref:`here <gene_object>` for more details. If the input **geneid** is not valid, 404 (NOT FOUND) will be returned.
 
 .. hint::
-    A retired Entrez gene id works too if it is replaced by a new one, e.g., `245794 <http://mygene.info/v2/gene/245794>`_. But a "*discontinued*" gene id will not return any hit, e.g., `138 <http://www.ncbi.nlm.nih.gov/gene/138>`_.
+    A retired Entrez gene id works too if it is replaced by a new one, e.g., `245794 <http://mygene.info/v3/gene/245794>`_. But a "*discontinued*" gene id will not return any hit, e.g., `138 <http://www.ncbi.nlm.nih.gov/gene/138>`_.
 
 Optionally, you can pass a "**fields**" parameter to return only the annotation you want (by filtering returned object fields)::
 
-    http://mygene.info/v2/gene/1017?fields=name,symbol
+    http://mygene.info/v3/gene/1017?fields=name,symbol
 
 "**fields**" accepts any attributes (a.k.a fields) available from the gene object. Multiple attributes should be seperated by commas. If an attribute is not available for a specific gene object, it will be ignored. Note that the attribute names are case-sensitive.
 
@@ -61,7 +61,7 @@ Returned object
 
 A GET request like this::
 
-    http://mygene.info/v2/gene/1017
+    http://mygene.info/v3/gene/1017
 
 should return a gene object below:
 
@@ -80,7 +80,7 @@ annotation for multiple genes). Fortunately, you can also make batch queries via
 need::
 
 
-    URL: http://mygene.info/v2/gene
+    URL: http://mygene.info/v3/gene
     HTTP method:  POST
 
 
@@ -114,46 +114,49 @@ Example code
 Unlike GET requests, you can easily test them from browser, make a POST request is often done via a
 piece of code, still trivial of course. Here is a sample python snippet::
 
-    import httplib2
-    h = httplib2.Http()
+    import requests
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     params = 'ids=1017,695&fields=name,symbol,refseq.rna'
-    res, con = h.request('http://mygene.info/v2/gene', 'POST', params, headers=headers)
+    res = requests.post('http://mygene.info/v3/gene', data=params, headers=headers)
 
 Returned object
 ---------------
 
-Returned result (the value of "con" variable above) from above example code should look like this:
+Returned result (the value of "res.text" variable above) from above example code should look like this:
 
 .. code-block:: json
 
     [
       {
-        "_id":"1017",
-        "name":"cyclin-dependent kinase 2",
-        "query":"1017",
-        "refseq.rna":[
-          "NM_001798",
-          "NM_052827",
-          "XM_005268559"
-        ],
-        "symbol":"CDK2"
+        '_id': '1017',
+        '_score': 21.731894,
+        'name': 'cyclin dependent kinase 2',
+        'query': '1017',
+        'refseq': {
+          'rna': [
+            'NM_001290230.1',
+            'NM_001798.4',
+            'NM_052827.3',
+            'XM_011537732.1'
+          ]
+        },
+        'symbol': 'CDK2'
       },
       {
-        "_id":"695",
-        "name":"Bruton agammaglobulinemia tyrosine kinase",
-        "query":"695",
-        "refseq.rna":[
-          "NM_000061",
-          "NM_001287344",
-          "NM_001287345",
-          "XM_005262181",
-          "XM_005278108"
-        ],
-        "symbol":"BTK"
+        '_id': '695',
+        '_score': 21.730501,
+        'name': 'Bruton tyrosine kinase',
+        'query': '695',
+        'refseq': {
+          'rna': [
+            'NM_000061.2',
+            'NM_001287344.1',
+            'NM_001287345.1'
+          ]
+        },
+        'symbol': 'BTK'
       }
     ]
-
 
 
 

@@ -29,7 +29,7 @@ CPDB             whenever a new               For "pathway" field
 
 ============    =======================      =================================
 
-The most updated data information can be accessed `here <http://mygene.info/v2/metadata>`_.
+The most updated data information can be accessed `here <http://mygene.info/v3/metadata>`_.
 
 .. _gene_object:
 
@@ -53,7 +53,7 @@ Gene annotation data are both stored and returned as a gene object, which is ess
         }
     }
 
-The example above omits most of available fields. For a full example, you can just check out a few gene examples: `CDK2 <http://mygene.info/v2/gene/1017>`_, `ADA <http://mygene.info/v2/gene/100>`_. Or, did you try our `interactive API page <http://mygene.info/v2/api>`_ yet?
+The example above omits most of available fields. For a full example, you can just check out a few gene examples: `CDK2 <http://mygene.info/v3/gene/1017>`_, `ADA <http://mygene.info/v3/gene/100>`_. Or, did you try our `interactive API page <http://mygene.info/v3/api>`_ yet?
 
 .. _species:
 

@@ -7,7 +7,7 @@ Gene query service
              :alt: information!
 
 
-This page describes the reference for MyGene.info gene query web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/v2/api>`_.
+This page describes the reference for MyGene.info gene query web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/v3/api>`_.
 
 
 Service endpoint
@@ -15,7 +15,7 @@ Service endpoint
 
 ::
 
-    http://mygene.info/v2/query
+    http://mygene.info/v3/query
 
 GET request
 ==================
@@ -29,7 +29,7 @@ q
 
 fields
 """"""
-    Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v2/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
+    Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v3/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
     "symbol,name,taxid,entrezgene".
 
 species
@@ -128,43 +128,43 @@ Available fields
 ========================    =============================================    =================================================================================
 Field                        Description                                     Examples
 ========================    =============================================    =================================================================================
-**entrezgene**                Entrez gene id                                    `q=entrezgene:1017 <http://mygene.info/v2/query?q=entrezgene:1017>`_
-**ensemblgene**               Ensembl gene id                                   `q=ensemblgene:ENSG00000123374 <http://mygene.info/v2/query?q=ensemblgene:ENSG00000123374>`_
-**symbol**                    official gene symbol                              `q=symbol:cdk2 <http://mygene.info/v2/query?q=symbol:cdk2>`_
-**name**                      gene name                                         `q=name:cyclin-dependent <http://mygene.info/v2/query?q=name:cyclin-dependent>`_
-**alias**                     gene alias                                        `q=alias:p33 <http://mygene.info/v2/query?q=alias:p33>`_
-**summary**                   gene summary text                                 `q=summary:insulin <http://mygene.info/v2/query?q=summary:insulin>`_
-**refseq**                    NCBI RefSeq id  (both rna and proteins)           `q=refseq:NM_001798 <http://mygene.info/v2/query?q=refseq:NM_001798>`_ :raw-html:`<br />`
-                                                                                `q=refseq:NP_439892 <http://mygene.info/v2/query?q=refseq:NP_439892>`_
-**unigene**                   NCBI UniGene id                                   `q=unigene:Hs.19192 <http://mygene.info/v2/query?q=unigene:Hs.19192>`_
-**homologene**                NCBI HomoloGene id                                `q=homologene:74409 <http://mygene.info/v2/query?q=homologene:74409>`_
-**accession**                 NCBI GeneBank Accession number                    `q=accession:AA810989 <http://mygene.info/v2/query?q=accession:AA810989>`_
-**ensembltranscript**         Ensembl transcript id                             `q=ensembltranscript:ENST00000266970 <http://mygene.info/v2/query?q=ensembltranscript:ENST00000266970>`_
-**ensemblprotein**            Ensembl protein id                                `q=ensemblprotein:ENSP00000243067 <http://mygene.info/v2/query?q=ensemblprotein:ENSP00000243067>`_
-**uniprot**                   UniProt id                                        `q=uniprot:P24941 <http://mygene.info/v2/query?q=uniprot:P24941>`_
-**ipi** (deprecated!)         IPI id                                            `q=ipi:IPI00031681 <http://mygene.info/v2/query?q=ipi:IPI00031681>`_
-**pdb**                       PDB id                                            `q=pdb:1AQ1 <http://mygene.info/v2/query?q=pdb:1AQ1>`_
-**prosite**                   Prosite id                                        `q=prosite:PS50011 <http://mygene.info/v2/query?q=prosite:PS50011>`_
-**pfam**                      PFam id                                           `q=pfam:PF00069 <http://mygene.info/v2/query?q=pfam:PF00069>`_
-**interpro**                  InterPro id                                       `q=interpro:IPR008351 <http://mygene.info/v2/query?q=interpro:IPR008351>`_
-**mim**                       OMIM id                                           `q=mim:116953 <http://mygene.info/v2/query?q=MIM:116953>`_
-**pharmgkb**                  PharmGKB id                                       `q=pharmgkb:PA101 <http://mygene.info/v2/query?q=pharmgkb:PA101>`_
-**reporter**                  Affymetrix probeset id                            `q=reporter:204252_at <http://mygene.info/v2/query?q=reporter:204252_at>`_
-**reagent**                   GNF reagent id                                    `q=reagent:GNF282834 <http://mygene.info/v2/query?q=reagent:GNF282834>`_
-**go**                        Gene Ontology id                                  `q=go:0000307 <http://mygene.info/v2/query?q=go:0000307>`_
-**hgnc**                      HUGO Gene Nomenclature Committee                  `q=hgnc:1771 <http://mygene.info/v2/query?q=HGNC:1771>`_
-**hprd**                      Human Protein Reference Database                  `q=hprd:00310 <http://mygene.info/v2/query?q=HPRD:00310>`_
-**mgi**                       Mouse Genome Informatics                          `q=mgi:MGI\\\\:88339 <http://mygene.info/v2/query?q=mgi:MGI%5C%5C:88339>`_
-**rgb**                       Rat Genome Database                               `q=rgd:620620 <http://mygene.info/v2/query?q=RGD:620620>`_
-**flybase**                   A Database of Drosophila Genes & Genomes          `q=flybase:FBgn0004107&species=fruitfly <http://mygene.info/v2/query?q=FLYBASE:FBgn0004107&species=fruitfly>`_
-**wormbase**                  C elegans and related nematodes database          `q=wormbase:WBGene00057218&species=31234 <http://mygene.info/v2/query?q=wormbase:WBGene00057218&species=31234>`_
-**zfin**                      Zebrafish Information Network                     `q=zfin:ZDB-GENE-980526-104&species=zebrafish <http://mygene.info/v2/query?q=ZFIN:ZDB-GENE-980526-104&species=zebrafish>`_
-**tair**                      Arabidopsis Information Resource                  `q=tair:AT3G48750&species=thale-cress <http://mygene.info/v2/query?q=TAIR:AT3G48750&species=thale-cress>`_
-**xenbase**                 | Xenopus laevis and Xenopus tropicalis             `q=xenbase:XB-GENE-1001990&species=frog <http://mygene.info/v2/query?q=xenbase:XB-GENE-1001990&species=frog>`_
+**entrezgene**                Entrez gene id                                    `q=entrezgene:1017 <http://mygene.info/v3/query?q=entrezgene:1017>`_
+**ensemblgene**               Ensembl gene id                                   `q=ensemblgene:ENSG00000123374 <http://mygene.info/v3/query?q=ensemblgene:ENSG00000123374>`_
+**symbol**                    official gene symbol                              `q=symbol:cdk2 <http://mygene.info/v3/query?q=symbol:cdk2>`_
+**name**                      gene name                                         `q=name:cyclin-dependent <http://mygene.info/v3/query?q=name:cyclin-dependent>`_
+**alias**                     gene alias                                        `q=alias:p33 <http://mygene.info/v3/query?q=alias:p33>`_
+**summary**                   gene summary text                                 `q=summary:insulin <http://mygene.info/v3/query?q=summary:insulin>`_
+**refseq**                    NCBI RefSeq id  (both rna and proteins)           `q=refseq:NM_001798 <http://mygene.info/v3/query?q=refseq:NM_001798>`_ :raw-html:`<br />`
+                                                                                `q=refseq:NP_439892 <http://mygene.info/v3/query?q=refseq:NP_439892>`_
+**unigene**                   NCBI UniGene id                                   `q=unigene:Hs.19192 <http://mygene.info/v3/query?q=unigene:Hs.19192>`_
+**homologene**                NCBI HomoloGene id                                `q=homologene:74409 <http://mygene.info/v3/query?q=homologene:74409>`_
+**accession**                 NCBI GeneBank Accession number                    `q=accession:AA810989 <http://mygene.info/v3/query?q=accession:AA810989>`_
+**ensembltranscript**         Ensembl transcript id                             `q=ensembltranscript:ENST00000266970 <http://mygene.info/v3/query?q=ensembltranscript:ENST00000266970>`_
+**ensemblprotein**            Ensembl protein id                                `q=ensemblprotein:ENSP00000243067 <http://mygene.info/v3/query?q=ensemblprotein:ENSP00000243067>`_
+**uniprot**                   UniProt id                                        `q=uniprot:P24941 <http://mygene.info/v3/query?q=uniprot:P24941>`_
+**ipi** (deprecated!)         IPI id                                            `q=ipi:IPI00031681 <http://mygene.info/v3/query?q=ipi:IPI00031681>`_
+**pdb**                       PDB id                                            `q=pdb:1AQ1 <http://mygene.info/v3/query?q=pdb:1AQ1>`_
+**prosite**                   Prosite id                                        `q=prosite:PS50011 <http://mygene.info/v3/query?q=prosite:PS50011>`_
+**pfam**                      PFam id                                           `q=pfam:PF00069 <http://mygene.info/v3/query?q=pfam:PF00069>`_
+**interpro**                  InterPro id                                       `q=interpro:IPR008351 <http://mygene.info/v3/query?q=interpro:IPR008351>`_
+**mim**                       OMIM id                                           `q=mim:116953 <http://mygene.info/v3/query?q=MIM:116953>`_
+**pharmgkb**                  PharmGKB id                                       `q=pharmgkb:PA101 <http://mygene.info/v3/query?q=pharmgkb:PA101>`_
+**reporter**                  Affymetrix probeset id                            `q=reporter:204252_at <http://mygene.info/v3/query?q=reporter:204252_at>`_
+**reagent**                   GNF reagent id                                    `q=reagent:GNF282834 <http://mygene.info/v3/query?q=reagent:GNF282834>`_
+**go**                        Gene Ontology id                                  `q=go:0000307 <http://mygene.info/v3/query?q=go:0000307>`_
+**hgnc**                      HUGO Gene Nomenclature Committee                  `q=hgnc:1771 <http://mygene.info/v3/query?q=HGNC:1771>`_
+**hprd**                      Human Protein Reference Database                  `q=hprd:00310 <http://mygene.info/v3/query?q=HPRD:00310>`_
+**mgi**                       Mouse Genome Informatics                          `q=mgi:MGI\\\\:88339 <http://mygene.info/v3/query?q=mgi:MGI%5C%5C:88339>`_
+**rgb**                       Rat Genome Database                               `q=rgd:620620 <http://mygene.info/v3/query?q=RGD:620620>`_
+**flybase**                   A Database of Drosophila Genes & Genomes          `q=flybase:FBgn0004107&species=fruitfly <http://mygene.info/v3/query?q=FLYBASE:FBgn0004107&species=fruitfly>`_
+**wormbase**                  C elegans and related nematodes database          `q=wormbase:WBGene00057218&species=31234 <http://mygene.info/v3/query?q=wormbase:WBGene00057218&species=31234>`_
+**zfin**                      Zebrafish Information Network                     `q=zfin:ZDB-GENE-980526-104&species=zebrafish <http://mygene.info/v3/query?q=ZFIN:ZDB-GENE-980526-104&species=zebrafish>`_
+**tair**                      Arabidopsis Information Resource                  `q=tair:AT3G48750&species=thale-cress <http://mygene.info/v3/query?q=TAIR:AT3G48750&species=thale-cress>`_
+**xenbase**                 | Xenopus laevis and Xenopus tropicalis             `q=xenbase:XB-GENE-1001990&species=frog <http://mygene.info/v3/query?q=xenbase:XB-GENE-1001990&species=frog>`_
                             | biology and genomics resource
-**mirbase**                 | database of published miRNA                       `q=mirbase:MI0017267 <http://mygene.info/v2/query?q=mirbase:MI0017267>`_
+**mirbase**                 | database of published miRNA                       `q=mirbase:MI0017267 <http://mygene.info/v3/query?q=mirbase:MI0017267>`_
                             | sequences and annotation
-**retired**                 | Retired Entrez gene id, including                 `q=retired:84999 <http://mygene.info/v2/query?q=retired:84999>`_
+**retired**                 | Retired Entrez gene id, including                 `q=retired:84999 <http://mygene.info/v3/query?q=retired:84999>`_
                             | those with replaced gene ids.
 ========================    =============================================    =================================================================================
 
@@ -218,7 +218,7 @@ Returned object
 
 A GET request like this::
 
-    http://mygene.info/v2/query?q=symbol:cdk2
+    http://mygene.info/v3/query?q=symbol:cdk2
 
 should return hits as:
 
@@ -263,7 +263,7 @@ If you need to perform a faceted query, you can pass an optional "`facets <#face
 
 A GET request like this::
 
-    http://mygene.info/v2/query?q=cdk2&size=1&facets=taxid
+    http://mygene.info/v3/query?q=cdk2&size=1&facets=taxid
 
 should return hits as:
 
@@ -310,7 +310,7 @@ should return hits as:
 
 Another useful field to get facets on is "type_of_gene"::
 
-    http://mygene.info/v2/query?q=cdk2&size=1&facets=type_of_gene
+    http://mygene.info/v3/query?q=cdk2&size=1&facets=type_of_gene
 
 It should return hits as:
 
@@ -353,7 +353,7 @@ It should return hits as:
 
 If you need to, you can also pass multiple fields as comma-separated list::
 
-    http://mygene.info/v2/query?q=cdk2&size=1&facets=taxid,type_of_gene
+    http://mygene.info/v3/query?q=cdk2&size=1&facets=taxid,type_of_gene
 
 
 Particularly relevant to species facets (i.e., "facets=taxid"), you can pass a
@@ -361,12 +361,12 @@ Particularly relevant to species facets (i.e., "facets=taxid"), you can pass a
 
 You can see the different "hits" are returned in the following queries, while "facets" keeps the same::
 
-    http://localhost:9000/v2/query?q=cdk?&size=1&facets=taxid&species_facet_filter=human
+    http://mygene.info/v3/query?q=cdk?&size=1&facets=taxid&species_facet_filter=human
 
 v.s.
 ::
 
-    http://localhost:9000/v2/query?q=cdk?&size=1&facets=taxid&species_facet_filter=mouse
+    http://mygene.info/v3/query?q=cdk?&size=1&facets=taxid&species_facet_filter=mouse
 
 
 
@@ -381,7 +381,7 @@ annotation for multiple genes). Fortunately, you can also make batch queries via
 need::
 
 
-    URL: http://mygene.info/v2/query
+    URL: http://mygene.info/v3/query
     HTTP method:  POST
 
 
@@ -405,7 +405,7 @@ species
 
 fields
 """"""
-    Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v2/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
+    Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v3/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
     "symbol,name,taxid,entrezgene".
 
 dotfield
@@ -422,46 +422,48 @@ Example code
 Unlike GET requests, you can easily test them from browser, make a POST request is often done via a
 piece of code. Here is a sample python snippet::
 
-    import httplib2
-    h = httplib2.Http()
+    import requests
     headers = {'content-type': 'application/x-www-form-urlencoded'}
-    params = 'q=1017,1018&scopes=entrezgene'
-    res, con = h.request('http://mygene.info/v2/query', 'POST', params, headers=headers)
+    params = 'q=1017,1018&scopes=entrezgene&fields=name,symbol,taxid,entrezgene'
+    res = requests.post('http://mygene.info/v3/query', data=params, headers=headers)
 
 
 Returned object
 ---------------
 
-Returned result (the value of "con" variable above) from above example code should look like this:
+Returned result (the value of "res.text" variable above) from above example code should look like this:
 
 .. code-block:: json
 
     [
       {
-        "name": "cyclin-dependent kinase 2",
-        "symbol": "CDK2",
-        "taxid": 9606,
-        "entrezgene": 1017,
-        "query": "1017",
-        "_id": "1017"
+        '_id': '1017',
+        '_score': 22.757837,
+        'entrezgene': 1017,
+        'name': 'cyclin dependent kinase 2',
+        'query': '1017',
+        'symbol': 'CDK2',
+        'taxid': 9606
       },
       {
-        "name": "cyclin-dependent kinase 3",
-        "symbol": "CDK3",
-        "taxid": 9606,
-        "entrezgene": 1018,
-        "query": "1018",
-        "_id": "1018"
+        '_id': '1018',
+        '_score': 22.757782,
+        'entrezgene': 1018,
+        'name': 'cyclin dependent kinase 3',
+        'query': '1018',
+        'symbol': 'CDK3',
+        'taxid': 9606
       }
     ]
 
 
 .. Tip:: "query" field in returned object indicates the matching query term.
+.. Note:: if no "fields" parameter is specified, all available fields will be returned
 
 If a query term has no match, it will return with "**notfound**" field as "**true**"::
 
-    params = 'q=1017,dummy&scopes=entrezgene'
-    res, con = h.request('http://mygene.info/v2/query', 'POST', params, headers=headers)
+    params = 'q=1017,dummy&scopes=entrezgene&fields=name,symbol,taxid,entrezgene'
+    res = requests.post('http://mygene.info/v3/query', data=params, headers=headers)
 
 .. code-block:: json
     :emphasize-lines: 12
@@ -483,8 +485,8 @@ If a query term has no match, it will return with "**notfound**" field as "**tru
 
 If a query term has multiple matches, they will be included with the same "query" field::
 
-    params = 'q=tp53,1017&scopes=symbol,entrezgene'
-    res, con = h.request('http://mygene.info/v2/query', 'POST', params, headers=headers)
+    params = 'q=tp53,1017&scopes=symbol,entrezgene&fields=name,symbol,taxid,entrezgene'
+    res = requests.post('http://mygene.info/v3/query', data=params, headers=headers)
 
 
 .. code-block:: json
