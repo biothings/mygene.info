@@ -5,6 +5,13 @@ API v3:
       if dotfield=true is also passed, then the following structure will be used: ["refseq.rna"]
 - refseq version can now be queried: /query?q=NM_001798.4 and /query?q=NM_001798 will lead to the same result
 - "exons" dict structure changed: now "exons" is a list of exons records, with "transcript" key containing the refseqID
-  (refseqID was previously used as key)
+  (refseqID was previously used as key). Inner "exons" key has also been renamed to "position"
+- "ensembl", "refseq" and "accession", have a new inner key "translation" containing association between RNA
+  and its corresponding protein.
 - "reporter" source should be queried with "reporter:<some_string>" as some fields content in "reporter"
   are just integer and could be confused with gene ID
+- fixed some discrepancy where an Ensemble gene ID could be associated to multiple Entrez gene ID. In such cases,
+  matching symbol is used to find unique association.
+
+
+See: http://mygene.info/mygene-info-v3-is-out/ for more information about this release
