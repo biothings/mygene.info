@@ -24,7 +24,7 @@ from biothings.utils.common import ask, timesofar, safewfile
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
-from utils.common import setup_logfile
+from utils.common import setup_logfile, hipchat_msg
 from utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT, logger as logging
 
@@ -114,7 +114,9 @@ def main(no_confirm=True):
 if __name__ == '__main__':
     try:
         main()
+        hipchat_msg('"pharmgkb" downloader finished successfully',color='green')
     except Exception as e:
         import traceback
         logging.error("Error while downloading: %s" % traceback.format_exc())
+        hipchat_msg('"pharmgkb" downloader failed: %s' % e,color='red')
         sys.exit(255)
