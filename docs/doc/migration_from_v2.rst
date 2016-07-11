@@ -38,8 +38,7 @@ Accession number with version
 Data can be search with and without version. Version is available for "`genomic`",
 "`rna`" and "`protein`" accession number keys.
 
-.. note:: "*genomic*" field is stored but it not searchable
-
+.. note:: "*genomic*" field is stored but is not searchable
 
 
 
@@ -171,6 +170,9 @@ have this information in returned objects.
 
 "exons" data structure modification
 """"""""""""""""""""""""""""""""""""
+
+.. warning:: Backward-incompatible, data structure changed
+
 "**exons**" field has two major modifications. It now contains a list of dictionary instead
 of a dictionary indexed by the accession number. This accession number is found within
 the dictionary under the key "*transcript*". Finally, inner "*exons*" key has been
@@ -277,6 +279,9 @@ rename to "*position*".
 
 "dotfield" notation default changed
 """"""""""""""""""""""""""""""""""""
+
+.. warning:: May be backward-incompatible, default data structure changed (but can be restored with "*dotfield*" paramater setting)
+
 By default, "**dotfield**" notation is now disabled for gene annotation endpoint in v3 (/gene). It's enabled by default in v2.
 You will need to explicitely pass "**dotfield=1**" to your queries to have the same behavior as v2.
 
