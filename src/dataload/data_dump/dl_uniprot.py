@@ -24,10 +24,11 @@ from biothings.utils.common import ask, timesofar, safewfile
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
-from utils.common import LogPrint
+from utils.common import setup_logfile
 from utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT
 
+import logging
 
 timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot', timestamp)
@@ -45,18 +46,18 @@ def download(no_confirm=False):
             if no_confirm or ask('Remove existing file "%s"?' % filename) == 'Y':
                 os.remove(filename)
             else:
-                print("Skipped!")
+                logging.info("Skipped!")
                 return
-        print('Downloading "%s"...' % filename)
+        logging.info('Downloading "%s"...' % filename)
         url = 'ftp://{}/{}'.format(FTP_SERVER, DATAFILE_PATH)
         cmdline = 'wget %s -O %s' % (url, filename)
         #cmdline = 'axel -a -n 5 %s' % url   #faster than wget using 5 connections
         return_code = os.system(cmdline)
         if return_code == 0:
-            print("Success.")
+            logging.info("Success.")
         else:
-            print("Failed with return code (%s)." % return_code)
-        print("=" * 50)
+            logging.info("Failed with return code (%s)." % return_code)
+        logging.info("=" * 50)
     finally:
         os.chdir(orig_path)
 
@@ -72,8 +73,7 @@ def check_lastmodified():
     return lastmodified
 
 
-if __name__ == '__main__':
-    no_confirm = True   # set it to True for running this script automatically without intervention.
+def main(no_confirm=True):
 
     src_dump = get_src_dump()
     lastmodified = check_lastmodified()
@@ -82,7 +82,7 @@ if __name__ == '__main__':
         path, filename = os.path.split(DATAFILE_PATH)
         data_file = os.path.join(doc['data_folder'], filename)
         if os.path.exists(data_file):
-            print("No newer file found. Abort now.")
+            logging.info("No newer file found. Abort now.")
             sys.exit(0)
 
     if not os.path.exists(DATA_FOLDER):
@@ -103,10 +103,7 @@ if __name__ == '__main__':
            'status': 'downloading'}
     src_dump.save(doc)
     t0 = time.time()
-    try:
-        download(no_confirm)
-    finally:
-        sys.stdout.close()
+    download(no_confirm)
     #mark the download finished successfully
     _updates = {
         'status': 'success',
@@ -114,3 +111,6 @@ if __name__ == '__main__':
         'pending_to_upload': True    # a flag to trigger data uploading
     }
     src_dump.update({'_id': 'uniprot'}, {'$set': _updates})
+
+if __name__ == '__main__':
+    main()
