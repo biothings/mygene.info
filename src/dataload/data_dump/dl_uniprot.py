@@ -26,9 +26,8 @@ src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[
 sys.path.append(src_path)
 from utils.common import setup_logfile
 from utils.mongo import get_src_dump
-from config import DATA_ARCHIVE_ROOT
+from config import DATA_ARCHIVE_ROOT, logger as logging
 
-import logging
 
 timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot', timestamp)
@@ -91,8 +90,8 @@ def main(no_confirm=True):
         if not (no_confirm or len(os.listdir(DATA_FOLDER)) == 0 or ask('DATA_FOLDER (%s) is not empty. Continue?' % DATA_FOLDER) == 'Y'):
             sys.exit(0)
 
-    log_f, logfile = safewfile(os.path.join(DATA_FOLDER, 'uniprot_dump.log'), prompt=(not no_confirm), default='O')
-    sys.stdout = LogPrint(log_f, timestamp=True)
+    logfile = os.path.join(DATA_FOLDER, 'uniprot_dump.log')
+    setup_logfile(logfile)
 
     #mark the download starts
     doc = {'_id': 'uniprot',

@@ -26,9 +26,8 @@ src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[
 sys.path.append(src_path)
 from utils.common import setup_logfile
 from utils.mongo import get_src_dump
-from config import DATA_ARCHIVE_ROOT
+from config import DATA_ARCHIVE_ROOT, logger as logging
 
-import logging
 
 
 timestamp = time.strftime('%Y%m%d')

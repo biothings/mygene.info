@@ -32,10 +32,7 @@ sys.path.append(src_path)
 from utils.mongo import get_src_dump
 from utils.dataload import tab2list
 from utils.common import setup_logfile
-from config import DATA_ARCHIVE_ROOT
-
-import logging
-
+from config import DATA_ARCHIVE_ROOT, logger as logging
 
 
 ENSEMBL_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ensembl')
