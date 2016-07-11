@@ -38,7 +38,7 @@ Accession number with version
 Data can be search with and without version. Version is available for "`genomic`",
 "`rna`" and "`protein`" accession number keys.
 
-.. note:: "*genomic*" field is stored but is not searchable
+.. note:: "*genomic*" field is returned but is not searchable
 
 
 
