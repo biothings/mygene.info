@@ -2,7 +2,7 @@ import os.path
 import time
 
 from biothings.utils.common import get_timestamp, timesofar
-from utils.dataload import (load_start, load_done, tabfile_feeder,
+from biothings.utils.dataload import (load_start, load_done, tabfile_feeder,
                             list2dict, value_convert, dict_convert)
 from dataload import get_data_folder
 
@@ -10,7 +10,7 @@ DATA_FOLDER = get_data_folder('cpdb')
 
 
 def _download(__metadata__):
-    from utils.dataload import download as _download
+    from biothings.utils.dataload import download as _download
 
     output_folder = os.path.join(os.path.split(DATA_FOLDER)[0], get_timestamp())
     for species in ['human', 'mouse', 'yeast']:

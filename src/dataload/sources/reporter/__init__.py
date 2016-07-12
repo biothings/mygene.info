@@ -1,4 +1,4 @@
-from utils.dataload import merge_dict, value_convert
+from biothings.utils.dataload import merge_dict, value_convert
 
 __metadata__ = {
     '__collection__': 'reporter',
@@ -12,7 +12,7 @@ for i, module in enumerate(reporter_modules):
     platform_li.extend(module.platform_li)
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     reporter_d = {}
     for module in reporter_modules:
         reporter_d.update(module.loaddata())

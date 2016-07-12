@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 import sys
 import os
 import os.path
@@ -23,15 +22,13 @@ from datetime import datetime
 from urllib.request import urlparse
 from ftplib import FTP, error_perm
 
-from biothings.utils.common import timesofar, safewfile
+import biothings, config
+biothings.config_for_app(config)
 
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
-from utils.common import setup_logfile, hipchat_msg
-from utils.mongo import get_src_dump
+from biothings.utils.common import timesofar, safewfile, setup_logfile
+from biothings.utils.hipchat import hipchat_msg
+from biothings.utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT, logger as logging
-
-
 
 timestamp = time.strftime('%Y%m%d')
 # DATA_FOLDER=os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ucsc', timestamp)
@@ -71,6 +68,9 @@ def get_file_list():
     # now add refFlat.txt.gz for mm9
     file_path = 'goldenPath/mm9/database/refFlat.txt.gz'
     fli.append(file_path)
+    # refLink now is ane single file
+    file_path = "goldenPath/hgFixed/database/refLink.txt.gz"
+    fli.append(file_path)
 
     fli = [(file_path, get_ftpfile_lastmodified(ftp, file_path)) for file_path in fli]
     fli = [x for x in fli if x[1]]    # remove item if lastmodified is None
@@ -91,7 +91,7 @@ def get_file_list_for_download():
         if not os.path.exists(local_file) or \
                 (time.mktime(lastmodified.timetuple()) > os.stat(local_file)[-2]):
             download_list.append(file_path)
-            download_list.append(file_path.replace('refFlat', 'refLink'))
+
     return download_list
 
 

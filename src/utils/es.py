@@ -25,7 +25,7 @@ from elasticsearch import Elasticsearch
 from .userfilters import UserFilters
 
 from elasticsearch import helpers
-from utils.mongo import doc_feeder
+from biothings.utils.mongo import doc_feeder
 
 
 import logging
@@ -507,7 +507,7 @@ class ESQueryBuilder(ESQueryBuilder):
             })
         if self.ensemblonly:
             filters.append({
-                "exists": {"field": "ensemblgene"}
+                "exists": {"field": "ensembl.gene"}
             })
 
         if self.userfilter:
@@ -648,7 +648,7 @@ class ESQueryBuilder(ESQueryBuilder):
             else:
                 _query = {
                     "match": {
-                        "ensemblgene": {
+                        "ensembl.gene": {
                             "query": u"{}".format(id),
                             "operator": "and"
                         }

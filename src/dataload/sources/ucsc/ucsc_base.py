@@ -1,18 +1,17 @@
 import os.path
 import time
 from biothings.utils.common import timesofar
-from utils.dataload import (load_start, load_done, tab2dict,
+from biothings.utils.dataload import (load_start, load_done, tab2dict,
                             tabfile_feeder, list2dict)
 
-from dataload import get_data_folder
+from biothings.utils.mongo import get_data_folder
 
 # DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot')
 DATA_FOLDER = os.path.join(get_data_folder('ucsc'), 'goldenPath/currentGenomes')
-
+REFLINK_FILE = os.path.join(get_data_folder('ucsc'), 'goldenPath/hgFixed/database/refLink.txt.gz')
 
 def load_exons_for_species(species, exons_key='exons'):
     refflat_file = os.path.join(DATA_FOLDER, species, 'database/refFlat.txt.gz')
-    reflink_file = os.path.join(DATA_FOLDER, species, 'database/refLink.txt.gz')
 
     load_start(refflat_file)
     t0 = time.time()
@@ -102,3 +101,4 @@ def load_ucsc_exons():
     load_done('[%d, %s]' % (len(gene2exons), timesofar(t0)))
 
     return gene2exons
+

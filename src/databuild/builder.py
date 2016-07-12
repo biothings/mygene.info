@@ -6,14 +6,17 @@ import copy
 from datetime import datetime
 from pprint import pformat
 
-from utils.mongo import (get_src_db, get_target_db, get_src_master,
+import biothings, config
+biothings.config_for_app(config)
+
+from biothings.utils.mongo import (get_src_db, get_target_db, get_src_master,
                          get_src_build, get_src_dump, doc_feeder)
-from biothings.utils.common import (timesofar, ask,
-                                    dump2gridfs, get_timestamp, get_random_string)
-from utils.common import safewfile, setup_logfile, loadobj
-from utils.dataload import list2dict, alwayslist
+from biothings.utils.common import (timesofar, ask, safewfile,
+                                    dump2gridfs, get_timestamp, get_random_string,
+                                    setup_logfile, loadobj)
+from biothings.utils.dataload import list2dict, alwayslist
 from utils.es import ESIndexer
-import databuild.backend
+import biothings.databuild.backend as btbackend
 from config import LOG_FOLDER, logger as logging
 
 '''
@@ -74,15 +77,15 @@ class DataBuilder():
         self.get_src_master()
 
         if backend == 'mongodb':
-            self.target = databuild.backend.GeneDocMongoDBBackend()
+            self.target = btbackend.GeneDocMongoDBBackend()
         elif backend == 'es':
-            self.target = databuild.backend.GeneDocESBackend(ESIndexer())
+            self.target = btbackend.GeneDocESBackend(ESIndexer())
         elif backend == 'couchdb':
             from config import COUCHDB_URL
             import couchdb
-            self.target = databuild.backend.GeneDocCouchDBBackend(couchdb.Server(COUCHDB_URL))
+            self.target = btbackend.GeneDocCouchDBBackend(couchdb.Server(COUCHDB_URL))
         elif backend == 'memory':
-            self.target = databuild.backend.GeneDocMemeoryBackend()
+            self.target = btbackend.GeneDocMemeoryBackend()
         else:
             raise ValueError('Invalid backend "%s".' % backend)
 
@@ -475,7 +478,7 @@ class DataBuilder():
                 self._load_entrez_geneid_d()
             #geneid_set = set([x['_id'] for x in target_collection.find(projection=[], manipulate=False)])
             geneid_set = set(self.target.get_id_list())
-            logging.info('\t', len(geneid_set))
+            logging.info('\t%s' % len(geneid_set))
 
         if not src_collection_list:
             src_collection_list = self._build_config['sources']
@@ -721,7 +724,7 @@ class DataBuilder():
 
         if n > 0:
             for src in self._build_config['sources']:
-                logging.info("\nSrc:", src)
+                logging.info("\nSrc: %s" % src)
                 # if 'id_type' in self.src_master[src] and self.src_master[src]['id_type'] != 'entrez_gene':
                 #     print "skipped."
                 #     continue
@@ -738,7 +741,7 @@ class DataBuilder():
                         if _first_exception:
                             logging.info()
                             _first_exception = False
-                        logging.info(_id, 'not found.')
+                        logging.info("%s not found." % _id)
                         continue
                     for k in doc:
                         if src == 'entrez_homologene' and k == 'taxid':
@@ -791,8 +794,8 @@ class DataBuilder():
         target_collection = "genedoc_{}_current".format(build_config)
         _db = get_target_db()
         target_collection = _db[target_collection]
-        logging.info()
-        logging.info('Source: ', target_collection.name)
+        logging.info("")
+        logging.info('Source: %s' % target_collection.name)
         _mapping = self.get_mapping()
         _meta = {}
         src_version = self.get_src_version()
@@ -837,7 +840,7 @@ class DataBuilder():
         es_idxer.ES_INDEX_NAME = sync_src.target_collection.name
         es_idxer.step = 10000
         es_idxer.use_parallel = use_parallel
-        sync_target = databuild.backend.GeneDocESBackend(es_idxer)
+        sync_target = btbackend.GeneDocESBackend(es_idxer)
 
         changes = diff.diff_collections(sync_src, sync_target)
         return changes
@@ -863,7 +866,7 @@ def main():
     bdr.using_ipython_cluster = use_parallel
     bdr.merge(sources=sources,target=target)
 
-    logging.info("Finished.", timesofar(t0))
+    logging.info("Finished. %s" % timesofar(t0))
 
 
 if __name__ == '__main__':

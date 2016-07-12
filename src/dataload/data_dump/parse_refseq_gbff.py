@@ -19,8 +19,7 @@ import glob
 import time
 from Bio import SeqIO
 
-from utils.common import SubStr
-from utils.dataload import anyfile
+from biothings.utils.common import SubStr, anyfile
 from config import DATA_ARCHIVE_ROOT
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]

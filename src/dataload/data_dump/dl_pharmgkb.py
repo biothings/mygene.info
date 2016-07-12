@@ -12,26 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 import sys
 import os
 import os.path
 import time
 from datetime import datetime
-
 import requests
-from biothings.utils.common import ask, timesofar, safewfile
 
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
-from utils.common import setup_logfile, hipchat_msg
-from utils.mongo import get_src_dump
+import biothings, config
+biothings.config_for_app(config)
+
+from biothings.utils.common import ask, timesofar, safewfile, setup_logfile
+from biothings.utils.hipchat import hipchat_msg
+from biothings.utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT, logger as logging
 
 
-
-timestamp = time.strftime('%Y%m%d')
-DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/pharmgkb', timestamp)
+TIMESTAMP = time.strftime('%Y%m%d')
+if ARCHIVE_DATA:
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/pharmgkb', TIMESTAMP)
+else:
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/pharmgkb/latest')
 
 #GENES_URL = 'http://www.pharmgkb.org/commonFileDownload.action?filename=genes.zip'
 GENES_URL = 'http://www.pharmgkb.org/download.do?objId=genes.zip&dlCls=common'
@@ -84,6 +85,9 @@ def main(no_confirm=True):
             logging.info("No newer file found. Abort now.")
             sys.exit(0)
 
+    if not ARCHIVE_DATA:
+        rmdashfr(DATA_FOLDER)
+
     if not os.path.exists(DATA_FOLDER):
         os.makedirs(DATA_FOLDER)
     else:
@@ -95,7 +99,7 @@ def main(no_confirm=True):
 
     #mark the download starts
     doc = {'_id': 'pharmgkb',
-           'timestamp': timestamp,
+           'timestamp': TIMESTAMP,
            'data_folder': DATA_FOLDER,
            'lastmodified': lastmodified,
            'logfile': logfile,

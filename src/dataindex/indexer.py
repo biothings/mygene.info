@@ -3,7 +3,7 @@ from optparse import OptionParser
 
 from databuild.builder import DataBuilder, timesofar
 # from utils.es import es_clean_indices
-from utils.common import ask
+from biothings.utils.common import ask
 from .tunnel import open_tunnel, es_local_tunnel_port
 from config import ES_HOST
 
@@ -12,7 +12,7 @@ def validate(build_config=None):
     from pprint import pprint
     from utils.diff import diff_collections
     from databuild.backend import GeneDocMongoDBBackend, GeneDocESBackend
-    from utils.mongo import get_src_build, get_target_db
+    from biothings.utils.mongo import get_src_build, get_target_db
     from utils.es import ESIndexer
 
     src_build = get_src_build()

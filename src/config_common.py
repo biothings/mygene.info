@@ -94,6 +94,21 @@ SOURCE_TRANSLATORS = {
     "ensemblgene:":         "ensembl.gene:",
     "ensembltranscript:":   "ensembl.transcript:",
     "ensemblprotein:":      "ensembl.protein:",
+
+    # some specific datasources needs to be case-insentive
+    "hgnc:":        r"HGNC:",
+    "hprd:":        r"HPRD:",
+    "mim:":        r"MIM:",
+    "mgi:":        r"MGI:",
+    "ratmap:":      r"RATMAP:",
+    "rgd:":      r"RGD:",
+    "flybase:":      r"FLYBASE:",
+    "wormbase:":    r"WormBase:",
+    "tair:":      r"TAIR:",
+    "zfin:":      r"ZFIN:",
+    "xenbase:":      r"Xenbase:",
+    "mirbase:":     r"miRBase:",
+
 }
 
 
@@ -104,6 +119,10 @@ SOURCE_TRANSLATORS = {
 DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
 DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
 DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
-DATA_SRC_DATABASE = 'genedoc_src'
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
+
+# time in seconds for dispatcher to check new jobs
+DISPATCHER_SLEEP_TIME = 1
+
+SOURCE_UPLOADER_CLASS = "dataload.MyGeneSourceUploader"

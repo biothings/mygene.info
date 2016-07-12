@@ -1,6 +1,6 @@
 var theseFields = [];
 var serverAddress = 'mygene.info';
-var apiVersion = 'v2';
+var apiVersion = 'v3';
 
 function split( val ) {
     return val.split( /,\s*/ );

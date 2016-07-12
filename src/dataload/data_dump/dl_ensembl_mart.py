@@ -18,20 +18,19 @@ Usage:
      python dl_ensembl.py check      # Check the lastest Ensembl/BioMart version
      python dl_ensembl.py <ensembl_ver>   # perform the actual download
 '''
-from __future__ import print_function
 import sys
 import os
 import time
 from ftplib import FTP
-
 import requests
-from biothings.utils.common import ask, timesofar, safewfile
 
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
-from utils.mongo import get_src_dump
-from utils.dataload import tab2list
-from utils.common import setup_logfile, hipchat_msg
+import biothings, config
+biothings.config_for_app(config)
+
+from biothings.utils.common import ask, timesofar, safewfile, setup_logfile
+from biothings.utils.hipchat import hipchat_msg
+from biothings.utils.mongo import get_src_dump
+from biothings.utils.dataload import tab2list
 from config import DATA_ARCHIVE_ROOT, logger as logging
 
 

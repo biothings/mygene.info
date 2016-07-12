@@ -5,7 +5,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self):
+def load_data(self):
     parser = Gene2RetiredParser()
     parser.set_all_species()
     gene2retired = parser.load()

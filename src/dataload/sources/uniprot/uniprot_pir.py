@@ -5,7 +5,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     return load_pir()
 
 

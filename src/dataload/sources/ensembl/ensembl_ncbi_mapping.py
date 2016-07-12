@@ -2,9 +2,9 @@ from __future__ import print_function
 import os.path
 from collections import defaultdict
 
-from dataload import get_data_folder
-from utils.dataload import anyfile, tabfile_feeder
-from utils.common import safewfile
+from biothings.utils.mongo import get_data_folder
+from biothings.utils.dataload import tabfile_feeder
+from biothings.utils.common import safewfile, anyfile
 
 
 ENSEMBL_DATA_FOLDER = get_data_folder('ensembl')

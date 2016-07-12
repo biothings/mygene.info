@@ -155,7 +155,7 @@ Field                        Description                                     Exa
 **hgnc**                      HUGO Gene Nomenclature Committee                  `q=hgnc:1771 <http://mygene.info/v3/query?q=HGNC:1771>`_
 **hprd**                      Human Protein Reference Database                  `q=hprd:00310 <http://mygene.info/v3/query?q=HPRD:00310>`_
 **mgi**                       Mouse Genome Informatics                          `q=mgi:MGI\\\\:88339 <http://mygene.info/v3/query?q=mgi:MGI%5C%5C:88339>`_
-**rgb**                       Rat Genome Database                               `q=rgd:620620 <http://mygene.info/v3/query?q=RGD:620620>`_
+**rgd**                       Rat Genome Database                               `q=rgd:620620 <http://mygene.info/v3/query?q=RGD:620620>`_
 **flybase**                   A Database of Drosophila Genes & Genomes          `q=flybase:FBgn0004107&species=fruitfly <http://mygene.info/v3/query?q=FLYBASE:FBgn0004107&species=fruitfly>`_
 **wormbase**                  C elegans and related nematodes database          `q=wormbase:WBGene00057218&species=31234 <http://mygene.info/v3/query?q=wormbase:WBGene00057218&species=31234>`_
 **zfin**                      Zebrafish Information Network                     `q=zfin:ZDB-GENE-980526-104&species=zebrafish <http://mygene.info/v3/query?q=ZFIN:ZDB-GENE-980526-104&species=zebrafish>`_

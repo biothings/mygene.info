@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import print_function
 import sys
 import os
 import os.path
@@ -20,17 +19,22 @@ import time
 import re
 from ftplib import FTP, error_temp
 
-from biothings.utils.common import ask, timesofar, safewfile
+import biothings, config
+biothings.config_for_app(config)
 
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
-from utils.mongo import get_src_dump
-from utils.common import setup_logfile, hipchat_msg
+from biothings.utils.common import ask, timesofar, safewfile, setup_logfile
+from biothings.utils.hipchat import hipchat_msg
+from biothings.utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT, ASCP_ROOT, logger as logging
+import glob
+from parse_refseq_gbff import main as parse_refseq_gbff
 
+TIMESTAMP = time.strftime('%Y%m%d')
+if ARCHIVE_DATA:
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez', TIMESTAMP)
+else:
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez/latest')
 
-timestamp = time.strftime('%Y%m%d')
-DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez', timestamp)
 
 FILE_LIST = {
     'gene': {
@@ -161,12 +165,10 @@ def download(path, no_confirm=False):
 
 
 def parse_gbff(path):
-    import glob
-    from parse_refseq_gbff import main
     refseq_folder = os.path.join(path, 'refseq')
     gbff_files = glob.glob(os.path.join(refseq_folder, '*.rna.gbff.gz'))
-    assert len(gbff_files) >= 15, 'Missing "*.gbff.gz" files? Found %d:\n%s' % (len(gbff_files), '\n'.join(gbff_files))
-    main(refseq_folder)
+    assert len(gbff_files) >= 15, 'Missing "*.gbff.gz" files? Found %d in %s:\n%s' % (len(gbff_files), refseq_folder, '\n'.join(gbff_files))
+    parse_refseq_gbff(refseq_folder)
 
 
 def redo_parse_gbff(path):
@@ -203,6 +205,9 @@ def redo_parse_gbff(path):
 def main():
     no_confirm = True   # set it to True for running this script automatically without intervention.
 
+    if not ARCHIVE_DATA:
+        rmdashfr(DATA_FOLDER)
+
     if not os.path.exists(DATA_FOLDER):
         os.makedirs(DATA_FOLDER)
     else:
@@ -215,7 +220,7 @@ def main():
     #mark the download starts
     src_dump = get_src_dump()
     doc = {'_id': 'entrez',
-           'timestamp': timestamp,
+           'timestamp': TIMESTAMP,
            'data_folder': DATA_FOLDER,
            'logfile': logfile,
            'status': 'downloading'}
