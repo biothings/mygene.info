@@ -145,15 +145,11 @@ class MyGeneTest(BiothingTestHelperMixin):
         # /query via post
         #self.json_ok(self.post_ok(self.api + '/query', {'q': '1017'}))
 
-        #res = self.json_ok(self.post_ok(self.api + '/query',
-        #                                {'q': '1017', 'scopes': 'entrezgene'}))
-        #eq_(len(res), 1)
-        #eq_(set(res[0].keys()),set(['pathway', 'generif', 'exons_hg19', 'go', 'pfam', 'HGNC', 'symbol', 'uniprot',
-        #    'refseq', 'MIM', 'genomic_pos_hg19', 'pharmgkb', 'unigene', 'query', 'summary', 'reagent', 'interpro',
-        #    'entrezgene', 'taxid', 'map_location', 'Vega', 'ensembl', 'accession', 'pir', 'exons', 'ec', '_score',
-        #    'genomic_pos', 'type_of_gene', 'pdb', 'name', 'wikipedia', 'HPRD', 'alias', 'reporter', 'homologene', '_id',
-        #    'ipi', 'prosite']))
-        #eq_(res[0]['_id'], '1017')
+        res = self.json_ok(self.post_ok(self.api + '/query',
+                                        {'q': '1017', 'scopes': 'entrezgene'}))
+        eq_(len(res), 1)
+        eq_(set(res[0].keys()),set(['query', 'taxid', '_score', 'entrezgene', 'symbol', '_id', 'name']))
+        eq_(res[0]['_id'], '1017')
 
         res = self.json_ok(self.post_ok(self.api + '/query',
                                         {'q': '211803_at,1018',
@@ -162,23 +158,23 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res[0]['_id'], '1017')
         eq_(res[1]['_id'], '1018')
 
-        #res = self.json_ok(self.post_ok(self.api + '/query',
-        #                                {'q': 'CDK2',
-        #                                 'species': 'human,10090,frog,pig',
-        #                                 'scopes': 'symbol',
-        #                                 'fields': 'name,symbol'}))
-        #assert len(res) >= 4, (res, len(res))
-        #res = self.json_ok(self.post_ok(self.api + '/query', {}),
-        #                   checkerror=False)
-        #assert 'error' in res, res
+        res = self.json_ok(self.post_ok(self.api + '/query',
+                                        {'q': 'CDK2',
+                                         'species': 'human,10090,frog,pig',
+                                         'scopes': 'symbol',
+                                         'fields': 'name,symbol'}))
+        assert len(res) >= 4, (res, len(res))
+        res = self.json_ok(self.post_ok(self.api + '/query', {}),
+                           checkerror=False)
+        assert 'error' in res, res
 
-        #res = self.json_ok(self.post_ok(self.api + '/query',
-        #                                {'q': '[1017, "1018"]',
-        #                                 'scopes': 'entrezgene',
-        #                                 'jsoninput': 'true'}))
-        #eq_(len(res), 2)
-        #eq_(res[0]['_id'], '1017')
-        #eq_(res[1]['_id'], '1018')
+        res = self.json_ok(self.post_ok(self.api + '/query',
+                                        {'q': '[1017, "1018"]',
+                                         'scopes': 'entrezgene',
+                                         'jsoninput': 'true'}))
+        eq_(len(res), 2)
+        eq_(res[0]['_id'], '1017')
+        eq_(res[1]['_id'], '1018')
 
     def test_query_interval(self):
         res = self.json_ok(self.get_ok(self.api +
