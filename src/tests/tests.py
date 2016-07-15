@@ -686,6 +686,11 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(hit["ensembl"]["gene"], "ENSG00000100373")
         assert "ENSP00000216211" in hit["ensembl"]["protein"]
         assert "ENST00000216211" in hit["ensembl"]["transcript"]
+        # POST /gene batch
+        resl = self.json_ok(self.post_ok(self.api + '/gene', {'ids': 'ENSG00000148795'}))
+        eq_(len(resl), 1)
+        res = resl[0]
+        eq_(res["_id"], "1586")
 
     def test_sort_by_fields(self):
         res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene"))

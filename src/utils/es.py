@@ -507,7 +507,7 @@ class ESQueryBuilder(ESQueryBuilder):
             })
         if self.ensemblonly:
             filters.append({
-                "exists": {"field": "ensemblgene"}
+                "exists": {"field": "ensembl.gene"}
             })
 
         if self.userfilter:
@@ -648,7 +648,7 @@ class ESQueryBuilder(ESQueryBuilder):
             else:
                 _query = {
                     "match": {
-                        "ensemblgene": {
+                        "ensembl.gene": {
                             "query": u"{}".format(id),
                             "operator": "and"
                         }
