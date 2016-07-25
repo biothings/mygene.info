@@ -94,7 +94,7 @@ class GeneDocSyncer:
                     t1 = time.time()
             logging.info("done. [{}]".format(timesofar(t00)))
         logging.info("\n")
-        logging.info("Finished.", timesofar(t0))
+        logging.info("Finished. %s" % timesofar(t0))
 
     def verify_changes(self, changes):
         _timestamp = changes['timestamp']
@@ -309,7 +309,7 @@ def main():
                 sc.apply_changes(changes)
                 sc.verify_changes(changes)
             logging.info('=' * 20)
-            logging.info("Finished.", timesofar(t0))
+            logging.info("Finished. %s" % timesofar(t0))
 
 
 if __name__ == '__main__':

@@ -791,7 +791,7 @@ class DataBuilder():
         target_collection = "genedoc_{}_current".format(build_config)
         _db = get_target_db()
         target_collection = _db[target_collection]
-        logging.info()
+        logging.info("")
         logging.info('Source: ', target_collection.name)
         _mapping = self.get_mapping()
         _meta = {}
