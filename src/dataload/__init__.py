@@ -42,6 +42,7 @@ __sources_dict__ = {
     'pharmgkb': ['pharmgkb'],
     'reporter': ['reporter'],
     'ucsc': ['ucsc.ucsc_exons'],
+    'exac': ['exac.broadinstitute_exac'],
     'cpdb': ['cpdb'],
     'reagent': ['reagent'],
 }
