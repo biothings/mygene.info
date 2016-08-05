@@ -248,7 +248,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                     'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                    'exons', 'HPRD']))
+                                    'exons', 'HPRD','exac']))
         eq_(res[0]['entrezgene'], 1017)
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
@@ -731,6 +731,20 @@ class MyGeneTest(BiothingTestHelperMixin):
         self.query_has_hits('Xenbase:XB-GENE-1001990&species=frog')
         self.query_has_hits(r'mgi:MGI\\:104772')
 
+    def test_exac(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970.4&fields=exac"),filter=True)
+        resnover = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970&fields=exac"),filter=True)
+        eq_(res["hits"], resnover["hits"])
+        eq_(len(res["hits"]), 1)
+        hit = res["hits"][0]
+        eq_(hit["exac"]["bp"], 897)
+        eq_(hit["exac"]["cds_end"], 56365409)
+        eq_(hit["exac"]["cds_start"], 56360792)
+        eq_(hit["exac"]["n_exons"], 7)
+        eq_(hit["exac"]["transcript"], "ENST00000266970.4")
+        eq_(hit["exac"]["all"]["mu_syn"], 0.00000345583178284)
+        eq_(hit["exac"]["nonpsych"]["syn_z"], 0.0369369403215127)
+        eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
 
 
 # Self contained test class, used for CI tools such as Travis
