@@ -724,6 +724,12 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(type(res),dict)
         eq_(res["entrezgene"],645520)
 
+    def test_caseinsentive_datasources(self):
+        self.query_has_hits('mirbase:MI0017267')
+        self.query_has_hits('wormbase:WBGene00057218&species=31234')
+        self.query_has_hits('xenbase:XB-GENE-1001990&species=frog')
+        self.query_has_hits('Xenbase:XB-GENE-1001990&species=frog')
+        self.query_has_hits(r'mgi:MGI\\:104772')
 
 
 

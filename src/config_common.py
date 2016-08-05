@@ -94,6 +94,21 @@ SOURCE_TRANSLATORS = {
     "ensemblgene:":         "ensembl.gene:",
     "ensembltranscript:":   "ensembl.transcript:",
     "ensemblprotein:":      "ensembl.protein:",
+
+    # some specific datasources needs to be case-insentive
+    "hgnc:":        r"HGNC:",
+    "hprd:":        r"HPRD:",
+    "mim:":        r"MIM:",
+    "mgi:":        r"MGI:",
+    "ratmap:":      r"RATMAP:",
+    "rgd:":      r"RGD:",
+    "flybase:":      r"FLYBASE:",
+    "wormbase:":    r"WormBase:",
+    "tair:":      r"TAIR:",
+    "zfin:":      r"ZFIN:",
+    "xenbase:":      r"Xenbase:",
+    "mirbase:":     r"miRBase:",
+
 }
 
 
