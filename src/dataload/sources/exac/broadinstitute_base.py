@@ -37,9 +37,9 @@ def load_broadinstitute_exac_any(one_file,key):
                         "syn_z" : float(tupleexac[13]),
                         "mis_z" : float(tupleexac[14]),
                         "lof_z" : float(tupleexac[15]),
-                        "pLI" : float(tupleexac[16]),
-                        "pRec" : float(tupleexac[17]),
-                        "pNull" : float(tupleexac[18])
+                        "p_li" : float(tupleexac[16]),
+                        "p_rec" : float(tupleexac[17]),
+                        "p_null" : float(tupleexac[18])
                         }
                     }
                 }
