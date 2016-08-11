@@ -297,10 +297,10 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "homologene" in fields
         assert "reporter.snowball" in fields
         # debug info
-        debug = self.json_ok(self.get_ok(self.api + '/metadata?debug=1'))
+        debug = self.json_ok(self.get_ok(self.api + '/metadata?dev=1'))
         print(debug.keys())
         assert "software" in debug.keys()
-        nodebug = self.json_ok(self.get_ok(self.api + '/metadata?debug=0'))
+        nodebug = self.json_ok(self.get_ok(self.api + '/metadata?dev=0'))
         assert not "software" in nodebug.keys()
 
     def test_query_facets(self):
