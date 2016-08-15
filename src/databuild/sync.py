@@ -166,7 +166,7 @@ class GeneDocSyncer:
         with file_handler(outfile, 'w') as out_f:
             for doc in doc_feeder(self._target_col, step=100000, fields=['_timestamp']):
                 out_f.write('{}\t{}\n'.format(doc['_id'], doc['_timestamp'].strftime('%Y%m%d')))
-        logging.info("Done.", timesofar(t0))
+        logging.info("Done. %s" % timesofar(t0))
         return outfile
 
     def get_timestamp_stats(self, returnresult=False, verbose=True):
@@ -188,12 +188,14 @@ class GeneDocSyncer:
 
     def get_target_latest_timestamp(self):
         cur = self._target_col.find(projection=['_timestamp']).sort([('_timestamp', -1)]).limit(1)
+        # epoch to bootstrap if no previous
+        default_ts = datetime(1970, 1, 1, 0, 0, 0)
         try:
             doc = next(cur)
         except StopIteration:
-            doc = {'_timestamp': datetime(1970, 1, 1, 0, 0, 0)}  # epoch to bootstrap if no previous
+            doc = {'_timestamp': default_ts}
         cur.close()
-        latest_ts = doc['_timestamp']
+        latest_ts = doc.get('_timestamp',default_ts)
         return latest_ts
 
 
@@ -287,7 +289,7 @@ def main():
 
         for src in new_src_li:
             t0 = time.time()
-            logging.info("Current source collection:", src)
+            logging.info("Current source collection: %s" % src)
             ts = _get_timestamp(src, as_str=True)
             logging.info("Calculating changes... ")
             changes = sc.get_changes(src, use_parallel=use_parallel)
