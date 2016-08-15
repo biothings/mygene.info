@@ -483,7 +483,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         rfalse = self.json_ok(self.get_ok(self.api +
                               '/gene/1017?filter=symbol,go.MF&dotfield=false'))
         eq_(rdefault, rfalse)
-        assert "go.MF" in rtrue.keys()
+        assert "go.MF.term" in rtrue.keys()
         assert "go" in rdefault.keys()
         assert "MF" in rdefault["go"].keys()
 
@@ -529,7 +529,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                 'common_name', 'genbank_common_name',
                                 '_version', 'parent_taxid', 'scientific_name',
                                 'has_gene', 'children', 'rank',
-                                'uniprot_name']))
+                                'uniprot_name','other_names']))
 
     def test_query_dotstar_refseq(self):
         protein = self.json_ok(self.get_ok(self.api +
