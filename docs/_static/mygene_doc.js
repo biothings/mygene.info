@@ -1,7 +1,7 @@
 jQuery(document).ready(function() {
     if( jQuery(' .indexed-field-table ').length ) {
         jQuery.ajax({
-            url: "http://mygene.info/v2/metadata/fields",
+            url: "http://mygene.info/v3/metadata/fields",
             dataType: "JSONP",
             jsonpCallback: "callback",
             type: "GET",
