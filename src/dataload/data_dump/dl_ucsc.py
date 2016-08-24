@@ -71,6 +71,9 @@ def get_file_list():
     # now add refFlat.txt.gz for mm9
     file_path = 'goldenPath/mm9/database/refFlat.txt.gz'
     fli.append(file_path)
+    # refLink now is ane single file
+    file_path = "goldenPath/hgFixed/database/refLink.txt.gz"
+    fli.append(file_path)
 
     fli = [(file_path, get_ftpfile_lastmodified(ftp, file_path)) for file_path in fli]
     fli = [x for x in fli if x[1]]    # remove item if lastmodified is None
@@ -91,7 +94,7 @@ def get_file_list_for_download():
         if not os.path.exists(local_file) or \
                 (time.mktime(lastmodified.timetuple()) > os.stat(local_file)[-2]):
             download_list.append(file_path)
-            download_list.append(file_path.replace('refFlat', 'refLink'))
+
     return download_list
 
 
