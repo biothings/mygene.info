@@ -20,7 +20,7 @@ tornadoes>=1.4.1
 -e git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
 
 # biothings
-git+https://github.com/SuLab/biothings.api.git@fe8e985bd557dc623121611a5d6c67093a1e8b3a#egg=biothings
+git+https://github.com/SuLab/biothings.api.git@58e4856c1a65484b87f4fecb543fbbb3ee32df86#egg=biothings
 
 #for build sphinx docs
 Sphinx>=1.2.3
