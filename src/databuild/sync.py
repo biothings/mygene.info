@@ -5,6 +5,7 @@ import os.path
 import re
 from datetime import datetime
 import time
+import glob
 
 from utils.mongo import get_target_db, doc_feeder
 from .backend import GeneDocMongoDBBackend
@@ -13,6 +14,7 @@ from utils.common import (iter_n, setup_logfile,
                           dump, send_s3_file, safewfile)
 from biothings.utils.common import timesofar, ask, is_str
 from config import LOG_FOLDER, logger as logging
+from pymongo.errors import InvalidOperation
 
 
 class GeneDocSyncer:
@@ -153,7 +155,7 @@ class GeneDocSyncer:
         else:
             raise ValueError('must provide either "before" for "after" argument.')
 
-    def backup_timestamp(self, outfile=None, compress=True):
+    def backup_timestamp(self, outfile=None, compress=True, ):
         '''backup "_id" and "_timestamp" fields into a output file.'''
         ts = time.strftime('%Y%m%d')
         outfile = outfile or self._target_col.name + '_tsbk_' + ts + '.txt'
@@ -163,9 +165,10 @@ class GeneDocSyncer:
         logging.info('Backing up timestamps into "{}"...'.format(outfile))
         t0 = time.time()
         file_handler = bz2.BZ2File if compress else open
-        with file_handler(outfile, 'w') as out_f:
+        with file_handler(outfile, 'wb') as out_f:
             for doc in doc_feeder(self._target_col, step=100000, fields=['_timestamp']):
-                out_f.write('{}\t{}\n'.format(doc['_id'], doc['_timestamp'].strftime('%Y%m%d')))
+                data = '%s\t%s\n' % (doc['_id'], doc['_timestamp'].strftime('%Y%m%d'))
+                out_f.write(data.encode())
         logging.info("Done. %s" % timesofar(t0))
         return outfile
 
@@ -187,6 +190,7 @@ class GeneDocSyncer:
         return latest_ts
 
     def get_target_latest_timestamp(self):
+        logging.debug("Searching for latest timestamp in [%s.%s]" % (self._db.name,self._target_col.name))
         cur = self._target_col.find(projection=['_timestamp']).sort([('_timestamp', -1)]).limit(1)
         # epoch to bootstrap if no previous
         default_ts = datetime(1970, 1, 1, 0, 0, 0)
@@ -196,6 +200,10 @@ class GeneDocSyncer:
             doc = {'_timestamp': default_ts}
         cur.close()
         latest_ts = doc.get('_timestamp',default_ts)
+        if latest_ts == default_ts:
+            logging.info("No timestamp found, considering oldest (%s)" % default_ts)
+        else:
+            logging.info("Lastest timestamp found; %s" % latest_ts)
         return latest_ts
 
 
@@ -245,33 +253,19 @@ def diff_two(col_1, col_2, use_parallel=True):
     return diff_collections(b1, b2, use_parallel=use_parallel)
 
 
-def backup_timestamp_main():
-    for config in ['genedoc_mygene', 'genedoc_mygene_allspecies']:
+def backup_timestamp_main(configs=['genedoc_mygene', 'genedoc_mygene_allspecies']):
+    bckfiles = []
+    for config in configs:
         sc = GeneDocSyncer(config)
         bkfile = sc.backup_timestamp()
         bkfile_key = 'genedoc_timestamp_bk/' + bkfile
         logging.info('Saving to S3: "{}"... '.format(bkfile_key))
         send_s3_file(bkfile, bkfile_key)
         logging.info('Done.')
-        os.remove(bkfile)
+        bckfiles.append(bkfile)
+    return bckfiles
 
-
-def main():
-    if len(sys.argv) > 1 and sys.argv[1] == 'backup_timestamp':
-        backup_timestamp_main()
-        return
-
-    if len(sys.argv) > 1:
-        config = sys.argv[1]
-    else:
-        config = 'mygene_allspecies'
-        #config = 'mygene_allspecies'
-    if not config.startswith('genedoc_'):
-        config = 'genedoc_' + config
-    assert config in ['genedoc_mygene', 'genedoc_mygene_allspecies']
-    use_parallel = '-p' in sys.argv
-    no_confirm = '-b' in sys.argv
-
+def update_from_temp_collections(config,no_confirm=False,use_parallel=False):
     t0 = time.time()
     sc = GeneDocSyncer(config)
     new_src_li = sc.get_new_source_list()
@@ -312,6 +306,120 @@ def main():
                 sc.verify_changes(changes)
             logging.info('=' * 20)
             logging.info("Finished. %s" % timesofar(t0))
+
+def rename_from_temp_collection(config,from_index,no_confirm=False):
+    # check if index exist before chenging anything
+    sc = GeneDocSyncer(config)
+    if not from_index in sc._db.collection_names():
+        logging.error("Collection '%s' does not exist" % from_index)
+    from_col = sc._db.get_collection(from_index)
+    orig_name = sc._target_col.name
+    logging.info("Backing up timestamp from '%s'" % orig_name)
+    if no_confirm or ask('Continue?') == 'Y':
+        bckfile = backup_timestamp_main([config]).pop()
+    else:
+        bckfile = None
+    # rename existing current for backup purpose
+    bck_name = orig_name + "_bck_%s" % time.strftime('%Y%m%d%H%M%S')
+    logging.info("Renaming %s to %s" % (orig_name,bck_name))
+    if no_confirm or ask('Continue?') == 'Y':
+        sc._target_col.rename(bck_name)
+    logging.info("Renaming %s to %s" % (from_col.name,orig_name))
+    if no_confirm or ask('Continue?') == 'Y':
+        from_col.rename(orig_name)
+    if bckfile is None:
+        try:
+            pat = "%s_current_tsbk_*.txt.bz" % config
+            logging.info("Looking for '%s'" % pat)
+            bckfile = sorted(glob.glob(pat))[0]
+            if ask("Do you want me to apply timestamp from file '%s' to collection '%s' ?" % (bckfile,sc._target_col.name)) == 'Y':
+                pass
+            else:
+                return
+        except IndexError:
+            logging.error("Can't find any timstamp file to apply, giving up...")
+            return
+    prev_ts = {}
+    import bz2
+    logging.info("Loading timestamps from '%s'" % bckfile)
+    with bz2.BZ2File(bckfile, 'rb') as in_f:
+        for line in in_f.readlines():
+            _id,ts = line.decode().split("\t")
+            prev_ts[_id.strip()] = datetime.strptime(ts.strip(),"%Y%m%d")
+
+    logging.info("Now applying timestamp from file '%s' (if more recent than those on the collection)" % bckfile)
+    cur = sc._target_col.find()
+    default_ts = datetime.now()
+    results = {"restored" : 0, "updated" : 0, "unchanged" : 0, "defaulted" : 0} 
+    bulk_cnt = 0
+    bob = sc._target_col.initialize_unordered_bulk_op()
+    cnt = 0
+    t0 = time.time()
+    while True:
+        try:
+            doc = next(cur)
+
+            if "_timestamp" not in doc:
+                if prev_ts.get(doc["_id"]):
+                    ts = prev_ts[doc["_id"]]
+                    results["restored"] += 1
+                else:
+                    ts = default_ts
+                    results["defaulted"] += 1
+                doc["_timestamp"] = ts
+                bulk_cnt += 1
+                cnt += 1
+                bob.find({"_id" : doc["_id"]}).update_one({"$set" : doc})
+            elif prev_ts.get(doc["_id"]) and prev_ts[doc["_id"]] > doc["_timestamp"]:
+                doc["_timestamp"] = prev_ts[doc["_id"]]
+                results["updated"] += 1
+                bulk_cnt += 1
+                cnt += 1
+                bob.find({"_id" : doc["_id"]}).update_one({"$set" : doc})
+            else:
+                results["unchanged"] += 1
+                cnt += 1
+
+            if cnt % 1000 == 0:
+                logging.info("Processed %s documents (%s) [%s]" % (cnt,results,timesofar(t0)))
+                t0 = time.time()
+            if bulk_cnt == 1000:
+                bulk_cnt = 0
+                bob.execute()
+                bob = sc._target_col.initialize_unordered_bulk_op()
+
+        except StopIteration:
+            break
+            cur.close()
+    try:
+        bob.execute()
+    except InvalidOperation:
+        pass
+
+    logging.info("Done: %s" % results)
+
+
+def main():
+    if len(sys.argv) > 1 and sys.argv[1] == 'backup_timestamp':
+        backup_timestamp_main()
+        return
+
+    if len(sys.argv) > 1:
+        config = sys.argv[1]
+    else:
+        config = 'mygene_allspecies'
+        #config = 'mygene_allspecies'
+    if not config.startswith('genedoc_'):
+        config = 'genedoc_' + config
+    assert config in ['genedoc_mygene', 'genedoc_mygene_allspecies']
+    use_parallel = '-p' in sys.argv
+    no_confirm = '-b' in sys.argv
+    rename = '-r' in sys.argv
+    if rename:
+        from_index = sys.argv[sys.argv.index('-r') + 1]
+        rename_from_temp_collection(config,from_index,no_confirm)
+    else:
+        update_from_temp_collections(config,no_confirm,use_parallel)
 
 
 if __name__ == '__main__':
