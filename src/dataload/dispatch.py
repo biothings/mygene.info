@@ -14,8 +14,7 @@ from datetime import datetime
 import sys
 import os.path
 from utils.mongo import get_src_dump
-from utils.common import safewfile
-from biothings.utils.common import timesofar
+from biothings.utils.common import safewfile, timesofar
 
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]
 sys.path.append(src_path)
