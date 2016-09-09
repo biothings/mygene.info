@@ -6,7 +6,7 @@ import time
 import os.path
 from biothings.utils.common import timesofar
 from databuild.backend import GeneDocMongoDBBackend, GeneDocESBackend
-from utils.mongo import get_target_db
+from biothings.utils.mongo import get_target_db
 from utils.es import ESIndexer
 
 
@@ -218,6 +218,6 @@ def diff_collections(b1, b2, use_parallel=True, step=10000):
 def get_backend(uri, db, col, bk_type):
     if bk_type != "mongodb":
         raise NotImplemented("Backend type '%s' not supported" % bk_type)
-    from utils.mongo import MongoClient
+    from biothings.utils.mongo import MongoClient
     colobj = MongoClient(uri)[db][col]
     return GeneDocMongoDBBackend(colobj)

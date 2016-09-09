@@ -7,7 +7,7 @@ from datetime import datetime
 import time
 import glob
 
-from utils.mongo import get_target_db, doc_feeder
+from biothings.utils.mongo import get_target_db, doc_feeder
 from .backend import GeneDocMongoDBBackend
 from utils.diff import diff_collections
 from utils.common import (iter_n, setup_logfile,

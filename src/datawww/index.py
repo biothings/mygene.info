@@ -59,7 +59,7 @@ __revision__ = _get_rev()
 class MongoViewer(tornado.web.RequestHandler):
     def get(self, db, collection=None, id=None):
         import random
-        from utils.mongo import get_src_conn
+        from biothings.utils.mongo import get_src_conn
 
         get_random = self.get_argument('random', None) != 'false'
         size = int(self.get_argument('size', 10))

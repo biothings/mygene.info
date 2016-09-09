@@ -6,7 +6,7 @@ import copy
 from datetime import datetime
 from pprint import pformat
 
-from utils.mongo import (get_src_db, get_target_db, get_src_master,
+from biothings.utils.mongo import (get_src_db, get_target_db, get_src_master,
                          get_src_build, get_src_dump, doc_feeder)
 from biothings.utils.common import (timesofar, ask, safewfile,
                                     dump2gridfs, get_timestamp, get_random_string)

@@ -8,7 +8,7 @@ from pprint import pprint
 
 from config import TARGET_ES_INDEX_SUFFIX, ES_HOST
 from utils.es import ESIndexer
-from utils.mongo import get_target_db, get_src_build
+from biothings.utils.mongo import get_target_db, get_src_build
 from utils.common import loadobj  # the one from biothings doesn't work for now
 from biothings.utils.common import timesofar, ask, iter_n
 from databuild.backend import GeneDocMongoDBBackend, GeneDocESBackend

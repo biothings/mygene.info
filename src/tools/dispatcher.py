@@ -6,7 +6,7 @@ import dispatch
 
 from biothings.utils.common import timesofar
 from utils.common import src_path
-from utils.mongo import src_clean_archives, target_clean_collections
+from biothings.utils.mongo import src_clean_archives, target_clean_collections
 from dataload.dispatch import (check_mongo, get_process_info, src_dump,
                                mark_upload_started, mark_upload_done)
 from dataload.dispatch import dispatch as dispatch_src_upload

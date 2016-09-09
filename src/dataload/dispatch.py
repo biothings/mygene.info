@@ -13,7 +13,7 @@ import time
 from datetime import datetime
 import sys
 import os.path
-from utils.mongo import get_src_dump
+from biothings.utils.mongo import get_src_dump
 from biothings.utils.common import safewfile, timesofar
 
 src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0]

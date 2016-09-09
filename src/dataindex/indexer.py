@@ -12,7 +12,7 @@ def validate(build_config=None):
     from pprint import pprint
     from utils.diff import diff_collections
     from databuild.backend import GeneDocMongoDBBackend, GeneDocESBackend
-    from utils.mongo import get_src_build, get_target_db
+    from biothings.utils.mongo import get_src_build, get_target_db
     from utils.es import ESIndexer
 
     src_build = get_src_build()
