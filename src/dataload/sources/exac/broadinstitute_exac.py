@@ -40,15 +40,15 @@ def get_mapping(self=None):
                         },
                     "all": {
                         "type": "object",
-                        "index": "no",
+                        "enabled": False,
                         },
                     "nontcga": {
                         "type": "object",
-                        "index": "no",
+                        "enabled": False,
                         },
                     "nonpsych": {
                         "type": "object",
-                        "index": "no",
+                        "enabled": False,
                         }
                     }
                 }

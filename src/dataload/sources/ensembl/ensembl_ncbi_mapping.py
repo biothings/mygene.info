@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from dataload import get_data_folder
 from utils.dataload import anyfile, tabfile_feeder
-from utils.common import safewfile
+from biothings.utils.common import safewfile
 
 
 ENSEMBL_DATA_FOLDER = get_data_folder('ensembl')

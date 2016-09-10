@@ -1,7 +1,7 @@
 import sys
 import time
-from utils.common import timesofar, ask
-from utils.mongo import get_target_db, doc_feeder
+from biothings.utils.common import timesofar, ask
+from biothings.utils.mongo import get_target_db, doc_feeder
 from utils.es import ESIndexer
 from utils import diff
 from builder import DataBuilder

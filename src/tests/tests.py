@@ -248,7 +248,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                     'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                    'exons', 'HPRD']))
+                                    'exons', 'HPRD','exac']))
         eq_(res[0]['entrezgene'], 1017)
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
@@ -297,10 +297,10 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "homologene" in fields
         assert "reporter.snowball" in fields
         # debug info
-        debug = self.json_ok(self.get_ok(self.api + '/metadata?debug=1'))
+        debug = self.json_ok(self.get_ok(self.api + '/metadata?dev=1'))
         print(debug.keys())
         assert "software" in debug.keys()
-        nodebug = self.json_ok(self.get_ok(self.api + '/metadata?debug=0'))
+        nodebug = self.json_ok(self.get_ok(self.api + '/metadata?dev=0'))
         assert not "software" in nodebug.keys()
 
     def test_query_facets(self):
@@ -483,7 +483,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         rfalse = self.json_ok(self.get_ok(self.api +
                               '/gene/1017?filter=symbol,go.MF&dotfield=false'))
         eq_(rdefault, rfalse)
-        assert "go.MF" in rtrue.keys()
+        assert "go.MF.term" in rtrue.keys()
         assert "go" in rdefault.keys()
         assert "MF" in rdefault["go"].keys()
 
@@ -529,7 +529,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                 'common_name', 'genbank_common_name',
                                 '_version', 'parent_taxid', 'scientific_name',
                                 'has_gene', 'children', 'rank',
-                                'uniprot_name']))
+                                'uniprot_name','other_names']))
 
     def test_query_dotstar_refseq(self):
         protein = self.json_ok(self.get_ok(self.api +
@@ -723,8 +723,33 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000237613"))
         eq_(type(res),dict)
         eq_(res["entrezgene"],645520)
+        ### test "orphan" EntrezID (associated EnsemblIDs were all resolved into other EntrezIDs but we want to keep ambiguated
+        ### Ensembl data for those)
+        ###res = self.json_ok(self.get_ok(self.api + "/gene/100287596"))
+        ###ensids = [e["gene"] for e in res["ensembl"]]
+        ###eq_(set(endids),{"ENSG00000248472","ENSG00000223972"})
 
+    def test_caseinsentive_datasources(self):
+        self.query_has_hits('mirbase:MI0017267')
+        self.query_has_hits('wormbase:WBGene00057218&species=31234')
+        self.query_has_hits('xenbase:XB-GENE-1001990&species=frog')
+        self.query_has_hits('Xenbase:XB-GENE-1001990&species=frog')
+        self.query_has_hits(r'mgi:MGI\\:104772')
 
+    def test_exac(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970.4&fields=exac"),filter=True)
+        resnover = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970&fields=exac"),filter=True)
+        eq_(res["hits"], resnover["hits"])
+        eq_(len(res["hits"]), 1)
+        hit = res["hits"][0]
+        eq_(hit["exac"]["bp"], 897)
+        eq_(hit["exac"]["cds_end"], 56365409)
+        eq_(hit["exac"]["cds_start"], 56360792)
+        eq_(hit["exac"]["n_exons"], 7)
+        eq_(hit["exac"]["transcript"], "ENST00000266970.4")
+        eq_(hit["exac"]["all"]["mu_syn"], 0.00000345583178284)
+        eq_(hit["exac"]["nonpsych"]["syn_z"], 0.0369369403215127)
+        eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
 
 
 # Self contained test class, used for CI tools such as Travis

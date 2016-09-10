@@ -6,7 +6,7 @@ import types
 import time
 import datetime
 import importlib
-from utils.mongo import get_src_conn, get_src_dump
+from biothings.utils.mongo import get_src_conn, get_src_dump, get_data_folder
 from biothings.utils.common import get_timestamp, get_random_string, timesofar, dump2gridfs, iter_n
 from config import DATA_SRC_DATABASE, DATA_SRC_MASTER_COLLECTION
 
@@ -51,13 +51,6 @@ __sources__ = None   # should be a list defined at runtime
 
 conn = get_src_conn()
 doc_register = {}
-
-
-def get_data_folder(src_name):
-    src_dump = get_src_dump()
-    src_doc = src_dump.find_one({'_id': src_name})
-    assert src_doc['status'] == 'success', "Source files are not ready yet [status: \"%s\"]." % src_doc['status']
-    return src_doc['data_folder']
 
 
 class GeneDocSourceMaster(dict):

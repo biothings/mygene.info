@@ -12,6 +12,7 @@ DATA_FOLDER = get_data_folder('exac')
 
 
 def load_broadinstitute_exac_any(one_file,key):
+    print("Loading file %s (%s)" % (one_file,key))
     data = tab2dict(os.path.join(DATA_FOLDER, one_file), (0,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21), 0)
     exacs = {}
     for transcript in data:
@@ -37,9 +38,9 @@ def load_broadinstitute_exac_any(one_file,key):
                         "syn_z" : float(tupleexac[13]),
                         "mis_z" : float(tupleexac[14]),
                         "lof_z" : float(tupleexac[15]),
-                        "pLI" : float(tupleexac[16]),
-                        "pRec" : float(tupleexac[17]),
-                        "pNull" : float(tupleexac[18])
+                        "p_li" : float(tupleexac[16]),
+                        "p_rec" : float(tupleexac[17]),
+                        "p_null" : float(tupleexac[18])
                         }
                     }
                 }
@@ -69,6 +70,8 @@ def load_broadinstitute_exac_all():
     # which unfortunately contains the release number...
     all_file = None
     for filename in os.listdir(DATA_FOLDER):
+        if filename.endswith(".log"):
+            continue
         if filename.find("nonTCGA") == -1 and filename.find("nonpsych") == -1:
             all_file = filename
             break
@@ -101,7 +104,6 @@ def load_broadinstitute_exac():
         if transid in exacs:
             data = exacs.pop(transid) # pop so no-match means no data in the end
             for entrezid in ensembl2entrez.get(ensid,[ensid]):
-                print("%s -> %s" % (transid,entrezid))
                 exacs[entrezid] = data
 
     load_done('[%d, %s]' % (len(exacs), timesofar(t0)))
