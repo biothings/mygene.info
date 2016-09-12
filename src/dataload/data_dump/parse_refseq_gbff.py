@@ -19,7 +19,7 @@ import glob
 import time
 from Bio import SeqIO
 
-from utils.common import SubStr
+from biothings.utils.common import SubStr
 from utils.dataload import anyfile
 from config import DATA_ARCHIVE_ROOT
 

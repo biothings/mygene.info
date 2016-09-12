@@ -1,11 +1,11 @@
 from __future__ import print_function
-import time
+import time, os
 from subprocess import Popen
 from datetime import datetime
 import dispatch
 
+src_path = os.path.split(os.path.split(os.path.abspath(__file__))[0])[0] 
 from biothings.utils.common import timesofar
-from utils.common import src_path
 from biothings.utils.mongo import src_clean_archives, target_clean_collections
 from dataload.dispatch import (check_mongo, get_process_info, src_dump,
                                mark_upload_started, mark_upload_done)
@@ -20,7 +20,7 @@ genedoc_merged = dispatch.Signal()
 es_indexed = dispatch.Signal()
 
 try:
-    from utils.common import hipchat_msg
+    from biothings.utils.common import hipchat_msg
 except:
     hipchat_msg = None
 

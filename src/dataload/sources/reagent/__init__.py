@@ -1,5 +1,5 @@
 import os.path
-from utils.common import loadobj
+from biothings.utils.common import loadobj
 from config import DATA_ARCHIVE_ROOT
 
 __metadata__ = {

@@ -2,7 +2,7 @@ from __future__ import print_function
 import os.path
 import datetime
 from config import SPECIES_LI, TAXONOMY
-from utils.common import file_newer, loadobj, dump
+from biothings.utils.common import file_newer, loadobj, dump
 from dataload import get_data_folder
 from utils.dataload import (load_start, load_done,
                             tab2dict, tab2list, value_convert,

@@ -25,13 +25,12 @@ import time
 from ftplib import FTP
 
 import requests
-from biothings.utils.common import ask, timesofar, safewfile
+from biothings.utils.common import ask, timesofar, safewfile, setup_logfile, hipchat_msg
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
 from biothings.utils.mongo import get_src_dump
 from utils.dataload import tab2list
-from utils.common import setup_logfile, hipchat_msg
 from config import DATA_ARCHIVE_ROOT, logger as logging
 
 

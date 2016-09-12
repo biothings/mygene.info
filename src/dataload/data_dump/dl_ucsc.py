@@ -23,11 +23,10 @@ from datetime import datetime
 from urllib.request import urlparse
 from ftplib import FTP, error_perm
 
-from biothings.utils.common import timesofar, safewfile
+from biothings.utils.common import timesofar, safewfile, setup_logfile, hipchat_msg
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
-from utils.common import setup_logfile, hipchat_msg
 from biothings.utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT, logger as logging
 

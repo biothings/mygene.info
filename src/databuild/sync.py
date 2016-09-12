@@ -10,9 +10,8 @@ import glob
 from biothings.utils.mongo import get_target_db, doc_feeder
 from .backend import GeneDocMongoDBBackend
 from utils.diff import diff_collections
-from utils.common import (iter_n, setup_logfile,
-                          dump, send_s3_file)
-from biothings.utils.common import timesofar, ask, is_str, safewfile
+from biothings.utils.common import (timesofar, ask, is_str, safewfile, iter_n,
+                                    setup_logfile, dump, send_s3_file)
 from config import LOG_FOLDER, logger as logging
 from pymongo.errors import InvalidOperation
 
