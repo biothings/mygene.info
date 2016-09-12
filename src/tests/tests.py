@@ -52,7 +52,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                    'ensembl', 'entrezgene', 'genomic_pos', 'go',
                    'homologene', 'interpro', 'ipi', 'map_location', 'name',
                    'pdb', 'pharmgkb', 'pir', 'prosite', 'reagent', 'refseq',
-                   'reporter', 'summary', 'symbol', 'taxid', 'type_of_gene',
+                   'reporter', 'symbol', 'taxid', 'type_of_gene',
                    'unigene', 'uniprot', 'exons', 'generif']
 
         for attr in attr_li:
@@ -244,7 +244,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(len(res), 1)
         # check default fields returned
         eq_(set(res[0].keys()),set(['symbol', 'reporter', 'refseq', '_score', 'pdb', 'interpro', 'entrezgene',
-                                    'summary', 'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
+                                    'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
                                     'ensembl', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
