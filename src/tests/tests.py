@@ -49,7 +49,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
 
         attr_li = ['HGNC', 'HPRD', 'MIM', 'Vega', '_id', 'accession', 'alias',
-                   'ec', 'ensembl', 'entrezgene', 'genomic_pos', 'go',
+                   'ensembl', 'entrezgene', 'genomic_pos', 'go',
                    'homologene', 'interpro', 'ipi', 'map_location', 'name',
                    'pdb', 'pharmgkb', 'pir', 'prosite', 'reagent', 'refseq',
                    'reporter', 'summary', 'symbol', 'taxid', 'type_of_gene',
@@ -245,7 +245,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         # check default fields returned
         eq_(set(res[0].keys()),set(['symbol', 'reporter', 'refseq', '_score', 'pdb', 'interpro', 'entrezgene',
                                     'summary', 'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
-                                    'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
+                                    'ensembl', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
                                     'exons', 'HPRD','exac']))
