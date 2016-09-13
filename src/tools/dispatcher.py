@@ -170,9 +170,10 @@ class GeneDocDispatcher:
             self.check_src_index()
 
             if self.idle:
-                print('\b' * 50, end='')
+                sys.stdout.write('\b' * 50)
                 for i in range(100):
-                    print('\b' * 2 + [chr(8212), '\\', '|', '/'][i % 4], end='')
+                    sys.stdout.write('\b' * 2 + [chr(8212), '\\', '|', '/'][i % 4])
+                    sys.stdout.flush()
                     time.sleep(0.1)
             else:
                 time.sleep(10)
