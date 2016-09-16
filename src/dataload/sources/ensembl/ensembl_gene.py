@@ -10,7 +10,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     ep = EnsemblParser()
     ensembl_genes = ep.load_ensembl_main()
     return ensembl_genes

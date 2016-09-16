@@ -1,7 +1,7 @@
 import os.path
 import copy
 #from config import DATA_ARCHIVE_ROOT
-from dataload import get_data_folder
+from biothings.utils.mongo import get_data_folder
 from biothings.utils.common import SubStr
 from utils.dataload import (load_start, load_done,
                             tab2dict, tab2list, value_convert, normalized_value,

@@ -36,7 +36,7 @@ platform_li = [
 ]
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     genedoc_d = loadobj(os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/gnfreagents/gnfreagents_20110817.pyobj'))
     #Fixing invalid key "GNF_hs-ORFeome1.1_reads" (replacing "." with "_")
     for k in genedoc_d:

@@ -6,7 +6,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     ep = EnsemblParser()
     ensembl2acc = ep.load_ensembl2acc()
     return ensembl2acc

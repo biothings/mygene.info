@@ -6,7 +6,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     ep = EnsemblParser()
     ensembl2interpro = ep.load_ensembl2interpro()
     return ensembl2interpro

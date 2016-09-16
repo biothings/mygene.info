@@ -1,6 +1,6 @@
 import os.path
 from utils.dataload import (load_start, load_done, tab2dict, value_convert)
-from dataload import get_data_folder
+from biothings.utils.mongo import get_data_folder
 #from config import DATA_ARCHIVE_ROOT
 
 #timestamp = '20121005'

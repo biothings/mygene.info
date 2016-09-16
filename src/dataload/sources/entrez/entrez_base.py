@@ -87,13 +87,13 @@ class GeneInfoParser(EntrezParserBase):
                     continue
                 xd = x.split(':')
                 if len(xd) == 3 and xd[0] == xd[1] and \
-                        xd[0] in ['HGNC', 'MGI']:
+                        xd[0] in ['VGNC', 'HGNC', 'MGI']:
                     # a fix for NCBI bug for dup xref prefix, 'HGNC:HGNC:36328'
                     xd = xd[1:]
                 try:
                     _db, _id = xd
                 except:
-                    print(x)
+                    print(repr(x))
                     raise
                 # we don't need ensembl xref from here, we will get it from
                 # Ensembl directly

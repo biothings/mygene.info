@@ -4,7 +4,7 @@ from biothings.utils.common import timesofar
 from utils.dataload import (load_start, load_done, tab2dict,
                             tabfile_feeder, list2dict)
 
-from dataload import get_data_folder
+from biothings.utils.mongo import get_data_folder
 import logging
 
 # DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot')

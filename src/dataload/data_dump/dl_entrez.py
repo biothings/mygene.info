@@ -22,11 +22,9 @@ from ftplib import FTP, error_temp
 
 import biothings, config
 biothings.config_for_app(config)
+
 from biothings.utils.common import ask, timesofar, safewfile, setup_logfile
 from biothings.utils.hipchat import hipchat_msg
-
-src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
-sys.path.append(src_path)
 from biothings.utils.mongo import get_src_dump
 from config import DATA_ARCHIVE_ROOT, ASCP_ROOT, logger as logging
 

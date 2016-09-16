@@ -5,7 +5,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     genedoc_d = load_broadinstitute_exac()
     return genedoc_d
 
