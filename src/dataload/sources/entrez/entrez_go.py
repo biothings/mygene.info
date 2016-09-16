@@ -5,7 +5,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     parser = Gene2GOParser()
     parser.set_all_species()
     gene2go = parser.load()

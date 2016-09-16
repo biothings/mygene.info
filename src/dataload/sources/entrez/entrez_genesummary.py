@@ -5,7 +5,7 @@ __metadata__ = {
 }
 
 
-def load_genedoc(self=None):
+def load_data(self=None):
     gene2summary = GeneSummaryParser().load()
     return gene2summary
 

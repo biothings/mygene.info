@@ -8,7 +8,7 @@ when it's necessary.
 import os.path
 from biothings.utils.common import (dump, loadobj, get_timestamp)
 from utils.dataload import (tab2list, load_start, load_done)
-from dataload import get_data_folder
+from biothings.utils.mongo import get_data_folder
 
 
 DATA_FOLDER = get_data_folder('entrez')
@@ -22,7 +22,7 @@ TAXIDS_FILE = os.path.join(DATA_FOLDER, "../ref_microbe_taxids_20151014.pyobj")
 DATAFILE = os.path.join(DATA_FOLDER, 'gene/gene2refseq.gz')
 
 
-def load_genedoc(self):
+def load_data(self):
     """
     Loads gene data from NCBI's refseq2gene.gz file.
     Parses it based on genomic position data and refseq status provided by the
