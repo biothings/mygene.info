@@ -122,3 +122,8 @@ DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
 DATA_SRC_DATABASE = 'genedoc_src'
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
+
+# time in seconds for dispatcher to check new jobs
+DISPATCHER_SLEEP_TIME = 1
+
+SOURCE_UPLOADER_CLASS = "dataload.MyGeneSourceUploader"
