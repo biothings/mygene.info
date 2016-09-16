@@ -20,7 +20,8 @@ import time
 from datetime import datetime
 
 import requests
-from biothings.utils.common import ask, timesofar, safewfile, setup_logfile, hipchat_msg
+from biothings.utils.common import ask, timesofar, safewfile, setup_logfile
+from biothings.utils.hipchat import hipchat_msg
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)

@@ -7,11 +7,15 @@ from datetime import datetime
 import time
 import glob
 
+import biothings, config
+biothings.config_for_app(config)
+
 from biothings.utils.mongo import get_target_db, doc_feeder
 from .backend import GeneDocMongoDBBackend
 from utils.diff import diff_collections
 from biothings.utils.common import (timesofar, ask, is_str, safewfile, iter_n,
-                                    setup_logfile, dump, send_s3_file)
+                                    setup_logfile, dump)
+from biothings.utils.aws import send_s3_file
 from config import LOG_FOLDER, logger as logging
 from pymongo.errors import InvalidOperation
 

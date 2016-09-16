@@ -23,7 +23,8 @@ from datetime import datetime
 from urllib.request import urlparse
 from ftplib import FTP, error_perm
 
-from biothings.utils.common import timesofar, safewfile, setup_logfile, hipchat_msg
+from biothings.utils.common import timesofar, safewfile, setup_logfile
+from biothings.utils.hipchat import hipchat_msg
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)

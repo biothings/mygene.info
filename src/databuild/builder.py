@@ -6,6 +6,9 @@ import copy
 from datetime import datetime
 from pprint import pformat
 
+import biothings, config
+biothings.config_for_app(config)
+
 from biothings.utils.mongo import (get_src_db, get_target_db, get_src_master,
                          get_src_build, get_src_dump, doc_feeder)
 from biothings.utils.common import (timesofar, ask, safewfile,
