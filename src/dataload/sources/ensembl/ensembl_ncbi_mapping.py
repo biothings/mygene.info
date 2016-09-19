@@ -3,8 +3,8 @@ import os.path
 from collections import defaultdict
 
 from biothings.utils.mongo import get_data_folder
-from utils.dataload import anyfile, tabfile_feeder
-from biothings.utils.common import safewfile
+from utils.dataload import tabfile_feeder
+from biothings.utils.common import safewfile, anyfile
 
 
 ENSEMBL_DATA_FOLDER = get_data_folder('ensembl')

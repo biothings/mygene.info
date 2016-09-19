@@ -18,7 +18,7 @@ import io
 import itertools
 import csv
 import json
-from biothings.utils.common import ask, safewfile
+from biothings.utils.common import ask, safewfile, anyfile
 
 csv.field_size_limit(10000000)   # default is 131072, too small for some big files
 
@@ -218,29 +218,6 @@ def merge_struct(v1, v2,aslistofdict=None):
 #===============================================================================
 # File Utility functions
 #===============================================================================
-def anyfile(infile, mode='r'):
-    '''
-    return a file handler with the support for gzip/zip comppressed files
-    if infile is a two value tuple, then first one is the compressed file;
-      the second one is the actual filename in the compressed file.
-      e.g., ('a.zip', 'aa.txt')
-
-    '''
-    if isinstance(infile, tuple):
-        infile, rawfile = infile[:2]
-    else:
-        rawfile = os.path.splitext(infile)[0]
-    filetype = os.path.splitext(infile)[1].lower()
-    if filetype == '.gz':
-        import gzip
-        in_f = io.TextIOWrapper(gzip.GzipFile(infile, 'r'))
-    elif filetype == '.zip':
-        import zipfile
-        in_f = io.TextIOWrapper(zipfile.ZipFile(infile, 'r').open(rawfile, 'r'))
-    else:
-        in_f = open(infile, mode)
-    return in_f
-
 
 def tabfile_tester(datafile, header=1, sep='\t'):
     reader = csv.reader(anyfile(datafile), delimiter=sep)
