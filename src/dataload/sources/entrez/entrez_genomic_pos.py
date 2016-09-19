@@ -7,7 +7,7 @@ when it's necessary.
 '''
 import os.path
 from biothings.utils.common import (dump, loadobj, get_timestamp)
-from utils.dataload import (tab2list, load_start, load_done)
+from biothings.utils.dataload import (tab2list, load_start, load_done)
 from biothings.utils.mongo import get_data_folder
 
 

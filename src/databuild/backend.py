@@ -267,7 +267,7 @@ class GeneDocCouchDBBackend(GeneDocBackendBase):
     def _db_upload(self, doc_li, step=10000, verbose=True):
         import time
         from biothings.utils.common import timesofar
-        from utils.dataload import list2dict, list_itemcnt, listsort
+        from biothings.utils.dataload import list2dict, list_itemcnt, listsort
 
         output = []
         t0 = time.time()

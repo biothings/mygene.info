@@ -1,7 +1,7 @@
 import os.path
 import time
 from biothings.utils.common import timesofar
-from utils.dataload import (load_start, load_done, tab2dict,
+from biothings.utils.dataload import (load_start, load_done, tab2dict,
                             tabfile_feeder, list2dict)
 
 from biothings.utils.mongo import get_data_folder

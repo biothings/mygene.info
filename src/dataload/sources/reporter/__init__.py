@@ -1,4 +1,4 @@
-from utils.dataload import merge_dict, value_convert
+from biothings.utils.dataload import merge_dict, value_convert
 
 __metadata__ = {
     '__collection__': 'reporter',

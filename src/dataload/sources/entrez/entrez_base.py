@@ -4,7 +4,7 @@ import datetime
 from config import SPECIES_LI, TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
 from biothings.utils.mongo import get_data_folder
-from utils.dataload import (load_start, load_done,
+from biothings.utils.dataload import (load_start, load_done,
                             tab2dict, tab2list, value_convert,
                             normalized_value, dict_convert, dict_to_list,
                             )

@@ -1,12 +1,11 @@
 import os.path
 import time
 from biothings.utils.common import timesofar
-from utils.dataload import (load_start, load_done,
+from biothings.utils.dataload import (load_start, load_done,
                             listitems, dupline_seperator,
                             tabfile_feeder, list2dict, list_nondup,
                             value_convert)
-#from config import DATA_ARCHIVE_ROOT
-from dataload import get_data_folder
+from biothings.utils.mongo import get_data_folder
 
 #DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot')
 DATA_FOLDER = get_data_folder('uniprot')

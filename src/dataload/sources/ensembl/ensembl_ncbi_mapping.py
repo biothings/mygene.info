@@ -3,7 +3,7 @@ import os.path
 from collections import defaultdict
 
 from biothings.utils.mongo import get_data_folder
-from utils.dataload import tabfile_feeder
+from biothings.utils.dataload import tabfile_feeder
 from biothings.utils.common import safewfile, anyfile
 
 

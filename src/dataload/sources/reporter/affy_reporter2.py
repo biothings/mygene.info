@@ -5,7 +5,7 @@ Created on Fri Jan 23 11:33:12 2015
 @author: kevin
 """
 import os.path
-from utils.dataload import (load_start, load_done, tab2dict,
+from biothings.utils.dataload import (load_start, load_done, tab2dict,
                             dict_apply)
 from config import DATA_ARCHIVE_ROOT
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/reporters')

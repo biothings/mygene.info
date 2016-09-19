@@ -31,7 +31,7 @@ biothings.config_for_app(config)
 from biothings.utils.common import ask, timesofar, safewfile, setup_logfile
 from biothings.utils.hipchat import hipchat_msg
 from biothings.utils.mongo import get_src_dump
-from utils.dataload import tab2list
+from biothings.utils.dataload import tab2list
 from config import DATA_ARCHIVE_ROOT, logger as logging
 
 
