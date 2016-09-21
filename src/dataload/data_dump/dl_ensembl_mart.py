@@ -18,7 +18,6 @@ Usage:
      python dl_ensembl.py check      # Check the lastest Ensembl/BioMart version
      python dl_ensembl.py <ensembl_ver>   # perform the actual download
 '''
-from __future__ import print_function
 import sys
 import os
 import time
