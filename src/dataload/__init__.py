@@ -2,7 +2,7 @@ import time, datetime
 import importlib
 
 from biothings.utils.common import timesofar, dump2gridfs
-import biothings.dataload as btdataload
+import biothings.dataload.uploader as uploader
 
 
 __sources_dict__ = {
@@ -43,7 +43,7 @@ __sources_dict__ = {
 
 
 
-class MyGeneSourceUploader(btdataload.SourceUploader):
+class MyGeneSourceUploader(uploader.SourceUploader):
 
     def register_sources(self):
         for src in self.__sources__:
@@ -63,7 +63,7 @@ class MyGeneSourceUploader(btdataload.SourceUploader):
             self.doc_register[name] = src_cls
             self.conn.register(src_cls)
 
-class GeneDocSource(btdataload.DocSource):
+class GeneDocSource(uploader.DocSource):
 
     def post_update_data(self):
         if getattr(self, 'ENTREZ_GENEDOC_ROOT', False):

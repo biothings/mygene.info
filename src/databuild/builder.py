@@ -16,7 +16,7 @@ from biothings.utils.common import (timesofar, ask, safewfile,
                                     setup_logfile, loadobj)
 from biothings.utils.dataload import list2dict, alwayslist
 from utils.es import ESIndexer
-import databuild.backend
+import biothings.databuild.backend as btbackend
 from config import LOG_FOLDER, logger as logging
 
 '''
@@ -77,15 +77,15 @@ class DataBuilder():
         self.get_src_master()
 
         if backend == 'mongodb':
-            self.target = databuild.backend.GeneDocMongoDBBackend()
+            self.target = btbackend.GeneDocMongoDBBackend()
         elif backend == 'es':
-            self.target = databuild.backend.GeneDocESBackend(ESIndexer())
+            self.target = btbackend.GeneDocESBackend(ESIndexer())
         elif backend == 'couchdb':
             from config import COUCHDB_URL
             import couchdb
-            self.target = databuild.backend.GeneDocCouchDBBackend(couchdb.Server(COUCHDB_URL))
+            self.target = btbackend.GeneDocCouchDBBackend(couchdb.Server(COUCHDB_URL))
         elif backend == 'memory':
-            self.target = databuild.backend.GeneDocMemeoryBackend()
+            self.target = btbackend.GeneDocMemeoryBackend()
         else:
             raise ValueError('Invalid backend "%s".' % backend)
 
@@ -840,7 +840,7 @@ class DataBuilder():
         es_idxer.ES_INDEX_NAME = sync_src.target_collection.name
         es_idxer.step = 10000
         es_idxer.use_parallel = use_parallel
-        sync_target = databuild.backend.GeneDocESBackend(es_idxer)
+        sync_target = btbackend.GeneDocESBackend(es_idxer)
 
         changes = diff.diff_collections(sync_src, sync_target)
         return changes
