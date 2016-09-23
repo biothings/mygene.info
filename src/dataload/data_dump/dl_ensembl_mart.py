@@ -290,7 +290,7 @@ def main_cron(no_confirm=True):
        without intervention.'''
 
     src_dump = get_src_dump()
-    mart_version = chk_latest_mart_version()
+    mart_version = 85#chk_latest_mart_version()
     logging.info("Checking latest mart_version:\t%s" % mart_version)
 
     doc = src_dump.find_one({'_id': 'ensembl'})

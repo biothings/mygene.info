@@ -21,11 +21,11 @@ from ftplib import FTP
 
 import biothings, config
 biothings.config_for_app(config)
-from biothings.utils.common import ask, timesofar, safewfile, setup_logfile
+from biothings.utils.common import ask, timesofar, safewfile, setup_logfile, rmdashfr
 from biothings.utils.hipchat import hipchat_msg
 
 from biothings.utils.mongo import get_src_dump
-from config import DATA_ARCHIVE_ROOT, logger as logging
+from config import DATA_ARCHIVE_ROOT, logger as logging, ARCHIVE_DATA
 
 TIMESTAMP = time.strftime('%Y%m%d')
 if ARCHIVE_DATA:

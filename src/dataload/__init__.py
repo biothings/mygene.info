@@ -1,4 +1,4 @@
-import time, datetime
+import time, datetime, types, copy
 import importlib
 
 from pymongo.errors import DuplicateKeyError, BulkWriteError
@@ -69,14 +69,13 @@ class MyGeneSourceUploader(uploader.SourceUploader):
 class GeneDocSource(uploader.DocSource):
 
     def post_update_data(self):
+        t0 = time.time()
         if getattr(self, 'ENTREZ_GENEDOC_ROOT', False):
             print('Uploading "geneid_d" to GridFS...', end='')
-            t0 = time.time()
             geneid_d = self.get_geneid_d()
             dump2gridfs(geneid_d, self.__collection__ + '__geneid_d.pyobj', self.db)
         if getattr(self, 'ENSEMBL_GENEDOC_ROOT', False):
             print('Uploading "mapping2entrezgene" to GridFS...', end='')
-            t0 = time.time()
             x2entrezgene_list = self.get_mapping_to_entrez()
             dump2gridfs(x2entrezgene_list, self.__collection__ + '__2entrezgene_list.pyobj', self.db)
         print('Done[%s]' % timesofar(t0))
@@ -89,7 +88,7 @@ class GeneDocSource(uploader.DocSource):
             if batch:
                 doc_li = []
                 i = 0
-            for _id, doc in genedoc_d.items():
+            for _id, doc in doc_d.items():
                 doc['_id'] = _id
                 _doc = copy.copy(self)
                 _doc.clear()
@@ -116,47 +115,46 @@ class GeneDocSource(uploader.DocSource):
         tinner = time.time()
         aslistofdict = None
         for doc_li in self.doc_iterator(doc_d, batch=True, step=step):
-            if not test:
-                toinsert = len(doc_li)
-                nbinsert = 0
-                print("Inserting %s records ... " % toinsert,end="", flush=True)
-                try:
-                    bob = self.temp_collection.initialize_unordered_bulk_op()
-                    for d in doc_li:
-                        aslistofdict = d.pop("__aslistofdict__",None)
-                        bob.insert(d)
-                    res = bob.execute()
-                    nbinsert += res["nInserted"]
-                    print("OK [%s]" % timesofar(tinner))
-                except BulkWriteError as e:
-                    inserted = e.details["nInserted"]
-                    nbinsert += inserted
-                    print("Fixing %d records " % len(e.details["writeErrors"]),end="",flush=True)
-                    ids = [d["op"]["_id"] for d in e.details["writeErrors"]]
-                    # build hash of existing docs
-                    docs = self.temp_collection.find({"_id" : {"$in" : ids}})
-                    hdocs = {}
-                    for doc in docs:
-                        hdocs[doc["_id"]] = doc
-                    bob2 = self.temp_collection.initialize_unordered_bulk_op()
-                    for err in e.details["writeErrors"]:
-                        errdoc = err["op"]
-                        existing = hdocs[errdoc["_id"]]
-                        assert "_id" in existing
-                        _id = errdoc.pop("_id")
-                        merged = merge_struct(errdoc, existing,aslistofdict=aslistofdict)
-                        bob2.find({"_id" : _id}).update_one({"$set" : merged})
-                        # update previously fetched doc. if several errors are about the same doc id,
-                        # we would't merged things properly without an updated document
-                        assert "_id" in merged
-                        hdocs[_id] = merged
-                        nbinsert += 1
+            toinsert = len(doc_li)
+            nbinsert = 0
+            print("Inserting %s records ... " % toinsert,end="", flush=True)
+            try:
+                bob = self.temp_collection.initialize_unordered_bulk_op()
+                for d in doc_li:
+                    aslistofdict = d.pop("__aslistofdict__",None)
+                    bob.insert(d)
+                res = bob.execute()
+                nbinsert += res["nInserted"]
+                print("OK [%s]" % timesofar(tinner))
+            except BulkWriteError as e:
+                inserted = e.details["nInserted"]
+                nbinsert += inserted
+                print("Fixing %d records " % len(e.details["writeErrors"]),end="",flush=True)
+                ids = [d["op"]["_id"] for d in e.details["writeErrors"]]
+                # build hash of existing docs
+                docs = self.temp_collection.find({"_id" : {"$in" : ids}})
+                hdocs = {}
+                for doc in docs:
+                    hdocs[doc["_id"]] = doc
+                bob2 = self.temp_collection.initialize_unordered_bulk_op()
+                for err in e.details["writeErrors"]:
+                    errdoc = err["op"]
+                    existing = hdocs[errdoc["_id"]]
+                    assert "_id" in existing
+                    _id = errdoc.pop("_id")
+                    merged = merge_struct(errdoc, existing,aslistofdict=aslistofdict)
+                    bob2.find({"_id" : _id}).update_one({"$set" : merged})
+                    # update previously fetched doc. if several errors are about the same doc id,
+                    # we would't merged things properly without an updated document
+                    assert "_id" in merged
+                    hdocs[_id] = merged
+                    nbinsert += 1
 
-                    res = bob2.execute()
-                    print("OK [%s]" % timesofar(tinner))
-                assert nbinsert == toinsert, "nb %s to %s" % (nbinsert,toinsert)
-                # end of loop so it counts the time spent in doc_iterator
-                tinner = time.time()
+                res = bob2.execute()
+                print("OK [%s]" % timesofar(tinner))
+            assert nbinsert == toinsert, "nb %s to %s" % (nbinsert,toinsert)
+            # end of loop so it counts the time spent in doc_iterator
+            tinner = time.time()
 
         print('Done[%s]' % timesofar(t0))
         self.switch_collection()
