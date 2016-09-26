@@ -78,9 +78,7 @@ def main(no_confirm=True):
 
     src_dump = get_src_dump()
     lastmodified = check_lastmodified()
-    print(lastmodified)
     doc = src_dump.find_one({'_id': 'uniprot'})
-    print(doc)
     if doc and 'lastmodified' in doc and lastmodified <= doc['lastmodified']:
         path, filename = os.path.split(DATAFILE_PATH)
         data_file = os.path.join(doc['data_folder'], filename)
