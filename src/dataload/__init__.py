@@ -46,27 +46,15 @@ __sources_dict__ = {
 }
 
 
-class MyGeneSourceUploader(uploader.SourceUploader):
+class MyGeneSourceUploader(uploader.SourceStorage):
 
-    def register_sources(self):
-        for src in self.__sources__:
-            src_m = importlib.import_module('dataload.sources.' + src)
-            metadata = src_m.__metadata__
-            name = src + '_doc'
-            metadata['load_data'] = src_m.load_data
-            metadata['get_mapping'] = src_m.get_mapping
-            metadata['conn'] = self.conn
-            if metadata.get('ENTREZ_GENEDOC_ROOT', False):
-                metadata['get_geneid_d'] = src_m.get_geneid_d
-            if metadata.get('ENSEMBL_GENEDOC_ROOT', False):
-                metadata['get_mapping_to_entrez'] = src_m.get_mapping_to_entrez
-            src_cls = type(name, (GeneDocSource,), metadata)
-	        # manually propagate db attr
-            src_cls.db = self.conn[src_cls.__database__]
-            self.doc_register[name] = src_cls
-            self.conn.register(src_cls)
+    def add_custom_source_metadata(self,metadata):
+        if metadata.get('ENTREZ_GENEDOC_ROOT', False):
+            metadata['get_geneid_d'] = src_m.get_geneid_d
+        if metadata.get('ENSEMBL_GENEDOC_ROOT', False):
+            metadata['get_mapping_to_entrez'] = src_m.get_mapping_to_entrez
 
-class GeneDocSource(uploader.DocSource):
+class GeneDocSource(uploader.DefaultSourceUploader):
 
     def post_update_data(self):
         t0 = time.time()
