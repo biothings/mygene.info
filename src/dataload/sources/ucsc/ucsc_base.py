@@ -6,13 +6,9 @@ from biothings.utils.dataload import (load_start, load_done, tab2dict,
 
 from biothings.utils.mongo import get_data_folder
 
-# DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot')
-DATA_FOLDER = os.path.join(get_data_folder('ucsc'), 'goldenPath/currentGenomes')
-REFLINK_FILE = os.path.join(get_data_folder('ucsc'), 'goldenPath/hgFixed/database/refLink.txt.gz')
-refseq2gene = tab2dict(REFLINK_FILE, (2, 6), 0, alwayslist=False)
 
-def load_exons_for_species(species, exons_key='exons'):
-    refflat_file = os.path.join(DATA_FOLDER, species, 'database/refFlat.txt.gz')
+def load_exons_for_species(data_folder, species, exons_key='exons'):
+    refflat_file = os.path.join(data_folder, species, 'database/refFlat.txt.gz')
 
     load_start(refflat_file)
     t0 = time.time()
@@ -38,6 +34,8 @@ def load_exons_for_species(species, exons_key='exons'):
         })
 
     gene2exons = {}
+    reflink_file = os.path.join(data_folder, '../hgFixed/database/refLink.txt.gz')
+    refseq2gene = tab2dict(reflink_file, (2, 6), 0, alwayslist=False)
     for refseq in sorted(ref2exons.keys()):
         geneid = refseq2gene.get(refseq, None)
         if geneid and geneid != '0':
@@ -51,14 +49,14 @@ def load_exons_for_species(species, exons_key='exons'):
     return gene2exons
 
 
-def load_exons_for_human():
+def load_exons_for_human(data_folder):
     '''We currently load exons on both hg19 and hg38 for human genes,
        so it will be loaded separately from other species.
            exons  -->   hg38
            exons_hg19  -->  hg19
     '''
-    gene2exons_hg19 = load_exons_for_species('Homo_sapiens', exons_key='exons_hg19')
-    gene2exons = load_exons_for_species('../hg38')
+    gene2exons_hg19 = load_exons_for_species(data_folder, 'Homo_sapiens', exons_key='exons_hg19')
+    gene2exons = load_exons_for_species(data_folder, '../hg38')
     for gid in gene2exons_hg19:
         if gid in gene2exons:
             gene2exons[gid].update(gene2exons_hg19[gid])
@@ -67,14 +65,14 @@ def load_exons_for_human():
     return gene2exons
 
 
-def load_exons_for_mouse():
+def load_exons_for_mouse(data_folder):
     '''We currently load exons on both mm9 and mm10 for mouse genes,
        so it will be loaded separately from other species.
            exons  -->   mm10
            exons_mm9  -->  mm9
     '''
-    gene2exons = load_exons_for_species('Mus_musculus')
-    gene2exons_mm9 = load_exons_for_species('../mm9', exons_key='exons_mm9')
+    gene2exons = load_exons_for_species(data_folder, 'Mus_musculus')
+    gene2exons_mm9 = load_exons_for_species(data_folder, '../mm9', exons_key='exons_mm9')
     for gid in gene2exons_mm9:
         if gid in gene2exons:
             gene2exons[gid].update(gene2exons_mm9[gid])
@@ -83,20 +81,20 @@ def load_exons_for_mouse():
     return gene2exons
 
 
-def load_ucsc_exons():
-    print('DATA_FOLDER: ' + DATA_FOLDER)
-    species_li = os.listdir(DATA_FOLDER)
+def load_ucsc_exons(data_folder):
+    species_data_folder = os.path.join(data_folder, 'goldenPath/currentGenomes')
+    species_li = os.listdir(species_data_folder)
     print("Found {} species folders.".format(len(species_li)))
     t0 = time.time()
     gene2exons = {}
     for species in species_li:
         print(species, end='...')
         if species == 'Homo_sapiens':
-            gene2exons.update(load_exons_for_human())
+            gene2exons.update(load_exons_for_human(species_data_folder))
         elif species == 'Mus_musculus':
-            gene2exons.update(load_exons_for_mouse())
+            gene2exons.update(load_exons_for_mouse(species_data_folder))
         else:
-            gene2exons.update(load_exons_for_species(species))
+            gene2exons.update(load_exons_for_species(species_data_folder,species))
 
     load_done('[%d, %s]' % (len(gene2exons), timesofar(t0)))
 

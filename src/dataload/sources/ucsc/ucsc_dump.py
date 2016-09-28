@@ -37,7 +37,6 @@ class UCSCDumper(FTPDumper):
 
     def get_new_data_folder(self):
         # no archive, no "latest", just keep the root directory
-        print("onela !!!")
         return self.SRC_ROOT_FOLDER
 
     def get_ftpfile_lastmodified(self, file_path):
@@ -83,9 +82,7 @@ class UCSCDumper(FTPDumper):
         self.to_dump = []
         remote_files = self.get_file_list()
         for remote_file, remote_lastmodified in remote_files:
-            print("remote: %s" % remote_file)
             localfile = os.path.join(self.current_data_folder, self.CWD_DIR, remote_file)
-            print("local: %s" % localfile)
             if force or not os.path.exists(localfile) or \
                     self.remote_is_better((remote_file, remote_lastmodified), localfile):
                 # register new release (will be stored in backend)
