@@ -1,20 +1,20 @@
 from .entrez_base import GeneSummaryParser
+import biothings.dataload.uploader as uploader
 
-__metadata__ = {
-    '__collection__': 'entrez_genesummary',
-}
+class EntrezGeneSummaryUploader(uploader.BaseSourceUploader):
 
+    name = "entrez_genesummary"
+    main_source = "entrez"
 
-def load_data(self=None):
-    gene2summary = GeneSummaryParser().load()
-    return gene2summary
+    def load_data(self, data_folder):
+        gene2summary = GeneSummaryParser(data_folder).load()
+        return gene2summary
 
-
-def get_mapping(self=None):
-    mapping = {
-        "summary": {
-            "type": "string",
-            "boost": 0.5      # downgrade summary field.
-        },
-    }
-    return mapping
+    def get_mapping(self):
+        mapping = {
+            "summary": {
+                "type": "string",
+                "boost": 0.5      # downgrade summary field.
+            },
+        }
+        return mapping

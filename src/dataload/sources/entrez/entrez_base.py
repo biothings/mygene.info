@@ -3,23 +3,19 @@ import os.path
 import datetime
 from config import SPECIES_LI, TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
-from biothings.utils.mongo import get_data_folder
 from biothings.utils.dataload import (load_start, load_done,
                             tab2dict, tab2list, value_convert,
                             normalized_value, dict_convert, dict_to_list,
                             tab2dict_iter
                             )
 
-DATA_FOLDER = get_data_folder('entrez')
-print('DATA_FOLDER: ' + DATA_FOLDER)
-
 
 class EntrezParserBase(object):
-    def __init__(self):
+    def __init__(self, data_folder):
         # if species_li is None, include all species
         self.set_species_li(SPECIES_LI)
-        self.DATA_FOLDER = DATA_FOLDER
-        self.datafile = os.path.join(self.DATA_FOLDER, self.DATAFILE)
+        self.data_folder = data_folder
+        self.datafile = os.path.join(self.data_folder, self.DATAFILE)
 
     def set_all_species(self):
         '''To load all species.'''
