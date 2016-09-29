@@ -1,11 +1,9 @@
 import os.path
 from biothings.utils.dataload import (load_start, load_done, tab2dict,
                             dict_apply)
-from config import DATA_ARCHIVE_ROOT
-DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/reporters')
+
 AFFY_RELEASE = 'na35'
 AFFY_FILE_EXTENSION = '.zip'  # or '.gz'
-AFFY_DATA_FOLDER = os.path.join(DATA_FOLDER, 'affy', AFFY_RELEASE)
 AFFY_ANNOT_FILES = [
     # human chips
     {'name': 'HG-U133_Plus_2',
@@ -58,13 +56,14 @@ def _load_affy(df):
     return gene2affy
 
 
-def loaddata():
+def loaddata(data_folder):
+    affy_data_folder = os.path.join(data_folder, 'affy', AFFY_RELEASE)
     affy_d = {}
     for annot in AFFY_ANNOT_FILES:
         name = annot['name']
-        DATAFILE = os.path.join(AFFY_DATA_FOLDER, annot['file'] % AFFY_RELEASE)
-        load_start(DATAFILE)
-        d = _load_affy(DATAFILE)
+        datafile = os.path.join(affy_data_folder, annot['file'] % AFFY_RELEASE)
+        load_start(datafile)
+        d = _load_affy(datafile)
         affy_d[name] = d
         load_done('[%d]' % len(d))
 

@@ -6,15 +6,7 @@ from biothings.utils.common import timesofar, dump, loadobj
 from biothings.utils.dataload import (load_start, load_done,
                             listitems, dupline_seperator,
                             tabfile_feeder, list2dict, list_nondup,
-                            value_convert,merge_struct)
-from biothings.utils.mongo import get_data_folder
-
-#DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot')
-DATA_FOLDER = get_data_folder('uniprot')
-UNIPROT_DATAFILE = os.path.join(DATA_FOLDER, 'idmapping_selected.tab.gz')  
-PDB_DUMPFILE = os.path.join(DATA_FOLDER, 'gene2pdb.pyobj')
-PIR_DUMPFILE = os.path.join(DATA_FOLDER, 'gene2pir.pyobj')
-
+                            value_convert)
 #REF:
 #ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/README
 VALID_COLUMN_NO = 22
@@ -51,7 +43,7 @@ def _dict_convert(uniprot_li):
     return {'uniprot': _dict}
 
 
-def load_all():
+def load_all(data_folder):
     '''Load "uniprot" using yield, while building "PDB" and "PIR"
     data dict while reading data file. These dict are then dumped
     (pickled) and stored later'''
@@ -112,8 +104,8 @@ def load_all():
         for x in xli2:
             gene2x.setdefault(x[0],[]).append(x[1])
 
-    print('DATA_FOLDER: ' + DATA_FOLDER)
-    load_start(UNIPROT_DATAFILE)
+    uniprot_datafile = os.path.join(data_folder, 'idmapping_selected.tab.gz')  
+    load_start(uniprot_datafile)
     t0 = time.time()
 
     # cache for uniprot
@@ -130,7 +122,7 @@ def load_all():
     gene2pir = {}
 
     # store all PDB & PIR data while looping, the whole will be stored later
-    for ld in tabfile_feeder(UNIPROT_DATAFILE, header=1, assert_column_no=VALID_COLUMN_NO):
+    for ld in tabfile_feeder(uniprot_datafile, header=1, assert_column_no=VALID_COLUMN_NO):
         # Uniprot data will be stored as we read line by line
         xlis = []
         pdbxlis = []
@@ -239,18 +231,22 @@ def load_all():
 
     # PDB
     gene2pdb = value_convert(gene2pdb, normalize_pdb, traverse_list=False)
-    dump(gene2pdb,PDB_DUMPFILE)
+    pdb_dumpfile = os.path.join(data_folder, 'gene2pdb.pyobj')
+    dump(gene2pdb,pdb_dumpfile)
     load_done('Dumped PDB data files [%s]' % (timesofar(t0)))
 
     # PIR
     gene2pir = value_convert(gene2pir, normalize_pir, traverse_list=False)
-    dump(gene2pir,PIR_DUMPFILE)
+    pir_dumpfile = os.path.join(data_folder, 'gene2pir.pyobj')
+    dump(gene2pir,pir_dumpfile)
     load_done('Dumped PIR data files [%s]' % (timesofar(t0)))
 
-def load_pdb():
-    data = loadobj(PDB_DUMPFILE)
+def load_pdb(data_folder):
+    pdb_dumpfile = os.path.join(data_folder, 'gene2pdb.pyobj')
+    data = loadobj(pdb_dumpfile)
     return data
 
-def load_pir():
-    data = loadobj(PIR_DUMPFILE)
+def load_pir(data_folder):
+    pir_dumpfile = os.path.join(data_folder, 'gene2pir.pyobj')
+    data = loadobj(pir_dumpfile)
     return data

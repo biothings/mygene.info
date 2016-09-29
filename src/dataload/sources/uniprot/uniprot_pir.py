@@ -1,19 +1,20 @@
 from .uniprot_base import load_pir
-
-__metadata__ = {
-    '__collection__': 'uniprot_pir',
-}
+import biothings.dataload.uploader as uploader
 
 
-def load_data(self=None):
-    return load_pir()
+class UniprotPIRUploader(uploader.MergerSourceUploader):
 
+    name = "uniprot_pir"
+    main_source = "uniprot"
 
-def get_mapping(self=None):
-    mapping = {
-        "pir": {
-            "type": "string",
-            "analyzer": "string_lowercase"
+    def load_data(self, data_folder):
+        return load_pir(data_folder)
+
+    def get_mapping(self):
+        mapping = {
+            "pir": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            }
         }
-    }
-    return mapping
+        return mapping

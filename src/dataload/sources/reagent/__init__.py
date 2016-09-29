@@ -1,10 +1,7 @@
 import os.path
 from biothings.utils.common import loadobj
-from config import DATA_ARCHIVE_ROOT
+import biothings.dataload.uploader as uploader
 
-__metadata__ = {
-    '__collection__': 'reagent',
-}
 
 platform_li = [
     'CM-LibrX-no-seq',
@@ -36,68 +33,71 @@ platform_li = [
 ]
 
 
-def load_data(self=None):
-    genedoc_d = loadobj(os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/gnfreagents/gnfreagents_20110817.pyobj'))
-    #Fixing invalid key "GNF_hs-ORFeome1.1_reads" (replacing "." with "_")
-    for k in genedoc_d:
-        doc = genedoc_d[k]
-        if "GNF_hs-ORFeome1.1_reads" in doc['reagent']:
-            doc['reagent']['GNF_hs-ORFeome1_1_reads'] = doc['reagent']['GNF_hs-ORFeome1.1_reads']
-            del doc['reagent']['GNF_hs-ORFeome1.1_reads']
-            genedoc_d[k] = doc
-    return genedoc_d
+class ReagentUploader(uploader.BaseSourceUploader):
 
+    name = "reagent"
 
-def get_mapping(self=None):
-    '''
-    mapping = {
-        "reagent":  {"dynamic" : False,
-                      "path": "just_name",
-                      "properties" : {
-                            "CM-LibrX-no-seq": {
-                                "dynamic": False,
-                                "path": "just_name",
-                                "properties": {
-                                    "id": {
-                                        "type" : "string",
-                                        "analyzer": "string_lowercase",
-                                        "index_name": "reagent",
-                                    },
-                                    "relationship": {
-                                        "type": "string",
-                                        "index": "no",
-                                        "include_in_all": False
+    def load_data(self, data_folder):
+        genedoc_d = loadobj(os.path.join(data_folder, 'gnfreagents_20110817.pyobj'))
+        #Fixing invalid key "GNF_hs-ORFeome1.1_reads" (replacing "." with "_")
+        for k in genedoc_d:
+            doc = genedoc_d[k]
+            if "GNF_hs-ORFeome1.1_reads" in doc['reagent']:
+                doc['reagent']['GNF_hs-ORFeome1_1_reads'] = doc['reagent']['GNF_hs-ORFeome1.1_reads']
+                del doc['reagent']['GNF_hs-ORFeome1.1_reads']
+                genedoc_d[k] = doc
+        return genedoc_d
+
+    def get_mapping(self):
+        '''
+        mapping = {
+            "reagent":  {"dynamic" : False,
+                          "path": "just_name",
+                          "properties" : {
+                                "CM-LibrX-no-seq": {
+                                    "dynamic": False,
+                                    "path": "just_name",
+                                    "properties": {
+                                        "id": {
+                                            "type" : "string",
+                                            "analyzer": "string_lowercase",
+                                            "index_name": "reagent",
+                                        },
+                                        "relationship": {
+                                            "type": "string",
+                                            "index": "no",
+                                            "include_in_all": False
+                                        }
                                     }
-                                }
-                            },
-                            ... ...
-                      }
-        }
-    }
-    '''
-
-    platform_mapping = {
-        "dynamic": False,
-        "properties": {
-            "id": {
-                "type": "string",
-                "analyzer": "string_lowercase",
-            },
-            "relationship": {
-                "type": "string",
-                "index": "no",
-                "include_in_all": False
+                                },
+                                ... ...
+                          }
             }
         }
-    }
+        '''
 
-    mapping = {
-        "reagent": {
+        platform_mapping = {
             "dynamic": False,
-            "properties": {}
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "analyzer": "string_lowercase",
+                },
+                "relationship": {
+                    "type": "string",
+                    "index": "no",
+                    "include_in_all": False
+                }
+            }
         }
-    }
-    for platform in platform_li:
-        mapping['reagent']['properties'][platform] = platform_mapping
 
-    return mapping
+        mapping = {
+            "reagent": {
+                "dynamic": False,
+                "properties": {}
+            }
+        }
+        for platform in platform_li:
+            mapping['reagent']['properties'][platform] = platform_mapping
+
+        return mapping

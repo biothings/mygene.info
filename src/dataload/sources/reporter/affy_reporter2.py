@@ -7,12 +7,10 @@ Created on Fri Jan 23 11:33:12 2015
 import os.path
 from biothings.utils.dataload import (load_start, load_done, tab2dict,
                             dict_apply)
-from config import DATA_ARCHIVE_ROOT
-DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/reporters')
+
 AFFY_RELEASE = 'na35'
 AFFY_RELEASE_EXTRA = 'na34'
 AFFY_FILE_EXTENSION = '.zip'  # or '.gz'
-AFFY_DATA_FOLDER = os.path.join(DATA_FOLDER, 'affy', AFFY_RELEASE)
 AFFY_ANNOT_FILES = [
     #human chips
     {'name': 'HTA-2_0',
@@ -129,19 +127,20 @@ def _load_affy(df):
     return gene2affy
 
 
-def loaddata():
+def loaddata(data_folder):
+    affy_data_folder = os.path.join(data_folder, 'affy', AFFY_RELEASE)
     affy_d = {}
     for annot in AFFY_ANNOT_FILES:
         name = annot['name']
-        DATAFILE = annot['file']
-        if DATAFILE.find('%s') != -1:
-            if DATAFILE.startswith('extra'):
-                DATAFILE = DATAFILE % AFFY_RELEASE_EXTRA
+        datafile = annot['file']
+        if datafile.find('%s') != -1:
+            if datafile.startswith('extra'):
+                datafile = datafile % AFFY_RELEASE_EXTRA
             else:
-                DATAFILE = DATAFILE % AFFY_RELEASE
-        DATAFILE = os.path.join(AFFY_DATA_FOLDER, DATAFILE)
-        load_start(DATAFILE)
-        d = _load_affy(DATAFILE)
+                datafile = datafile % AFFY_RELEASE
+        datafile = os.path.join(affy_data_folder, datafile)
+        load_start(datafile)
+        d = _load_affy(datafile)
         affy_d[name] = d
         load_done('[%d]' % len(d))
 
