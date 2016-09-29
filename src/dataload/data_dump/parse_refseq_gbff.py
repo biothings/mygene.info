@@ -27,7 +27,7 @@ sys.path.append(src_path)
 
 # TODO: what if process is done day after ?
 timestamp = time.strftime('%Y%m%d')
-DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez', timestamp, 'refseq')
+DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'entrez', timestamp, 'refseq')
 
 
 class GBFFParser():

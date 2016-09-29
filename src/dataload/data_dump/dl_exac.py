@@ -29,7 +29,7 @@ from config import DATA_ARCHIVE_ROOT, logger as logging
 
 
 timestamp = time.strftime('%Y%m%d')
-DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/exac', timestamp)
+DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'exac', timestamp)
 
 FTP_SERVER = 'ftp.broadinstitute.org'
 DATAFILES_PATH = [

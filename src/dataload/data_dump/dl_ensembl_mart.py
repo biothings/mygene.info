@@ -34,7 +34,7 @@ from biothings.utils.dataload import tab2list
 from config import DATA_ARCHIVE_ROOT, logger as logging
 
 
-ENSEMBL_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ensembl')
+ENSEMBL_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'ensembl')
 
 MART_URL = "http://www.biomart.org/biomart/martservice"
 MART_URL = "http://uswest.ensembl.org/biomart/martservice"

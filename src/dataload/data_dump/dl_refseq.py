@@ -30,8 +30,7 @@ src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[
 sys.path.append(src_path)
 
 timestamp = time.strftime('%Y%m%d')
-# DATA_FOLDER=os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ucsc', timestamp)
-REFSEQ_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/refseq')
+REFSEQ_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'refseq')
 
 FTP_SERVER = 'ftp.ncbi.nih.gov'
 BASE_PATH = '/refseq/release/complete/'

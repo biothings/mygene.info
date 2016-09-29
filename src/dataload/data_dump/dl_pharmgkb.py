@@ -30,9 +30,9 @@ from config import DATA_ARCHIVE_ROOT, ARCHIVE_DATA, logger as logging
 
 TIMESTAMP = time.strftime('%Y%m%d')
 if ARCHIVE_DATA:
-    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/pharmgkb', TIMESTAMP)
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'pharmgkb', TIMESTAMP)
 else:
-    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/pharmgkb/latest')
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'pharmgkb/latest')
 
 #GENES_URL = 'http://www.pharmgkb.org/commonFileDownload.action?filename=genes.zip'
 GENES_URL = 'http://www.pharmgkb.org/download.do?objId=genes.zip&dlCls=common'

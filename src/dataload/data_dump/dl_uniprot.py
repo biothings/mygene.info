@@ -29,9 +29,9 @@ from config import DATA_ARCHIVE_ROOT, logger as logging, ARCHIVE_DATA
 
 TIMESTAMP = time.strftime('%Y%m%d')
 if ARCHIVE_DATA:
-    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot', TIMESTAMP)
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'uniprot', TIMESTAMP)
 else:
-    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot/latest')
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'uniprot/latest')
 
 
 FTP_SERVER = 'ftp.uniprot.org'

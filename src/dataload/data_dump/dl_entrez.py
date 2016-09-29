@@ -31,9 +31,9 @@ from parse_refseq_gbff import main as parse_refseq_gbff
 
 TIMESTAMP = time.strftime('%Y%m%d')
 if ARCHIVE_DATA:
-    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez', TIMESTAMP)
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'entrez', TIMESTAMP)
 else:
-    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/entrez/latest')
+    DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'entrez/latest')
 
 
 FILE_LIST = {
