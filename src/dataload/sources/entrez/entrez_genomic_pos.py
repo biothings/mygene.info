@@ -11,7 +11,7 @@ from biothings.utils.common import (dump, loadobj, get_timestamp)
 from biothings.utils.dataload import (tab2list, load_start, load_done)
 import biothings.dataload.uploader as uploader
 
-class EntrezGenomicPosUploader(uploader.BaseSourceUploader):
+class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
 
     name = "entrez_genomic_pos"
     main_source = "entrez"

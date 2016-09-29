@@ -1,7 +1,7 @@
 from .entrez_base import Gene2RefseqParser
 import biothings.dataload.uploader as uploader
 
-class EntrezRefseqUploader(uploader.BaseSourceUploader):
+class EntrezRefseqUploader(uploader.MergerSourceUploader):
 
     name = "entrez_refseq"
     main_source = "entrez"

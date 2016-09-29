@@ -2,7 +2,7 @@ from .ucsc_base import load_ucsc_exons
 import biothings.dataload.uploader as uploader
 
 
-class UCSCExonsUploader(uploader.BaseSourceUploader):
+class UCSCExonsUploader(uploader.MergerSourceUploader):
 
     name = "ucsc_exons"
     main_source = "ucsc"

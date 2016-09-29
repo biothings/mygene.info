@@ -10,7 +10,7 @@ from biothings.utils.common import safewfile, anyfile
 ENSEMBL_DATA_FOLDER = get_data_folder('ensembl')
 print('Ensembl DATA_FOLDER: ' + ENSEMBL_DATA_FOLDER)
 Entrez_DATA_FOLDER = get_data_folder('entrez')
-print('Ensembl DATA_FOLDER: ' + Entrez_DATA_FOLDER)
+print('Entrez DATA_FOLDER: ' + Entrez_DATA_FOLDER)
 
 
 gene_ensembl_1_xref_dm_file = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__xref_entrezgene__dm.txt")

@@ -1,17 +1,10 @@
 import os.path
 import copy
-#from config import DATA_ARCHIVE_ROOT
-from biothings.utils.mongo import get_data_folder
 from biothings.utils.common import SubStr
 from biothings.utils.dataload import (load_start, load_done,
                             tab2dict, tab2list, value_convert, normalized_value,
                             list2dict, dict_nodup, dict_attrmerge, tab2dict_iter
                             )
-
-#DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/ensembl/69')
-DATA_FOLDER = get_data_folder('ensembl')
-print('DATA_FOLDER: ' + DATA_FOLDER)
-
 
 #fn to skip lines with LRG records.'''
 def _not_LRG(ld):
@@ -34,8 +27,9 @@ def map_id(hdocs,mapdict):
     return res
 
 
-class EnsemblParser:
-    def __init__(self,load_ensembl2entrez=True):
+class EnsemblParser(object):
+    def __init__(self, data_folder, load_ensembl2entrez=True):
+        self.data_folder = data_folder
         self.ensembl2entrez_li = None
         self.ensembl_main = None
         if load_ensembl2entrez:
@@ -46,9 +40,9 @@ class EnsemblParser:
     #TODO: not used
     def _load_ensembl_2taxid(self):
         """ensembl2taxid"""
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__translation__main.txt')
-        load_start(DATAFILE)
-        ensembl2taxid = dict_nodup(tab2dict(DATAFILE, (0, 1), 1, includefn=_not_LRG))
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__translation__main.txt')
+        load_start(datafile)
+        ensembl2taxid = dict_nodup(tab2dict(datafile, (0, 1), 1, includefn=_not_LRG))
         # need to convert taxid to integer here
         ensembl2taxid = value_convert(ensembl2taxid, lambda x: int(x))
         load_done('[%d]' % len(ensembl2taxid))
@@ -57,9 +51,9 @@ class EnsemblParser:
     #TODO: not used
     def _load_ensembl2name(self):
         """loading ensembl gene to symbol+name mapping"""
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__gene__main.txt')
-        load_start(DATAFILE)
-        ensembl2name = tab2dict(DATAFILE, (1, 2, 7), 0, includefn=_not_LRG)
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__gene__main.txt')
+        load_start(datafile)
+        ensembl2name = tab2dict(datafile, (1, 2, 7), 0, includefn=_not_LRG)
 
         def _fn(x):
             out = {}
@@ -76,16 +70,16 @@ class EnsemblParser:
 
     def _load_ensembl2entrez_li(self):
         """gene_ensembl__xref_entrezgene__dm"""
-        CUSTOM_MAPPING_FILE = os.path.join(DATA_FOLDER, 'gene_ensembl__gene__extra.txt')
+        CUSTOM_MAPPING_FILE = os.path.join(self.data_folder, 'gene_ensembl__gene__extra.txt')
         if not os.path.exists(CUSTOM_MAPPING_FILE):
             print("Missing extra mapping file, now generating")
             from . import ensembl_ncbi_mapping
             ensembl_ncbi_mapping.main(confirm=False)
         load_start(CUSTOM_MAPPING_FILE)
         extra = tab2dict(CUSTOM_MAPPING_FILE,(0, 1), 0, alwayslist=True)
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__xref_entrezgene__dm.txt')
-        load_start(DATAFILE)
-        ensembl2entrez = tab2dict(DATAFILE, (1, 2), 0, includefn=_not_LRG, alwayslist=True)   # [(ensembl_gid, entrez_gid),...]
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__xref_entrezgene__dm.txt')
+        load_start(datafile)
+        ensembl2entrez = tab2dict(datafile, (1, 2), 0, includefn=_not_LRG, alwayslist=True)   # [(ensembl_gid, entrez_gid),...]
         # replace with our custom mapping
         for k in extra:
             ensembl2entrez[k] = extra[k]
@@ -111,9 +105,9 @@ class EnsemblParser:
                     out['name'] = _name
             return out
 
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__gene__main.txt')
-        load_start(DATAFILE)
-        for datadict in tab2dict_iter(DATAFILE, (0, 1, 2, 7), 1, includefn=_not_LRG):
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__gene__main.txt')
+        load_start(datafile)
+        for datadict in tab2dict_iter(datafile, (0, 1, 2, 7), 1, includefn=_not_LRG):
             datadict = value_convert(datadict, _fn)
             for id,doc in datadict.items():
                 doc['_id'] = id
@@ -138,8 +132,8 @@ class EnsemblParser:
         loading ensembl to transcripts/proteins data
         """
         #Loading all ensembl GeneIDs, TranscriptIDs and ProteinIDs
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__translation__main.txt')
-        load_start(DATAFILE)
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__translation__main.txt')
+        load_start(datafile)
 
         def _fn(x, eid):
             out = {'gene': eid, 'translation' : []}
@@ -172,8 +166,8 @@ class EnsemblParser:
 
             return out
 
-        #ensembl2acc = tab2dict(DATAFILE, (1, 2, 3), 0, includefn=_not_LRG)
-        for datadict in tab2dict_iter(DATAFILE, (1, 2, 3), 0, includefn=_not_LRG):
+        #ensembl2acc = tab2dict(datafile, (1, 2, 3), 0, includefn=_not_LRG)
+        for datadict in tab2dict_iter(datafile, (1, 2, 3), 0, includefn=_not_LRG):
             for k in datadict:
                 datadict[k] = {'ensembl': _fn(datadict[k], k), '__aslistofdict__' : 'ensembl'}
             for doc in map_id(datadict,self.ensembl2entrez):
@@ -185,9 +179,9 @@ class EnsemblParser:
         #return self.convert2entrez(ensembl2acc)
 
     def load_ensembl2pos(self):
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__gene__main.txt')
-        load_start(DATAFILE)
-        for datadict in tab2dict_iter(DATAFILE, (1, 3, 4, 5, 6), 0, includefn=_not_LRG):
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__gene__main.txt')
+        load_start(datafile)
+        for datadict in tab2dict_iter(datafile, (1, 3, 4, 5, 6), 0, includefn=_not_LRG):
             datadict = dict_nodup(datadict)
             datadict = value_convert(datadict, lambda x: {'chr': x[2], 'start': int(x[0]), 'end': int(x[1]), 'strand': int(x[3])})
             datadict = value_convert(datadict, lambda x: {'genomic_pos': x, '__aslistofdict__' : 'genomic_pos'}, traverse_list=False) 
@@ -196,9 +190,9 @@ class EnsemblParser:
 
     def load_ensembl2prosite(self):
         #Prosite
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__prot_profile__dm.txt')
-        load_start(DATAFILE)
-        for datadict in tab2dict_iter(DATAFILE, (1, 4), 0):
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__prot_profile__dm.txt')
+        load_start(datafile)
+        for datadict in tab2dict_iter(datafile, (1, 4), 0):
             datadict = dict_nodup(datadict)
             datadict = value_convert(datadict, lambda x: {'prosite': x}, traverse_list=False)
             for doc in map_id(datadict,self.ensembl2entrez):
@@ -206,9 +200,9 @@ class EnsemblParser:
 
     def load_ensembl2interpro(self):
         #Interpro
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__prot_interpro__dm.txt')
-        load_start(DATAFILE)
-        for datadict in tab2dict_iter(DATAFILE, (1, 4, 5, 6), 0):
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__prot_interpro__dm.txt')
+        load_start(datafile)
+        for datadict in tab2dict_iter(datafile, (1, 4, 5, 6), 0):
             datadict = dict_nodup(datadict)
             # optimize with on call/convert
             datadict = value_convert(datadict, lambda x: {'id': x[0], 'short_desc': x[1], 'desc': x[2]})
@@ -224,9 +218,9 @@ class EnsemblParser:
 
     def load_ensembl2pfam(self):
         #Prosite
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__prot_pfam__dm.txt')
-        load_start(DATAFILE)
-        for datadict in tab2dict_iter(DATAFILE, (1, 4), 0):
+        datafile = os.path.join(self.data_folder, 'gene_ensembl__prot_pfam__dm.txt')
+        load_start(datafile)
+        for datadict in tab2dict_iter(datafile, (1, 4), 0):
             datadict = dict_nodup(datadict)
             datadict = value_convert(datadict, lambda x: {'pfam': x}, traverse_list=False)
             for doc in map_id(datadict,self.ensembl2entrez):

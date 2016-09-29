@@ -1,7 +1,7 @@
 from .entrez_base import Gene2GOParser
 import biothings.dataload.uploader as uploader
 
-class EntrezGOUploader(uploader.BaseSourceUploader):
+class EntrezGOUploader(uploader.MergerSourceUploader):
 
     name = "entrez_go"
     main_source = "entrez"

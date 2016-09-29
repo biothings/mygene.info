@@ -2,7 +2,7 @@ from .entrez_base import Gene2UnigeneParser
 import biothings.dataload.uploader as uploader
 
 
-class EntrezUnigeneUploader(uploader.BaseSourceUploader):
+class EntrezUnigeneUploader(uploader.MergerSourceUploader):
 
     name = "entrez_unigene"
     main_source = "entrez"

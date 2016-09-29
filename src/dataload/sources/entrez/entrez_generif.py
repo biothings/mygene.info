@@ -1,7 +1,7 @@
 from .entrez_base import Gene2GeneRifParser
 import biothings.dataload.uploader as uploader
 
-class EntrezGenerifUploader(uploader.BaseSourceUploader):
+class EntrezGenerifUploader(uploader.MergerSourceUploader):
 
     name = "entrez_generif"
     main_source = "entrez"

@@ -1,8 +1,9 @@
 from .entrez_base import GeneInfoParser
 from .entrez_base import get_geneid_d
 import biothings.dataload.uploader as uploader
+from dataload import RootDocSourceUploader
 
-class EntrezGeneUploader(uploader.BaseSourceUploader):
+class EntrezGeneUploader(RootDocSourceUploader):
 
     name = "entrez_gene"
     main_source = "entrez"

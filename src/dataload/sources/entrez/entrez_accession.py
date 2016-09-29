@@ -1,8 +1,7 @@
 from .entrez_base import Gene2AccessionParser
-
 import biothings.dataload.uploader as uploader
 
-class EntrezAccessionUploader(uploader.BaseSourceUploader):
+class EntrezAccessionUploader(uploader.MergerSourceUploader):
 
     name = "entrez_accession"
     main_source = "entrez"

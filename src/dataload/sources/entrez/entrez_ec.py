@@ -1,7 +1,7 @@
 from .entrez_base import Gene2ECParser
 import biothings.dataload.uploader as uploader
 
-class EntrezECUploader(uploader.BaseSourceUploader):
+class EntrezECUploader(uploader.MergerSourceUploader):
 
     name = "entrez_ec"
     main_source = "entrez"

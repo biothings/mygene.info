@@ -1,7 +1,7 @@
 from .entrez_base import HomologeneParser
 import biothings.dataload.uploader as uploader
 
-class EntrezHomologeneUploader(uploader.BaseSourceUploader):
+class EntrezHomologeneUploader(uploader.MergerSourceUploader):
 
     name = "entrez_homologene"
     main_source = "entrez"

@@ -1,7 +1,7 @@
 from .entrez_base import Gene2RetiredParser
 import biothings.dataload.uploader as uploader
 
-class EntrezRetiredUploader(uploader.BaseSourceUploader):
+class EntrezRetiredUploader(uploader.MergerSourceUploader):
 
     name = "entrez_retired"
     main_source = "entrez"

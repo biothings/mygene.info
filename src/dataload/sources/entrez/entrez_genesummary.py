@@ -1,7 +1,7 @@
 from .entrez_base import GeneSummaryParser
 import biothings.dataload.uploader as uploader
 
-class EntrezGeneSummaryUploader(uploader.BaseSourceUploader):
+class EntrezGeneSummaryUploader(uploader.MergerSourceUploader):
 
     name = "entrez_genesummary"
     main_source = "entrez"

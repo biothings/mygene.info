@@ -1,7 +1,7 @@
 from .pharmgkb_base import load_pharmgkb
 import biothings.dataload.uploader as uploader
 
-class PharmgkbUploader(uploader.BaseSourceUploader):
+class PharmgkbUploader(uploader.MergerSourceUploader):
 
     name = "pharmgkb"
 
