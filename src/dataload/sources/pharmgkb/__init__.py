@@ -1,19 +1,18 @@
 from .pharmgkb_base import load_pharmgkb
+import biothings.dataload.uploader as uploader
 
-__metadata__ = {
-    '__collection__': 'pharmgkb',
-}
+class PharmgkbUploader(uploader.BaseSourceUploader):
 
+    name = "pharmgkb"
 
-def load_data(self=None):
-    return load_pharmgkb()
+    def load_data(self, data_folder):
+        return load_pharmgkb(data_folder)
 
-
-def get_mapping(self=None):
-    mapping = {
-        "pharmgkb": {
-            "type": "string",
-            "analyzer": "string_lowercase"
+    def get_mapping(self):
+        mapping = {
+            "pharmgkb": {
+                "type": "string",
+                "analyzer": "string_lowercase"
+            }
         }
-    }
-    return mapping
+        return mapping
