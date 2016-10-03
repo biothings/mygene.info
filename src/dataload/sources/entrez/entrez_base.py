@@ -121,7 +121,7 @@ class GeneInfoParser(EntrezParserBase):
         load_done('[%d]' % cnt)
 
 
-def get_geneid_d(species_li=None, load_cache=True, save_cache=True,only_for={}):
+def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,only_for={}):
     '''return a dictionary of current/retired geneid to current geneid mapping.
        This is useful, when other annotations were mapped to geneids may
        contain retired gene ids.
@@ -136,7 +136,7 @@ def get_geneid_d(species_li=None, load_cache=True, save_cache=True,only_for={}):
         taxid_set = None
 
     orig_cwd = os.getcwd()
-    os.chdir(DATA_FOLDER)
+    os.chdir(data_folder)
 
     # check cache file
     _cache_file = 'gene/geneid_d.pyobj'
@@ -151,7 +151,7 @@ def get_geneid_d(species_li=None, load_cache=True, save_cache=True,only_for={}):
         os.chdir(orig_cwd)
         return out_d
 
-    DATAFILE = os.path.join(DATA_FOLDER, 'gene/gene_info.gz')
+    DATAFILE = os.path.join(data_folder, 'gene/gene_info.gz')
     load_start(DATAFILE)
     if species_li:
         species_filter = lambda ld: int(ld[0]) in taxid_set and (only_for and ld[1] in only_for)
@@ -160,7 +160,7 @@ def get_geneid_d(species_li=None, load_cache=True, save_cache=True,only_for={}):
     geneid_li = set(tab2list(DATAFILE, 1, includefn=species_filter))
     load_done('[%d]' % len(geneid_li))
 
-    DATAFILE = os.path.join(DATA_FOLDER, 'gene/gene_history.gz')
+    DATAFILE = os.path.join(data_folder, 'gene/gene_history.gz')
     load_start(DATAFILE)
 
     if species_li:
@@ -211,7 +211,7 @@ class HomologeneParser(EntrezParserBase):
 
         load_start(self.datafile)
         homo_d = tab2dict(self.datafile,(2,1),0,header=0)
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene/gene_history.gz')
+        DATAFILE = os.path.join(self.data_folder, 'gene/gene_history.gz')
         retired2gene = tab2dict(DATAFILE, (1, 2), 1, alwayslist=0,includefn=lambda ld: ld[1] != '-')
         for id in list(homo_d.keys()):
             homo_d[retired2gene.get(id,id)] = homo_d[id]
@@ -220,7 +220,7 @@ class HomologeneParser(EntrezParserBase):
             homologene_d = {}
             doc_li = []
             print()
-            geneid_d = get_geneid_d(self.species_li,load_cache=False,save_cache=False,only_for=homo_d)
+            geneid_d = get_geneid_d(self.data_folder, self.species_li,load_cache=False,save_cache=False,only_for=homo_d)
 
             for line in df:
                 ld = line.strip().split('\t')
@@ -357,12 +357,11 @@ class Gene2UnigeneParser(EntrezParserBase):
         load_start(self.datafile)
         print()
         uni_d = tab2dict(self.datafile, (0, 1), 0, alwayslist=0)
-        DATAFILE = os.path.join(DATA_FOLDER, 'gene/gene_history.gz')
+        DATAFILE = os.path.join(self.data_folder, 'gene/gene_history.gz')
         retired2gene = tab2dict(DATAFILE, (1, 2), 1, alwayslist=0,includefn=lambda ld: ld[1] != '-')
         for id in list(uni_d.keys()):
             uni_d[retired2gene.get(id,id)] = uni_d[id]
-        geneid_d = get_geneid_d(self.species_li,load_cache=False,save_cache=False,only_for=uni_d)
-        #geneid_d = get_geneid_d(self.species_li)
+        geneid_d = get_geneid_d(self.data_folder, self.species_li,load_cache=False,save_cache=False,only_for=uni_d)
         gene2unigene = tab2dict_iter(self.datafile, (0, 1), 0, alwayslist=0,
                                  includefn=lambda ld: int(ld[0]) in geneid_d)
         cnt = 0
