@@ -1,7 +1,7 @@
 from .ensembl_base import EnsemblParser
-from dataload import RootDocSourceUploader
+import biothings.dataload.uploader as uploader
 
-class EnsemblGeneUploader(RootDocSourceUploader):
+class EnsemblGeneUploader(uploader.MergerSourceUploader):
 
     name = "ensembl_gene"
     main_source = "ensembl"
@@ -29,3 +29,13 @@ class EnsemblGeneUploader(RootDocSourceUploader):
         ep = EnsemblParser(data_folder)
         ep._load_ensembl2entrez_li()
         return ep.ensembl2entrez_li
+
+    def generate_doc_src_master(self):
+        # TODO: not sure this ENTREZ_GENEDOC_ROOT is actually useful now we're using class inheritance
+        _doc = super(uploader.MergerSourceUploader,self).generate_doc_src_master()
+        _doc["ENSEMBL_GENEDOC_ROOT"] = True
+
+    def post_update_data(self):
+        self.logger.info('Uploading "mapping2entrezgene" to GridFS...')
+        x2entrezgene_list = self.get_mapping_to_entrez(self.data_folder)
+        dump2gridfs(x2entrezgene_list, self.name + '__2entrezgene_list.pyobj', self.db)

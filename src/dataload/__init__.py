@@ -45,29 +45,3 @@ __sources_dict__ = [
 ]
 
 
-class RootDocSourceUploader(uploader.MergerSourceUploader):
-
-    def post_update_data(self):
-        t0 = time.time()
-        if getattr(self, 'ENTREZ_GENEDOC_ROOT', False):
-            self.logger.info('Uploading "geneid_d" to GridFS...')
-            geneid_d = self.get_geneid_d()
-            dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
-        if getattr(self, 'ENSEMBL_GENEDOC_ROOT', False):
-            self.logger.info('Uploading "mapping2entrezgene" to GridFS...')
-            x2entrezgene_list = self.get_mapping_to_entrez(self.data_folder)
-            dump2gridfs(x2entrezgene_list, self.name + '__2entrezgene_list.pyobj', self.db)
-        self.logger.info('Done[%s]' % timesofar(t0))
-
-    def generate_doc_src_master(self):
-        _doc = {"_id": str(self.name),
-                "name": str(self.name),
-                "timestamp": datetime.datetime.now()}
-        for attr in ['ENTREZ_GENEDOC_ROOT', 'ENSEMBL_GENEDOC_ROOT', 'id_type']:
-            if hasattr(self, attr):
-                _doc[attr] = getattr(self, attr)
-        if hasattr(self, 'get_mapping'):
-            _doc['mapping'] = getattr(self, 'get_mapping')()
-
-        return _doc
-

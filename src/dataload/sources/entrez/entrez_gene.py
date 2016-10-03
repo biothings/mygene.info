@@ -1,9 +1,9 @@
 from .entrez_base import GeneInfoParser
 from .entrez_base import get_geneid_d
 import biothings.dataload.uploader as uploader
-from dataload import RootDocSourceUploader
+import biothings.dataload.uploader as uploader
 
-class EntrezGeneUploader(RootDocSourceUploader):
+class EntrezGeneUploader(uploader.MergerSourceUploader):
 
     name = "entrez_gene"
     main_source = "entrez"
@@ -142,3 +142,13 @@ class EntrezGeneUploader(RootDocSourceUploader):
 
     def get_geneid_d(self):
         return get_geneid_d()
+
+    def generate_doc_src_master(self):
+        # TODO: not sure this ENTREZ_GENEDOC_ROOT is actually useful now we're using class inheritance
+        _doc = super(uploader.MergerSourceUploader,self).generate_doc_src_master()
+        _doc["ENTREZ_GENEDOC_ROOT"] = True
+
+    def post_update_data(self):
+        self.logger.info('Uploading "geneid_d" to GridFS...')
+        geneid_d = self.get_geneid_d()
+        dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
