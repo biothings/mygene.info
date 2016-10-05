@@ -155,8 +155,10 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
     load_start(DATAFILE)
     if species_li:
         species_filter = lambda ld: int(ld[0]) in taxid_set and (only_for and ld[1] in only_for)
-    else:
+    elif only_for:
         species_filter = lambda ld: only_for and ld[1] in only_for
+    else:
+        species_filter = None
     geneid_li = set(tab2list(DATAFILE, 1, includefn=species_filter))
     load_done('[%d]' % len(geneid_li))
 
@@ -174,6 +176,7 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
     load_done('[%d]' % len(retired2gene))
     # convert key/value to int
     out_d = dict_convert(retired2gene, keyfn=int, valuefn=int)
+# TODO: this fills memory with key==value ...
     for g in geneid_li:
         _g = int(g)
         out_d[_g] = _g

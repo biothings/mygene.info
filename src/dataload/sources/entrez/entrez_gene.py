@@ -1,7 +1,7 @@
 from .entrez_base import GeneInfoParser
 from .entrez_base import get_geneid_d
 import biothings.dataload.uploader as uploader
-import biothings.dataload.uploader as uploader
+from biothings.utils.common import dump2gridfs
 
 class EntrezGeneUploader(uploader.MergerSourceUploader):
 
@@ -40,7 +40,7 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
                 "type": "string",
                 "analyzer": "string_lowercase"
             },
-    
+
             # do not index map_location and type_of_gene
             "map_location": {
                 "index": "no",
@@ -63,7 +63,7 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
                 "type": "string",
                 "include_in_all": False
             },
-    
+
             # convert index_name to lower-case, and excluded from "_all"
             "HGNC": {
                 "type": "string",              # 1771
@@ -140,8 +140,8 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
         }
         return mapping
 
-    def get_geneid_d(self):
-        return get_geneid_d()
+    def get_geneid_d(self,*args,**kwargs):
+        return get_geneid_d(self.data_folder, *args, **kwargs)
 
     def generate_doc_src_master(self):
         # TODO: not sure this ENTREZ_GENEDOC_ROOT is actually useful now we're using class inheritance
@@ -150,5 +150,5 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
 
     def post_update_data(self):
         self.logger.info('Uploading "geneid_d" to GridFS...')
-        geneid_d = self.get_geneid_d()
+        geneid_d = self.get_geneid_d(load_cache=False,save_cache=False)
         dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
