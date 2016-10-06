@@ -417,8 +417,7 @@ class Gene2GOParser(EntrezParserBase):
             convd = dict_convert(gd, valuefn=_ff)
             assert len(list(convd.items())) == 1, "nope: %s" % list(convd.items())
             gid, go = list(convd.items())[0]
-            gene_d = {}
-            gene_d[gid] = {'go': go}
+            gene_d = {"_id": gid, "go": go}
             yield gene_d
 
 
