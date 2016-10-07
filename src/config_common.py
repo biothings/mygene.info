@@ -124,5 +124,5 @@ DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
 # time in seconds for dispatcher to check new jobs
 DISPATCHER_SLEEP_TIME = 1
-# Use default storage
-SOURCE_STORAGE_CLASS = None # use default one
+# Use default source manager
+#SOURCE_MANAGER_CLASS = 
