@@ -40,78 +40,22 @@ import biothings.databuild.builder as builder
 
 class MyGeneDataBuilder(builder.DataBuilder):
 
-    def generate_root_document_query(self):
+    def generate_document_query(self, src_name):
         """Root documents are created according to species list"""
-        if "species" in self._build_config:
-            _query = {'taxid': {'$in': self._build_config['species']}}
-        elif "species_to_exclude" in self._build_config:
-            _query = {'taxid': {'$nin': self._build_config['species_to_exclude']}}
-        else:
-            _query = None
+        _query = None
+        if src_name in self.get_root_document_sources():
+            if "species" in self._build_config:
+                _query = {'taxid': {'$in': self._build_config['species']}}
+            elif "species_to_exclude" in self._build_config:
+                _query = {'taxid': {'$nin': self._build_config['species_to_exclude']}}
+            else:
+                _query = None
+        if _query:
+            self.logger.debug("Source '%s' requires custom query: '%s'" % (src_name,_query))
         return _query
 
     def clean_document_to_merge(self,doc):
-        doc = super(MyGeneDataBuilder,self).clean_document_to_merge(doc)
         doc.pop('taxid', None)
         return doc
 
-
-
-import biothings.databuild.backend as btbackend
-from biothings.utils.common import get_timestamp, get_random_string
-
-class MyGeneTargetDocMongoBackend(btbackend.TargetDocMongoBackend):
-
-    def generate_target_name(self,build_config_name):
-        return 'genedoc_{}_{}_{}'.format(build_config_name,
-                    get_timestamp(), get_random_string()).lower()
-
-
-
-if __name__ == '__main__':
-    import sys
-
-    import biothings, config
-    biothings.config_for_app(config)
-    from config import LOG_FOLDER
-
-    import biothings.utils.mongo as mongo
-    from databuild.mapper import EntrezRetired2Current, Ensembl2Entrez
-
-    if len(sys.argv) > 1:
-        build_name = sys.argv[1]
-    else:
-        build_name = 'mygene_allspecies'
-    use_parallel = '-p' in sys.argv
-    sources = None  # will build all sources
-    target = None   # will generate a new collection name
-    # "target_col:src_col1,src_col2" will specifically merge src_col1
-    # and src_col2 into existing target_col (instead of merging everything)
-    if not use_parallel and len(sys.argv) > 2:
-        target,tmp = sys.argv[2].split(":")
-        sources = tmp.split(",")
-
-    # declare source backend
-    source_backend =  btbackend.SourceDocMongoBackend(
-                            build=mongo.get_src_build(),
-                            master=mongo.get_src_master(),
-                            dump=mongo.get_src_dump(),
-                            sources=mongo.get_src_db())
-    # declare target backend
-    target_backend = MyGeneTargetDocMongoBackend(target_db=mongo.get_target_db())
-    # build mapping object (ensembl -> entrez IDs conversionà
-    retired2current = EntrezRetired2Current(convert_func=int,db=mongo.get_src_db())
-    ensembl2entrez = Ensembl2Entrez(name="ensembl_gene",
-                                    db=mongo.get_src_db(),
-                                    retired2current=retired2current)
-    # assemble the whole
-    bdr = MyGeneDataBuilder(
-            build_name,
-            doc_root_key="gene_root",
-            source_backend=source_backend,
-            target_backend=target_backend,
-            log_folder=config.LOG_FOLDER,
-            id_mappers=[ensembl2entrez])
-    # and start merging process
-    bdr.merge(sources=sources,target_name=target)
 

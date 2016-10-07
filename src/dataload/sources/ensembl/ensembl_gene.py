@@ -5,7 +5,7 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
 
     name = "ensembl_gene"
     main_source = "ensembl"
-    id_type = 'ensembl_gene'
+    id_type = 'ensembl'
     ENSEMBL_GENEDOC_ROOT = True
 
     def load_data(self, data_folder):

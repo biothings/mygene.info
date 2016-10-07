@@ -14,11 +14,17 @@ class EntrezRetired2Current(mapper.IDMapperBase):
             # but it's a way to know the entrez perimeter (what entrez _ids exist and should be considered
             self.map = loadobj(("entrez_gene__geneid_d.pyobj", self.db), mode='gridfs')
 
+    def process(self,*args,**kwargs):
+        raise UserWarning("Don't call me, please")
+
 
 class Ensembl2Entrez(mapper.IDMapperBase):
+    """
+    Mapper to convert ensembl _id to entrez type id.
+    """
 
-    def __init__(self, name, db, retired2current, *args, **kwargs):
-        super(Ensembl2Entrez,self).__init__(name,*args,**kwargs)
+    def __init__(self, db, retired2current, *args, **kwargs):
+        super(Ensembl2Entrez,self).__init__("ensembl_gene",*args,**kwargs)
         self.db = db
         self.retired2current = retired2current
 
@@ -33,7 +39,24 @@ class Ensembl2Entrez(mapper.IDMapperBase):
                 if entrez_id in self.retired2current:
                     self.map[ensembl_id] = self.retired2current.translate(entrez_id)
 
-    def convert(self,docs,key_to_convert,**kwargs):
+
+class Ensembl2EntrezRoot(mapper.IDMapperBase):
+    """
+    Mapper to select ensembl documents. Those whose _id can be translated
+    to entrez are discarded, ensembl-only documents are the only ones kept.
+    """
+
+    def __init__(self, ensembl2entrez, *args, **kwargs):
+        super(Ensembl2EntrezRoot,self).__init__("ensembl",*args,**kwargs)
+        self.ensembl2entrez = ensembl2entrez
+
+    def load(self):
+        # this mapper strictly use the same mapping dict as its base class
+        if self.map is None:
+            self.ensembl2entrez.load()
+            self.map = self.ensembl2entrez.map
+
+    def process(self,docs,key_to_convert="_id",**kwargs):
         """
         we want to force translation, not defaulting to ensembl if no match
         so, if there's a match, it means ensembl doc can be converted so it means
