@@ -50,6 +50,23 @@ class MyGeneDataBuilder(builder.DataBuilder):
             _query = None
         return _query
 
+    def clean_document_to_merge(self,doc):
+        doc = super(MyGeneDataBuilder,self).clean_document_to_merge(doc)
+        doc.pop('taxid', None)
+        return doc
+
+
+
+import biothings.databuild.backend as btbackend
+from biothings.utils.common import get_timestamp, get_random_string
+
+class MyGeneTargetDocMongoBackend(btbackend.TargetDocMongoBackend):
+
+    def generate_target_name(self,build_config_name):
+        return 'genedoc_{}_{}_{}'.format(build_config_name,
+                    get_timestamp(), get_random_string()).lower()
+
+
 
 if __name__ == '__main__':
     import sys
@@ -59,7 +76,6 @@ if __name__ == '__main__':
     from config import LOG_FOLDER
 
     import biothings.utils.mongo as mongo
-    import biothings.databuild.backend as btbackend
     from databuild.mapper import EntrezRetired2Current, Ensembl2Entrez
 
     if len(sys.argv) > 1:
@@ -82,7 +98,7 @@ if __name__ == '__main__':
                             dump=mongo.get_src_dump(),
                             sources=mongo.get_src_db())
     # declare target backend
-    target_backend = btbackend.TargetDocMongoBackend(target_db=mongo.get_target_db())
+    target_backend = MyGeneTargetDocMongoBackend(target_db=mongo.get_target_db())
     # build mapping object (ensembl -> entrez IDs conversionà
     retired2current = EntrezRetired2Current(convert_func=int,db=mongo.get_src_db())
     ensembl2entrez = Ensembl2Entrez(name="ensembl_gene",
