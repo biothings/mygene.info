@@ -751,6 +751,22 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(hit["exac"]["nonpsych"]["syn_z"], 0.0369369403215127)
         eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
 
+    def test_caseinsensitive(self):
+        lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
+        upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"))
+        eq_(lower["hits"],upper["hits"])
+
+    def test_symbolnamespecies_order(self):
+        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
+        hits = res["hits"]
+        # first is 1017, it's human and cdk2 is a symbol
+        eq_(hits[0]["_id"],"1017")
+        # second is 12566, mouse
+        eq_(hits[1]["_id"],"12566")
+        # third is 362817, rat
+        eq_(hits[2]["_id"],"362817")
+
+
 
 # Self contained test class, used for CI tools such as Travis
 # This will start a Tornado server on its own and perform tests
