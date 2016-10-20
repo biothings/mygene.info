@@ -41,6 +41,9 @@ def get_mapping(self):
             "type": "string",
             "boost": 0.8    # downgrade name field a little bit
         },
+        "other_names": {
+            "type": "string_lowercase",
+        },
         "symbol": {
             "type": "string",
             "analyzer": "string_lowercase",
