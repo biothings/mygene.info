@@ -761,6 +761,15 @@ class MyGeneTest(BiothingTestHelperMixin):
         # third is 362817, rat
         eq_(hits[2]["_id"],"362817")
 
+    def test_gene_other_names(self):
+        # this one has some
+        res = self.json_ok(self.get_ok(self.api + "/gene/107924918"))
+        assert "other_names" in res, "No other_names found in %s" % res
+        eq_(res["other_names"],["aquaporin NIP1;2","aquaporin NIP1;3"])
+        # that one not
+        res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
+        assert not "other_names" in res
+
 
 
 # Self contained test class, used for CI tools such as Travis
