@@ -248,7 +248,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                     'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                    'exons', 'HPRD','exac']))
+                                    'exons', 'HPRD','exac','other_names']))
         eq_(res[0]['entrezgene'], 1017)
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
