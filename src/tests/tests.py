@@ -775,8 +775,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
         assert not "other_names" in res
         # query by other_names:
-        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33*"))
-        eq_(len(res["hits"]),3)
+        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33"))
+        eq_(len(res["hits"]),6)
         ids = [h["_id"] for h in res["hits"]]
         assert "1017" in ids, "Should have 1017 in results"
 
