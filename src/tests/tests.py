@@ -775,6 +775,24 @@ class MyGeneTest(BiothingTestHelperMixin):
         ids = [h["_id"] for h in res["hits"]]
         assert "1017" in ids, "Should have 1017 in results"
 
+    def test_int_float(self):
+        def check_homologene(res):
+            for h in res["homologene"]["genes"]:
+                eq_(type(h[0]),int)
+                eq_(type(h[1]),int)
+        def check_exons(res):
+            for ex in res["exons"]:
+                for pos in ex["position"]:
+                    eq_(type(pos[0]),int)
+                    eq_(type(pos[1]),int)
+        res = self.json_ok(self.get_ok(self.api + "/gene/1017?species=9606&fields=homologene,exons"))
+        check_homologene(res)
+        check_exons(res)
+        resall = self.json_ok(self.get_ok(self.api + "/gene/1017?fields=homologene,exons"))
+        check_homologene(resall)
+        check_exons(resall)
+
+
 
 
 
