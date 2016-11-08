@@ -22,6 +22,8 @@ GA_ACCOUNT = 'UA-xxxxxxxx-x'
 # Turn this to True to start google analytics tracking
 GA_RUN_IN_PROD = False
 
+# Path to folder containing user defined queries
+USERQUERY_DIR = 'biothings.userqueries/mygene'
 
 # ################ #
 # MYGENE HUB VARS  #

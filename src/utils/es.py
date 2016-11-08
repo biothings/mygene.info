@@ -222,8 +222,8 @@ class ESQueryBuilder(ESQueryBuilder):
                                   returned genes must have NO given field(s).
 
         """
-        super(ESQueryBuilder, self).__init__()
-        self._query_options = query_options
+        super(ESQueryBuilder, self).__init__(**query_options)
+        #self._query_options = query_options
         # species should be either 'all' or a list of taxids.
         self.species = self._query_options.pop('species', 'all')
         self.species_facet_filter = self._query_options.pop(
