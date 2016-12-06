@@ -60,17 +60,18 @@ class QueryHandler(QueryHandler):
     esq = ESQuery()
 
 
-class SpeciesHandler(BaseHandler):
+class TaxonHandler(BaseHandler):
 
     def get(self, taxid):
-        self.redirect("http://s.biothings.io/v1/species/%s?include_children=1" % taxid)
+        self.redirect("http://t.biothings.io/v1/taxon/%s?include_children=1" % taxid)
 
 
 APP_LIST = [
     (r"/gene/([\w\-\.]+)/?", GeneHandler),   # for gene get request
     (r"/gene/?$", GeneHandler),              # for gene post request
     (r"/query/?", QueryHandler),
-    (r"/species/(\d+)/?", SpeciesHandler),
+    (r"/species/(\d+)/?", TaxonHandler),
+    (r"/taxon/(\d+)/?", TaxonHandler),
     (r"/metadata", MyGeneMetaDataHandler),
     (r"/metadata/fields", MyGeneFieldsHandler),
 ]

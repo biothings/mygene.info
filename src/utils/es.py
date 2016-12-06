@@ -141,7 +141,7 @@ class ESQuery(ESQuery):
                        'user-agent': "Python-requests_mygene.info/%s (gzip)"
                        % requests.__version__}
             # TODO: URL as config param
-            res = requests.post('http://s.biothings.io/v1/species?ids=' +
+            res = requests.post('http://t.biothings.io/v1/taxon?ids=' +
                                 ','.join(['{}'.format(sid) for sid in
                                           kwargs['species']]) +
                                 '&expand_species=true', headers=headers)
