@@ -8,13 +8,14 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
 
-ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'sort', 'explain',
+ALLOWED_OPTIONS = ['_source', 'start', 'from', 'size', 'sort', 'explain',
                    'version', 'aggs', 'fetch_all', 'species', 'fields',
                    'userfilter', 'exists', 'missing', 'include_tax_tree',
                    'species_facet_filter']
 
 ES_DOC_TYPE = 'gene'
-
+ES_SCROLL_SIZE = 1000
+ES_SCROLL_TIME = '1m'
 STATUS_CHECK_ID = '1017'
 
 FIELD_NOTES_PATH = ''
