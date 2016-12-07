@@ -59,6 +59,24 @@ class GeneHandler(BiothingHandler):
 class QueryHandler(QueryHandler):
     esq = ESQuery()
 
+    # over ride from biothings BaseHandler to stop renaming "from" to "from_"
+    def _check_paging_param(self, kwargs):
+        '''support paging parameters, limit and skip as the aliases of size and from.'''
+        if 'limit' in kwargs and 'size' not in kwargs:
+            kwargs['size'] = kwargs['limit']
+            del kwargs['limit']
+        if 'skip' in kwargs and 'from' not in kwargs:
+            kwargs['from'] = kwargs['skip']
+            del kwargs['skip']
+        # cap size
+        if 'size' in kwargs:
+            cap = biothing_settings.size_cap
+            try:
+                kwargs['size'] = int(kwargs['size']) > cap and cap or kwargs['size']
+            except ValueError:
+                # int conversion failure is delegated to later process
+                pass
+        return kwargs
 
 class TaxonHandler(BaseHandler):
 
