@@ -70,7 +70,7 @@ class QueryHandler(QueryHandler):
             del kwargs['skip']
         # cap size
         if 'size' in kwargs:
-            cap = biothing_settings.size_cap
+            cap = mygene_settings.size_cap
             try:
                 kwargs['size'] = int(kwargs['size']) > cap and cap or kwargs['size']
             except ValueError:
