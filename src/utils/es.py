@@ -224,6 +224,7 @@ class ESQueryBuilder(ESQueryBuilder):
         """
         super(ESQueryBuilder, self).__init__()
         self._query_options = query_options
+        self._options = self._query_options.pop('options', {})
         # species should be either 'all' or a list of taxids.
         self.species = self._query_options.pop('species', 'all')
         self.species_facet_filter = self._query_options.pop(
