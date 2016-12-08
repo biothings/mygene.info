@@ -443,7 +443,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_fetch_all(self):
         res = self.json_ok(self.get_ok(self.api +
-                           '/query?q=cdk2&fetch_all=true'))
+                           '/query?q=cdk*&species=all&fetch_all=true'))
         assert '_scroll_id' in res
 
         res2 = self.json_ok(self.get_ok(self.api +
