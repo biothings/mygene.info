@@ -107,6 +107,8 @@ def get_all_species(release):
         logging.info('Parsing "species.txt.gz"...')
         species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
         species_li = [x[:-1] + [_to_int(x[-1])] for x in species_li]
+        # as of ensembl 87, there are also mouse strains. keep only the "original" one
+        species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
         logging.info('Done.')
     finally:
         os.remove(outfile)
