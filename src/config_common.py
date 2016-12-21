@@ -17,7 +17,8 @@ ES_DOC_TYPE = 'gene'
 ES_SCROLL_SIZE = 1000
 ES_SCROLL_TIME = '1m'
 STATUS_CHECK_ID = '1017'
-
+#TODO: uncomment in prod
+#USERQUERY_DIR = 'biothings.userqueries/mygene'
 FIELD_NOTES_PATH = ''
 JSONLD_CONTEXT_PATH = ''
 
