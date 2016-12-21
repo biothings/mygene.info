@@ -48,7 +48,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         # test all fields are load in gene objects
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
 
-        attr_li = ['HGNC', 'HPRD', 'MIM', 'Vega', '_id', 'accession', 'alias',
+        attr_li = ['HGNC', 'MIM', 'Vega', '_id', 'accession', 'alias',
                    'ec', 'ensembl', 'entrezgene', 'genomic_pos', 'go',
                    'homologene', 'interpro', 'ipi', 'map_location', 'name',
                    'pdb', 'pharmgkb', 'pir', 'prosite', 'reagent', 'refseq',
@@ -248,7 +248,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                     'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                    'exons', 'HPRD','exac','other_names']))
+                                    'exons', 'exac','other_names']))
         eq_(res[0]['entrezgene'], 1017)
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
@@ -752,8 +752,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
 
     def test_caseinsensitive(self):
-        lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
-        upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"))
+        lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"),filter=True)
+        upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
         eq_(lower["hits"],upper["hits"])
 
     def test_symbolnamespecies_order(self):
