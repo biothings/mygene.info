@@ -1,84 +1,90 @@
-# LOGGING #
-import logging
-LOGGER_NAME = "mygene.hub"
-# this will affect any logging calls
-logger = logging.getLogger(LOGGER_NAME)
-logger.setLevel(logging.DEBUG)
-# log to console by default
-logger.addHandler(logging.StreamHandler())
+# -*- coding: utf-8 -*-
+from biothings.www.settings.default import *
+from www.api.query_builder import ESQueryBuilder
+from www.api.query import ESQuery
+from www.api.transform import ESResultTransformer
+from www.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusHandler, TaxonHandler, DemoHandler
 
-
-ALLOWED_OPTIONS = ['_source', 'start', 'from', 'size', 'sort', 'explain',
-                   'version', 'aggs', 'fetch_all', 'species', 'fields',
-                   'userfilter', 'exists', 'missing', 'include_tax_tree',
-                   'species_facet_filter']
-
+# *****************************************************************************
+# Elasticsearch variables
+# *****************************************************************************
+# elasticsearch server transport url
+ES_HOST = 'localhost:9200'
+# elasticsearch index name
+ES_INDEX = 'mygene_current'
+# elasticsearch document type
 ES_DOC_TYPE = 'gene'
-ES_SCROLL_SIZE = 1000
-ES_SCROLL_TIME = '1m'
-STATUS_CHECK_ID = '1017'
-#TODO: uncomment in prod
-#USERQUERY_DIR = 'biothings.userqueries/mygene'
-FIELD_NOTES_PATH = ''
-JSONLD_CONTEXT_PATH = ''
 
-GENOME_ASSEMBLY = {
-    "human": "hg38",
-    "mouse": "mm10",
-    "rat": "rn4",
-    "fruitfly": "dm3",
-    "nematode": "ce10",
-    "zebrafish": "zv9",
-    "frog": "xenTro3",
-    "pig": "susScr2"
-}
-
-TAXONOMY = {
-    "human": 9606,
-    "mouse": 10090,
-    "rat": 10116,
-    "fruitfly": 7227,
-    "nematode": 6239,
-    "zebrafish": 7955,
-    "thale-cress": 3702,
-    "frog": 8364,
-    "pig": 9823
-}
-
-SPECIES_LI = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish',
-              'thale-cress', 'frog', 'pig']
-
-
-# 'category' in google analytics event object
-GA_EVENT_CATEGORY = 'v3_api'
-# url for google analytics tracker
-GA_TRACKER_URL = 'mygene.info'
-
-# *****************************************************************************
-# URL settings
-# *****************************************************************************
-# For URL stuff
-ANNOTATION_ENDPOINT = 'gene'
-QUERY_ENDPOINT = 'query'
 API_VERSION = 'v3'
 
 # *****************************************************************************
-# Tests
+# App URL Patterns
 # *****************************************************************************
-# use this file as nosetest config file
-NOSETEST_SETTINGS = "config"
-# Env. var containing root URL to services
-HOST_ENVAR_NAME = "MG_HOST"
+APP_LIST = [
+    (r"/status", StatusHandler),
+    (r"/metadata/?", MetadataHandler),
+    (r"/metadata/fields/?", MetadataHandler),
+    (r"/demo/?$", DemoHandler),
+    (r"/{}/species/(\d+)/?".format(API_VERSION), TaxonHandler),
+    (r"/{}/taxon/(\d+)/?".format(API_VERSION), TaxonHandler),
+    (r"/{}/gene/(.+)/?".format(API_VERSION), GeneHandler),
+    (r"/{}/gene/?$".format(API_VERSION), GeneHandler),
+    (r"/{}/query/?".format(API_VERSION), QueryHandler),
+    (r"/{}/metadata/?".format(API_VERSION), MetadataHandler),
+    (r"/{}/metadata/fields/?".format(API_VERSION), MetadataHandler),
+]
 
-# translate data source
-# (keys will be used as regex pattern, case-ignored)
-# /!\ values can be evaled as regex by ES
-# so special chars may need escape.
-# Ex: "refseq.\*" should be escaped 2 times,
-# one for ES, one for python ES client
-# Also, make sure using raw python string so there's no
-# need to actually escape here again...
-SOURCE_TRANSLATORS = {
+###############################################################################
+#   app-specific query builder, query, and result transformer classes
+###############################################################################
+
+# *****************************************************************************
+# Subclass of biothings.www.api.es.query_builder.ESQueryBuilder to build
+# queries for this app
+# *****************************************************************************
+ES_QUERY_BUILDER = ESQueryBuilder
+# *****************************************************************************
+# Subclass of biothings.www.api.es.query.ESQuery to execute queries for this app
+# *****************************************************************************
+ES_QUERY = ESQuery
+# *****************************************************************************
+# Subclass of biothings.www.api.es.transform.ESResultTransformer to transform
+# ES results for this app
+# *****************************************************************************
+ES_RESULT_TRANSFORMER = ESResultTransformer
+
+GA_ACTION_QUERY_GET = 'query_get'
+GA_ACTION_QUERY_POST = 'query_post'
+GA_ACTION_ANNOTATION_GET = 'gene_get'
+GA_ACTION_ANNOTATION_POST = 'gene_post'
+GA_TRACKER_URL = 'MyGene.info'
+
+STATUS_CHECK_ID = '1017'
+
+JSONLD_CONTEXT_PATH = 'www/context/context.json'
+
+# MYGENE THINGS
+# This essentially bypasses the es.get fallback as in myvariant...
+# The first regex matched integers, in which case the query becomes against entrezgeneall annotation queries are now multimatch
+# against the following fields
+ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired']),
+                            (re.compile(r'.*'), ['ensembl.gene'])]
+
+DEFAULT_FIELDS = ['name', 'symbol', 'taxid', 'entrezgene']
+
+TAXONOMY = {
+    "human": {"tax_id": "9606", "assembly": "hg38"},
+    "mouse": {"tax_id": "10090", "assembly": "mm10"},
+    "rat": {"tax_id": "10116", "assembly": "rn4"},
+    "fruitfly": {"tax_id": "7227", "assembly": "dm3"},
+    "nematode": {"tax_id": "6239", "assembly": "ce10"},
+    "zebrafish": {"tax_id": "7955", "assembly": "zv9"},
+    "thale-cress": {"tax_id": "3702"},
+    "frog": {"tax_id": "8364", "assembly": "xenTro3"}, 
+    "pig": {"tax_id": "9823", "assembly": "susScr2"}
+}
+
+DATASOURCE_TRANSLATIONS = {
     "refseq:":  r"refseq.\\\*:",
     "accession:":   r"accession.\\\*:",
     "reporter:":    r"reporter.\\\*:",
@@ -110,17 +116,33 @@ SOURCE_TRANSLATORS = {
     "zfin:":      r"ZFIN:",
     "xenbase:":      r"Xenbase:",
     "mirbase:":     r"miRBase:",
-
 }
 
+SPECIES_TYPEDEF = {'species': {'type': list, 'default': ['all'], 'max': 10, 
+                   'translations': [(re.compile(pattern, re.I), translation['tax_id']) for (pattern, translation) in TAXONOMY.items()]}}
 
-# ################ #
-# MYGENE HUB VARS  #
-# ################ #
+# For datasource translations
+DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(pattern, re.I), translation) for 
+    (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
+TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(re.sub(r':.*', '', pattern).replace('\\', ''), re.I), 
+    re.sub(r':.*', '', translation).replace('\\','')) for (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
 
-DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
-DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
-DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
-DATA_SRC_DATABASE = 'genedoc_src'
+# Kwarg control update for mygene specific kwargs
 
-DATA_TARGET_MASTER_COLLECTION = 'db_master'
+# ES KWARGS (_source, scopes, 
+ANNOTATION_GET_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
+    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+ANNOTATION_POST_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
+    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+QUERY_GET_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+QUERY_POST_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+
+# Control KWARGS
+QUERY_GET_CONTROL_KWARGS['q'].update({'translations': DATASOURCE_TRANSLATION_TYPEDEF})
+
+# query builder KWARGS
+ANNOTATION_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
+ANNOTATION_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
+QUERY_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
+QUERY_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
+QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
