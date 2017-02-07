@@ -113,6 +113,8 @@ SOURCE_TRANSLATORS = {
 
 }
 
+# For JSON-LD context
+JSONLD_CONTEXT_PATH = 'www/context/context.json'
 
 # ################ #
 # MYGENE HUB VARS  #
