@@ -18,7 +18,7 @@ __metadata__ = {
     '__collection__': 'entrez_genomic_pos',
 }
 
-TAXIDS_FILE = os.path.join(DATA_FOLDER, "../ref_microbe_taxids_20151014.pyobj")
+TAXIDS_FILE = os.path.join(DATA_FOLDER, "../ref_microbe_taxids.pyobj")
 DATAFILE = os.path.join(DATA_FOLDER, 'gene/gene2refseq.gz')
 
 
@@ -90,17 +90,19 @@ def get_ref_microbe_taxids():
 
     :return:
     """
-    import urllib
+    import urllib.request
     import csv
 
     urlbase = 'ftp://ftp.ncbi.nlm.nih.gov'
     urlextension = '/genomes/refseq/bacteria/assembly_summary.txt'
-    assembly = urllib.urlopen(urlbase + urlextension)
-    datareader = csv.reader(assembly.read().splitlines(), delimiter="\t")
+    assembly = urllib.request.urlopen(urlbase + urlextension)
+    datareader = csv.reader(assembly.read().decode().splitlines(), delimiter="\t")
     taxid = []
 
     for row in datareader:
-        if row[4] == 'reference genome':
+        if len(row) == 1 and row[0].startswith("#"):
+            continue
+        if row[4] in ['reference genome','representative genome']:
             taxid.append(row[5])
 
     ts = get_timestamp()
