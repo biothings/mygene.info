@@ -1,4 +1,4 @@
-from cpdb_base import load_cpdb, _download
+from .cpdb_base import load_cpdb, _download
 
 
 __metadata__ = {
