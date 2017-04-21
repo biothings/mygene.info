@@ -61,7 +61,14 @@ _id field
 
 Each individual gene object contains an "**_id**" field as the primary key. The value of the "**_id**" field is the NCBI gene ID (the same as "entrezgene" field, but as a string) if available for a gene object, otherwise, Ensembl gene ID is used (e.g. those Ensembl-only genes). Here is `an example <http://mygene.info/v3/gene/ENSG00000274236>`_. We recommend to use "**entrezgene**" field for the NCBI gene ID, and "**ensembl.gene**" field for Ensembl gene ID, instead of using "**_id**" field.
 
-.. note:: Regardless how the value of the "**_id**" field looks like, either NCBI gene ID or Ensembl gene ID always work for our gene annotation endpoint *`/v3/gene/\<geneid\> <http://docs.mygene.info/en/latest/doc/annotation_service.html#get-request>`_*.
+.. note:: Regardless how the value of the "**_id**" field looks like, either NCBI gene ID or Ensembl gene ID always works for our gene annotation service `/v3/gene/\<geneid\> <http://docs.mygene.info/en/latest/doc/annotation_service.html#get-request>`_.
+
+
+_score field
+------------
+You will often see a "**_score**" field in the returned gene object, which is the internal score representing how well the query matches the returned gene object. It probably does not mean much in `gene annotation service <http://docs.mygene.info/en/latest/doc/annotation_service.html>`_ when only one gene object is returned. In `gene query 
+service <http://docs.mygene.info/en/latest/doc/query_service.html>`_, by default, the returned gene hits are sorted by the scores in descending order.
+
 
 .. _species:
 
