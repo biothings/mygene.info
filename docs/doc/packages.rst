@@ -52,6 +52,19 @@ This is a brief example:
 See https://pypi.python.org/pypi/mygene for more details.
 
 
+MyGene R package
+-------------------
+An R wrapper for the MyGene.info API is available in Bioconductor since v3.0.  To install::
+
+    source("https://bioconductor.org/biocLite.R")
+    biocLite("mygene")
+
+To view documentation for your installation, enter R and type::
+
+    browseVignettes("mygene")
+
+For more information, visit the `Bioconductor mygene page <https://www.bioconductor.org/packages/release/bioc/html/mygene.html>`_.
+
 
 
 MyGene autocomplete widget
