@@ -77,7 +77,7 @@ You can also play with this `jsFiddle <http://jsfiddle.net/frm3X/>`_ example:
 
 .. raw:: html
 
-    <iframe width="100%" height="400" src="http://jsfiddle.net/frm3X/embedded/js,resources,html,result/presentation/" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+    <script async src="//jsfiddle.net/frm3X/embed/"></script>
 
 
 
