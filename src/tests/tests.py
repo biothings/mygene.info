@@ -718,8 +718,9 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(len(res["hits"]),1)
         eq_(res["hits"][0]["symbol"],"Setdb2")
         res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000011454"))
-        eq_(type(res),dict)
-        eq_(res["entrezgene"],23637)
+        eq_(type(res),list)
+        eq_(res[0]["entrezgene"],2844)
+        eq_(res[1]["entrezgene"],23637)
         res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000237613"))
         eq_(type(res),dict)
         eq_(res["entrezgene"],645520)
@@ -770,7 +771,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         # this one has some
         res = self.json_ok(self.get_ok(self.api + "/gene/107924918"))
         assert "other_names" in res, "No other_names found in %s" % res
-        eq_(res["other_names"],["aquaporin NIP1;2","aquaporin NIP1;3"])
+        eq_(res["other_names"],['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3'])
         # that one not
         res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
         assert not "other_names" in res
@@ -839,7 +840,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         # this one has some
         res = self.json_ok(self.get_ok(self.api + "/gene/107924918"))
         assert "other_names" in res, "No other_names found in %s" % res
-        eq_(res["other_names"],["aquaporin NIP1;2","aquaporin NIP1;3"])
+        eq_(res["other_names"],['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3'])
         # that one not
         res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
         assert not "other_names" in res
