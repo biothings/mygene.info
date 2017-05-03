@@ -121,5 +121,5 @@ domready(function () {
       if (el) el.innerHTML = status_text;
     }
   };
-  myConn.connect("http://mygene.info/v2/metadata", "GET", "", update_status);
+  myConn.connect("http://mygene.info/metadata", "GET", "", update_status);
 })

@@ -74,35 +74,6 @@ def addsuffix(filename, suffix, noext=False):
     else:
         return suffix.join(os.path.splitext(filename))
 
-
-def safewfile(filename, prompt=True, default='C', mode='w'):
-    '''return a file handle in 'w' mode,use alternative name if same name exist.
-       if prompt == 1, ask for overwriting,appending or changing name,
-       else, changing to available name automatically.'''
-    suffix = 1
-    while 1:
-        if not os.path.exists(filename):
-            break
-        print('Warning:"%s" exists.' % filename, end='')
-        if prompt:
-            option = ask('Overwrite,Append or Change name?', 'OAC')
-        else:
-            option = default
-        if option == 'O':
-            if not prompt or ask('You sure?') == 'Y':
-                print("Overwritten.")
-                break
-        elif option == 'A':
-            print("Append to original file.")
-            f = open(filename, 'a')
-            f.write('\n' + "=" * 20 + 'Appending on ' + time.ctime() + "=" * 20 + '\n')
-            return f, filename
-        print('Use "%s" instead.' % addsuffix(filename, '_' + str(suffix)))
-        filename = addsuffix(filename, '_' + str(suffix))
-        suffix += 1
-    return open(filename, mode), filename
-
-
 def SubStr(input_string, start_string='', end_string='', include=0):
     '''Return the substring between start_string and end_string.
         If start_string is '', cut string from the beginning of input_string.

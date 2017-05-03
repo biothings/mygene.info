@@ -1,5 +1,6 @@
 from __future__ import print_function
 import os.path
+import datetime
 from config import SPECIES_LI, TAXONOMY
 from utils.common import file_newer, loadobj, dump
 from dataload import get_data_folder
@@ -81,18 +82,21 @@ class GeneInfoParser(EntrezParserBase):
             if other_designations != "-":
                 out['other_names'] = normalized_value(other_designations.split('|'))
 
+            # when merged, this will become the default timestamp
+            out["_timestamp"] = datetime.datetime.strptime(modification_date,"%Y%m%d")
+
             for x in dbxrefs.split('|'):
                 if x == '-':
                     continue
                 xd = x.split(':')
                 if len(xd) == 3 and xd[0] == xd[1] and \
-                        xd[0] in ['HGNC', 'MGI']:
+                        xd[0] in ['VGNC', 'HGNC', 'MGI']:
                     # a fix for NCBI bug for dup xref prefix, 'HGNC:HGNC:36328'
                     xd = xd[1:]
                 try:
                     _db, _id = xd
                 except:
-                    print(x)
+                    print(repr(x))
                     raise
                 # we don't need ensembl xref from here, we will get it from
                 # Ensembl directly

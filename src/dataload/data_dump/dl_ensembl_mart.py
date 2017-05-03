@@ -29,7 +29,7 @@ from biothings.utils.common import ask, timesofar, safewfile
 
 src_path = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])[0]
 sys.path.append(src_path)
-from utils.mongo import get_src_dump
+from biothings.utils.mongo import get_src_dump
 from utils.dataload import tab2list
 from utils.common import setup_logfile, hipchat_msg
 from config import DATA_ARCHIVE_ROOT, logger as logging
@@ -107,6 +107,8 @@ def get_all_species(release):
         logging.info('Parsing "species.txt.gz"...')
         species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
         species_li = [x[:-1] + [_to_int(x[-1])] for x in species_li]
+        # as of ensembl 87, there are also mouse strains. keep only the "original" one
+        species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
         logging.info('Done.')
     finally:
         os.remove(outfile)

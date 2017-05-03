@@ -6,11 +6,11 @@ import copy
 from datetime import datetime
 from pprint import pformat
 
-from utils.mongo import (get_src_db, get_target_db, get_src_master,
+from biothings.utils.mongo import (get_src_db, get_target_db, get_src_master,
                          get_src_build, get_src_dump, doc_feeder)
-from biothings.utils.common import (timesofar, ask,
+from biothings.utils.common import (timesofar, ask, safewfile,
                                     dump2gridfs, get_timestamp, get_random_string)
-from utils.common import safewfile, setup_logfile, loadobj
+from utils.common import setup_logfile, loadobj
 from utils.dataload import list2dict, alwayslist
 from utils.es import ESIndexer
 import databuild.backend
@@ -475,7 +475,7 @@ class DataBuilder():
                 self._load_entrez_geneid_d()
             #geneid_set = set([x['_id'] for x in target_collection.find(projection=[], manipulate=False)])
             geneid_set = set(self.target.get_id_list())
-            logging.info('\t', len(geneid_set))
+            logging.info('\t%s' % len(geneid_set))
 
         if not src_collection_list:
             src_collection_list = self._build_config['sources']
@@ -721,7 +721,7 @@ class DataBuilder():
 
         if n > 0:
             for src in self._build_config['sources']:
-                logging.info("\nSrc:", src)
+                logging.info("\nSrc: %s" % src)
                 # if 'id_type' in self.src_master[src] and self.src_master[src]['id_type'] != 'entrez_gene':
                 #     print "skipped."
                 #     continue
@@ -738,7 +738,7 @@ class DataBuilder():
                         if _first_exception:
                             logging.info()
                             _first_exception = False
-                        logging.info(_id, 'not found.')
+                        logging.info("%s not found." % _id)
                         continue
                     for k in doc:
                         if src == 'entrez_homologene' and k == 'taxid':
@@ -791,8 +791,8 @@ class DataBuilder():
         target_collection = "genedoc_{}_current".format(build_config)
         _db = get_target_db()
         target_collection = _db[target_collection]
-        logging.info()
-        logging.info('Source: ', target_collection.name)
+        logging.info("")
+        logging.info('Source: %s' % target_collection.name)
         _mapping = self.get_mapping()
         _meta = {}
         src_version = self.get_src_version()
@@ -863,7 +863,7 @@ def main():
     bdr.using_ipython_cluster = use_parallel
     bdr.merge(sources=sources,target=target)
 
-    logging.info("Finished.", timesofar(t0))
+    logging.info("Finished. %s" % timesofar(t0))
 
 
 if __name__ == '__main__':

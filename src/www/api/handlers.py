@@ -30,7 +30,6 @@ class MyGeneFieldsHandler(FieldsHandler):
     ''' This class is for the /metadata/fields endpoint. '''
     esq = ESQuery()
 
-
 class GeneHandler(BiothingHandler):
     esq = ESQuery()
 

@@ -18,8 +18,7 @@ import io
 import itertools
 import csv
 import json
-from utils.common import safewfile
-from biothings.utils.common import ask
+from biothings.utils.common import ask, safewfile
 
 csv.field_size_limit(10000000)   # default is 131072, too small for some big files
 

@@ -25,7 +25,7 @@ from elasticsearch import Elasticsearch
 from .userfilters import UserFilters
 
 from elasticsearch import helpers
-from utils.mongo import doc_feeder
+from biothings.utils.mongo import doc_feeder
 
 
 import logging

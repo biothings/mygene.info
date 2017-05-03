@@ -8,16 +8,16 @@ from dataload import get_data_folder
 
 # DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/uniprot')
 DATA_FOLDER = os.path.join(get_data_folder('ucsc'), 'goldenPath/currentGenomes')
+REFLINK_FILE = os.path.join(get_data_folder('ucsc'), 'goldenPath/hgFixed/database/refLink.txt.gz')
+refseq2gene = tab2dict(REFLINK_FILE, (2, 6), 0, alwayslist=False)
 
 
 def load_exons_for_species(species, exons_key='exons'):
     refflat_file = os.path.join(DATA_FOLDER, species, 'database/refFlat.txt.gz')
-    reflink_file = os.path.join(DATA_FOLDER, species, 'database/refLink.txt.gz')
 
     load_start(refflat_file)
     t0 = time.time()
 
-    refseq2gene = tab2dict(reflink_file, (2, 6), 0, alwayslist=False)
     ref2exons = {}
     for ld in tabfile_feeder(refflat_file, header=0):
         refseq = ld[1]
