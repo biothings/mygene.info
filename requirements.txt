@@ -34,7 +34,7 @@ nose>=1.3.0
 httplib2>=0.8
 
 #for internal API-API querying (mygene-myspecies)
-requests>=2.9.1
+requests>=2.9.1,<2.13
 
 #Optional
 msgpack-python
