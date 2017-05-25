@@ -529,7 +529,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                 'common_name', 'genbank_common_name',
                                 '_version', 'parent_taxid', 'scientific_name',
                                 'has_gene', 'children', 'rank',
-                                'uniprot_name','other_names']))
+                                'uniprot_name']))
 
     def test_query_dotstar_refseq(self):
         protein = self.json_ok(self.get_ok(self.api +
