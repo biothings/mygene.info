@@ -1,120 +1,27 @@
 {
-    "root": {
-        "@context": {
-            "ensembl": "http://schema.mygene.info/datasource/ensembl",
-            "entrezgene": "http://identifiers.org/ncbigene/",
-            "FLYBASE": "http://identifiers.org/flybase/",
-            "go": "http://schema.mygene.info/datasource/go",
-            "CC": "http://schema.mygene.info/datanode/CC",
-            "MF": "http://schema.mygene.info/datanode/MF",
-            "BP": "http://schema.mygene.info/datanode/BP",
-            "homologene": "http://schema.mygene.info/datasource/homologene",
-            "HPRD": "http://identifiers.org/hprd/",
-            "interpro": "http://schema.mygene.info/datasource/interpro",
-            "ipi": "http://identifiers.org/ipi/",
-            "MIM": "http://identifiers.org/omim/",
-            "pathway": "http://schema.mygene.info/datasource/pathway",
-            "biocarta": "http://schema.mygene.info/datanode/biocarta",
-            "kegg": "http://schema.mygene.info/datanode/kegg",
-            "pharmgkb": "http://schema.mygene.info/datanode/pharmgkb",
-            "reactome": "http://schema.mygene.info/datanode/reactome",
-            "smpdb": "http://schema.mygene.info/datanode/smpdb",
-            "wikipathways": "http://schema.mygene.info/datanode/wikipathways",
-            "pdb": "http://identifiers.org/pdb/",
-            "pfam": "http://identifiers.org/pfam/",
-            "pharmgkb": "http://identifiers.org/pharmgkb.gene/",
-            "prosite": "http://identifiers.org/prosite/",
-            "refseq": "http://schema.mygene.info/datasource/refseq",
-            "protein": "http://schema.mygene.info/datanode/protein",
-            "genomic": "http://schema.mygene.info/datanode/genomic",
-            "rna": "http://schema.mygene.info/datanode/rna",
-            "RGD": "http://identifiers.org/rgd/",
-            "symbol": "http://identifiers.org/hgnc.symbol/",
-            "TAIR": "http://identifiers.org/tair.locus/",
-            "taxid": "http://identifiers.org/taxonomy/",
-            "unigene": "http://identifiers.org/unigene/",
-            "Xenbase": "http://identifiers.org/xenbase/",
-            "WormBase": "http://identifiers.org/wormbase/",
-            "zfin": "http://identifiers.org/zfin/",
-            "uniprot": "http://schema.mygene.info/datasource/uniprot"
-        }
-    },
-    "ensembl": {
-        "@context": {
-            "gene": "http://localhost:8899/ensembl/",
-            "protein": "http://identifiers.org/ensembl/",
-            "transcript": "http://identifiers.org/ensembl/"
-        }
-    },
-    "go/CC": {
-        "@context": {
-            "id": "http://identifiers.org/go/",
-            "pubmed": "http://identifiers.org/pubmed/"
-        }
-    },
-    "go/MF": {
-        "@context": {
-            "id": "http://identifiers.org/go/",
-            "pubmed": "http://identifiers.org/pubmed/"
-        }
-    },
-    "go/BP": {
-        "@context": {
-            "id": "http://identifiers.org/go/",
-            "pubmed": "http://identifiers.org/pubmed/"
-        }
-    },
-    "homologene": {
-        "@context": {
-            "id": "http://identifiers.org/homologene/"
-        }
-    },
-    "interpro": {
-        "@context": {
-            "id": "http://identifiers.org/interpro/"
-        }
-    },
-    "pathway/biocarta": {
-        "@context": {
-            "id": "http://identifiers.org/biocarta.pathway/"
-        }
-    },
-    "pathway/kegg": {
-        "@context": {
-            "id": "http://identifiers.org/kegg.pathway/"
-        }
-    },
-    "pathway/pharmgkb": {
-        "@context": {
-            "id": "http://identifiers.org/pharmgkb.pathways/"
-        }
-    },
-    "pathway/reactome": {
-        "@context": {
-            "id": "http://identifiers.org/reactome/"
-        }
-    },
-    "pathway/smpdb": {
-        "@context": {
-            "id": "http://identifiers.org/smpdb/"
-        }
-    },
-    "pathway/wikipathways": {
-        "@context": {
-            "id": "http://localhost:8899/wikipathways/"
-        }
-    },
-    "refseq": {
-        "@context": {
-            "genomic": "http://identifiers.org/refseq/",
-            "protein": "http://identifiers.org/refseq/",
-            "rna": "http://identifiers.org/refseq/"
-        }
-    },
-    "uniprot": {
-        "@context": {
-            "Swiss-Prot": "http://identifiers.org/uniprot/",
-            "TrEMBL": "http://identifiers.org/uniprot/"
-        }
+    "@context": {
+        "symbol": "http://identifiers.org/hgnc.symbol/",
+        "ensembl.gene": "http://identifiers.org/ensembl.gene/",
+        "ensembl.protein": "http://identifiers.org/ensembl.protein/",
+        "ensembl.transcript": "http://identifiers.org/ensembl.transcript/",
+        "go.CC.id": "http://identifiers.org/go/",
+        "go.CC.pubmed": "http://identifiers.org/pubmed/",
+        "go.MF.id": "http://identifiers.org/go/",
+        "go.MF.pubmed": "http://identifiers.org/pubmed/",
+        "go.BP.id": "http://identifiers.org/go/",
+        "go.BP.pubmed": "http://identifiers.org/pubmed/",
+        "generif.pubmed": "http://identifiers.org/pubmed/",
+        "homologene.id": "http://identifiers.org/homologene/",
+        "interpro.id": "http://identifiers.org/interpro/",
+        "pathway.biocarta.id": "http://identifiers.org/biocarta.pathway/",
+        "pathway.kegg.id": "http://identifiers.org/kegg.pathway/",
+        "pathway.pharmgkb.id": "http://identifiers.org/pharmgkb.pathways/",
+        "pathway.reactome.id": "http://identifiers.org/reactome/",
+        "pathway.sympdb.id": "http://identifiers.org/smpdb/",
+        "pathway.wikipathways.id": "http://identifiers.org/wikipathways/",
+        "refseq.genomic": "http://identifiers.org/refseq/",
+        "refseq.protein": "http://identifiers.org/refseq/",
+        "refseq.rna": "http://identifiers.org/refseq/",
+        "uniprot.Swiss-Prot": "http://identifiers.org/uniprot/"
     }
 }
