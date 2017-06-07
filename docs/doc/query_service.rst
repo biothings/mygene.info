@@ -125,6 +125,9 @@ Fielded queries
 
 Available fields
 ^^^^^^^^^^^^^^^^
+
+This table lists some commonly used fields can be used for "fielded queries". `Check here <./data.html#available-fields>`_ for the complete list of available fields.
+
 ========================    =============================================    =================================================================================
 Field                        Description                                     Examples
 ========================    =============================================    =================================================================================
