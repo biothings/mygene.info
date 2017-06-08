@@ -35,6 +35,7 @@ requests>=2.9.1,<2.13
 
 #Optional
 msgpack-python
+boto
 
 # temp
 pymongo
