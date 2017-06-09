@@ -823,7 +823,8 @@ class MyGeneTest(BiothingTestHelperMixin):
     def test_caseinsensitive(self):
         lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"),filter=True)
         upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
-        eq_(lower["hits"],upper["hits"])
+        eq_(sorted(lower["hits"]),sorted(upper["hits"])) # scores can be slightly different
+                                                         # depending on the case so use sort
 
     def test_symbolnamespecies_order(self):
         res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
