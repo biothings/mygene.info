@@ -754,7 +754,7 @@ class MyGeneTest(BiothingTestHelperMixin):
     def test_caseinsensitive(self):
         lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"),filter=True)
         upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
-        eq_(lower["hits"],upper["hits"])
+        eq_(sorted(lower["hits"],key=lambda e: e["entrezgene"]),sorted(upper["hits"],key=lambda e: e["entrezgene"]))
 
     def test_symbolnamespecies_order(self):
         res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
@@ -796,78 +796,6 @@ class MyGeneTest(BiothingTestHelperMixin):
         resall = self.json_ok(self.get_ok(self.api + "/gene/1017?fields=homologene,exons"))
         check_homologene(resall)
         check_exons(resall)
-
-
-    def test_caseinsentive_datasources(self):
-        self.query_has_hits('mirbase:MI0017267')
-        self.query_has_hits('wormbase:WBGene00057218&species=31234')
-        self.query_has_hits('xenbase:XB-GENE-1001990&species=frog')
-        self.query_has_hits('Xenbase:XB-GENE-1001990&species=frog')
-        self.query_has_hits(r'mgi:MGI\\:104772')
-
-    def test_exac(self):
-        res = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970.4&fields=exac"),filter=True)
-        resnover = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970&fields=exac"),filter=True)
-        eq_(res["hits"], resnover["hits"])
-        eq_(len(res["hits"]), 1)
-        hit = res["hits"][0]
-        eq_(hit["exac"]["bp"], 897)
-        eq_(hit["exac"]["cds_end"], 56365409)
-        eq_(hit["exac"]["cds_start"], 56360792)
-        eq_(hit["exac"]["n_exons"], 7)
-        eq_(hit["exac"]["transcript"], "ENST00000266970.4")
-        eq_(hit["exac"]["all"]["mu_syn"], 0.00000345583178284)
-        eq_(hit["exac"]["nonpsych"]["syn_z"], 0.0369369403215127)
-        eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
-
-    def test_caseinsensitive(self):
-        lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"),filter=True)
-        upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
-        eq_(sorted(lower["hits"]),sorted(upper["hits"])) # scores can be slightly different
-                                                         # depending on the case so use sort
-
-    def test_symbolnamespecies_order(self):
-        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
-        hits = res["hits"]
-        # first is 1017, it's human and cdk2 is a symbol
-        eq_(hits[0]["_id"],"1017")
-        # second is 12566, mouse
-        eq_(hits[1]["_id"],"12566")
-        # third is 362817, rat
-        eq_(hits[2]["_id"],"362817")
-
-    def test_gene_other_names(self):
-        # this one has some
-        res = self.json_ok(self.get_ok(self.api + "/gene/107924918"))
-        assert "other_names" in res, "No other_names found in %s" % res
-        eq_(res["other_names"],['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3'])
-        # that one not
-        res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
-        assert not "other_names" in res
-        # query by other_names:
-        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33"))
-        eq_(len(res["hits"]),6)
-        ids = [h["_id"] for h in res["hits"]]
-        assert "1017" in ids, "Should have 1017 in results"
-
-    def test_int_float(self):
-        def check_homologene(res):
-            for h in res["homologene"]["genes"]:
-                eq_(type(h[0]),int)
-                eq_(type(h[1]),int)
-        def check_exons(res):
-            for ex in res["exons"]:
-                for pos in ex["position"]:
-                    eq_(type(pos[0]),int)
-                    eq_(type(pos[1]),int)
-        res = self.json_ok(self.get_ok(self.api + "/gene/1017?species=9606&fields=homologene,exons"))
-        check_homologene(res)
-        check_exons(res)
-        resall = self.json_ok(self.get_ok(self.api + "/gene/1017?fields=homologene,exons"))
-        check_homologene(resall)
-        check_exons(resall)
-
-
 
 
 
