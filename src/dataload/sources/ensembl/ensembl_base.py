@@ -66,10 +66,7 @@ class EnsemblParser:
         ensembl2entrez = tab2dict(DATAFILE, (1, 2), 0, includefn=_not_LRG, alwayslist=True)   # [(ensembl_gid, entrez_gid),...]
         # replace with our custom mapping
         for k in extra:
-            # when all ensemblIDs are resolved to other EntrezIDs different from those defined in xref file, there can
-            # be "orphan" EntrezID with no more EnsemblID associated (because there were resolved). Make sure we keep ensembl data
-            # for those. (so we extend mapping instead of replacing with the ones we previously found)
-            ensembl2entrez[k].extend(extra[k])
+            ensembl2entrez[k] = extra[k]
         # back to list of tuples
         ensembl2entrez_li = []
         for ensembl_id, entrez_ids in ensembl2entrez.items():

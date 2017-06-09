@@ -256,8 +256,8 @@ class BioMart(object):
         attributes = ["ensembl_gene_id",
                       "ensembl_transcript_id",
                       "ensembl_peptide_id",
-                      "profile"]
-        filters = ["with_profile"]
+                      "pfscan"]
+        filters = ["with_pfscan"]
         self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
 
     def get_interpro(self, outfile, debug=False):
@@ -283,7 +283,7 @@ class BioMart(object):
                       "ensembl_transcript_id",
                       "ensembl_peptide_id",
                       "pfam"]
-        filters = ["with_protein_feature_pfam"]
+        filters = ["with_pfam"]
         self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
 
 
