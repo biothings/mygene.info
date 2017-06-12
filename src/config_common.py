@@ -25,12 +25,12 @@ JSONLD_CONTEXT_PATH = ''
 GENOME_ASSEMBLY = {
     "human": "hg38",
     "mouse": "mm10",
-    "rat": "rn4",
-    "fruitfly": "dm3",
-    "nematode": "ce10",
-    "zebrafish": "zv9",
-    "frog": "xenTro3",
-    "pig": "susScr2"
+    "rat": "rn6",
+    "fruitfly": "dm6",
+    "nematode": "ce11",
+    "zebrafish": "GRCz10",
+    "frog": "xenTro7",
+    "pig": "susScr3"
 }
 
 TAXONOMY = {
