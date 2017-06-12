@@ -114,12 +114,12 @@ This table lists the genome assembies for commonly-used species:
     ===========  =======================   =======================
     human        Homo sapiens              GRCh38 (hg38), also support hg19
     mouse        Mus musculus              GRCm38 (mm10), also support mm9
-    rat          Rattus norvegicus         Rnor_5.0 (rn4)
-    fruitfly     Drosophila melanogaster   BDGP5 (dm3)
-    nematode     Caenorhabditis elegans    WBcel235 (ce10)
-    zebrafish    Danio rerio               Zv9 (danRer6)
-    frog         Xenopus tropicalis        JGI_4.2 (xenTro2)
-    pig          Sus scrofa                Sscrofa10.2 (susScr2)
+    rat          Rattus norvegicus         Rnor_6.0 (rn6)
+    fruitfly     Drosophila melanogaster   BDGP6 (dm6)
+    nematode     Caenorhabditis elegans    WBcel235 (ce11)
+    zebrafish    Danio rerio               GRCz10 (danRer10)
+    frog         Xenopus tropicalis        JGI_7.0 (xenTro7)
+    pig          Sus scrofa                Sscrofa10.2 (susScr3)
     ===========  =======================   =======================
 
 
