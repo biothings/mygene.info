@@ -136,8 +136,9 @@ class EnsemblParser:
         #Genomic position
         DATAFILE = os.path.join(DATA_FOLDER, 'gene_ensembl__gene__main.txt')
         load_start(DATAFILE)
-        ensembl2pos = dict_nodup(tab2dict(DATAFILE, (1, 3, 4, 5, 6), 0, includefn=_not_LRG))
-        ensembl2pos = value_convert(ensembl2pos, lambda x: {'chr': x[2], 'start': int(x[0]), 'end': int(x[1]), 'strand': int(x[3])})
+	# Twice 1 because first is the dict key, the second because we need gene id within genomic_pos
+        ensembl2pos = dict_nodup(tab2dict(DATAFILE, (1, 1, 3, 4, 5, 6), 0, includefn=_not_LRG))
+        ensembl2pos = value_convert(ensembl2pos, lambda x: {'ensemblgene': x[0], 'chr': x[3], 'start': int(x[1]), 'end': int(x[2]), 'strand': int(x[4])})
         ensembl2pos = value_convert(ensembl2pos, lambda x: {'genomic_pos': x}, traverse_list=False)
         load_done('[%d]' % len(ensembl2pos))
         return self.convert2entrez(ensembl2pos)

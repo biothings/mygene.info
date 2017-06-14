@@ -49,6 +49,7 @@ def load_genedoc(self):
         mgi_dict = {
             '_id': _id,
             'genomic_pos': {
+                'entrezgene': _id,
                 'start': int(gene[3]),
                 'end': int(gene[4]),
                 'chr': gene[2],
