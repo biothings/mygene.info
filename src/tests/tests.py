@@ -482,6 +482,9 @@ class MyGeneTest(BiothingTestHelperMixin):
                              '/gene/1017?filter=symbol,go.MF&dotfield=true'))
         rfalse = self.json_ok(self.get_ok(self.api +
                               '/gene/1017?filter=symbol,go.MF&dotfield=false'))
+        # sharding makes scoring slightly variable
+        rdefault.pop("_score")
+        rfalse.pop("_score")
         eq_(rdefault, rfalse)
         assert "go.MF.term" in rtrue.keys()
         assert "go" in rdefault.keys()
@@ -494,6 +497,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         raw0 = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=0'))
         rawfalse = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=false'))
         eq_(sorted(raw1), sorted(rawtrue))
+        raw0.pop("_score")
+        rawfalse.pop("_score")
         eq_(raw0, rawfalse)
         assert "_shards" in raw1
         assert "_shards" not in raw0
