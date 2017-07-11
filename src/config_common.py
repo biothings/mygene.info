@@ -11,7 +11,9 @@ from www.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusH
 # elasticsearch server transport url
 ES_HOST = 'localhost:9200'
 # elasticsearch index name
-ES_INDEX = 'mygene_current'
+ES_INDEX = 'genedoc_mygene_allspecies_current'
+# index for common species types
+ES_INDEX_TIER1 = 'genedoc_mygene_current'
 # elasticsearch document type
 ES_DOC_TYPE = 'gene'
 
