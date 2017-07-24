@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from biothings.www.api.es.handlers import BiothingHandler
-from biothings.www.api.es.handlers import MetadataHandler
-from biothings.www.api.es.handlers import QueryHandler
-from biothings.www.api.es.handlers import StatusHandler
+from biothings.web.api.es.handlers import BiothingHandler
+from biothings.web.api.es.handlers import MetadataHandler
+from biothings.web.api.es.handlers import QueryHandler
+from biothings.web.api.es.handlers import StatusHandler
 from tornado.web import RequestHandler
 
 class GeneHandler(BiothingHandler):

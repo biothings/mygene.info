@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from biothings.www.api.es.query_builder import ESQueryBuilder
+from biothings.web.api.es.query_builder import ESQueryBuilder
 from biothings.utils.common import is_int
 import json
 
