@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from biothings.www.settings.default import *
-from www.api.query_builder import ESQueryBuilder
-from www.api.query import ESQuery
-from www.api.transform import ESResultTransformer
-from www.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusHandler, TaxonHandler, DemoHandler
+from biothings.web.settings.default import *
+from web.api.query_builder import ESQueryBuilder
+from web.api.query import ESQuery
+from web.api.transform import ESResultTransformer
+from web.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusHandler, TaxonHandler, DemoHandler
 
 # *****************************************************************************
 # Elasticsearch variables
@@ -41,16 +41,16 @@ APP_LIST = [
 ###############################################################################
 
 # *****************************************************************************
-# Subclass of biothings.www.api.es.query_builder.ESQueryBuilder to build
+# Subclass of biothings.web.api.es.query_builder.ESQueryBuilder to build
 # queries for this app
 # *****************************************************************************
 ES_QUERY_BUILDER = ESQueryBuilder
 # *****************************************************************************
-# Subclass of biothings.www.api.es.query.ESQuery to execute queries for this app
+# Subclass of biothings.web.api.es.query.ESQuery to execute queries for this app
 # *****************************************************************************
 ES_QUERY = ESQuery
 # *****************************************************************************
-# Subclass of biothings.www.api.es.transform.ESResultTransformer to transform
+# Subclass of biothings.web.api.es.transform.ESResultTransformer to transform
 # ES results for this app
 # *****************************************************************************
 ES_RESULT_TRANSFORMER = ESResultTransformer
@@ -63,7 +63,7 @@ GA_TRACKER_URL = 'MyGene.info'
 
 STATUS_CHECK_ID = '1017'
 
-JSONLD_CONTEXT_PATH = 'www/context/context.json'
+JSONLD_CONTEXT_PATH = 'web/context/context.json'
 
 # MYGENE THINGS
 # This essentially bypasses the es.get fallback as in myvariant...

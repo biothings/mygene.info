@@ -16,11 +16,8 @@ thrift>=0.9.1
 tornado>=3.2
 tornadoes>=1.4.1
 
-#for tracking API on Google Analytics
--e git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
-
 # biothings
-git+https://github.com/SuLab/biothings.api.git@0e8731cb4071f01fab57f618ca1f2e9ed8cf6d20#egg=biothings
+git+https://github.com/biothings/biothings.api.git@a6034f3550037c233165a705719852ce88498a0b#egg=biothings
 
 #for build sphinx docs
 Sphinx>=1.2.3
