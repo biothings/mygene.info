@@ -146,5 +146,14 @@ QUERY_GET_CONTROL_KWARGS['q'].update({'translations': DATASOURCE_TRANSLATION_TYP
 ANNOTATION_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 ANNOTATION_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
+QUERY_GET_ESQB_KWARGS.update({
+    'entrezonly':{'type': bool, 'default': False}, 
+    'ensemblonly': {'type':bool, 'default': False}, 
+    'exists': {'type': list, 'default': None, 'max': 10}, 
+    'missing': {'type': list, 'default': None, 'max': 10}, 
+    'species_facet_filter': {'type': list, 'default': None, 'max': 10, 
+        'translations': [(re.compile(pattern, re.I), translation['tax_id']) for 
+                        (pattern, translation) in TAXONOMY.items()]}
+})
 QUERY_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
