@@ -1,12 +1,9 @@
 import random, os, httplib2
 from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
 from nose.tools import ok_, eq_
-
 from tornado.testing import AsyncHTTPTestCase
-import www.index as index
-from biothings.settings import BiothingSettings
-import config
-
+from tornado.web import Application
+from web.settings import MyGeneWebSettings
 
 class MyGeneTest(BiothingTestHelperMixin):
     __test__ = True  # explicitly set this to be a test class
@@ -15,11 +12,11 @@ class MyGeneTest(BiothingTestHelperMixin):
     # Test functions                                            #
     #############################################################
 
-    host = os.getenv(config.HOST_ENVAR_NAME,"")
+    host = os.getenv("MG_HOST","")
     #if not host:
     #    raise ValueError("Missing HOST_ENVAR_NAME")
     host = host.rstrip('/')
-    api = host + '/' + config.API_VERSION
+    api = host + '/v3'
     h = httplib2.Http()
 
     def _filter_hits(self, res, field=None):
@@ -792,26 +789,13 @@ class MyGeneTest(BiothingTestHelperMixin):
         check_homologene(resall)
         check_exons(resall)
 
-
-
-
-
-# Self contained test class, used for CI tools such as Travis
-# This will start a Tornado server on its own and perform tests
-# against this server.
-btsettings = BiothingSettings()
-# force static path, as if we were in debug mode
-index.settings.update({
-    "static_path": btsettings.static_path
-})
-
-
 class MyGeneTestTornadoClient(AsyncHTTPTestCase, MyGeneTest):
     __test__ = True
 
     def __init__(self, methodName='runTest', **kwargs):
         super(AsyncHTTPTestCase, self).__init__(methodName, **kwargs)
         self.h = TornadoRequestHelper(self)
+        self._settings = MyGeneWebSettings(config='config')
 
     def get_app(self):
-        return index.get_app(index.APP_LIST)
+        return Application(self._settings.generate_app_list())        
