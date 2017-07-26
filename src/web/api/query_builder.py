@@ -64,7 +64,7 @@ class ESQueryBuilder(ESQueryBuilder):
               gend
             , otherwise, return None.
         '''
-        pattern = r'chr(?P<chr>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
+        pattern = r'chr(?P<chrom>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
         if query:
             mat = re.search(pattern, query)
             if mat:
