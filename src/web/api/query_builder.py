@@ -5,6 +5,19 @@ import json
 import re
 import logging
 
+def safe_genome_pos(s):
+    '''
+        safe_genome_pos(1000) = 1000
+        safe_genome_pos('1000') = 1000
+        safe_genome_pos('10,000') = 100000
+     '''
+    if isinstance(s, int):
+        return s
+    elif isinstance(s, str):
+        return int(s.replace(',', ''))
+    else:
+        raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
+
 class ESQueryBuilder(ESQueryBuilder):
     def get_query_filters(self):
         # BioThings filters
