@@ -1,6 +1,6 @@
 body {
     margin: 0px;
-    min-width: 930px;
+    max-width: 1200px;
     position: relative;
 }
 .top-navbar {
@@ -14,7 +14,6 @@ body {
     left: 0;
     height: 86px;
     width: 100%;
-    min-width: 930px;
 }
 .spacer {
     height: 86px;
@@ -40,7 +39,7 @@ body {
     font-size: 0.75em;
 }
 .introduction {
-    width:600px;
+    width:95%;
 }
 .introduction p:first-child {
     margin-top: 0px;
@@ -51,36 +50,7 @@ body {
 .results p:first-child {
     margin-top: 0px;
 }
-#mygene-logo {
-    width: 65px;
-    height: 65px;
-    margin-top: 0px;
-    margin-left: 0px;
-    position: absolute;
-    z-index: 0;
-    top: 0;
-    left: 0;
-}
-.logo-link {
-    width: 65px;
-    height: 65px;
-    margin-top: 2px;
-    margin-left: 18px;
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    left: 0;
-}
-.logo-text {
-    font-size: 0.67em;
-    margin: 0px;
-    position: absolute;
-    z-index: 0;
-    top: 68px;
-    left: 19px;
-    float: left;
-    font-family: 'Open Sans', sans-serif;
-}  
+ 
 #main-input {
     width: 500px;
     font-size: 0.8em;
@@ -105,11 +75,11 @@ body {
 }
 .navbar-row {
     float: left;
-    padding-left:20px;
+    padding-left:0px;
     padding-top:0px;
     padding-bottom:0px;
     margin-top: 5px;
-    margin-left: 101px;
+    margin-left: 10px;
 }
 .first {
     margin-top: 8px;
@@ -117,7 +87,7 @@ body {
 .second {
     clear: left;
     margin-top: 0px;
-    margin-left: 249px;
+    margin-left: 160px;
 }
 .third {
     clear: left;
@@ -201,4 +171,124 @@ label[for="fields-input"] {
 .help-link {
     color: #6cd02f;
     text-decoration: none;
+}
+
+/* Responsive web design elements copy/pasted below */
+
+/*---------------------------------
+5. RWD
+----------------------------------*/
+
+@media (max-width: 1140px) {
+	body {
+		max-width: 95%;
+	}
+
+}
+
+@media (max-width: 900px) {
+	body {
+		max-width: 95%;
+	}
+}
+
+@media (max-width: 750px) {
+	body {
+		max-width: 95%;
+	}
+    .introduction {
+        margin-top:10px;
+    }
+    .second {
+        clear: left;
+        margin-top: -30px;
+        margin-left: 260px;
+    }
+}
+
+@media (max-width: 678px) {
+	body {
+		max-width: 95%;
+	}
+    .introduction {
+        margin-top:20px;
+    }
+    .second {
+        clear: left;
+        margin-top: 0px;
+        margin-left: 30px;
+    }
+}
+
+@media (max-width: 595px) {
+	body {
+		max-width: 95%;
+	}
+    .introduction {
+        margin-top:30px;
+    }
+    .second {
+        clear: left;
+        margin-top: -30px;
+        margin-left: 90px;
+    }
+}
+
+@media (max-width: 520px) {
+	body {
+		max-width: 95%;
+	}
+    .introduction {
+        margin-top:30px;
+    }
+    .second {
+        clear: left;
+        margin-top: -30px;
+        margin-left: 90px;
+    }
+    #main-input {
+        width: 480px;
+        font-size: 0.8em;
+        margin-right: 8px;
+        margin-top: 5px;
+        float: left;
+    }
+}
+
+@media (max-width: 480px) { 
+	body {
+		max-width: 95%;
+	}
+    .introduction {
+        margin-top:30px;
+    }
+    #main-input {
+        width: 480px;
+        font-size: 0.8em;
+        margin-right: 8px;
+        margin-top: 5px;
+        float: left;
+    }
+}
+@media (max-width: 320px) { 
+	body {
+		max-width: 95%;
+	}
+    .introduction {
+        margin-top:50px;
+    }
+    #main-input {
+        width: 270px;
+        font-size: 0.8em;
+        margin-right: 8px;
+        margin-top: 5px;
+        float: left;
+    }
+    #fields-input {
+    width: 270px;
+    font-size: 0.8em;
+    float: left;
+    margin-left: 0px;
+    margin-top: 2px;
+    }
 }
