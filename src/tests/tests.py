@@ -494,8 +494,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         raw0 = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=0'))
         rawfalse = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=false'))
         eq_(sorted(raw1), sorted(rawtrue))
-        raw0.pop("_score")
-        rawfalse.pop("_score")
+        raw0.pop("_score", None)
+        rawfalse.pop("_score", None)
         eq_(raw0, rawfalse)
         assert "_shards" in raw1
         assert "_shards" not in raw0
