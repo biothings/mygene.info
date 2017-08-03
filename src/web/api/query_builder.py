@@ -134,7 +134,7 @@ class ESQueryBuilder(ESQueryBuilder):
         return _q
 
     def genomic_interval_query(self, chrom, gstart, gend, assembly=None):
-        return self.queries.raw_query(self._genomic_interval_query(chrom, gstart, gend, assembly))
+        return self._genomic_interval_query(chrom, gstart, gend, assembly)
 
     def raw_string_query(self, q):
         return self._raw_string_query(q)
