@@ -61,9 +61,16 @@ GA_ACTION_ANNOTATION_GET = 'gene_get'
 GA_ACTION_ANNOTATION_POST = 'gene_post'
 GA_TRACKER_URL = 'MyGene.info'
 
-STATUS_CHECK_ID = '1017'
+STATUS_CHECK = {
+    'id':'1017',
+    'index': 'genedoc_mygene_current',
+    'doc_type': 'gene'
+}
 
 JSONLD_CONTEXT_PATH = 'web/context/context.json'
+
+# url template to redirect for 'include_tax_tree' parameter
+INCLUDE_TAX_TREE_REDIRECT_TEMPLATE = 'http://t.biothings.io/v1/taxon?ids={ids}&expand_species=true'
 
 # MYGENE THINGS
 # This essentially bypasses the es.get fallback as in myvariant...
@@ -147,6 +154,7 @@ ANNOTATION_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 ANNOTATION_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_GET_ESQB_KWARGS.update({
+    'include_tax_tree': {'type': bool, 'default': False},
     'entrezonly':{'type': bool, 'default': False}, 
     'ensemblonly': {'type':bool, 'default': False}, 
     'exists': {'type': list, 'default': None, 'max': 10}, 
