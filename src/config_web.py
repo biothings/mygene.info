@@ -139,12 +139,12 @@ TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(re.sub(r':.*', '', pattern
 # Kwarg control update for mygene specific kwargs
 
 # ES KWARGS (_source, scopes, 
-ANNOTATION_GET_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
-    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-ANNOTATION_POST_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
-    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-QUERY_GET_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-QUERY_POST_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+#ANNOTATION_GET_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
+#    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+#ANNOTATION_POST_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
+#    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+QUERY_GET_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})#, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+QUERY_POST_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})#, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
 
 # Control KWARGS
 QUERY_GET_CONTROL_KWARGS['q'].update({'translations': DATASOURCE_TRANSLATION_TYPEDEF})
