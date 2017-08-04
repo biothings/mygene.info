@@ -3,8 +3,12 @@ from biothings.web.api.es.handlers import BiothingHandler
 from biothings.web.api.es.handlers import MetadataHandler
 from biothings.web.api.es.handlers import QueryHandler
 from biothings.web.api.es.handlers import StatusHandler
+from biothings.utils.version import get_repository_information
 from tornado.web import RequestHandler
+from collections import OrderedDict
 import requests
+import os
+
 #import logging
 
 def get_es_index(inst, options):
@@ -44,7 +48,20 @@ class StatusHandler(StatusHandler):
 
 class MetadataHandler(MetadataHandler):
     ''' This class is for the /metadata endpoint. '''
-    pass
+    def _pre_finish_GET_hook(self, options, res):
+        if not self.request.path.endswith('fields'):
+            # Add mygene specific metadata stuff
+            res['available_fields'] = 'http://mygene.info/metadata/fields'
+            res['app_revision'] = get_repository_information(app_dir=self.web_settings._app_git_repo).get('commit-hash', '')
+            res['genome_assembly'] = {}
+            res['taxonomy'] = {}
+            for (s, d) in self.web_settings.TAXONOMY.items():
+                if 'tax_id' in d:
+                    res['taxonomy'][s] = int(d['tax_id'])
+                if 'assembly' in d:
+                    res['genome_assembly'][s] = d['assembly']
+            res = OrderedDict(sorted(list(res.items()), key=lambda x: x[0]))
+        return res
 
 class TaxonHandler(RequestHandler):
     def initialize(self, web_settings):
@@ -54,7 +71,9 @@ class TaxonHandler(RequestHandler):
         self.redirect("http://t.biothings.io/v1/taxon/%s?include_children=1" % taxid)
 
 class DemoHandler(RequestHandler):
+    def initialize(self, web_settings):
+        pass
+
     def get(self):
         with open('../docs/demo/index.html', 'r') as demo_file: 
             self.write(demo_file.read())
-    
