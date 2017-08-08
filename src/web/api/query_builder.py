@@ -19,6 +19,44 @@ def safe_genome_pos(s):
         raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
 
 class ESQueryBuilder(ESQueryBuilder):
+    def _POST_single_query(self, term, scopes=None):
+        if not term:
+            return self.queries.match({"non_exist_field":""})
+
+        if len(scopes) == 1 and '*' not in scopes[0]:
+            q = self.queries.match({scopes[0]:{"query": "{}".format(term), "operator": "and"}})
+        else:
+            q = self.queries.multi_match({"query": "{}".format(term), "fields": scopes, "operator": "and"})
+
+        q["query"] = self.add_query_filters(q["query"])
+        q["query"] = self.add_species_custom_filters_score(q["query"])
+        return q
+
+    def _POST_query(self, qs, scopes):
+        _q = []
+        INT_FIELDS = set(['entrezgene', 'retired'])
+        
+        if not scopes:
+            scopes = self.default_scopes
+
+        for term in qs:
+            logging.debug("Term: {}".format(term))
+            if is_int(term) and set(scopes).intersection(INT_FIELDS):
+                _q.extend(['{}', json.dumps(self._POST_single_query(term, scopes=
+                    list(set(scopes).intersection(INT_FIELDS))))])
+            elif not is_int(term) and set(scopes).difference(INT_FIELDS):
+                _q.extend(['{}', json.dumps(self._POST_single_query(term, scopes=
+                    list(set(scopes).difference(INT_FIELDS))))])
+            else:
+                _q.extend(['{}', json.dumps(self._POST_single_query(term=None))])
+        return self._return_query_kwargs({'body': '\n'.join(_q)})
+
+    def _query_POST_query(self, qs, scopes):
+        return self._POST_query(qs, scopes)
+
+    def _annotation_POST_query(self, bids):
+        return self._POST_query(qs=bids, scopes=['entrezgene', 'retired', 'ensembl.gene'])
+
     def get_query_filters(self):
         # BioThings filters
         _filters = self._get_query_filters()

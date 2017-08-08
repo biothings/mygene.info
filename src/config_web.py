@@ -69,10 +69,15 @@ STATUS_CHECK = {
 
 JSONLD_CONTEXT_PATH = 'web/context/context.json'
 
+# MYGENE THINGS
+
+# for docs
+INCLUDE_DOCS = True
+DOCS_STATIC_PATH = '../docs/_build/html'
+
 # url template to redirect for 'include_tax_tree' parameter
 INCLUDE_TAX_TREE_REDIRECT_TEMPLATE = 'http://t.biothings.io/v1/taxon?ids={ids}&expand_species=true'
 
-# MYGENE THINGS
 # This essentially bypasses the es.get fallback as in myvariant...
 # The first regex matched integers, in which case the query becomes against entrezgeneall annotation queries are now multimatch
 # against the following fields
