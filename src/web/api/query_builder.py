@@ -3,7 +3,7 @@ from biothings.web.api.es.query_builder import ESQueryBuilder
 from biothings.utils.common import is_int
 import json
 import re
-import logging
+#import logging
 
 def safe_genome_pos(s):
     '''
@@ -40,7 +40,7 @@ class ESQueryBuilder(ESQueryBuilder):
             scopes = self.default_scopes
 
         for term in qs:
-            logging.debug("Term: {}".format(term))
+            #logging.debug("Term: {}".format(term))
             if is_int(term) and set(scopes).intersection(INT_FIELDS):
                 _q.extend(['{}', json.dumps(self._POST_single_query(term, scopes=
                     list(set(scopes).intersection(INT_FIELDS))))])
@@ -60,6 +60,9 @@ class ESQueryBuilder(ESQueryBuilder):
     def get_query_filters(self):
         # BioThings filters
         _filters = self._get_query_filters()
+
+        #logging.debug("_filters: {}".format(_filters))
+
         # mygene filters
         if 'all' not in self.options.species:
             if len(self.options.species) == 1:
