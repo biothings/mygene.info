@@ -123,12 +123,12 @@ class MyGeneTest(BiothingTestHelperMixin):
                            '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
         eq_(res['hits'], [])
 
-        res = self.json_ok(self.get_ok(self.api + '/query'), checkerror=False)
-        assert 'error' in res
+        self.get_status_code(self.api + '/query', status_code=400)
+        #res = self.json_ok(self.get_ok(self.api + '/query'), checkerror=False)
+        #assert 'error' in res
 
-        res = self.json_ok(self.get_ok(self.api + '/query?q=tRNA:Y1:85Ae'),
-                           checkerror=False)
-        assert 'error' in res
+        self.get_status_code(self.api + '/query?q=tRNA:Y1:85Ae', status_code=400)
+        
         # ensure returned fields by default
         res = self.json_ok(self.get_ok(self.api + '/query?q=cdk'))
         # pick one
@@ -161,9 +161,10 @@ class MyGeneTest(BiothingTestHelperMixin):
                                          'scopes': 'symbol',
                                          'fields': 'name,symbol'}))
         assert len(res) >= 4, (res, len(res))
-        res = self.json_ok(self.post_ok(self.api + '/query', {}),
-                           checkerror=False)
-        assert 'error' in res, res
+        self.post_status_code(self.api + '/query', {}, status_code=400)
+        #res = self.json_ok(self.post_ok(self.api + '/query', {}),
+        #                   checkerror=False)
+        #assert 'error' in res, res
 
         res = self.json_ok(self.post_ok(self.api + '/query',
                                         {'q': '[1017, "1018"]',
@@ -209,9 +210,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(len(res['hits']), 1000)
 
         # assert 1==0
-        res = self.json_ok(self.get_ok(self.api + '/query?q=cdk?&size=1a'),
-                           checkerror=False)  # invalid size parameter
-        assert 'error' in res
+        self.get_status_code(self.api + '/query?q=cdk?&size=1a', status_code=400)
 
     def test_gene(self):
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
