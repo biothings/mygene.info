@@ -71,6 +71,10 @@ JSONLD_CONTEXT_PATH = 'web/context/context.json'
 
 # MYGENE THINGS
 
+# for error messages
+ID_REQUIRED_MESSAGE = '404: Gene ID Required'
+ID_NOT_FOUND_TEMPLATE = '404: Gene ID "{bid}" Not Found'
+
 # for docs
 INCLUDE_DOCS = True
 DOCS_STATIC_PATH = '../docs/_build/html'
