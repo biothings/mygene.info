@@ -788,6 +788,7 @@ class DataBuilder():
         #            in mappings, last_build['target'] collection won't be indexed by ES correctly,
         #            therefore, we use "genedoc_*_current" collection as the source here:
         #target_collection = last_build['target']
+        #target_collection = "genedoc_mygene_allspecies_20170614_apqrsbd8"
         target_collection = "genedoc_{}_current".format(build_config)
         _db = get_target_db()
         target_collection = _db[target_collection]

@@ -34,7 +34,8 @@ timestamp = time.strftime('%Y%m%d')
 DATA_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, 'by_resources/pharmgkb', timestamp)
 
 #GENES_URL = 'http://www.pharmgkb.org/commonFileDownload.action?filename=genes.zip'
-GENES_URL = 'http://www.pharmgkb.org/download.do?objId=genes.zip&dlCls=common'
+#GENES_URL = 'http://www.pharmgkb.org/download.do?objId=genes.zip&dlCls=common'
+GENES_URL = 'https://s3.pgkb.org/data/genes.zip'
 
 
 def download(no_confirm=False):
