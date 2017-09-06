@@ -22,7 +22,7 @@ def parse_hgnc():
         .assign(entrez_id = lambda df: df["entrez_id"].astype(int))
     )
 
-def parse_umls():
+def parse_umls(rrf_file):
     """Parse the UMLS to determine the HGNC identifier of each gene CUI.
 
     The relevant files are in the archive <version>-1-meta.nlm (a zip file)
@@ -33,7 +33,7 @@ def parse_umls():
     """
 
     res = defaultdict(list)
-    with open("MRCONSO.RRF", "r") as fin:
+    with open(rrf_file, "r") as fin:
         for line in fin:
             if "HGNC:" in line:
                 vals = line.rstrip("\n").split("|")
@@ -46,9 +46,9 @@ def parse_umls():
 
     return pd.DataFrame(res).drop_duplicates()
 
-def load_data():
+def load_data(rrf_file):
     hgnc_map = parse_hgnc()
-    cui_map = parse_umls()
+    cui_map = parse_umls(rrf_file)
 
     res = hgnc_map.merge(cui_map, how="inner", on="hgnc_id")
 

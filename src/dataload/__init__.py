@@ -45,6 +45,7 @@ __sources_dict__ = {
     'exac': ['exac.broadinstitute_exac'],
     'cpdb': ['cpdb'],
     'reagent': ['reagent'],
+    'umls': ['umls'],
 }
 
 __sources__ = None   # should be a list defined at runtime
