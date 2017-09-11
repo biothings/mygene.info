@@ -8,27 +8,29 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler())
 
 
-ALLOWED_OPTIONS = ['_source', 'start', 'from_', 'size', 'sort', 'explain',
+ALLOWED_OPTIONS = ['_source', 'start', 'from', 'size', 'sort', 'explain',
                    'version', 'aggs', 'fetch_all', 'species', 'fields',
                    'userfilter', 'exists', 'missing', 'include_tax_tree',
                    'species_facet_filter']
 
 ES_DOC_TYPE = 'gene'
-
+ES_SCROLL_SIZE = 1000
+ES_SCROLL_TIME = '1m'
 STATUS_CHECK_ID = '1017'
-
+#TODO: uncomment in prod
+#USERQUERY_DIR = 'biothings.userqueries/mygene'
 FIELD_NOTES_PATH = ''
 JSONLD_CONTEXT_PATH = ''
 
 GENOME_ASSEMBLY = {
     "human": "hg38",
     "mouse": "mm10",
-    "rat": "rn4",
-    "fruitfly": "dm3",
-    "nematode": "ce10",
-    "zebrafish": "zv9",
-    "frog": "xenTro3",
-    "pig": "susScr2"
+    "rat": "rn6",
+    "fruitfly": "dm6",
+    "nematode": "ce11",
+    "zebrafish": "GRCz10",
+    "frog": "xenTro7",
+    "pig": "susScr3"
 }
 
 TAXONOMY = {

@@ -61,14 +61,15 @@ class GeneInfoParser(EntrezParserBase):
 
         '''
         load_start(self.datafile)
-        gene_d = tab2dict_iter(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9, 14), key=1,
+        gene_d = tab2dict(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9, 13, 14), key=1,
                           alwayslist=0, includefn=self.species_filter)
 
         def _ff(d):
             (
                 taxid, symbol, locus_tag, synonyms,
                 dbxrefs, map_location,
-                description, type_of_gene, modification_date
+                description, type_of_gene, other_designations,
+                modification_date
             ) = d
             out = dict(taxid=int(taxid),
                        symbol=symbol,
@@ -81,6 +82,8 @@ class GeneInfoParser(EntrezParserBase):
                 out['alias'] = normalized_value(synonyms.split('|'))
             if locus_tag != '-':
                 out['locus_tag'] = locus_tag
+            if other_designations != "-":
+                out['other_names'] = normalized_value(other_designations.split('|'))
 
             # when merged, this will become the default timestamp
             out["_timestamp"] = datetime.datetime.strptime(modification_date,"%Y%m%d")
@@ -499,7 +502,7 @@ class Gene2GeneRifParser(EntrezParserBase):
     def load(self):
         load_start(self.datafile)
         cnt = 0
-        for datadict in tab2dict_iter(self.datafile, (1, 2, 4), 0, alwayslist=1):
+        for datadict in tab2dict_iter(self.datafile, (1, 2, 4), 0, alwayslist=1, encoding="latin1"):
             datadict = dict_convert(datadict, valuefn=lambda v: {
                             'generif': [dict(pubmed=self._cvt_pubmed(x[0]), text=x[1]) for x in v]})
 

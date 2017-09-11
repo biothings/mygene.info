@@ -54,7 +54,7 @@ def load_cpdb(data_folder, __metadata__):
         _d = value_convert(_d, _inner_cvt)
         for p_source in _d:
             if isinstance(_d[p_source], list):
-                _d[p_source].sort()
+                _d[p_source].sort(key=lambda e: e["id"])
         return {'pathway': _d}
 
     _out = dict_convert(_out, valuefn=_cvt)

@@ -141,7 +141,7 @@ class ESQuery(ESQuery):
                        'user-agent': "Python-requests_mygene.info/%s (gzip)"
                        % requests.__version__}
             # TODO: URL as config param
-            res = requests.post('http://s.biothings.io/v1/species?ids=' +
+            res = requests.post('http://t.biothings.io/v1/taxon?ids=' +
                                 ','.join(['{}'.format(sid) for sid in
                                           kwargs['species']]) +
                                 '&expand_species=true', headers=headers)
@@ -190,7 +190,7 @@ class ESQuery(ESQuery):
     def get_gene(self, geneid, **kwargs):
         '''for /gene/<geneid>'''
         options = self._get_cleaned_annotation_options(kwargs)
-        qbdr = ESQueryBuilder(**options.kwargs)
+        qbdr = ESQueryBuilder(options=options, **options.kwargs)
         _q = qbdr.build_id_query(geneid, options.scopes)
         if options.rawquery:
             return _q
@@ -220,10 +220,12 @@ class ESQueryBuilder(ESQueryBuilder):
                                   returned genes must have given field(s).
             missing     optional, passing field, comma-separated fields,
                                   returned genes must have NO given field(s).
+            userquery   optional, information about user query
 
         """
         super(ESQueryBuilder, self).__init__()
         self._query_options = query_options
+        self._options = self._query_options.pop('options', {})
         # species should be either 'all' or a list of taxids.
         self.species = self._query_options.pop('species', 'all')
         self.species_facet_filter = self._query_options.pop(
@@ -431,6 +433,10 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return _query
 
+    def _is_wildcard_query(self, query):
+        ''' Return True if input query is a wildcard query. '''
+        return query.find('*') != -1 or query.find('?') != -1
+
     def wildcard_query(self, q):
         '''q should contains either * or ?, but not the first character.'''
         _query = {
@@ -486,11 +492,40 @@ class ESQueryBuilder(ESQueryBuilder):
 
         return _query
 
-    def get_query_filters(self):
+    def generate_query(self, q):
+        '''
+        Return query dict according to passed arg "q". Can be:
+            - match query
+            - wildcard query
+            - raw_string query
+            - "match all" query
+        Also add query filters
+        '''
+        # Check if fielded/boolean query, excluding special goid query
+        # raw_string_query should be checked ahead of wildcard query, as
+        # raw_string may contain wildcard as well # e.g., a query
+        # "symbol:CDK?", should be treated as raw_string_query.
+        if self._is_user_query() and self.user_query(q):
+            _query = self.user_query(q)
+        elif q == '__all__':
+            _query = {"match_all": {}}
+        elif self._is_raw_string_query(q):
+            #logging.debug("this is raw string query")
+            _query = self.raw_string_query(q)
+        elif self._is_wildcard_query(q):
+            #logging.debug("this is wildcard query")
+            _query = self.wildcard_query(q)
+        else:
+            #logging.debug("this is dis max query")
+            _query = self.dis_max_query(q)
+
+        _query = self.add_query_filters(_query)
+        return _query
+
+    def extra_query_filters(self, filters):
         '''filters added here will be applied in a filtered query,
            thus will affect the facet counts.
         '''
-        filters = []
         # species filter
         if self.species and self.species != 'all':
             if len(self.species) == 1:
@@ -620,7 +655,6 @@ class ESQueryBuilder(ESQueryBuilder):
 
         else:
             _query = self.generate_query(q)
-
             # TODO: this is actually not used, how useful ?
             # _query = self.string_query(q)
 
@@ -718,6 +752,7 @@ class ESQueryBuilder(ESQueryBuilder):
             raise ValueError('"scopes" cannot be "%s" type' % type(scopes))
 
         # _query = self.add_species_filter(_query)
+        logging.debug("_query: {}".format(_query))
         _query = self.add_query_filters(_query)
         _query = self.add_species_custom_filters_score(_query)
         _q = {"query": _query}

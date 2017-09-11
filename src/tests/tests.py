@@ -48,11 +48,11 @@ class MyGeneTest(BiothingTestHelperMixin):
         # test all fields are load in gene objects
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
 
-        attr_li = ['HGNC', 'HPRD', 'MIM', 'Vega', '_id', 'accession', 'alias',
-                   'ensembl', 'entrezgene', 'genomic_pos', 'go',
+        attr_li = ['HGNC', 'MIM', 'Vega', '_id', 'accession', 'alias',
+                   'ec', 'ensembl', 'entrezgene', 'genomic_pos', 'go',
                    'homologene', 'interpro', 'ipi', 'map_location', 'name',
                    'pdb', 'pharmgkb', 'pir', 'prosite', 'reagent', 'refseq',
-                   'reporter', 'symbol', 'taxid', 'type_of_gene',
+                   'reporter', 'summary', 'symbol', 'taxid', 'type_of_gene',
                    'unigene', 'uniprot', 'exons', 'generif']
 
         for attr in attr_li:
@@ -244,11 +244,11 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(len(res), 1)
         # check default fields returned
         eq_(set(res[0].keys()),set(['symbol', 'reporter', 'refseq', '_score', 'pdb', 'interpro', 'entrezgene',
-                                    'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
-                                    'ensembl', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
+                                    'summary', 'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
+                                    'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                    'exons', 'HPRD','exac']))
+                                    'exons', 'exac','other_names','umls']))
         eq_(res[0]['entrezgene'], 1017)
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
@@ -443,7 +443,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_fetch_all(self):
         res = self.json_ok(self.get_ok(self.api +
-                           '/query?q=cdk2&fetch_all=true'))
+                           '/query?q=cdk*&species=all&fetch_all=true'))
         assert '_scroll_id' in res
 
         res2 = self.json_ok(self.get_ok(self.api +
@@ -529,7 +529,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                 'common_name', 'genbank_common_name',
                                 '_version', 'parent_taxid', 'scientific_name',
                                 'has_gene', 'children', 'rank',
-                                'uniprot_name','other_names']))
+                                'uniprot_name']))
 
     def test_query_dotstar_refseq(self):
         protein = self.json_ok(self.get_ok(self.api +
@@ -750,6 +750,124 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(hit["exac"]["all"]["mu_syn"], 0.00000345583178284)
         eq_(hit["exac"]["nonpsych"]["syn_z"], 0.0369369403215127)
         eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
+
+    def test_caseinsensitive(self):
+        lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"),filter=True)
+        upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
+        eq_(lower["hits"],upper["hits"])
+
+    def test_symbolnamespecies_order(self):
+        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
+        hits = res["hits"]
+        # first is 1017, it's human and cdk2 is a symbol
+        eq_(hits[0]["_id"],"1017")
+        # second is 12566, mouse
+        eq_(hits[1]["_id"],"12566")
+        # third is 362817, rat
+        eq_(hits[2]["_id"],"362817")
+
+    def test_gene_other_names(self):
+        # this one has some
+        res = self.json_ok(self.get_ok(self.api + "/gene/107924918"))
+        assert "other_names" in res, "No other_names found in %s" % res
+        eq_(res["other_names"],['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3'])
+        # that one not
+        res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
+        assert not "other_names" in res
+        # query by other_names:
+        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33"))
+        eq_(len(res["hits"]),6)
+        ids = [h["_id"] for h in res["hits"]]
+        assert "1017" in ids, "Should have 1017 in results"
+
+    def test_int_float(self):
+        def check_homologene(res):
+            for h in res["homologene"]["genes"]:
+                eq_(type(h[0]),int)
+                eq_(type(h[1]),int)
+        def check_exons(res):
+            for ex in res["exons"]:
+                for pos in ex["position"]:
+                    eq_(type(pos[0]),int)
+                    eq_(type(pos[1]),int)
+        res = self.json_ok(self.get_ok(self.api + "/gene/1017?species=9606&fields=homologene,exons"))
+        check_homologene(res)
+        check_exons(res)
+        resall = self.json_ok(self.get_ok(self.api + "/gene/1017?fields=homologene,exons"))
+        check_homologene(resall)
+        check_exons(resall)
+
+
+    def test_caseinsentive_datasources(self):
+        self.query_has_hits('mirbase:MI0017267')
+        self.query_has_hits('wormbase:WBGene00057218&species=31234')
+        self.query_has_hits('xenbase:XB-GENE-1001990&species=frog')
+        self.query_has_hits('Xenbase:XB-GENE-1001990&species=frog')
+        self.query_has_hits(r'mgi:MGI\\:104772')
+
+    def test_exac(self):
+        res = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970.4&fields=exac"),filter=True)
+        resnover = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970&fields=exac"),filter=True)
+        eq_(res["hits"], resnover["hits"])
+        eq_(len(res["hits"]), 1)
+        hit = res["hits"][0]
+        eq_(hit["exac"]["bp"], 897)
+        eq_(hit["exac"]["cds_end"], 56365409)
+        eq_(hit["exac"]["cds_start"], 56360792)
+        eq_(hit["exac"]["n_exons"], 7)
+        eq_(hit["exac"]["transcript"], "ENST00000266970.4")
+        eq_(hit["exac"]["all"]["mu_syn"], 0.00000345583178284)
+        eq_(hit["exac"]["nonpsych"]["syn_z"], 0.0369369403215127)
+        eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
+
+    def test_caseinsensitive(self):
+        lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"),filter=True)
+        upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
+        eq_(lower["hits"],upper["hits"])
+
+    def test_symbolnamespecies_order(self):
+        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
+        hits = res["hits"]
+        # first is 1017, it's human and cdk2 is a symbol
+        eq_(hits[0]["_id"],"1017")
+        # second is 12566, mouse
+        eq_(hits[1]["_id"],"12566")
+        # third is 362817, rat
+        eq_(hits[2]["_id"],"362817")
+
+    def test_gene_other_names(self):
+        # this one has some
+        res = self.json_ok(self.get_ok(self.api + "/gene/107924918"))
+        assert "other_names" in res, "No other_names found in %s" % res
+        eq_(res["other_names"],['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3'])
+        # that one not
+        res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
+        assert not "other_names" in res
+        # query by other_names:
+        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33"))
+        eq_(len(res["hits"]),6)
+        ids = [h["_id"] for h in res["hits"]]
+        assert "1017" in ids, "Should have 1017 in results"
+
+    def test_int_float(self):
+        def check_homologene(res):
+            for h in res["homologene"]["genes"]:
+                eq_(type(h[0]),int)
+                eq_(type(h[1]),int)
+        def check_exons(res):
+            for ex in res["exons"]:
+                for pos in ex["position"]:
+                    eq_(type(pos[0]),int)
+                    eq_(type(pos[1]),int)
+        res = self.json_ok(self.get_ok(self.api + "/gene/1017?species=9606&fields=homologene,exons"))
+        check_homologene(res)
+        check_exons(res)
+        resall = self.json_ok(self.get_ok(self.api + "/gene/1017?fields=homologene,exons"))
+        check_homologene(resall)
+        check_exons(resall)
+
+
+
 
 
 # Self contained test class, used for CI tools such as Travis

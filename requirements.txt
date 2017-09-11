@@ -20,10 +20,10 @@ tornadoes>=1.4.1
 -e git+https://github.com/cyrus0824/py-ga-mob.git#egg=pyga
 
 # biothings
-git+https://github.com/SuLab/biothings.api.git#egg=biothings
+git+https://github.com/SuLab/biothings.api.git@0e8731cb4071f01fab57f618ca1f2e9ed8cf6d20#egg=biothings
 
 #for build sphinx docs
-Sphinx>=1.2.3
+sphinx==1.5.6
 #sphinx-bootstrap-theme==0.3.1
 
 #for nosetests
@@ -31,10 +31,11 @@ nose>=1.3.0
 httplib2>=0.8
 
 #for internal API-API querying (mygene-myspecies)
-requests>=2.9.1
+requests>=2.9.1,<2.13
 
 #Optional
 msgpack-python
+boto
 
 # temp
 pymongo

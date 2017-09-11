@@ -1,0 +1,27 @@
+{
+    "@context": {
+        "symbol": "http://identifiers.org/hgnc.symbol/",
+        "ensembl.gene": "http://identifiers.org/ensembl.gene/",
+        "ensembl.protein": "http://identifiers.org/ensembl.protein/",
+        "ensembl.transcript": "http://identifiers.org/ensembl.transcript/",
+        "go.CC.id": "http://identifiers.org/go/",
+        "go.CC.pubmed": "http://identifiers.org/pubmed/",
+        "go.MF.id": "http://identifiers.org/go/",
+        "go.MF.pubmed": "http://identifiers.org/pubmed/",
+        "go.BP.id": "http://identifiers.org/go/",
+        "go.BP.pubmed": "http://identifiers.org/pubmed/",
+        "generif.pubmed": "http://identifiers.org/pubmed/",
+        "homologene.id": "http://identifiers.org/homologene/",
+        "interpro.id": "http://identifiers.org/interpro/",
+        "pathway.biocarta.id": "http://identifiers.org/biocarta.pathway/",
+        "pathway.kegg.id": "http://identifiers.org/kegg.pathway/",
+        "pathway.pharmgkb.id": "http://identifiers.org/pharmgkb.pathways/",
+        "pathway.reactome.id": "http://identifiers.org/reactome/",
+        "pathway.sympdb.id": "http://identifiers.org/smpdb/",
+        "pathway.wikipathways.id": "http://identifiers.org/wikipathways/",
+        "refseq.genomic": "http://identifiers.org/refseq/",
+        "refseq.protein": "http://identifiers.org/refseq/",
+        "refseq.rna": "http://identifiers.org/refseq/",
+        "uniprot.Swiss-Prot": "http://identifiers.org/uniprot/"
+    }
+}
