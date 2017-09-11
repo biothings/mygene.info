@@ -92,10 +92,12 @@ def load_broadinstitute_exac(data_folder):
             exacs[k] = v
 
     logging.info("Convert transcript ID to EntrezID")
-    import dataload.sources.ensembl.ensembl_base as ensembl_base
-    from biothings.utils.mongo import get_data_folder
-    ensembl_dir = get_data_folder("ensembl")
-    ensembl_parser = ensembl_base.EnsemblParser(ensembl_dir)
+    from ..ensembl.ensembl_base import EnsemblParser
+    from biothings.utils.hub_db import get_src_dump
+    ensembl_doc = get_src_dump().find_one({"_id":"ensembl"}) or {}
+    ensembl_dir = ensembl_doc.get("data_folder")
+    assert ensembl_dir, "Can't find Ensembl data directory (used for id conversion)"
+    ensembl_parser = EnsemblParser(ensembl_dir)
     ensembl_parser._load_ensembl2entrez_li()
     ensembl2entrez = list2dict(ensembl_parser.ensembl2entrez_li, 0, alwayslist=True)
     for line in tabfile_feeder(os.path.join(ensembl_dir,"gene_ensembl__translation__main.txt")):
