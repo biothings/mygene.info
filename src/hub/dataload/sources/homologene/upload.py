@@ -1,10 +1,9 @@
-from .entrez_base import HomologeneParser
-import biothings.dataload.uploader as uploader
+from .parser import HomologeneParser
+import biothings.hub.dataload.uploader as uploader
 
-class EntrezHomologeneUploader(uploader.MergerSourceUploader):
+class HomologeneUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_homologene"
-    main_source = "entrez"
+    name = "homologene"
 
     def load_data(self, data_folder):
         parser = HomologeneParser(data_folder)

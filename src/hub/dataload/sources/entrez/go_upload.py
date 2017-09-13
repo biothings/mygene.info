@@ -1,5 +1,5 @@
-from .entrez_base import Gene2GOParser
-import biothings.dataload.uploader as uploader
+from .parser import Gene2GOParser
+import biothings.hub.dataload.uploader as uploader
 
 class EntrezGOUploader(uploader.MergerSourceUploader):
 
@@ -12,7 +12,8 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
         gene2go = parser.load()
         return gene2go
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "go": {
                 "dynamic": False,
@@ -83,5 +84,5 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                 }
             }
         }
-    
+
         return mapping

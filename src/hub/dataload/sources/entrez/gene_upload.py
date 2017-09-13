@@ -1,6 +1,6 @@
-from .entrez_base import GeneInfoParser
-from .entrez_base import get_geneid_d
-import biothings.dataload.uploader as uploader
+from .parser import GeneInfoParser
+from .parser import get_geneid_d
+import biothings.hub.dataload.uploader as uploader
 from biothings.utils.common import dump2gridfs
 
 class EntrezGeneUploader(uploader.MergerSourceUploader):
@@ -15,7 +15,8 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
         genedoc_d = self.parser.load()
         return genedoc_d
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "entrezgene": {
                 "type": "long"
@@ -152,3 +153,4 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
         self.logger.info('Uploading "geneid_d" to GridFS...')
         geneid_d = self.get_geneid_d(load_cache=False,save_cache=False)
         dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
+

@@ -1,5 +1,5 @@
-from .entrez_base import Gene2AccessionParser
-import biothings.dataload.uploader as uploader
+from .parser import Gene2AccessionParser
+import biothings.hub.dataload.uploader as uploader
 
 class EntrezAccessionUploader(uploader.MergerSourceUploader):
 
@@ -12,7 +12,8 @@ class EntrezAccessionUploader(uploader.MergerSourceUploader):
         gene2acc = self.parser.load()
         return gene2acc
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
                 "accession": {
                     "dynamic": False,
@@ -41,3 +42,4 @@ class EntrezAccessionUploader(uploader.MergerSourceUploader):
                     }
                 }
         return mapping
+

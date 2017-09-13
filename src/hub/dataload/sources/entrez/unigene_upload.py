@@ -1,5 +1,5 @@
-from .entrez_base import Gene2UnigeneParser
-import biothings.dataload.uploader as uploader
+from .parser import Gene2UnigeneParser
+import biothings.hub.dataload.uploader as uploader
 
 
 class EntrezUnigeneUploader(uploader.MergerSourceUploader):
@@ -13,7 +13,8 @@ class EntrezUnigeneUploader(uploader.MergerSourceUploader):
         gene2unigene = self.parser.load()
         return gene2unigene
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "unigene":  {
                 "type": "string",

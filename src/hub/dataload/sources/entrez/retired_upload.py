@@ -1,5 +1,5 @@
-from .entrez_base import Gene2RetiredParser
-import biothings.dataload.uploader as uploader
+from .parser import Gene2RetiredParser
+import biothings.hub.dataload.uploader as uploader
 
 class EntrezRetiredUploader(uploader.MergerSourceUploader):
 
@@ -12,7 +12,8 @@ class EntrezRetiredUploader(uploader.MergerSourceUploader):
         gene2retired = parser.load()
         return gene2retired
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "retired": {"type": "long"},
         }

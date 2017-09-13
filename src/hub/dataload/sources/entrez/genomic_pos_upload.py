@@ -9,7 +9,7 @@ when it's necessary.
 import os.path
 from biothings.utils.common import (dump, loadobj, get_timestamp)
 from biothings.utils.dataload import (tab2list, load_start, load_done)
-import biothings.dataload.uploader as uploader
+import biothings.hub.dataload.uploader as uploader
 
 class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
 
@@ -24,8 +24,8 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
         :return:
         """
 
-        taxids_file = os.path.join(data_folder, "../ref_microbe_taxids_20151014.pyobj")
-        datafile = os.path.join(data_folder, 'gene/gene2refseq.gz')
+        taxids_file = os.path.join(data_folder, "../ref_microbe_taxids.pyobj")
+        datafile = os.path.join(data_folder, 'gene2refseq.gz')
 
         taxids = loadobj(taxids_file)
         taxid_set = set(taxids)
@@ -60,7 +60,8 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
 
         load_done('[%d]' % count)
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "genomic_pos": {
                 "dynamic": False,
