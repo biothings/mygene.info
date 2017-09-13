@@ -1,16 +1,16 @@
-from .entrez_base import Gene2GeneRifParser
-import biothings.dataload.uploader as uploader
+from .parser import Gene2GeneRifParser
+import biothings.hub.dataload.uploader as uploader
 
-class EntrezGenerifUploader(uploader.MergerSourceUploader):
+class GenerifUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_generif"
-    main_source = "entrez"
+    name = "generif"
 
     def load_data(self, data_folder):
         gene2generif = Gene2GeneRifParser(data_folder).load()
         return gene2generif
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             # do not index generif
             "generif": {
