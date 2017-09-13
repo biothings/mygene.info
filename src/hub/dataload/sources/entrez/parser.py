@@ -54,10 +54,10 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
     os.chdir(data_folder)
 
     # check cache file
-    _cache_file = 'gene/geneid_d.pyobj'
+    _cache_file = 'geneid_d.pyobj'
     if load_cache and os.path.exists(_cache_file) and \
-       file_newer(_cache_file, 'gene/gene_info.gz') and \
-       file_newer(_cache_file, 'gene/gene_history.gz'):
+       file_newer(_cache_file, 'gene_info.gz') and \
+       file_newer(_cache_file, 'gene_history.gz'):
 
         print('Loading "geneid_d" from cache file...', end='')
         _taxid_set, out_d = loadobj(_cache_file)
@@ -66,7 +66,7 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
         os.chdir(orig_cwd)
         return out_d
 
-    DATAFILE = os.path.join(data_folder, 'gene/gene_info.gz')
+    DATAFILE = os.path.join(data_folder, 'gene_info.gz')
     load_start(DATAFILE)
     if species_li:
         species_filter = lambda ld: int(ld[0]) in taxid_set and (only_for and ld[1] in only_for)
@@ -77,7 +77,7 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
     geneid_li = set(tab2list(DATAFILE, 1, includefn=species_filter))
     load_done('[%d]' % len(geneid_li))
 
-    DATAFILE = os.path.join(data_folder, 'gene/gene_history.gz')
+    DATAFILE = os.path.join(data_folder, 'gene_history.gz')
     load_start(DATAFILE)
 
     if species_li:
@@ -91,7 +91,7 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
     load_done('[%d]' % len(retired2gene))
     # convert key/value to int
     out_d = dict_convert(retired2gene, keyfn=int, valuefn=int)
-# TODO: this fills memory with key==value ...
+    # TODO: this fills memory with key==value ...
     for g in geneid_li:
         _g = int(g)
         out_d[_g] = _g
@@ -193,7 +193,7 @@ class GeneInfoParser(EntrezParserBase):
 
         '''
         load_start(self.datafile)
-        gene_d = tab2dict(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9, 13, 14), key=1,
+        gene_d = tab2dict_iter(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9, 13, 14), key=1,
                           alwayslist=0, includefn=self.species_filter)
 
         def _ff(d):
@@ -289,7 +289,6 @@ class Gene2UnigeneParser(EntrezParserBase):
             yield self.format(doc)
             cnt += 1
         load_done('[%d]' % cnt)
-
 
 
 class Gene2GOParser(EntrezParserBase):
