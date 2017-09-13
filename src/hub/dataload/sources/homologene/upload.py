@@ -11,7 +11,8 @@ class HomologeneUploader(uploader.MergerSourceUploader):
         gene2homologene = parser.load()
         return gene2homologene
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "homologene": {
                 "dynamic": False,
