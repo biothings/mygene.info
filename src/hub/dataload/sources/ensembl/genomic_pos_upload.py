@@ -1,5 +1,5 @@
-from .ensembl_base import EnsemblParser
-import biothings.dataload.uploader as uploader
+from .parser import EnsemblParser
+import biothings.hub.dataload.uploader as uploader
 
 class EnsemblGenomicPosUploader(uploader.MergerSourceUploader):
 
@@ -11,7 +11,8 @@ class EnsemblGenomicPosUploader(uploader.MergerSourceUploader):
         ensembl2pos = ep.load_ensembl2pos()
         return ensembl2pos
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "genomic_pos": {
                 "dynamic": False,

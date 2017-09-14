@@ -1,5 +1,5 @@
-from .ensembl_base import EnsemblParser
-import biothings.dataload.uploader as uploader
+from .parser import EnsemblParser
+import biothings.hub.dataload.uploader as uploader
 
 class EnsemblPrositeUploader(uploader.MergerSourceUploader):
 
@@ -12,7 +12,8 @@ class EnsemblPrositeUploader(uploader.MergerSourceUploader):
         ensembl2prosite = ep.load_ensembl2prosite()
         return ensembl2prosite
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "prosite": {
                 "type": "string",

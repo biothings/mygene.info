@@ -1,5 +1,5 @@
-from .ensembl_base import EnsemblParser
-import biothings.dataload.uploader as uploader
+from .parser import EnsemblParser
+import biothings.hub.dataload.uploader as uploader
 
 class EnsemblInterproUploader(uploader.MergerSourceUploader):
 
@@ -12,7 +12,8 @@ class EnsemblInterproUploader(uploader.MergerSourceUploader):
         ensembl2interpro = ep.load_ensembl2interpro()
         return ensembl2interpro
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "interpro": {
                 "dynamic": False,

@@ -1,5 +1,5 @@
-from .ensembl_base import EnsemblParser
-import biothings.dataload.uploader as uploader
+from .parser import EnsemblParser
+import biothings.hub.dataload.uploader as uploader
 
 class EnsemblGeneUploader(uploader.MergerSourceUploader):
 
@@ -13,7 +13,8 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
         ensembl_genes = ep.load_ensembl_main()
         return ensembl_genes
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "taxid":  {"type": "integer",
                        "include_in_all": False},

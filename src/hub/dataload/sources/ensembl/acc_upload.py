@@ -1,5 +1,5 @@
-from .ensembl_base import EnsemblParser
-import biothings.dataload.uploader as uploader
+from .parser import EnsemblParser
+import biothings.hub.dataload.uploader as uploader
 
 class EnsemblAccUploader(uploader.MergerSourceUploader):
 
@@ -11,7 +11,8 @@ class EnsemblAccUploader(uploader.MergerSourceUploader):
         ensembl2acc = ep.load_ensembl2acc()
         return ensembl2acc
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
                 "ensembl": {
                     "dynamic": False,

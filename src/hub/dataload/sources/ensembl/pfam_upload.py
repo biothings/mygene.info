@@ -1,5 +1,5 @@
-from .ensembl_base import EnsemblParser
-import biothings.dataload.uploader as uploader
+from .parser import EnsemblParser
+import biothings.hub.dataload.uploader as uploader
 
 class EnsemblPfamUploader(uploader.MergerSourceUploader):
 
@@ -11,7 +11,8 @@ class EnsemblPfamUploader(uploader.MergerSourceUploader):
         ensembl2pfam = ep.load_ensembl2pfam()
         return ensembl2pfam
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "pfam": {
                 "type": "string",

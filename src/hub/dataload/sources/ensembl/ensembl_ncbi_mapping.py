@@ -2,23 +2,9 @@ from __future__ import print_function
 import os.path
 from collections import defaultdict
 
-from biothings.utils.mongo import get_data_folder
 from biothings.utils.dataload import tabfile_feeder
 from biothings.utils.common import safewfile, anyfile
-
-
-ENSEMBL_DATA_FOLDER = get_data_folder('ensembl')
-print('Ensembl DATA_FOLDER: ' + ENSEMBL_DATA_FOLDER)
-Entrez_DATA_FOLDER = get_data_folder('entrez')
-print('Entrez DATA_FOLDER: ' + Entrez_DATA_FOLDER)
-
-
-gene_ensembl_1_xref_dm_file = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__xref_entrezgene__dm.txt")
-gene_ensembl_2_main_file = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__gene__main.txt")
-gene2ensembl_file = os.path.join(Entrez_DATA_FOLDER, "gene/gene2ensembl.gz")
-gene_main_file = os.path.join(Entrez_DATA_FOLDER, "gene/gene_info.gz")
-
-outfile = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__gene__extra.txt")
+from biothings.utils.hub_db import get_src_dump
 
 
 def find_multiple_mappings_from_entrezgene_file(gene_ensembl_entrezgene_dm_file):
@@ -182,7 +168,7 @@ def merge_mapping(ensembl_dict, mygene_website_dict, add_source=False):
     print("step 5 end")
 
 
-def write_mapping_file(mapping_generator, confirm=True):
+def write_mapping_file(mapping_generator, outfile, confirm=True):
     """OUTPUT is mapping file:
     -------------------------
     Note: you will not know the source of the mapping unless you use
@@ -226,11 +212,28 @@ def run_stats(total_ensembl_IDs, ensembl_dict, ensembl_map_count, total_mapped):
 
 # def main(gene_ensembl_1, gene_ensembl_2, gene2ensembl):
 def main(confirm=True):
+    src_dump = get_src_dump()
+    ensembl_doc = src_dump.find_one({"_id":"ensembl"}) or {}
+    ENSEMBL_DATA_FOLDER = ensembl_doc.get("data_folder")
+    assert ENSEMBL_DATA_FOLDER, "Can't find Ensembl data folder"
+    entrez_doc = src_dump.find_one({"_id":"entrez"}) or {}
+    ENTREZ_DATA_FOLDER = entrez_doc.get("data_folder")
+    assert ENTREZ_DATA_FOLDER, "Can't find Entrez data folder"
+
+    gene_ensembl_1_xref_dm_file = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__xref_entrezgene__dm.txt")
+    gene_ensembl_2_main_file = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__gene__main.txt")
+    gene2ensembl_file = os.path.join(ENTREZ_DATA_FOLDER, "gene2ensembl.gz")
+    gene_main_file = os.path.join(ENTREZ_DATA_FOLDER, "gene_info.gz")
+
+    outfile = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__gene__extra.txt")
+
+
+
     multi_mapping_dict, total_ensembl_IDs = find_multiple_mappings_from_entrezgene_file(gene_ensembl_1_xref_dm_file)
     ensembl_dict = create_ensembl_gene_id_dict(gene_ensembl_2_main_file, multi_mapping_dict)
     ensembl_dict, ensembl_match_count = find_ncbi_ids_from_gene2ensembl(ensembl_dict, gene2ensembl_file)
     ncbi_id_symbols = find_ncbi_symbols(gene_main_file, ensembl_dict)
     mapping_generator = merge_mapping(ensembl_dict, ncbi_id_symbols, add_source=False)
-    total_mapped = write_mapping_file(mapping_generator, confirm=confirm)
+    total_mapped = write_mapping_file(mapping_generator, outfile, confirm=confirm)
     run_stats(total_ensembl_IDs, ensembl_dict, ensembl_match_count, total_mapped)
 

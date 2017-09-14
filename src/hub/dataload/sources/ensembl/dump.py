@@ -50,6 +50,7 @@ class BioMart(HTTPDumper):
     #MART_URL = "http://www.biomart.org/biomart/martservice"
     MART_URL = "http://uswest.ensembl.org/biomart/martservice"
     TEMPLATE = XML_QUERY_TEMPLATE
+    species_li = []
     DUMP_METHOD = {"gene_ensembl__gene__main.txt":"get_gene__main",
                  "gene_ensembl__translation__main.txt":"get_translation__main",
                  "gene_ensembl__xref_entrezgene__dm.txt":"get_xref_entrezgene",
@@ -58,6 +59,7 @@ class BioMart(HTTPDumper):
                  "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
 
     SCHEDULE = "0 9 * * *"
+
 
     def download(self,remotefile,localfile):
         self.prepare_local_folders(localfile)
@@ -81,7 +83,6 @@ class BioMart(HTTPDumper):
     def create_todump_list(self,force=False):
         self.get_newest_info()
         newrelease = self.new_release_available()
-        self.species_li = self.get_all_species()
         for fn in ["gene_ensembl__gene__main.txt",
                 "gene_ensembl__translation__main.txt",
                 "gene_ensembl__xref_entrezgene__dm.txt",
@@ -90,6 +91,8 @@ class BioMart(HTTPDumper):
                 "gene_ensembl__prot_pfam__dm.txt"]:
             local_file = os.path.join(self.new_data_folder,os.path.basename(fn))
             if force or not os.path.exists(local_file) or newrelease:
+                if not self.__class__.species_li:
+                    self.__class__.species_li = self.get_all_species()
                 method = self.__class__.DUMP_METHOD[fn]
                 self.to_dump.append({"remote":method,"local":local_file})
 
@@ -116,7 +119,7 @@ class BioMart(HTTPDumper):
             #load saved file
             self.logger.info('Parsing "species.txt.gz"...')
             species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
-            species_li = [x[:-1] + [is_int(x[-1]) or int(x[-1]) or None] for x in species_li]
+            species_li = [x[:-1] + [is_int(x[-1]) and int(x[-1]) or None] for x in species_li]
             # as of ensembl 87, there are also mouse strains. keep only the "original" one
             species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
             self.logger.info('Done.')
@@ -177,8 +180,14 @@ class BioMart(HTTPDumper):
         out_f, outfile = safewfile(outfile,prompt=False,default='O')
         if header:
             out_f.write('\t'.join(header) + '\n')
-        for species in self.species_li:
-            dataset = self.get_dataset_name(species)
+        for species in self.__class__.species_li:
+            try:
+                dataset = self.get_dataset_name(species)
+            except IndexError:
+                # bad dataset name, skip (this used to be catched in a try/finally
+                # so it wasn't dealth with before)
+                self.logger.debug("Skip species '%s'" % species)
+                continue
             taxid = species[2]
             if not dataset:
                 continue
