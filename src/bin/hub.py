@@ -40,7 +40,7 @@ from hub.dataindex.indexer import GeneIndexer
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
 upload_manager.register_sources(hub.dataload.__sources_dict__)
-upload_manager.poll()
+upload_manager.poll('upload',lambda doc: upload_manager.upload_src(doc["_id"]))
 
 dmanager = dumper.DumperManager(job_manager=job_manager)
 dmanager.register_sources(hub.dataload.__sources_dict__)
