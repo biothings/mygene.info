@@ -1,16 +1,17 @@
-from .entrez_base import Gene2ECParser
-import biothings.dataload.uploader as uploader
+from .parser import Gene2ECParser
+import biothings.hub.dataload.uploader as uploader
 
 class EntrezECUploader(uploader.MergerSourceUploader):
 
     name = "entrez_ec"
-    main_source = "entrez"
+    main_source = "refseq"
 
     def load_data(self, data_folder):
         gene2ec = Gene2ECParser(data_folder).load()
         return gene2ec
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "ec": {
                 "type": "string",

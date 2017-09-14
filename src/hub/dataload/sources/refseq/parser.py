@@ -13,7 +13,7 @@ from ..entrez.parser import EntrezParserBase
 
 class GeneSummaryParser(EntrezParserBase):
     '''Parser for gene2summary_all.txt, adding "summary" field in gene doc'''
-    DATAFILE = 'refseq/gene2summary_all.txt'
+    DATAFILE = 'gene2summary_all.txt'
 
     def load(self, aslist=False):
         load_start(self.datafile)
@@ -42,7 +42,7 @@ class Gene2ECParser(EntrezParserBase):
         24159   2.3.3.8
         24161   3.1.3.2,3.1.3.48
     '''
-    DATAFILE = 'refseq/gene2ec_all.txt'
+    DATAFILE = 'gene2ec_all.txt'
 
     def load(self, aslist=False):
         load_start(self.datafile)

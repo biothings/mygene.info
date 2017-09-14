@@ -1,5 +1,5 @@
-from .entrez_base import Gene2RefseqParser
-import biothings.dataload.uploader as uploader
+from .parser import Gene2RefseqParser
+import biothings.hub.dataload.uploader as uploader
 
 class EntrezRefseqUploader(uploader.MergerSourceUploader):
 
@@ -12,7 +12,8 @@ class EntrezRefseqUploader(uploader.MergerSourceUploader):
         gene2refseq = parser.load()
         return gene2refseq
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
                 "refseq": {
                     "dynamic": False,
