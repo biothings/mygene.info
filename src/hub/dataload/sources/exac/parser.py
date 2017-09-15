@@ -92,7 +92,7 @@ def load_broadinstitute_exac(data_folder):
             exacs[k] = v
 
     logging.info("Convert transcript ID to EntrezID")
-    from ..ensembl.ensembl_base import EnsemblParser
+    from ..ensembl.parser import EnsemblParser
     from biothings.utils.hub_db import get_src_dump
     ensembl_doc = get_src_dump().find_one({"_id":"ensembl"}) or {}
     ensembl_dir = ensembl_doc.get("data_folder")
