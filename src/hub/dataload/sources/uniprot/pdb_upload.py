@@ -1,5 +1,5 @@
-from .uniprot_base import load_pdb
-import biothings.dataload.uploader as uploader
+from .parser import load_pdb
+import biothings.hub.dataload.uploader as uploader
 
 
 class UniprotPDBUploader(uploader.MergerSourceUploader):
@@ -10,7 +10,8 @@ class UniprotPDBUploader(uploader.MergerSourceUploader):
     def load_data(self, data_folder):
         return load_pdb(data_folder)
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "pdb": {
                 "type": "string",

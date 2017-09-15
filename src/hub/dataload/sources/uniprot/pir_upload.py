@@ -1,5 +1,5 @@
-from .uniprot_base import load_pir
-import biothings.dataload.uploader as uploader
+from .parser import load_pir
+import biothings.hub.dataload.uploader as uploader
 
 
 class UniprotPIRUploader(uploader.MergerSourceUploader):
@@ -10,7 +10,8 @@ class UniprotPIRUploader(uploader.MergerSourceUploader):
     def load_data(self, data_folder):
         return load_pir(data_folder)
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
         mapping = {
             "pir": {
                 "type": "string",
