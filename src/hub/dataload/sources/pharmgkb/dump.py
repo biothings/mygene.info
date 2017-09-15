@@ -18,7 +18,7 @@ class PharmgkbDumper(LastModifiedHTTPDumper):
     SRC_URLS = ["https://s3.pgkb.org/data/genes.zip"]
     SCHEDULE = "0 9 * * *"
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Uncompressing files in '%s'" % self.new_data_folder) 
         unzipall(self.new_data_folder)
 

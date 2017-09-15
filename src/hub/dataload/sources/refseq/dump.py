@@ -54,7 +54,7 @@ class RefseqDumper(FTPDumper):
                 if force or not os.path.exists(local_file) or self.remote_is_better(fn,local_file) or self.new_release_available():
                     self.to_dump.append({"remote": fn, "local":local_file})
 
-    def post_dump(self,job_manager=None):
+    def post_dump(self,job_manager=None, *args, **kwargs):
         # we're in a new thread, we need to "bring back" the loop to run jobs
         # (it's fine, processes we'll use are independent)
         gbff_files = glob.glob(os.path.join(self.new_data_folder, '*.rna.gbff.gz'))

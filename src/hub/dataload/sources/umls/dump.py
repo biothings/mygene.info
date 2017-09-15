@@ -23,7 +23,7 @@ Assuming manual download from: https://www.nlm.nih.gov/research/umls/licensedcon
 - umls-2017AA-full.zip
 """)
 
-    def post_dump(self):
+    def post_dump(self, *args, **kwargs):
         self.logger.info("Unzipping files in '%s'" % self.new_data_folder) 
         unzipall(self.new_data_folder)
 
