@@ -25,7 +25,8 @@ import biothings, config
 biothings.config_for_app(config)
 
 from config import DATA_ARCHIVE_ROOT, logger as logging
-from biothings.dataload.dumper import FTPDumper
+from biothings.hub.dataload.dumper import FTPDumper
+
 
 class UCSCDumper(FTPDumper):
 
@@ -34,6 +35,7 @@ class UCSCDumper(FTPDumper):
     CWD_DIR = 'goldenPath/currentGenomes'
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     latest_lastmodified = None   # record the lastmodified for the newest file.
+    MAX_PARALLEL_DUMP = 1 # throttling as ucsc ftp would kick us out if too many...
 
     def get_new_data_folder(self):
         # no archive, no "latest", just keep the root directory
@@ -89,9 +91,3 @@ class UCSCDumper(FTPDumper):
                 self.release = self.timestamp
                 self.to_dump.append({"remote": remote_file,"local":localfile})
 
-def main():
-    dumper = UCSCDumper()
-    dumper.dump()
-
-if __name__ == "__main__":
-    main()

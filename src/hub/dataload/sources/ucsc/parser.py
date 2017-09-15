@@ -1,10 +1,8 @@
 import os.path
 import time
 from biothings.utils.common import timesofar
-from biothings.utils.dataload import (load_start, load_done, tab2dict,
-                            tabfile_feeder, list2dict)
-
-from biothings.utils.mongo import get_data_folder
+from biothings.utils.dataload import load_start, load_done, tab2dict, \
+                            tabfile_feeder, list2dict
 
 
 def load_exons_for_species(data_folder, species, exons_key='exons'):

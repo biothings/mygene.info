@@ -1,5 +1,5 @@
-from .ucsc_base import load_ucsc_exons
-import biothings.dataload.uploader as uploader
+from .parser import load_ucsc_exons
+import biothings.hub.dataload.uploader as uploader
 
 
 class UCSCExonsUploader(uploader.MergerSourceUploader):
@@ -11,7 +11,8 @@ class UCSCExonsUploader(uploader.MergerSourceUploader):
     	genedoc_d = load_ucsc_exons(data_folder)
     	return genedoc_d
 
-    def get_mapping(self):
+    @classmethod
+    def get_mapping(klass):
 	    mapping = {
 	        #do not index exons
 	        "exons":  {
