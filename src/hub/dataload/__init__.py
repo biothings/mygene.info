@@ -8,9 +8,9 @@ __sources_dict__ = [
         'hub.dataload.sources.uniprot',
         'hub.dataload.sources.pharmgkb',
         #'hub.dataload.sources.reporter',
-        #'hub.dataload.sources.ucsc.ucsc_exons',
+        'hub.dataload.sources.ucsc',
         'hub.dataload.sources.exac',
-        #'hub.dataload.sources.cpdb',
+        'hub.dataload.sources.cpdb',
         #'hub.dataload.sources.reagent',
         'hub.dataload.sources.umls',
 ]

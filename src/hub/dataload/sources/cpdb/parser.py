@@ -1,24 +1,14 @@
 import os.path
 import time
 
-from biothings.utils.common import get_timestamp, timesofar
+from biothings.utils.common import timesofar
 from biothings.utils.dataload import (load_start, load_done, tabfile_feeder,
                             list2dict, value_convert, dict_convert)
 
 
-def _download(__metadata__):
-    from biothings.utils.dataload import download as _download
-    DATA_FOLDER = "..."
-    output_folder = os.path.join(os.path.split(DATA_FOLDER)[0], get_timestamp())
-    for species in ['human', 'mouse', 'yeast']:
-        url = __metadata__['__url_{}__'.format(species)]
-        output_file = 'CPDB_pathways_genes_{}.tab'.format(species)
-        _download(url, output_folder, output_file)
-
-
-def load_cpdb(data_folder, __metadata__):
+def load_cpdb(data_folder, pathways):
     # only import pathways from these sources
-    PATHWAY_SOURCES_INCLUDED = __metadata__['pathway_sources_included']
+    PATHWAY_SOURCES_INCLUDED = pathways
     VALID_COLUMN_NO = 4
 
     t0 = time.time()
