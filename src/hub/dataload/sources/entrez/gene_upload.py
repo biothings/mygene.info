@@ -15,6 +15,14 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
         genedoc_d = self.parser.load()
         return genedoc_d
 
+    def get_geneid_d(self,*args,**kwargs):
+        return get_geneid_d(self.data_folder, *args, **kwargs)
+
+    def post_update_data(self,*args,**kwargs):
+        self.logger.info('Uploading "geneid_d" to GridFS...')
+        geneid_d = self.get_geneid_d(load_cache=False,save_cache=False)
+        dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
+
     @classmethod
     def get_mapping(klass):
         mapping = {
@@ -140,17 +148,3 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
             },
         }
         return mapping
-
-    def get_geneid_d(self,*args,**kwargs):
-        return get_geneid_d(self.data_folder, *args, **kwargs)
-
-    def generate_doc_src_master(self):
-        # TODO: not sure this ENTREZ_GENEDOC_ROOT is actually useful now we're using class inheritance
-        _doc = super(uploader.MergerSourceUploader,self).generate_doc_src_master()
-        _doc["ENTREZ_GENEDOC_ROOT"] = True
-
-    def post_update_data(self):
-        self.logger.info('Uploading "geneid_d" to GridFS...')
-        geneid_d = self.get_geneid_d(load_cache=False,save_cache=False)
-        dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
-
