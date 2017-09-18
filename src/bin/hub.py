@@ -34,8 +34,9 @@ import biothings.hub.databuild.differ as differ
 import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
 from hub.databuild.builder import MyGeneDataBuilder
-#from hub.databuild.mapper import TagObserved
+from hub.databuild.mapper import EntrezRetired2Current, Ensembl2Entrez
 from hub.dataindex.indexer import GeneIndexer
+import biothings.utils.mongo as mongo
 
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
@@ -46,9 +47,11 @@ dmanager = dumper.DumperManager(job_manager=job_manager)
 dmanager.register_sources(hub.dataload.__sources_dict__)
 dmanager.schedule_all()
 
-#observed = TagObserved(name="observed")
+retired2current = EntrezRetired2Current(convert_func=int,db_provider=mongo.get_src_db)
+ensembl2entrez = Ensembl2Entrez(db_provider=mongo.get_src_db,
+		retired2current=retired2current)
 build_manager = builder.BuilderManager(
-        builder_class=partial(MyGeneDataBuilder,mappers=[]),
+        builder_class=partial(MyGeneDataBuilder,mappers=[ensembl2entrez]),
         job_manager=job_manager)
 build_manager.configure()
 

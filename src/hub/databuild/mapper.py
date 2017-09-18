@@ -1,38 +1,38 @@
 from biothings.utils.common import loadobj
-import biothings.databuild.mapper as mapper
+import biothings.hub.databuild.mapper as mapper
 
-class EntrezRetired2Current(mapper.IDMapperBase):
+class EntrezRetired2Current(mapper.IDBaseMapper):
 
-    def __init__(self, db, *args, **kwargs):
+    def __init__(self, db_provider, *args, **kwargs):
         super(EntrezRetired2Current,self).__init__(*args,**kwargs)
-        self.db = db
+        self.db_provider = db_provider
 
     def load(self):
         if self.map is None:
             # this is a whole dict containing all entrez _id, wether it's a current or retired one.
             # it means most of the data has assoction with same _id as key and as value. It consumes memory
             # but it's a way to know the entrez perimeter (what entrez _ids exist and should be considered
-            self.map = loadobj(("entrez_gene__geneid_d.pyobj", self.db), mode='gridfs')
+            self.map = loadobj(("entrez_gene__geneid_d.pyobj", self.db_provider()), mode='gridfs')
 
     def process(self,*args,**kwargs):
         raise UserWarning("Don't call me, please")
 
 
-class Ensembl2Entrez(mapper.IDMapperBase):
+class Ensembl2Entrez(mapper.IDBaseMapper):
     """
     Mapper to convert ensembl _id to entrez type id.
     """
 
-    def __init__(self, db, retired2current, *args, **kwargs):
+    def __init__(self, db_provider, retired2current, *args, **kwargs):
         super(Ensembl2Entrez,self).__init__("ensembl_gene",*args,**kwargs)
-        self.db = db
+        self.db_provider = db_provider
         self.retired2current = retired2current
 
     def load(self):
         if self.map is None:
             self.retired2current.load()
             self.map = {}
-            ensembl2entrez_li = loadobj(("ensembl_gene__2entrezgene_list.pyobj", self.db), mode='gridfs')
+            ensembl2entrez_li = loadobj(("ensembl_gene__2entrezgene_list.pyobj", self.db_provider()), mode='gridfs')
             #filter out those deprecated entrez gene ids
             for ensembl_id,entrez_id in ensembl2entrez_li:
                 entrez_id = int(entrez_id)
@@ -40,7 +40,7 @@ class Ensembl2Entrez(mapper.IDMapperBase):
                     self.map[ensembl_id] = self.retired2current.translate(entrez_id)
 
 
-class Ensembl2EntrezRoot(mapper.IDMapperBase):
+class Ensembl2EntrezRoot(mapper.IDBaseMapper):
     """
     Mapper to select ensembl documents. Those whose _id can be translated
     to entrez are discarded, ensembl-only documents are the only ones kept.
