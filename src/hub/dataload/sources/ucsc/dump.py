@@ -34,8 +34,10 @@ class UCSCDumper(FTPDumper):
     FTP_HOST = 'hgdownload.cse.ucsc.edu'
     CWD_DIR = 'goldenPath/currentGenomes'
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
+
     latest_lastmodified = None   # record the lastmodified for the newest file.
     MAX_PARALLEL_DUMP = 1 # throttling as ucsc ftp would kick us out if too many...
+    SCHEDULE = "0 9 * * *"
 
     def get_new_data_folder(self):
         # no archive, no "latest", just keep the root directory

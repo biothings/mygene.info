@@ -1,6 +1,7 @@
 from biothings.utils.dataload import merge_dict, value_convert
 import biothings.hub.dataload.uploader as uploader
 
+
 reporter_modules = ['affy_reporter', 'affy_reporter2', 'gnf_reporter', 'pigatlas_reporter']
 platform_li = []
 for i, module in enumerate(reporter_modules):
@@ -8,11 +9,13 @@ for i, module in enumerate(reporter_modules):
     reporter_modules[i] = module
     platform_li.extend(module.platform_li)
 
-class ReporterUploader(uploader.BaseSourceUploader):
+
+class ReporterUploader(uploader.DummySourceUploader):
 
     name = "reporter"
 
     def load_data(self, data_folder):
+        raise Exception("Collection-only resource, no more dataload")
         reporter_d = {}
         for module in reporter_modules:
             reporter_d.update(module.loaddata(data_folder))
@@ -24,27 +27,6 @@ class ReporterUploader(uploader.BaseSourceUploader):
 
     @classmethod
     def get_mapping(klass):
-        '''
-        mapping = {
-            "reporter":  {"dynamic" : False,
-                          path": "just_name",
-                          "properties" : {
-                                "GNF1H": {
-                                   "type" : "string",
-                                    "analyzer": "string_lowercase",
-                                    "index_name": "reporter",
-                                },
-                                "GNF1M": {
-                                   "type" : "string",
-                                    "analyzer": "string_lowercase",
-                                    "index_name": "reporter",
-                                },
-                                ... ...
-                          }
-            }
-        }
-        '''
-
         platform_mapping = {
             "type": "string",
             "analyzer": "string_lowercase"
