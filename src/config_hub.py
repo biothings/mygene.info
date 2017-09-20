@@ -126,6 +126,14 @@ BIOTHINGS_ROLE = "slave"
 import logging
 from biothings.utils.loggers import setup_default_log
 
+# don't bother with elements order in a list when diffing,
+# mygene optmized uploaders can't produce different results
+# when parsing data (parallelization)
+import importlib
+import biothings.utils.jsondiff
+importlib.reload(biothings.utils.jsondiff)
+biothings.utils.jsondiff.UNORDERED_LIST = True
+
 ########################################
 # APP-SPECIFIC CONFIGURATION VARIABLES #
 ########################################
