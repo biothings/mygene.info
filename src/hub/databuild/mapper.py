@@ -24,7 +24,7 @@ class Ensembl2Entrez(mapper.IDBaseMapper):
     """
 
     def __init__(self, db_provider, retired2current, *args, **kwargs):
-        super(Ensembl2Entrez,self).__init__("ensembl_gene",*args,**kwargs)
+        super(Ensembl2Entrez,self).__init__("ensembl2entrez",*args,**kwargs)
         self.db_provider = db_provider
         self.retired2current = retired2current
 

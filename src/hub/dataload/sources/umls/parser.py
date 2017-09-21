@@ -54,7 +54,7 @@ def load_data(rrf_file):
 
     for idx, row in res.iterrows():
         yield {
-            "_id": row["entrez_id"],
+            "_id": str(row["entrez_id"]),
             "umls": {
                 "cui": row["cui"]
             }

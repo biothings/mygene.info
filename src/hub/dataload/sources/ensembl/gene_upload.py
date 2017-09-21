@@ -6,8 +6,7 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
 
     name = "ensembl_gene"
     main_source = "ensembl"
-    id_type = 'ensembl'
-    ENSEMBL_GENEDOC_ROOT = True
+    __metadata__ = {"mapper" : 'ensembl2entrez'}
 
     def load_data(self, data_folder):
         ep = EnsemblParser(data_folder,load_ensembl2entrez=False)

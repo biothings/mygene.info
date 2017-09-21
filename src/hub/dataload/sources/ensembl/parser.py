@@ -182,9 +182,12 @@ class EnsemblParser(object):
         datafile = os.path.join(self.data_folder, 'gene_ensembl__gene__main.txt')
         load_start(datafile)
 	    # Twice 1 because first is the dict key, the second because we need gene id within genomic_pos
+        ensembl2pos = dict_nodup(tab2dict(datafile, (1, 1, 3, 4, 5, 6), 0, includefn=_not_LRG))
+        ensembl2pos = value_convert(ensembl2pos, lambda x: {'ensemblgene': x[0], 'chr': x[3], 'start': int(x[1]), 'end': int(x[2]), 'strand': int(x[4])})
+        ensembl2pos = value_convert(ensembl2pos, lambda x: {'genomic_pos': x}, traverse_list=False)
         for datadict in tab2dict_iter(datafile, (1, 1, 3, 4, 5, 6), 0, includefn=_not_LRG):
             datadict = dict_nodup(datadict)
-            datadict = value_convert(datadict, lambda x: {'chr': x[3], 'start': int(x[1]), 'end': int(x[2]), 'strand': int(x[4])})
+            datadict = value_convert(datadict, lambda x: {'ensemblgene': x[0], 'chr': x[3], 'start': int(x[1]), 'end': int(x[2]), 'strand': int(x[4])})
             datadict = value_convert(datadict, lambda x: {'genomic_pos': x, '__aslistofdict__' : 'genomic_pos'}, traverse_list=False) 
             for doc in map_id(datadict,self.ensembl2entrez):
                 yield doc

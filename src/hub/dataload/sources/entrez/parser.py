@@ -58,11 +58,8 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
     if load_cache and os.path.exists(_cache_file) and \
        file_newer(_cache_file, 'gene_info.gz') and \
        file_newer(_cache_file, 'gene_history.gz'):
-
-        print('Loading "geneid_d" from cache file...', end='')
         _taxid_set, out_d = loadobj(_cache_file)
         assert _taxid_set == taxid_set
-        print('Done.')
         os.chdir(orig_cwd)
         return out_d
 
@@ -275,7 +272,6 @@ class Gene2UnigeneParser(EntrezParserBase):
 
     def load(self, aslist=False):
         load_start(self.datafile)
-        print()
         uni_d = tab2dict(self.datafile, (0, 1), 0, alwayslist=0)
         DATAFILE = os.path.join(self.data_folder, 'gene_history.gz')
         retired2gene = tab2dict(DATAFILE, (1, 2), 1, alwayslist=0,includefn=lambda ld: ld[1] != '-')
