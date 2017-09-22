@@ -72,8 +72,8 @@ JSONLD_CONTEXT_PATH = 'web/context/context.json'
 # MYGENE THINGS
 
 # for error messages
-ID_REQUIRED_MESSAGE = '404: Gene ID Required'
-ID_NOT_FOUND_TEMPLATE = '404: Gene ID "{bid}" Not Found'
+ID_REQUIRED_MESSAGE = 'Gene ID Required'
+ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
 
 # for docs
 INCLUDE_DOCS = True
