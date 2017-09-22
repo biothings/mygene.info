@@ -17,7 +17,7 @@ tornado>=3.2
 tornadoes>=1.4.1
 
 # biothings
-git+https://github.com/biothings/biothings.api.git@a6034f3550037c233165a705719852ce88498a0b#egg=biothings
+git+https://github.com/biothings/biothings.api.git@3933f82392042b1446456e13700f51dea9b4c975#egg=biothings
 
 #for build sphinx docs
 Sphinx>=1.2.3
