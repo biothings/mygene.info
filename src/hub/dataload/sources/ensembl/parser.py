@@ -166,17 +166,17 @@ class EnsemblParser(object):
 
             return out
 
-        #ensembl2acc = tab2dict(datafile, (1, 2, 3), 0, includefn=_not_LRG)
-        for datadict in tab2dict_iter(datafile, (1, 2, 3), 0, includefn=_not_LRG):
-            for k in datadict:
-                datadict[k] = {'ensembl': _fn(datadict[k], k), '__aslistofdict__' : 'ensembl'}
-            for doc in map_id(datadict,self.ensembl2entrez):
-                yield doc
+        ensembl2acc = tab2dict(datafile, (1, 2, 3), 0, includefn=_not_LRG)
+        #for datadict in tab2dict_iter(datafile, (1, 2, 3), 0, includefn=_not_LRG):
+        #    for k in datadict:
+        #        datadict[k] = {'ensembl': _fn(datadict[k], k), '__aslistofdict__' : 'ensembl'}
+        #    for doc in map_id(datadict,self.ensembl2entrez):
+        #        yield doc
 
-        #for k in ensembl2acc:
-        #    ensembl2acc[k] = {'ensembl': _fn(ensembl2acc[k], k)}
+        for k in ensembl2acc:
+            ensembl2acc[k] = {'ensembl': _fn(ensembl2acc[k], k)}
 
-        #return self.convert2entrez(ensembl2acc)
+        return self.convert2entrez(ensembl2acc)
 
     def load_ensembl2pos(self):
         datafile = os.path.join(self.data_folder, 'gene_ensembl__gene__main.txt')
