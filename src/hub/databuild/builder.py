@@ -17,8 +17,14 @@ class MyGeneDataBuilder(builder.DataBuilder):
             self.logger.debug("Source '%s' requires custom query: '%s'" % (src_name,_query))
         return _query
 
-    def clean_document_to_merge(self,doc):
-        doc.pop('taxid', None)
-        return doc
+    def document_cleaner(self,src_name,*args,**kwargs):
+        # only root sources document can keep their taxid
+        if src_name in self.get_root_document_sources():
+            return None
+        else:
+            return cleaner
 
 
+def cleaner(doc):
+    doc.pop('taxid', None)
+    return doc
