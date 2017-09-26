@@ -20,14 +20,12 @@ class HomologeneDumper(FTPDumper):
     SCHEDULE = "0 9 * * *"
 
     def get_newest_info(self):
-        self.client.cwd("/pub/HomoloGene")
-        releases = self.client.nlst()
-        # stick to release 0.3.x
-        releases = [x.lstrip("build") for x in releases if x.startswith('build')]
-        # sort items based on date
-        releases = sorted(releases)
-        # get the last item in the list, which is the latest version
-        self.release = releases[-1]
+        rel = None
+        def setrel(line):
+            nonlocal rel
+            rel = line
+        self.client.retrlines("RETR RELEASE_NUMBER",setrel)
+        self.release = rel
 
     def new_release_available(self):
         current_release = self.src_doc.get("release")

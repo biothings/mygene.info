@@ -26,9 +26,12 @@ class RefseqDumper(FTPDumper):
     SCHEDULE = "0 9 * * *"
 
     def get_newest_info(self):
-        res = self.client.sendcmd("MDTM H_sapiens/mRNA_Prot/human.1.protein.gpff.gz") # pick one, assuming all other on the same data
-        code, remote_lastmodified = res.split()
-        self.release = datetime.strptime(remote_lastmodified, '%Y%m%d%H%M%S').strftime("%Y%m%d")
+        rel = None
+        def setrel(line):
+            nonlocal rel
+            rel = line
+        self.client.retrlines("RETR /refseq/release/RELEASE_NUMBER",setrel)
+        self.release = rel
 
     def new_release_available(self):
         current_release = self.src_doc.get("release")
