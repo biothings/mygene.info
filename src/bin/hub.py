@@ -55,8 +55,12 @@ build_manager = builder.BuilderManager(
         job_manager=job_manager)
 build_manager.configure()
 
-differ_manager = differ.DifferManager(job_manager=job_manager)
+differ_manager = differ.DifferManager(job_manager=job_manager,
+        poll_schedule="* * * * * */10")
 differ_manager.configure()
+differ_manager.poll("diff",lambda doc: differ_manager.diff("jsondiff-selfcontained",old=None,new=doc["_id"]))
+differ_manager.poll("release_note",lambda doc: differ_manager.release_note(old=None,new=doc["_id"]))
+
 syncer_manager = syncer.SyncerManager(job_manager=job_manager)
 syncer_manager.configure()
 
@@ -85,7 +89,7 @@ COMMANDS["es_sync_gene_allspecies_prod"] = partial(syncer_manager.sync,"es",targ
 COMMANDS["es_prod"] = {"gene":config.ES_PROD_GENE,"gene_allspecies":config.ES_PROD_GENE_ALLSPECIES}
 COMMANDS["es_test"] = {"gene":config.ES_TEST_GENE,"gene_allspecies":config.ES_TEST_GENE_ALLSPECIES}
 # diff
-COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff")
+COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff-selfcontained")
 COMMANDS["report"] = differ_manager.diff_report
 COMMANDS["release_note"] = differ_manager.release_note
 COMMANDS["publish_diff_gene"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "gene")
