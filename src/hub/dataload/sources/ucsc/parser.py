@@ -1,16 +1,12 @@
 import os.path
 import time
 from biothings.utils.common import timesofar
-from biothings.utils.dataload import load_start, load_done, tab2dict, \
-                            tabfile_feeder, list2dict
+from biothings.utils.dataload import tab2dict, tabfile_feeder, list2dict
 
 
 def load_exons_for_species(data_folder, species, exons_key='exons'):
     refflat_file = os.path.join(data_folder, species, 'database/refFlat.txt.gz')
-
-    load_start(refflat_file)
     t0 = time.time()
-
     ref2exons = {}
     for ld in tabfile_feeder(refflat_file, header=0):
         refseq = ld[1]
@@ -41,8 +37,6 @@ def load_exons_for_species(data_folder, species, exons_key='exons'):
                 gene2exons[geneid] = {exons_key: ref2exons[refseq]}
             else:
                 gene2exons[geneid][exons_key].extend(ref2exons[refseq])
-
-    load_done('[%d, %s]' % (len(gene2exons), timesofar(t0)))
 
     return gene2exons
 
@@ -93,8 +87,6 @@ def load_ucsc_exons(data_folder):
             gene2exons.update(load_exons_for_mouse(species_data_folder))
         else:
             gene2exons.update(load_exons_for_species(species_data_folder,species))
-
-    load_done('[%d, %s]' % (len(gene2exons), timesofar(t0)))
 
     return gene2exons
 

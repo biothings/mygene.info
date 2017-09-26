@@ -1,8 +1,7 @@
 import os.path
 import time
 from biothings.utils.common import timesofar
-from biothings.utils.dataload import (load_start, load_done, tab2dict,
-                            tabfile_feeder, list2dict)
+from biothings.utils.dataload import tab2dict, tabfile_feeder, list2dict
 
 import logging
 logging = logging.getLogger("exac_upload")
@@ -106,7 +105,5 @@ def load_broadinstitute_exac(data_folder):
             data = exacs.pop(transid) # pop so no-match means no data in the end
             for entrezid in ensembl2entrez.get(ensid,[ensid]):
                 exacs[entrezid] = data
-
-    load_done('[%d, %s]' % (len(exacs), timesofar(t0)))
 
     return exacs

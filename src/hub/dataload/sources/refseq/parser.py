@@ -2,11 +2,9 @@ import os.path
 import datetime
 from config import SPECIES_LI, TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
-from biothings.utils.dataload import (load_start, load_done,
-                            tab2dict, tab2list, value_convert,
-                            normalized_value, dict_convert, dict_to_list,
+from biothings.utils.dataload import tab2dict, tab2list, value_convert, \
+                            normalized_value, dict_convert, dict_to_list, \
                             tab2dict_iter
-                            )
 
 from ..entrez.parser import EntrezParserBase
 
@@ -16,7 +14,6 @@ class GeneSummaryParser(EntrezParserBase):
     DATAFILE = 'gene2summary_all.txt'
 
     def load(self, aslist=False):
-        load_start(self.datafile)
         with open(self.datafile) as df:
             geneid_set = set()
             doc_li = []
@@ -25,7 +22,6 @@ class GeneSummaryParser(EntrezParserBase):
                 if geneid not in geneid_set:
                     doc_li.append(dict(_id=geneid, summary=str(summary)))
                     geneid_set.add(geneid)
-        load_done('[%d]' % len(doc_li))
 
         if aslist:
             return doc_li
@@ -45,7 +41,6 @@ class Gene2ECParser(EntrezParserBase):
     DATAFILE = 'gene2ec_all.txt'
 
     def load(self, aslist=False):
-        load_start(self.datafile)
         with open(self.datafile) as df:
             geneid_set = set()
             doc_li = []
@@ -59,7 +54,6 @@ class Gene2ECParser(EntrezParserBase):
                 if geneid not in geneid_set:
                     doc_li.append(dict(_id=geneid, ec=ec))
                     geneid_set.add(geneid)
-        load_done('[%d]' % len(doc_li))
 
         if aslist:
             return doc_li
@@ -82,7 +76,6 @@ class Gene2GeneRifParser(EntrezParserBase):
             return _li
 
     def load(self):
-        load_start(self.datafile)
         cnt = 0
         for datadict in tab2dict_iter(self.datafile, (1, 2, 4), 0, alwayslist=1, encoding="latin1"):
             datadict = dict_convert(datadict, valuefn=lambda v: {
@@ -95,4 +88,3 @@ class Gene2GeneRifParser(EntrezParserBase):
         #gene2generif = tab2dict(self.datafile, (1, 2, 4), 0, alwayslist=1)
         #gene2generif = dict_convert(gene2generif, valuefn=lambda v: {
         #    'generif': [dict(pubmed=self._cvt_pubmed(x[0]), text=x[1]) for x in v]})
-        load_done('[%d]' % cnt)

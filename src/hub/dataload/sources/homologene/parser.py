@@ -1,7 +1,7 @@
 import os.path
 from config import SPECIES_LI, TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
-from biothings.utils.dataload import load_start, load_done, tab2dict
+from biothings.utils.dataload import tab2dict
 
 from ..entrez.parser import EntrezParserBase, get_geneid_d
 
@@ -27,7 +27,6 @@ class HomologeneParser(EntrezParserBase):
         adding "homologene" field in gene doc
         '''
         from biothings.utils.hub_db import get_src_dump
-        load_start(self.datafile)
         homo_d = tab2dict(self.datafile,(2,1),0,header=0)
         entrez_doc = get_src_dump().find_one({"_id":"entrez"}) or {}
         entrez_dir = entrez_doc.get("data_folder")
@@ -65,8 +64,6 @@ class HomologeneParser(EntrezParserBase):
                 gdoc['homologene']['genes'] = self._sorted_homologenes(
                     set(homologene_d[gdoc['homologene']['id']]))
                 doc_li[i] = gdoc
-
-            load_done('[%d]' % len(doc_li))
 
         if aslist:
             return doc_li

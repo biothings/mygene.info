@@ -1,5 +1,4 @@
-from biothings.utils.dataload import load_start, load_done, \
-                            dict_convert, tab2dict_iter
+from biothings.utils.dataload import dict_convert, tab2dict_iter
 
 from ..entrez.parser import EntrezParserBase
 
@@ -17,7 +16,6 @@ class Gene2GeneRifParser(EntrezParserBase):
             return _li
 
     def load(self):
-        load_start(self.datafile)
         cnt = 0
         for datadict in tab2dict_iter(self.datafile, (1, 2, 4), 0, alwayslist=1):
             datadict = dict_convert(datadict, valuefn=lambda v: {
@@ -27,4 +25,3 @@ class Gene2GeneRifParser(EntrezParserBase):
                 cnt += 1
                 doc['_id'] = id
                 yield doc
-        load_done('[%d]' % cnt)

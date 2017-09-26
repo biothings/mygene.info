@@ -3,10 +3,9 @@ import pickle
 import copy
 import time
 from biothings.utils.common import timesofar, dump, loadobj
-from biothings.utils.dataload import (load_start, load_done,
-                            listitems, dupline_seperator,
-                            tabfile_feeder, list2dict, list_nondup,
-                            value_convert)
+from biothings.utils.dataload import listitems, dupline_seperator, \
+                                     tabfile_feeder, list2dict, list_nondup, \
+                                     value_convert
 #REF:
 #ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/README
 VALID_COLUMN_NO = 22
@@ -105,7 +104,6 @@ def load_all(data_folder):
             gene2x.setdefault(x[0],[]).append(x[1])
 
     uniprot_datafile = os.path.join(data_folder, 'idmapping_selected.tab.gz')  
-    load_start(uniprot_datafile)
     t0 = time.time()
 
     # cache for uniprot
@@ -199,8 +197,6 @@ def load_all(data_folder):
         except KeyError:
             pass
 
-    load_done('Loaded Uniprot data [%s]' % (timesofar(t0)))
-
     for remain in pdb_remains:
         try:
             merge_x(remain,gene2pdb,transcode=True,cvt_fn=cvt_fn)
@@ -233,13 +229,11 @@ def load_all(data_folder):
     gene2pdb = value_convert(gene2pdb, normalize_pdb, traverse_list=False)
     pdb_dumpfile = os.path.join(data_folder, 'gene2pdb.pyobj')
     dump(gene2pdb,pdb_dumpfile)
-    load_done('Dumped PDB data files [%s]' % (timesofar(t0)))
 
     # PIR
     gene2pir = value_convert(gene2pir, normalize_pir, traverse_list=False)
     pir_dumpfile = os.path.join(data_folder, 'gene2pir.pyobj')
     dump(gene2pir,pir_dumpfile)
-    load_done('Dumped PIR data files [%s]' % (timesofar(t0)))
 
 def load_pdb(data_folder):
     pdb_dumpfile = os.path.join(data_folder, 'gene2pdb.pyobj')

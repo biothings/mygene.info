@@ -8,7 +8,7 @@ when it's necessary.
 
 import os.path
 from biothings.utils.common import (dump, loadobj, get_timestamp)
-from biothings.utils.dataload import (tab2list, load_start, load_done)
+from biothings.utils.dataload import tab2list
 import biothings.hub.dataload.uploader as uploader
 
 class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
@@ -29,7 +29,6 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
 
         taxids = loadobj(taxids_file)
         taxid_set = set(taxids)
-        load_start(datafile)
 
         def _includefn(ld):
             return ld[0] in taxid_set  # match taxid from taxid_set
@@ -58,8 +57,6 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
                 # rows with dup _id will be skipped
                 yield mgi_dict
             last_id = _id
-
-        load_done('[%d]' % count)
 
     @classmethod
     def get_mapping(klass):

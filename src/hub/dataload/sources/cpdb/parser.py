@@ -2,8 +2,7 @@ import os.path
 import time
 
 from biothings.utils.common import timesofar
-from biothings.utils.dataload import (load_start, load_done, tabfile_feeder,
-                            list2dict, value_convert, dict_convert)
+from biothings.utils.dataload import tabfile_feeder, list2dict, value_convert, dict_convert
 
 
 def load_cpdb(data_folder, pathways):
@@ -19,7 +18,6 @@ def load_cpdb(data_folder, pathways):
 
     _out = []
     for DATA_FILE in DATA_FILES:
-        load_start(DATA_FILE)
         for ld in tabfile_feeder(DATA_FILE, header=1, assert_column_no=VALID_COLUMN_NO):
             p_name, p_id, p_source = ld[:3]
             p_source = p_source.lower()
@@ -29,7 +27,6 @@ def load_cpdb(data_folder, pathways):
                 genes = ld[-1].split(",")
                 for gene in genes:
                     _out.append((gene, p_name, p_id, p_source))
-        load_done()
     _out = list2dict(_out, 0, alwayslist=True)
 
     def _inner_cvt(p):
@@ -48,6 +45,5 @@ def load_cpdb(data_folder, pathways):
         return {'pathway': _d}
 
     _out = dict_convert(_out, valuefn=_cvt)
-    load_done('[%d, %s]' % (len(_out), timesofar(t0)))
 
     return _out

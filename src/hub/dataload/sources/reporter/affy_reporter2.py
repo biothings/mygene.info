@@ -5,8 +5,7 @@ Created on Fri Jan 23 11:33:12 2015
 @author: kevin
 """
 import os.path
-from biothings.utils.dataload import (load_start, load_done, tab2dict,
-                            dict_apply)
+from biothings.utils.dataload import tab2dict, dict_apply
 
 AFFY_RELEASE = 'na35'
 AFFY_RELEASE_EXTRA = 'na34'
@@ -139,9 +138,7 @@ def loaddata(data_folder):
             else:
                 datafile = datafile % AFFY_RELEASE
         datafile = os.path.join(affy_data_folder, datafile)
-        load_start(datafile)
         d = _load_affy(datafile)
         affy_d[name] = d
-        load_done('[%d]' % len(d))
 
     return affy_d

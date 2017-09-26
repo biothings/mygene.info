@@ -1,6 +1,5 @@
 import os.path
-from biothings.utils.dataload import (load_start, load_done, tab2dict,
-                            dict_apply)
+from biothings.utils.dataload import tab2dict, dict_apply
 
 AFFY_RELEASE = 'na35'
 AFFY_FILE_EXTENSION = '.zip'  # or '.gz'
@@ -62,9 +61,7 @@ def loaddata(data_folder):
     for annot in AFFY_ANNOT_FILES:
         name = annot['name']
         datafile = os.path.join(affy_data_folder, annot['file'] % AFFY_RELEASE)
-        load_start(datafile)
         d = _load_affy(datafile)
         affy_d[name] = d
-        load_done('[%d]' % len(d))
 
     return affy_d
