@@ -6,7 +6,7 @@ from tornado.gen import coroutine, Task
 
 from helper import BaseHandler
 from utils.es_async import ESQueryAsync
-from utils.common import split_ids
+from biothings.utils.common import split_ids
 
 
 class GeneHandler(BaseHandler):

@@ -18,4 +18,5 @@ requests
 elasticsearch
 biopython
 ipyparallel
+boto
 pandas # umls
