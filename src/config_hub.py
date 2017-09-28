@@ -205,7 +205,3 @@ logger = ConfigurationError("Provide a default hub logger instance (use setup_de
 # Usually use default setup
 #logger = setup_default_log("hub", LOG_FOLDER)
 
-# Path to ASCP install directory
-# (see "bin" and "etc" are). See http://asperasoft.com
-# http://download.asperasoft.com/download/sw/connect/3.6.2/aspera-connect-3.6.2.117442-linux-64.tar.gz
-ASCP_ROOT = ConfigurationError("Provide path to aspera_connect")
