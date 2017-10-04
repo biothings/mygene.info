@@ -92,6 +92,7 @@ S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
 S3_APP_FOLDER = "mygene.info-%s" # gene/gene_allspecies
 
+ES_DOC_TYPE = "gene" # also used during snapshot
 # Pre-prod/test ES definitions
 # (see bt.databuild.backend.create_backend() for the notation)
 ES_TEST_HOST = 'localhost:9200'

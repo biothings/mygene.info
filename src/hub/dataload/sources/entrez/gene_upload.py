@@ -40,6 +40,9 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
                 "type": "string",
                 "boost": 0.8    # downgrade name field a little bit
             },
+            "other_names": {
+                "type": "string",
+            },
             "symbol": {
                 "type": "string",
                 "analyzer": "string_lowercase",
