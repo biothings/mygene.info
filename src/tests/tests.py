@@ -286,8 +286,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         root = self.json_ok(self.get_ok(self.host + '/metadata'))
         v3 = self.json_ok(self.get_ok(self.api + '/metadata'))
         eq_(root, v3)
-        eq_(set(root.keys()), set(['available_fields', 'src_version',
-                                   'app_revision', 'timestamp', 'taxonomy',
+        eq_(set(root.keys()), set(['available_fields', 'src_version', 'build_version',
+                                   'app_revision', 'build_date', 'taxonomy',
                                    'stats', 'genome_assembly', 'source']))
         fields = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
         # test random field
