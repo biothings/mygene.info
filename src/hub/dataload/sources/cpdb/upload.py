@@ -43,6 +43,9 @@ class CPDBUploader(uploader.BaseSourceUploader):
             }
 
             # now define the type for "copy_to" field above
+            if p_source == "pharmgkb":
+                # this would override the datasource's mapping
+                continue
             mapping[p_source] = {
                 "type": "string",
                 "include_in_all": False
