@@ -69,8 +69,18 @@ index_manager = indexer.IndexerManager(pindexer=pindexer,
         job_manager=job_manager)
 index_manager.configure()
 
+from biothings.utils.hub import schedule, pending, done, _and
 
-from biothings.utils.hub import schedule, pending, done
+def trigger_merge(build_name):
+    @asyncio.coroutine
+    def do():
+        build_manager.merge(build_name)
+    return asyncio.ensure_future(do())
+mygene = partial(build_manager.merge,"mygene")
+allspecies = partial(build_manager.merge,"mygene_allspecies")
+demo = partial(build_manager.merge,"demo_allspecies")
+job_manager.submit(partial(_and,mygene,allspecies,demo),"0 2 * * 7")
+
 
 COMMANDS = OrderedDict()
 # dump commands
@@ -81,24 +91,30 @@ COMMANDS["upload"] = upload_manager.upload_src
 COMMANDS["upload_all"] = upload_manager.upload_all
 # building/merging
 COMMANDS["merge"] = build_manager.merge
-COMMANDS["premerge"] = partial(build_manager.merge,steps=["merge","metadata"])
+
 COMMANDS["es_sync_gene_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE)
 COMMANDS["es_sync_gene_allspecies_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
 COMMANDS["es_sync_gene_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE)
 COMMANDS["es_sync_gene_allspecies_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
+# TODO: replace above with these ones when switching only one allspecies index 
+##COMMANDS["es_sync_gene_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE)
+#COMMANDS["es_sync_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
+##COMMANDS["es_sync_gene_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE)
+#COMMANDS["es_sync_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
 COMMANDS["es_prod"] = {"gene":config.ES_PROD_GENE,"gene_allspecies":config.ES_PROD_GENE_ALLSPECIES}
 COMMANDS["es_test"] = {"gene":config.ES_TEST_GENE,"gene_allspecies":config.ES_TEST_GENE_ALLSPECIES}
 # diff
 COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff-selfcontained")
 COMMANDS["report"] = differ_manager.diff_report
 COMMANDS["release_note"] = differ_manager.release_note
-COMMANDS["publish_diff_gene"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "gene")
-COMMANDS["publish_diff_gene_allspecies"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER % "gene_allspecies")
+COMMANDS["publish_diff"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER)
+COMMANDS["publish_diff_demo"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo")
 # indexing commands
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
-COMMANDS["publish_snapshot_gene"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "gene")
-COMMANDS["publish_snapshot_gene_allspecies"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "gene_allspecies")
+#COMMANDS["publish_snapshot_gene"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "gene")
+COMMANDS["publish_snapshot"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER)
+COMMANDS["publish_snapshot_demo"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo")
 
 # admin/advanced
 EXTRA_NS = {

@@ -90,7 +90,7 @@ S3_RELEASE_BUCKET = "biothings-releases"
 # S3 bucket, root of all biothings diffs
 S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
-S3_APP_FOLDER = "mygene.info-%s" # gene/gene_allspecies
+S3_APP_FOLDER = "mygene.info" # gene/gene_allspecies
 
 ES_DOC_TYPE = "gene" # also used during snapshot
 # Pre-prod/test ES definitions
