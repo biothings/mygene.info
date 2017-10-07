@@ -1,4 +1,4 @@
-# Copyright [2010-2013] [Chunlei Wu]
+# Copyright [2010-2017] [Chunlei Wu]
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,13 +62,14 @@ class GBFFParser():
             if comment.find('Summary:') != -1:
                 summary = SubStr(comment, 'Summary: ',).replace('\n', ' ')
                 for end_str in [# '[provided by RefSeq].',
-                                '[provided by ',
-                                '[supplied by ',
+                                #'[provided by ',
+                                #'[supplied by ',
                                 '##',
                                 # '[RGD',
                                 'COMPLETENESS:',
                                 'Sequence Note:',
                                 'Transcript Variant:',
+                                'CCDS Note:',
                                 'Publication Note:']:
                     if summary.find(end_str) != -1:
                         summary = SubStr(summary, end_string=end_str)
