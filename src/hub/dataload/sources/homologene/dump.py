@@ -17,7 +17,7 @@ class HomologeneDumper(FTPDumper):
     FTP_HOST = 'ftp.ncbi.nih.gov'
     CWD_DIR = '/pub/HomoloGene/current'
 
-    SCHEDULE = "0 9 * * *"
+    SCHEDULE = "0 6 * * *"
 
     def get_newest_info(self):
         rel = None

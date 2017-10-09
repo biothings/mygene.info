@@ -37,7 +37,7 @@ class UCSCDumper(FTPDumper):
 
     latest_lastmodified = None   # record the lastmodified for the newest file.
     MAX_PARALLEL_DUMP = 1 # throttling as ucsc ftp would kick us out if too many...
-    SCHEDULE = "0 9 * * *"
+    SCHEDULE = "0 6 * * *"
     ARCHIVE = False
 
     def get_new_data_folder(self):

@@ -17,7 +17,7 @@ class CPDBDumper(HTTPDumper):
     URLS = {"human" : "http://cpdb.molgen.mpg.de/CPDB/getPathwayGenes?idtype=entrez-gene",
             "mouse" : "http://cpdb.molgen.mpg.de/MCPDB/getPathwayGenes?idtype=entrez-gene",
             "yeast" : "http://cpdb.molgen.mpg.de/YCPDB/getPathwayGenes?idtype=entrez-gene"}
-    SCHEDULE = "0 9 * * *"
+    SCHEDULE = "0 6 * * *"
 
     def get_remote_version(self):
         home = self.client.get(self.__class__.HOME_PAGE)
