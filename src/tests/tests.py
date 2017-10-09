@@ -301,14 +301,14 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_facets(self):
         res = self.json_ok(self.get_ok(self.api +
-                                       '/query?q=cdk?&facets=taxid'))
+                                       '/query?q=cdk?&facets=taxid&species=human,mouse,rat'))
         ok_('facets' in res)
         ok_('taxid' in res['facets'])
         eq_(res['facets']['taxid']['total'], res['total'])
         eq_(res['facets']['taxid']['other'], 0)
         eq_(res['facets']['taxid']['missing'], 0)
 
-        u = '/query?q=cdk?&facets=taxid&species_facet_filter=human'
+        u = '/query?q=cdk?&facets=taxid&species_facet_filter=human&species=human,mouse,rat'
         res2 = self.json_ok(self.get_ok(self.api + u))
         eq_(res2['facets']['taxid']['total'], res['total'])
         eq_(res2['facets']['taxid'], res['facets']['taxid'])
@@ -622,7 +622,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_interpro(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=interpro:IPR008389&fields=interpro"))
+                           "/query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat"))
         eq_(res["total"], 6)
         assert set([pro["id"] for hit in res["hits"]
                     for pro in hit["interpro"]]) == set(['IPR008389',
@@ -636,7 +636,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_homologene(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=homologene:44221&fields=homologene"))
+                           "/query?q=homologene:44221&fields=homologene&species=human,mouse,rat"))
         eq_(res["total"], 3)
         h = res["hits"][0]
         assert set([i[0] for i in h["homologene"]["genes"]]) == \
@@ -690,7 +690,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res["_id"], "1586")
 
     def test_sort_by_fields(self):
-        res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene"))
+        res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene&species=human,mouse,rat"))
         hits = res["hits"]
         assert len(hits) == 3
         eq_(hits[0]["entrezgene"],69606)
@@ -760,7 +760,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(sorted(lower["hits"],key=lambda e: e["entrezgene"]),sorted(upper["hits"],key=lambda e: e["entrezgene"]))
 
     def test_symbolnamespecies_order(self):
-        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
+        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2&species=human,mouse,rat"))
         hits = res["hits"]
         # first is 1017, it's human and cdk2 is a symbol
         eq_(hits[0]["_id"],"1017")
@@ -778,8 +778,9 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
         assert not "other_names" in res
         # query by other_names:
-        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33"))
-        eq_(len(res["hits"]),6)
+        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33&size=50"))
+        assert res["total"] > 30 # currently 35...
+        #eq_(len(res["hits"]),10)
         ids = [h["_id"] for h in res["hits"]]
         assert "1017" in ids, "Should have 1017 in results"
 
