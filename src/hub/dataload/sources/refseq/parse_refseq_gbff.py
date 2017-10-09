@@ -71,7 +71,7 @@ class GBFFParser():
                                 'Transcript Variant:',
                                 'CCDS Note:',
                                 'Publication Note:',
-                                ' '*20]:
+                                ' '*10]:
                     if summary.find(end_str) != -1:
                         summary = SubStr(summary, end_string=end_str)
                 summary = summary.strip()
