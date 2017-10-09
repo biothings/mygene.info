@@ -163,7 +163,7 @@ ANNOTATION_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 ANNOTATION_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 # ES query goes to these species by default?
-QUERY_GET_ESQB_KWARGS['species']['default'] = [9606, 10090, 10116]  
+#QUERY_GET_ESQB_KWARGS['species']['default'] = [9606, 10090, 10116]  
 QUERY_GET_ESQB_KWARGS.update({
     'include_tax_tree': {'type': bool, 'default': False},
     'entrezonly':{'type': bool, 'default': False}, 

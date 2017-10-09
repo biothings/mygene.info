@@ -12,11 +12,12 @@ import os
 #import logging
 
 def get_es_index(inst, options):
-    if 'all' in options.esqb_kwargs.species or len(set(options.esqb_kwargs.species)-
-        set([x['tax_id'] for x in inst.web_settings.TAXONOMY.values()])) > 0:
-        return inst.web_settings.ES_INDEX
-    else:
-        return inst.web_settings.ES_INDEX_TIER1
+    return inst.web_settings.ES_INDEX
+    #if 'all' in options.esqb_kwargs.species or len(set(options.esqb_kwargs.species)-
+    #    set([x['tax_id'] for x in inst.web_settings.TAXONOMY.values()])) > 0:
+    #    return inst.web_settings.ES_INDEX
+    #else:
+    #    return inst.web_settings.ES_INDEX_TIER1
 
 class GeneHandler(BiothingHandler):
     ''' This class is for the /gene endpoint. '''
@@ -60,6 +61,9 @@ class MetadataHandler(MetadataHandler):
                     res['taxonomy'][s] = int(d['tax_id'])
                 if 'assembly' in d:
                     res['genome_assembly'][s] = d['assembly']
+            if "source" not in res:
+                # occurs when loaded from scratch, not from a change/diff file
+                res["source"] = None
             res = OrderedDict(sorted(list(res.items()), key=lambda x: x[0]))
         return res
 
