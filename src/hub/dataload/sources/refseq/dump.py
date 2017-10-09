@@ -83,8 +83,8 @@ class RefseqDumper(FTPDumper):
                 nonlocal out_d
                 try:
                     out_li = res.result()
-                    self.logger.info("%d records parsed from %s" % (len(out_li),baseinfile))
-                    species = baseinfile.split('.')[0]
+                    self.logger.info("%d records parsed from %s" % (len(out_li),fn))
+                    species = os.path.basename(fn).split('.')[0]
                     out_d.setdefault(species,[]).extend(out_li)
                 except Exception as e:
                     self.logger.error("Failed parsing gbff file '%s': %s" % (fn,e))
