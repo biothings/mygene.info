@@ -63,7 +63,7 @@ GA_TRACKER_URL = 'MyGene.info'
 
 STATUS_CHECK = {
     'id':'1017',
-    'index': 'genedoc_mygene_current',
+    'index': 'genedoc_mygene_allspecies_current',
     'doc_type': 'gene'
 }
 
