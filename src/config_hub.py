@@ -65,6 +65,7 @@ HUB_MAX_MEM_USAGE = None
 
 # Max number of *processes* hub can access to run jobs
 HUB_MAX_WORKERS = int(os.cpu_count() / 4)
+MAX_SYNC_WORKERS = HUB_MAX_WORKERS
 
 # Max queued jobs in job manager
 # this shouldn't be 0 to make sure a job is pending and ready to be processed

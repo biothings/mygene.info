@@ -61,7 +61,13 @@ differ_manager.configure()
 differ_manager.poll("diff",lambda doc: differ_manager.diff("jsondiff-selfcontained",old=None,new=doc["_id"]))
 differ_manager.poll("release_note",lambda doc: differ_manager.release_note(old=None,new=doc["_id"]))
 
-syncer_manager = syncer.SyncerManager(job_manager=job_manager)
+# limit number of syncers accordingly
+# (this is useful when live-updating the prod, we usually
+# need to reduce the number of sync workers as they would
+# kill the ES server otherwise...
+def not_too_much_syncers():
+    return len([j for j in job_manager.jobs.values() if j["category"] == "sync"]) < config.MAX_SYNC_WORKERS
+syncer_manager = syncer.SyncerManager(job_manager=job_manager,predicates=[not_too_much_syncers])
 syncer_manager.configure()
 
 pindexer = partial(GeneIndexer,es_host=config.ES_HOST)
@@ -124,6 +130,7 @@ EXTRA_NS = {
         "dim" : differ_manager,
         "sm" : syncer_manager,
         "im" : index_manager,
+        "jm" : job_manager,
         "mongo_sync" : partial(syncer_manager.sync,"mongo"),
         "es_sync" : partial(syncer_manager.sync,"es"),
         "loop" : loop,
