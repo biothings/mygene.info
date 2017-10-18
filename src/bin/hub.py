@@ -65,14 +65,14 @@ differ_manager.configure()
 differ_manager.poll("diff",lambda doc: differ_manager.diff("jsondiff-selfcontained",old=None,new=doc["_id"]))
 differ_manager.poll("release_note",lambda doc: differ_manager.release_note(old=None,new=doc["_id"]))
 
-# limit number of syncers accordingly
-# (this is useful when live-updating the prod, we usually
-# need to reduce the number of sync workers as they would
-# kill the ES server otherwise...
-def not_too_much_syncers():
-    return len([j for j in job_manager.jobs.values() if j["category"] == "sync"]) < config.MAX_SYNC_WORKERS
-syncer_manager = syncer.SyncerManager(job_manager=job_manager,predicates=[not_too_much_syncers])
-syncer_manager.configure()
+# test will access localhost ES, no need to throttle
+syncer_manager_test = syncer.SyncerManager(job_manager=job_manager)
+syncer_manager_test.configure()
+# prod needs to be throttled
+from biothings.hub.databuild.syncer import ThrottledESJsonDiffSyncer, ThrottledESJsonDiffSelfContainedSyncer
+syncer_manager_prod = syncer.SyncerManager(job_manager=job_manager)
+syncer_manager_prod.configure(klasses=[partial(ThrottledESJsonDiffSyncer,config.MAX_SYNC_WORKERS),
+                                       partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
 pindexer = partial(GeneIndexer,es_host=config.ES_HOST)
 index_manager = indexer.IndexerManager(pindexer=pindexer,
@@ -102,15 +102,15 @@ COMMANDS["upload_all"] = upload_manager.upload_all
 # building/merging
 COMMANDS["merge"] = build_manager.merge
 
-COMMANDS["es_sync_gene_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE)
-COMMANDS["es_sync_gene_allspecies_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
-COMMANDS["es_sync_gene_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE)
-COMMANDS["es_sync_gene_allspecies_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
+COMMANDS["es_sync_gene_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE)
+COMMANDS["es_sync_gene_allspecies_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
+COMMANDS["es_sync_gene_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE)
+COMMANDS["es_sync_gene_allspecies_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
 # TODO: replace above with these ones when switching only one allspecies index 
-##COMMANDS["es_sync_gene_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE)
-#COMMANDS["es_sync_test"] = partial(syncer_manager.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
-##COMMANDS["es_sync_gene_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE)
-#COMMANDS["es_sync_prod"] = partial(syncer_manager.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
+##COMMANDS["es_sync_gene_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE)
+#COMMANDS["es_sync_test"] = partial(syncer_manager_test.sync_test,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
+##COMMANDS["es_sync_gene_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE)
+#COMMANDS["es_sync_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
 COMMANDS["es_prod"] = {"gene":config.ES_PROD_GENE,"gene_allspecies":config.ES_PROD_GENE_ALLSPECIES}
 COMMANDS["es_test"] = {"gene":config.ES_TEST_GENE,"gene_allspecies":config.ES_TEST_GENE_ALLSPECIES}
 # diff
@@ -132,11 +132,13 @@ EXTRA_NS = {
         "um" : upload_manager,
         "bm" : build_manager,
         "dim" : differ_manager,
-        "sm" : syncer_manager,
+        "smt" : syncer_manager_test,
+        "smp" : syncer_manager_prod,
         "im" : index_manager,
         "jm" : job_manager,
-        "mongo_sync" : partial(syncer_manager.sync,"mongo"),
-        "es_sync" : partial(syncer_manager.sync,"es"),
+        "mongo_sync" : partial(syncer_manager_test.sync,"mongo"),
+        "es_sync_test" : partial(syncer_manager_test.sync,"es"),
+        "es_sync_prod" : partial(syncer_manager_prod.sync,"es"),
         "loop" : loop,
         "pqueue" : process_queue,
         "tqueue" : thread_queue,
