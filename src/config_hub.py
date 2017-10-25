@@ -13,31 +13,17 @@ DATA_TARGET_MASTER_COLLECTION = 'db_master'
 # where to store info about processes launched by the hub
 RUN_DIR = './run'
 
-GENOME_ASSEMBLY = {
-    "human": "hg38",
-    "mouse": "mm10",
-    "rat": "rn6",
-    "fruitfly": "dm6",
-    "nematode": "ce11",
-    "zebrafish": "GRCz10",
-    "frog": "xenTro7",
-    "pig": "susScr3"
-}
-
 TAXONOMY = {
-    "human": 9606,
-    "mouse": 10090,
-    "rat": 10116,
-    "fruitfly": 7227,
-    "nematode": 6239,
-    "zebrafish": 7955,
-    "thale-cress": 3702,
-    "frog": 8364,
-    "pig": 9823
+    "human": {"tax_id": "9606", "assembly": "hg38"},
+    "mouse": {"tax_id": "10090", "assembly": "mm10"},
+    "rat": {"tax_id": "10116", "assembly": "rn4"},
+    "fruitfly": {"tax_id": "7227", "assembly": "dm3"},
+    "nematode": {"tax_id": "6239", "assembly": "ce10"},
+    "zebrafish": {"tax_id": "7955", "assembly": "zv9"},
+    "thale-cress": {"tax_id": "3702"},
+    "frog": {"tax_id": "8364", "assembly": "xenTro3"}, 
+    "pig": {"tax_id": "9823", "assembly": "susScr2"}
 }
-
-SPECIES_LI = ['human', 'mouse', 'rat', 'fruitfly', 'nematode', 'zebrafish',
-              'thale-cress', 'frog', 'pig']
 
 # reporting diff results, number of IDs to consider (to avoid too much mem usage)
 MAX_REPORTED_IDS = 1000
