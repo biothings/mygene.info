@@ -67,7 +67,7 @@ What's new in v3 API
 * JSON structure slightly changed
 * and more bugfixes
 
-You can read more details about this version on our `blog http://mygene.info/mygene-info-v3-is-out`_
+You can read more details about this version on our `blog <http://mygene.info/mygene-info-v3-is-out>`_
 
 `Migration guide from v2 to v3 API <doc/migration_from_v2.html>`_
 
@@ -85,6 +85,7 @@ Documentation
    Try it live on interactive API page <http://mygene.info/v3/api>
    doc/migration_from_v2
    doc/data
+   doc/release_changes
    doc/query_service
    doc/annotation_service
    doc/usage_demo

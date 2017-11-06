@@ -11,7 +11,7 @@ You can call MyGene.info services from either server-side or client-side (via AJ
 Calling services from server-side
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-All common programing languages provide functions for making http requests and JSON parsing. For Python, you can using build-in `httplib <http://docs.python.org/library/httplib.html>`_ and `json <http://docs.python.org/library/json.html>`_ modules (v2.6 up), or third-party `httplib2 <http://code.google.com/p/httplib2/>`_ and `simplejson <http://pypi.python.org/pypi/simplejson>`_ modules. For Perl, `LWP::Simple <http://search.cpan.org/~gaas/libwww-perl-5.837/lib/LWP/Simple.pm>`_ and `JSON <http://search.cpan.org/~makamaka/JSON-2.50/lib/JSON.pm>`_ modules should work nicely.
+All common programing languages provide functions for making http requests and JSON parsing. For Python, you can using build-in `httplib <http://docs.python.org/library/httplib.html>`_ and `json <http://docs.python.org/library/json.html>`__ modules (v2.6 up), or third-party `httplib2 <http://code.google.com/p/httplib2/>`_ and `simplejson <http://pypi.python.org/pypi/simplejson>`_ modules. For Perl, `LWP::Simple <http://search.cpan.org/~gaas/libwww-perl-5.837/lib/LWP/Simple.pm>`_ and `JSON <http://search.cpan.org/~makamaka/JSON-2.50/lib/JSON.pm>`_ modules should work nicely.
 
 
 Making AJAX calls from client-side
@@ -35,7 +35,7 @@ Making JSONP call
 Cross-origin http request through CORS
 """"""""""""""""""""""""""""""""""""""
 
-    Cross-Origin Resource Sharing (CORS) specification is a `W3C draft specification <http://www.w3.org/TR/cors/>`_ defining client-side cross-origin requests. It's actually supported by all major browsers by now (Internet Explorer 8+, Firefox 3.5+, Safari 4+, and Chrome. See more on `browser support <http://caniuse.com/cors>`_), but not many people are aware of it. Unlike JSONP, which is limited to GET requests only, you can make cross-domain POST requests as well. Our services supports CORS requests on both GET and POST requests. You can find more information and use case `here <http://blog.timothyfisher.com/?p=285>`_ and `here <http://hacks.mozilla.org/2009/07/cross-site-xmlhttprequest-with-cors/>`_.
+    Cross-Origin Resource Sharing (CORS) specification is a `W3C draft specification <http://www.w3.org/TR/cors/>`_ defining client-side cross-origin requests. It's actually supported by all major browsers by now (Internet Explorer 8+, Firefox 3.5+, Safari 4+, and Chrome. See more on `browser support <http://caniuse.com/cors>`_), but not many people are aware of it. Unlike JSONP, which is limited to GET requests only, you can make cross-domain POST requests as well. Our services supports CORS requests on both GET and POST requests. You can find more information and use case `here <http://blog.timothyfisher.com/?p=285>`__ and `here <http://hacks.mozilla.org/2009/07/cross-site-xmlhttprequest-with-cors/>`__.
 
     JQuery's native ajax call supports CORS since v1.5.
 
@@ -53,42 +53,42 @@ We implemented this demo in four ways:
 Example 1: using CGI
 ^^^^^^^^^^^^^^^^^^^^
 
- * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_cgi.py>`_.
+ * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_cgi.py>`__.
 
  * It's a simple python CGI script. To run it, you just need to drop it to your favorite web server's cgi-bin folder (make sure your python, v2.6 up, is in the path).
 
- * `See it in action here <http://sulab.scripps.edu/cgi-bin/mygene_info_demo.cgi>`_
+ * `See it in action here <http://sulab.scripps.edu/cgi-bin/mygene_info_demo.cgi>`__.
 
 Example 2: using tornado
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_tornado.py>`_.
+    * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_tornado.py>`__.
     * This single python script can be used to run a standalone website. Just run: ``python mygene_info_demo_tornado.py``.You then have your website up at ``http://localhost:8000``.
 
     Besides python (v2.6 up), you also need `tornado <http://www.tornadoweb.org>`_ to run this code. You can either install it by your own (``pip install tornado``), or download `this zip file <http://mygene.info/_static/demo/mygene_info_demo_tornado.zip>`_, which includes tornado in it.
 
-    * `See it in action here </demo/mygene_info_demo_tornado>`_
+    * `See it in action here </demo/mygene_info_demo_tornado>`__.
 
 Example 3: using JSONP
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
- * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_jsonp.zip>`_.
+ * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_jsonp.zip>`__.
 
  * The zip file contains one html file and one javascript file. There is no server-side code at all. To run it, just unzip it and open the html file in any browser. All remote service calls are done at client side (via browsers). Put the files into any web server serving static files will allow you to publish to the world.
 
- * `See it in action here <http://mygene.info/_static/demo/mygene_info_demo_jsonp.html>`_
+ * `See it in action here <http://mygene.info/_static/demo/mygene_info_demo_jsonp.html>`__.
 
 Example 4: using CORS
 ^^^^^^^^^^^^^^^^^^^^^^^
 
- * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_cors.zip>`_.
+ * `Download sample code here <http://mygene.info/_static/demo/mygene_info_demo_cors.zip>`__.
 
  * The zip file contains one html file and one javascript file. There is no server-side code at all. To run it, just unzip it and open the html file in any browser. All remote service calls are done at client side (via browsers). Put the files into any web server serving static files will allow you to publish to the world.
 
  * This demo is almost the same as the one using JSONP, except that the actual AJAX call to MyGene.info server is made via CORS.
 
 
- * `See it in action here <http://mygene.info/_static/demo/mygene_info_demo_cors.html>`_
+ * `See it in action here <http://mygene.info/_static/demo/mygene_info_demo_cors.html>`__.
 
 
 .. include :: autocomplete.rst
