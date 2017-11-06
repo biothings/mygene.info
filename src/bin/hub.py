@@ -74,10 +74,9 @@ syncer_manager_prod = syncer.SyncerManager(job_manager=job_manager)
 syncer_manager_prod.configure(klasses=[partial(ThrottledESJsonDiffSyncer,config.MAX_SYNC_WORKERS),
                                        partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
+index_manager = indexer.IndexerManager(job_manager=job_manager)
 pindexer = partial(GeneIndexer,es_host=config.ES_HOST)
-index_manager = indexer.IndexerManager(pindexer=pindexer,
-        job_manager=job_manager)
-index_manager.configure()
+index_manager.configure([{"default" : pindexer}])
 
 from biothings.utils.hub import schedule, pending, done, _and
 
@@ -121,7 +120,7 @@ COMMANDS["publish_diff"] = partial(differ_manager.publish_diff,config.S3_APP_FOL
 COMMANDS["publish_diff_demo"] = partial(differ_manager.publish_diff,config.S3_APP_FOLDER + "-demo",
                                         s3_bucket=config.S3_DIFF_BUCKET + "-demo")
 # indexing j
-COMMANDS["index"] = index_manager.index
+COMMANDS["index"] = partial(index_manager.index,"default")
 COMMANDS["snapshot"] = index_manager.snapshot
 #COMMANDS["publish_snapshot_gene"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "gene")
 COMMANDS["publish_snapshot"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER)

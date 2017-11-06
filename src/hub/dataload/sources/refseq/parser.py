@@ -1,6 +1,5 @@
 import os.path
 import datetime
-from config import SPECIES_LI, TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
 from biothings.utils.dataload import tab2dict, tab2list, value_convert, \
                             normalized_value, dict_convert, dict_to_list, \

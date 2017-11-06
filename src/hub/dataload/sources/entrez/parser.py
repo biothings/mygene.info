@@ -1,6 +1,6 @@
 import os.path
 import datetime
-from config import SPECIES_LI, TAXONOMY
+from config import TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
 from biothings.utils.dataload import tab2dict, tab2list, value_convert, \
                             normalized_value, dict_convert, dict_to_list, \
@@ -10,7 +10,7 @@ from biothings.utils.dataload import tab2dict, tab2list, value_convert, \
 class EntrezParserBase(object):
     def __init__(self, data_folder):
         # if species_li is None, include all species
-        self.set_species_li(SPECIES_LI)
+        self.set_species_li(list(TAXONOMY.keys()))
         self.data_folder = data_folder
         self.datafile = os.path.join(self.data_folder, self.DATAFILE)
 
@@ -24,7 +24,7 @@ class EntrezParserBase(object):
         '''To load only specied species if species_li is not None.'''
         if species_li:
             self.species_li = species_li
-            self.taxid_set = set([TAXONOMY[species] for species in species_li])
+            self.taxid_set = set([TAXONOMY[species]["tax_id"] for species in species_li])
             self.species_filter = lambda ld: int(ld[0]) in self.taxid_set
         else:
             self.set_all_species()
@@ -43,7 +43,7 @@ def get_geneid_d(data_folder, species_li=None, load_cache=True, save_cache=True,
        Note that all ids are int type.
     '''
     if species_li:
-        taxid_set = set([TAXONOMY[species] for species in species_li])
+        taxid_set = set([TAXONOMY[species]["tax_id"] for species in species_li])
     else:
         taxid_set = None
 

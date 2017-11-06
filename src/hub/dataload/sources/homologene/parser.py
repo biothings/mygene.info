@@ -1,5 +1,5 @@
 import os.path
-from config import SPECIES_LI, TAXONOMY
+from config import TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
 from biothings.utils.dataload import tab2dict
 
@@ -15,8 +15,8 @@ class HomologeneParser(EntrezParserBase):
             defined in species_li.
         '''
         d = {}
-        for i, species in enumerate(SPECIES_LI):
-            d[TAXONOMY[species]] = i
+        for i, species in enumerate(list(TAXONOMY.keys())):
+            d[TAXONOMY[species]["tax_id"]] = i
         gene_li = [(d.get(taxid, taxid), taxid, geneid)
                    for taxid, geneid in homologenes]
         return [g[1:] for g in sorted(gene_li)]
