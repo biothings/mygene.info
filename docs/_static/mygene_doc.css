@@ -6,3 +6,13 @@
 .dataTables_filter {float:left !important;}
 .dataTables_length {float:right !important;}
 .dataTables_filter input[type="search"] {font-size:12px;padding-top:1px;padding-bottom:1px; width:200px;}
+.release-info {display:none;border:1px solid grey;padding-left:10px;padding-right:10px;margin-top:3px;margin-left:10px;margin-bottom:10px;}
+.release-info pre {overflow-x:auto;font-size:12px;padding-bottom:15px;}
+.release-link {margin-left:10px;}
+.release-version {font-weight:bold;}
+.release-date {font-style: italic; font:monospace; margin-bottom:0px}
+#mygene-releases h2 {margin-bottom:5px;}
+.release-pane {padding-left:7px;/*border-left:1px solid grey;*/}
+.release-collapse {margin-left:10px;}
+.release-expand {margin-right:10px;}
+.release-control-line {margin-bottom: 5px;}
