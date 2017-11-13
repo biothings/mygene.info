@@ -17,7 +17,7 @@ class ExacDumper(FTPDumper):
     FTP_HOST = 'ftp.broadinstitute.org'
     CWD_DIR = '/pub/ExAC_release/current/functional_gene_constraint'
 
-    SCHEDULE = "0 6 * * *"
+    #SCHEDULE = "0 6 * * *"
 
     def get_newest_info(self):
         self.client.cwd("/pub/ExAC_release")
