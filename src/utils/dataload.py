@@ -144,7 +144,7 @@ def alwayslist(value):
 #===============================================================================
 # File Utility functions
 #===============================================================================
-def anyfile(infile, mode='r'):
+def anyfile(infile, mode='r', encoding="utf8"):
     '''
     return a file handler with the support for gzip/zip comppressed files
     if infile is a two value tuple, then first one is the compressed file;
@@ -159,12 +159,12 @@ def anyfile(infile, mode='r'):
     filetype = os.path.splitext(infile)[1].lower()
     if filetype == '.gz':
         import gzip
-        in_f = io.TextIOWrapper(gzip.GzipFile(infile, 'r'))
+        in_f = io.TextIOWrapper(gzip.GzipFile(infile, 'r'),encoding=encoding)
     elif filetype == '.zip':
         import zipfile
-        in_f = io.TextIOWrapper(zipfile.ZipFile(infile, 'r').open(rawfile, 'r'))
+        in_f = io.TextIOWrapper(zipfile.ZipFile(infile, 'r').open(rawfile, 'r'),encoding=encoding)
     else:
-        in_f = open(infile, mode)
+        in_f = open(infile, mode, encoding=encoding)
     return in_f
 
 
@@ -220,10 +220,10 @@ def dupline_seperator(dupline, dup_sep, dup_idx=None, strip=False):
 def tabfile_feeder(datafile, header=1, sep='\t',
                    includefn=None,
                    coerce_unicode=True,
-                   assert_column_no=None):
+                   assert_column_no=None,
+                   encoding="utf8"):
     '''a generator for each row in the file.'''
-
-    in_f = anyfile(datafile)
+    in_f = anyfile(datafile, encoding=encoding)
     reader = csv.reader(in_f, delimiter=sep)
     lineno = 0
     try:

@@ -1,0 +1,9 @@
+*ids.txt.xz files contain gene IDs used to create small indices/diff files.
+The purpose is to provide demo data. Add or remove any IDs you want to be part
+of the demo. A key "ids" pointing to one of these files should be added
+in src_build_config document.
+
+Also, ref_microbe_taxids.pyobj is a compressed pyobj pickled file containing
+a list of microbes' taxonomy ids for which genome position should be queried.
+This file should be copied in DATA_ARCHIVE_ROOT/entrez folder in order Entrez
+datasource to be uploaded.

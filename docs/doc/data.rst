@@ -29,7 +29,7 @@ CPDB             whenever a new               For "pathway" field
 
 ============    =======================      =================================
 
-The most updated data information can be accessed `here <http://mygene.info/v3/metadata>`_.
+The most updated data information can be accessed `here <http://mygene.info/v3/metadata>`__.
 
 .. _gene_object:
 
@@ -67,7 +67,7 @@ Each individual gene object contains an "**_id**" field as the primary key. The 
 _score field
 ------------
 You will often see a "**_score**" field in the returned gene object, which is the internal score representing how well the query matches the returned gene object. It probably does not mean much in `gene annotation service <http://docs.mygene.info/en/latest/doc/annotation_service.html>`_ when only one gene object is returned. In `gene query 
-service <http://docs.mygene.info/en/latest/doc/query_service.html>`_, by default, the returned gene hits are sorted by the scores in descending order.
+service <http://docs.mygene.info/en/latest/doc/query_service.html>`__, by default, the returned gene hits are sorted by the scores in descending order.
 
 
 .. _species:
@@ -102,7 +102,7 @@ If needed, you can pass "species=all" to query against all available species, al
 Genome assemblies
 ----------------------------
 
-Our `gene query service <query_service.html>`_ supports `genome interval queries <query_service.html#genome-interval-query>`_. We import genomic location data from Ensembl, so all species available there are supported. You can find the their reference genome assemblies information `here <http://www.ensembl.org/info/about/species.html>`_.
+Our `gene query service <query_service.html>`__ supports `genome interval queries <query_service.html#genome-interval-query>`_. We import genomic location data from Ensembl, so all species available there are supported. You can find the their reference genome assemblies information `here <http://www.ensembl.org/info/about/species.html>`__.
 
 
 This table lists the genome assembies for commonly-used species:
@@ -114,12 +114,12 @@ This table lists the genome assembies for commonly-used species:
     ===========  =======================   =======================
     human        Homo sapiens              GRCh38 (hg38), also support hg19
     mouse        Mus musculus              GRCm38 (mm10), also support mm9
-    rat          Rattus norvegicus         Rnor_5.0 (rn4)
-    fruitfly     Drosophila melanogaster   BDGP5 (dm3)
-    nematode     Caenorhabditis elegans    WBcel235 (ce10)
-    zebrafish    Danio rerio               Zv9 (danRer6)
-    frog         Xenopus tropicalis        JGI_4.2 (xenTro2)
-    pig          Sus scrofa                Sscrofa10.2 (susScr2)
+    rat          Rattus norvegicus         Rnor_6.0 (rn6)
+    fruitfly     Drosophila melanogaster   BDGP6 (dm6)
+    nematode     Caenorhabditis elegans    WBcel235 (ce11)
+    zebrafish    Danio rerio               GRCz10 (danRer10)
+    frog         Xenopus tropicalis        JGI_7.0 (xenTro7)
+    pig          Sus scrofa                Sscrofa10.2 (susScr3)
     ===========  =======================   =======================
 
 

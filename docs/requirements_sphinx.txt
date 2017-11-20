@@ -1,0 +1,2 @@
+# Requirements for virtualenv when building sphinx documentation
+sphinx_rtd_theme

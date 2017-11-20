@@ -1,12 +1,9 @@
 import random, os, httplib2
 from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
 from nose.tools import ok_, eq_
-
 from tornado.testing import AsyncHTTPTestCase
-import www.index as index
-from biothings.settings import BiothingSettings
-import config
-
+from tornado.web import Application
+from web.settings import MyGeneWebSettings
 
 class MyGeneTest(BiothingTestHelperMixin):
     __test__ = True  # explicitly set this to be a test class
@@ -15,11 +12,11 @@ class MyGeneTest(BiothingTestHelperMixin):
     # Test functions                                            #
     #############################################################
 
-    host = os.getenv(config.HOST_ENVAR_NAME,"")
+    host = os.getenv("MG_HOST","http://mygene.info")
     #if not host:
     #    raise ValueError("Missing HOST_ENVAR_NAME")
     host = host.rstrip('/')
-    api = host + '/' + config.API_VERSION
+    api = host + '/v3'
     h = httplib2.Http()
 
     def _filter_hits(self, res, field=None):
@@ -126,12 +123,12 @@ class MyGeneTest(BiothingTestHelperMixin):
                            '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
         eq_(res['hits'], [])
 
-        res = self.json_ok(self.get_ok(self.api + '/query'), checkerror=False)
-        assert 'error' in res
+        self.get_status_code(self.api + '/query', status_code=400)
+        #res = self.json_ok(self.get_ok(self.api + '/query'), checkerror=False)
+        #assert 'error' in res
 
-        res = self.json_ok(self.get_ok(self.api + '/query?q=tRNA:Y1:85Ae'),
-                           checkerror=False)
-        assert 'error' in res
+        self.get_status_code(self.api + '/query?q=tRNA:Y1:85Ae', status_code=400)
+        
         # ensure returned fields by default
         res = self.json_ok(self.get_ok(self.api + '/query?q=cdk'))
         # pick one
@@ -164,9 +161,10 @@ class MyGeneTest(BiothingTestHelperMixin):
                                          'scopes': 'symbol',
                                          'fields': 'name,symbol'}))
         assert len(res) >= 4, (res, len(res))
-        res = self.json_ok(self.post_ok(self.api + '/query', {}),
-                           checkerror=False)
-        assert 'error' in res, res
+        self.post_status_code(self.api + '/query', {}, status_code=400)
+        #res = self.json_ok(self.post_ok(self.api + '/query', {}),
+        #                   checkerror=False)
+        #assert 'error' in res, res
 
         res = self.json_ok(self.post_ok(self.api + '/query',
                                         {'q': '[1017, "1018"]',
@@ -212,9 +210,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(len(res['hits']), 1000)
 
         # assert 1==0
-        res = self.json_ok(self.get_ok(self.api + '/query?q=cdk?&size=1a'),
-                           checkerror=False)  # invalid size parameter
-        assert 'error' in res
+        self.get_status_code(self.api + '/query?q=cdk?&size=1a', status_code=400)
 
     def test_gene(self):
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
@@ -286,9 +282,9 @@ class MyGeneTest(BiothingTestHelperMixin):
         root = self.json_ok(self.get_ok(self.host + '/metadata'))
         v3 = self.json_ok(self.get_ok(self.api + '/metadata'))
         eq_(root, v3)
-        eq_(set(root.keys()), set(['available_fields', 'src_version', 'build_version',
-                                   'app_revision', 'build_date', 'taxonomy', 'src',
-                                   'stats', 'genome_assembly', 'source']))
+        eq_(set(root.keys()), set(['available_fields', 'src_version','build_version',
+                                   'app_revision', 'build_date', 'taxonomy',
+                                   'stats', 'genome_assembly', 'src', 'source']))
         fields = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
         # test random field
         assert "refseq" in fields
@@ -305,14 +301,14 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_facets(self):
         res = self.json_ok(self.get_ok(self.api +
-                                       '/query?q=cdk?&facets=taxid'))
+                                       '/query?q=cdk?&facets=taxid&species=human,mouse,rat'))
         ok_('facets' in res)
         ok_('taxid' in res['facets'])
         eq_(res['facets']['taxid']['total'], res['total'])
         eq_(res['facets']['taxid']['other'], 0)
         eq_(res['facets']['taxid']['missing'], 0)
 
-        u = '/query?q=cdk?&facets=taxid&species_facet_filter=human'
+        u = '/query?q=cdk?&facets=taxid&species_facet_filter=human&species=human,mouse,rat'
         res2 = self.json_ok(self.get_ok(self.api + u))
         eq_(res2['facets']['taxid']['total'], res['total'])
         eq_(res2['facets']['taxid'], res['facets']['taxid'])
@@ -497,8 +493,8 @@ class MyGeneTest(BiothingTestHelperMixin):
         raw0 = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=0'))
         rawfalse = self.json_ok(self.get_ok(self.api + '/gene/1017?raw=false'))
         eq_(sorted(raw1), sorted(rawtrue))
-        raw0.pop("_score")
-        rawfalse.pop("_score")
+        raw0.pop("_score", None)
+        rawfalse.pop("_score", None)
         eq_(raw0, rawfalse)
         assert "_shards" in raw1
         assert "_shards" not in raw0
@@ -626,7 +622,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_interpro(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=interpro:IPR008389&fields=interpro"))
+                           "/query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat"))
         eq_(res["total"], 6)
         assert set([pro["id"] for hit in res["hits"]
                     for pro in hit["interpro"]]) == set(['IPR008389',
@@ -640,7 +636,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_homologene(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=homologene:44221&fields=homologene"))
+                           "/query?q=homologene:44221&fields=homologene&species=human,mouse,rat"))
         eq_(res["total"], 3)
         h = res["hits"][0]
         assert set([i[0] for i in h["homologene"]["genes"]]) == \
@@ -694,7 +690,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res["_id"], "1586")
 
     def test_sort_by_fields(self):
-        res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene"))
+        res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene&species=human,mouse,rat"))
         hits = res["hits"]
         assert len(hits) == 3
         eq_(hits[0]["entrezgene"],69606)
@@ -759,10 +755,12 @@ class MyGeneTest(BiothingTestHelperMixin):
     def test_caseinsensitive(self):
         lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2"),filter=True)
         upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
+        # old test...needs revisiting, sometimes the orders of results are *slightly* different for cdk2 and CDK2
+        #eq_(lower["hits"],upper["hits"])
         eq_(sorted(lower["hits"],key=lambda e: e["entrezgene"]),sorted(upper["hits"],key=lambda e: e["entrezgene"]))
 
     def test_symbolnamespecies_order(self):
-        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2"))
+        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2&species=human,mouse,rat"))
         hits = res["hits"]
         # first is 1017, it's human and cdk2 is a symbol
         eq_(hits[0]["_id"],"1017")
@@ -780,8 +778,9 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
         assert not "other_names" in res
         # query by other_names:
-        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33"))
-        eq_(len(res["hits"]),6)
+        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33&size=50"))
+        assert res["total"] > 30 # currently 35...
+        #eq_(len(res["hits"]),10)
         ids = [h["_id"] for h in res["hits"]]
         assert "1017" in ids, "Should have 1017 in results"
 
@@ -802,17 +801,9 @@ class MyGeneTest(BiothingTestHelperMixin):
         check_homologene(resall)
         check_exons(resall)
 
-
-
 # Self contained test class, used for CI tools such as Travis
 # This will start a Tornado server on its own and perform tests
 # against this server.
-btsettings = BiothingSettings()
-# force static path, as if we were in debug mode
-index.settings.update({
-    "static_path": btsettings.static_path
-})
-
 
 class MyGeneTestTornadoClient(AsyncHTTPTestCase, MyGeneTest):
     __test__ = True
@@ -820,6 +811,7 @@ class MyGeneTestTornadoClient(AsyncHTTPTestCase, MyGeneTest):
     def __init__(self, methodName='runTest', **kwargs):
         super(AsyncHTTPTestCase, self).__init__(methodName, **kwargs)
         self.h = TornadoRequestHelper(self)
+        self._settings = MyGeneWebSettings(config='config')
 
     def get_app(self):
-        return index.get_app(index.APP_LIST)
+        return Application(self._settings.generate_app_list())

@@ -32,7 +32,7 @@ Examples
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <doc/query_service.html>`_.
+* You can read `the full description of our query syntax here <doc/query_service.html>`__.
 * Try it live on `interactive API page <http://mygene.info/v3/api>`_.
 * Play with our `demo applications <doc/usage_demo.html#demo>`_.
 * Batch queries? Yes, you can. do it with `a POST request <doc/query_service.html#batch-queries-via-post>`_.
@@ -62,7 +62,7 @@ Examples
 To learn more
 """""""""""""
 
-* You can read `the full description of our query syntax here <doc/annotation_service.html>`_.
+* You can read `the full description of our query syntax here <doc/annotation_service.html>`__.
 * Try it live on `interactive API page <http://mygene.info/v3/api>`_.
 * Play with our `demo applications <doc/usage_demo.html#demo>`_.
 * Yes, batch queries via `POST request <doc/annotation_service.html#batch-queries-via-post>`_ as well.

@@ -125,11 +125,14 @@ Fielded queries
 
 Available fields
 ^^^^^^^^^^^^^^^^
+
+This table lists some commonly used fields can be used for "fielded queries". `Check here <./data.html#available-fields>`_ for the complete list of available fields.
+
 ========================    =============================================    =================================================================================
 Field                        Description                                     Examples
 ========================    =============================================    =================================================================================
 **entrezgene**                Entrez gene id                                    `q=entrezgene:1017 <http://mygene.info/v3/query?q=entrezgene:1017>`_
-**ensemblgene**               Ensembl gene id                                   `q=ensemblgene:ENSG00000123374 <http://mygene.info/v3/query?q=ensemblgene:ENSG00000123374>`_
+**ensembl.gene**               Ensembl gene id                                   `q=ensembl.gene:ENSG00000123374 <http://mygene.info/v3/query?q=ensembl.gene:ENSG00000123374>`_
 **symbol**                    official gene symbol                              `q=symbol:cdk2 <http://mygene.info/v3/query?q=symbol:cdk2>`_
 **name**                      gene name                                         `q=name:cyclin-dependent <http://mygene.info/v3/query?q=name:cyclin-dependent>`_
 **alias**                     gene alias                                        `q=alias:p33 <http://mygene.info/v3/query?q=alias:p33>`_
@@ -139,8 +142,8 @@ Field                        Description                                     Exa
 **unigene**                   NCBI UniGene id                                   `q=unigene:Hs.19192 <http://mygene.info/v3/query?q=unigene:Hs.19192>`_
 **homologene**                NCBI HomoloGene id                                `q=homologene:74409 <http://mygene.info/v3/query?q=homologene:74409>`_
 **accession**                 NCBI GeneBank Accession number                    `q=accession:AA810989 <http://mygene.info/v3/query?q=accession:AA810989>`_
-**ensembltranscript**         Ensembl transcript id                             `q=ensembltranscript:ENST00000266970 <http://mygene.info/v3/query?q=ensembltranscript:ENST00000266970>`_
-**ensemblprotein**            Ensembl protein id                                `q=ensemblprotein:ENSP00000243067 <http://mygene.info/v3/query?q=ensemblprotein:ENSP00000243067>`_
+**ensembl.transcript**         Ensembl transcript id                             `q=ensembl.transcript:ENST00000266970 <http://mygene.info/v3/query?q=ensembl.transcript:ENST00000266970>`_
+**ensembl.protein**            Ensembl protein id                                `q=ensembl.protein:ENSP00000243067 <http://mygene.info/v3/query?q=ensembl.protein:ENSP00000243067>`_
 **uniprot**                   UniProt id                                        `q=uniprot:P24941 <http://mygene.info/v3/query?q=uniprot:P24941>`_
 **ipi** (deprecated!)         IPI id                                            `q=ipi:IPI00031681 <http://mygene.info/v3/query?q=ipi:IPI00031681>`_
 **pdb**                       PDB id                                            `q=pdb:1AQ1 <http://mygene.info/v3/query?q=pdb:1AQ1>`_
