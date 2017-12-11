@@ -61,6 +61,17 @@ GA_ACTION_ANNOTATION_GET = 'gene_get'
 GA_ACTION_ANNOTATION_POST = 'gene_post'
 GA_TRACKER_URL = 'MyGene.info'
 
+# html header image
+HTML_OUT_HEADER_IMG = "/static/favicon.ico"
+
+# for title line on format=html
+HTML_OUT_TITLE = """<p style="font-family:'Open Sans',sans-serif;font-weight:bold; font-size:16px;"><a href="http://mygene.info" target="_blank" style="text-decoration: none; color: black">MyGene.info - Gene Annotation as a Service</a></p>"""
+
+METADATA_DOCS_URL = "http://docs.mygene.info/en/latest/doc/data.html"
+QUERY_DOCS_URL = "http://docs.mygene.info/en/latest/doc/query_service.html"
+ANNOTATION_DOCS_URL = "http://docs.mygene.info/en/latest/doc/annotation_service.html"
+
+# kwargs for status check
 STATUS_CHECK = {
     'id':'1017',
     'index': 'genedoc_mygene_allspecies_current',
