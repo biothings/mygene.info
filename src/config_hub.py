@@ -104,6 +104,13 @@ HIPCHAT_CONFIG = {
 # SSH port for hub console
 HUB_SSH_PORT = 8022
 
+################################################################################
+# HUB_PASSWD
+################################################################################
+# The format is a dictionary of 'username': 'cryptedpassword'
+# Generate crypted passwords with 'openssl passwd -crypt'
+HUB_PASSWD = {"guest":"9RKfd8gDuNf0Q"}
+
 # cached data (it None, caches won't be used at all)
 CACHE_FOLDER = None
 
