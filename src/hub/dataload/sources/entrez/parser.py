@@ -205,7 +205,11 @@ class GeneInfoParser(EntrezParserBase):
                 out['other_names'] = normalized_value(other_designations.split('|'))
 
             # when merged, this will become the default timestamp
-            out["_timestamp"] = datetime.datetime.strptime(modification_date,"%Y%m%d")
+            # as of 2017/12/10, some timestamps can have different formats
+            if len(modification_date) > 8:
+                out["_timestamp"] = datetime.datetime.strptime(modification_date,"%m/%d/%Y %H:%M:%S")
+            else:
+                out["_timestamp"] = datetime.datetime.strptime(modification_date,"%Y%m%d")
 
             for x in dbxrefs.split('|'):
                 if x == '-':
