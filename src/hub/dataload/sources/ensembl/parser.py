@@ -87,7 +87,8 @@ class EnsemblParser(object):
 
         """loading ensembl gene to symbol+name mapping"""
         def _fn(x):
-            out = {'taxid' : int(x[0])}
+            import logging
+            out = {'taxid' : int(x[0]),'type_of_gene':x[3]}
             if x[1].strip() not in ['', '\\N']:
                 out['symbol'] = x[1].strip()
             if x[2].strip() not in ['', '\\N']:
@@ -97,7 +98,7 @@ class EnsemblParser(object):
             return out
 
         datafile = os.path.join(self.data_folder, 'gene_ensembl__gene__main.txt')
-        for datadict in tab2dict_iter(datafile, (0, 1, 2, 7), 1, includefn=_not_LRG):
+        for datadict in tab2dict_iter(datafile, (0, 1, 2, 7, 8), 1, includefn=_not_LRG):
             datadict = value_convert(datadict, _fn)
             for id,doc in datadict.items():
                 doc['_id'] = id
