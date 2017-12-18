@@ -33,10 +33,6 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
                        "boost": 5.0},
             "name":   {"type": "string",
                        "boost": 0.8},    # downgrade name field a little bit
-            "type_of_gene": {
-                "index": "not_analyzed",
-                "type": "string",
-                "include_in_all": False},
         }
         return mapping
 

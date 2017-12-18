@@ -88,7 +88,7 @@ class EnsemblParser(object):
         """loading ensembl gene to symbol+name mapping"""
         def _fn(x):
             import logging
-            out = {'taxid' : int(x[0]),'type_of_gene':x[3]}
+            out = {'taxid' : int(x[0])}
             if x[1].strip() not in ['', '\\N']:
                 out['symbol'] = x[1].strip()
             if x[2].strip() not in ['', '\\N']:
@@ -123,6 +123,7 @@ class EnsemblParser(object):
         """
         #Loading all ensembl GeneIDs, TranscriptIDs and ProteinIDs
         datafile = os.path.join(self.data_folder, 'gene_ensembl__translation__main.txt')
+        genefile = os.path.join(self.data_folder, 'gene_ensembl__gene__main.txt')
 
         def _fn(x, eid):
             out = {'gene': eid, 'translation' : []}
@@ -156,6 +157,7 @@ class EnsemblParser(object):
             return out
 
         ensembl2acc = tab2dict(datafile, (1, 2, 3), 0, includefn=_not_LRG)
+        typeofgene = tab2dict(genefile, (1,8),0, includefn=_not_LRG)
         #for datadict in tab2dict_iter(datafile, (1, 2, 3), 0, includefn=_not_LRG):
         #    for k in datadict:
         #        datadict[k] = {'ensembl': _fn(datadict[k], k), '__aslistofdict__' : 'ensembl'}
@@ -164,6 +166,8 @@ class EnsemblParser(object):
 
         for k in ensembl2acc:
             ensembl2acc[k] = {'ensembl': _fn(ensembl2acc[k], k)}
+            if k in typeofgene:
+                ensembl2acc[k]['ensembl']['type_of_gene'] = typeofgene[k]
 
         return self.convert2entrez(ensembl2acc)
 
