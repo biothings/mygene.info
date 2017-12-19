@@ -4,6 +4,7 @@ from web.api.query_builder import ESQueryBuilder
 from web.api.query import ESQuery
 from web.api.transform import ESResultTransformer
 from web.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusHandler, TaxonHandler, DemoHandler
+import re
 
 # *****************************************************************************
 # Elasticsearch variables
@@ -187,3 +188,5 @@ QUERY_GET_ESQB_KWARGS.update({
 })
 QUERY_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+
+LIST_SPLIT_REGEX = re.compile(r'[\r\n+|,]+')
