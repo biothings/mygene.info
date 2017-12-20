@@ -19,6 +19,10 @@ def get_es_index(inst, options):
     #else:
     #    return inst.web_settings.ES_INDEX_TIER1
 
+class FrontPageHandler(BiothingHandler):
+    def get(self):
+        self.write("MYGENE FRONTPAGE!")
+
 class GeneHandler(BiothingHandler):
     ''' This class is for the /gene endpoint. '''
     def _get_es_index(self, options):

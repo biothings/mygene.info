@@ -3,7 +3,7 @@ from biothings.web.settings.default import *
 from web.api.query_builder import ESQueryBuilder
 from web.api.query import ESQuery
 from web.api.transform import ESResultTransformer
-from web.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusHandler, TaxonHandler, DemoHandler
+from web.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusHandler, TaxonHandler, DemoHandler, FrontPageHandler
 import re
 
 # *****************************************************************************
@@ -24,6 +24,7 @@ API_VERSION = 'v3'
 # App URL Patterns
 # *****************************************************************************
 APP_LIST = [
+    (r"/", FrontPageHandler),
     (r"/status", StatusHandler),
     (r"/metadata/?", MetadataHandler),
     (r"/metadata/fields/?", MetadataHandler),
@@ -90,6 +91,9 @@ ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
 # for docs
 INCLUDE_DOCS = True
 DOCS_STATIC_PATH = '../docs/_build/html'
+
+# for static server
+STATIC_PATH = 'static'
 
 # url template to redirect for 'include_tax_tree' parameter
 INCLUDE_TAX_TREE_REDIRECT_TEMPLATE = 'http://t.biothings.io/v1/taxon?ids={ids}&expand_species=true'
@@ -188,5 +192,3 @@ QUERY_GET_ESQB_KWARGS.update({
 })
 QUERY_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-
-LIST_SPLIT_REGEX = re.compile(r'[\r\n+|,]+')
