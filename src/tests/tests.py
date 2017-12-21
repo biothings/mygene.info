@@ -718,9 +718,10 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + "/query?q=ensembl.transcript:ENSMUST00000161459"))
         eq_(len(res["hits"]),1)
         eq_(res["hits"][0]["symbol"],"Setdb2")
-        res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000011454"))
-        eq_(type(res),dict)
-        eq_(res["entrezgene"],23637)
+        # This test is now one to many => returns a list
+        #res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000011454"))
+        #eq_(type(res),dict)
+        #eq_(res["entrezgene"],23637)
         res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000237613"))
         eq_(type(res),dict)
         eq_(res["entrezgene"],645520)
