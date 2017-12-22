@@ -152,7 +152,7 @@ DATASOURCE_TRANSLATIONS = {
     "mirbase:":     r"miRBase:",
 }
 
-SPECIES_TYPEDEF = {'species': {'type': list, 'default': ['all'], 'max': 10, 
+SPECIES_TYPEDEF = {'species': {'type': list, 'default': ['all'], 'max': 1000, 
                    'translations': [(re.compile(pattern, re.I), translation['tax_id']) for (pattern, translation) in TAXONOMY.items()]}}
 
 # For datasource translations
@@ -184,9 +184,9 @@ QUERY_GET_ESQB_KWARGS.update({
     'include_tax_tree': {'type': bool, 'default': False},
     'entrezonly':{'type': bool, 'default': False}, 
     'ensemblonly': {'type':bool, 'default': False}, 
-    'exists': {'type': list, 'default': None, 'max': 10}, 
-    'missing': {'type': list, 'default': None, 'max': 10}, 
-    'species_facet_filter': {'type': list, 'default': None, 'max': 10, 
+    'exists': {'type': list, 'default': None, 'max': 1000}, 
+    'missing': {'type': list, 'default': None, 'max': 1000}, 
+    'species_facet_filter': {'type': list, 'default': None, 'max': 1000, 
         'translations': [(re.compile(pattern, re.I), translation['tax_id']) for 
                         (pattern, translation) in TAXONOMY.items()]}
 })
