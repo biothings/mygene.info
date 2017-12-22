@@ -447,17 +447,31 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert 'hits' in res2
         ok_(len(res2['hits']) >= 2)
 
+    def test_list_handling(self):
+        res = self.json_ok(self.post_ok(self.api + '/query', {'q': '"cyclin dependent kinase 2", "cyclin dependent kinase 3"', 'scopes': 'name', 'fields':'entrezgene,  name', 'species': 'human'}))
+        query_set = set([l['query'] for l in res])
+        # make sure queries are interpreted correctly and returned
+        assert query_set == set(["cyclin dependent kinase 2", "cyclin dependent kinase 3"])
+        # make sure fields are interpreted correctly
+        field_set = set()
+        for l in res:
+            if 'entrezgene' in l:
+                field_set.add('entrezgene')
+            if 'name' in l:
+                field_set.add('name')
+        assert field_set == set(['entrezgene', 'name'])
+
     def test_dotfield(self):
         # /query service
         # default dotfield=0
         rdefault = self.json_ok(self.get_ok(self.api +
-                                '/query?q=ccnk&fields=refseq.rna'))
+                                '/query?q=ccnk&fields=refseq.rna&size=3'))
         # force no dotfield
         rfalse = self.json_ok(self.get_ok(self.api +
-                              '/query?q=ccnk&fields=refseq.rna&dotfield=false'))
+                              '/query?q=ccnk&fields=refseq.rna&dotfield=false&size=3'))
         # force dotfield
         rtrue = self.json_ok(self.get_ok(self.api +
-                             '/query?q=ccnk&fields=refseq.rna&dotfield=true'))
+                             '/query?q=ccnk&fields=refseq.rna&dotfield=true&size=3'))
         # check defaults and bool params
         # TODO: put this in json_ok as post-process filter ?
         for d in [rdefault,rfalse,rtrue]:
@@ -501,10 +515,10 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "timed_out" in raw1
         assert "timed_out" not in raw0
         # /query
-        raw1 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=1'))
-        rawtrue = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=true'))
-        raw0 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=0'))
-        rawfalse = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=false'))
+        raw1 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=1&size=3'))
+        rawtrue = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=true&size=3'))
+        raw0 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=0&size=3'))
+        rawfalse = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=false&size=3'))
         # this may vary so remove in comparison
         for d in [raw1, rawtrue, raw0, rawfalse]:
             del d["took"]
@@ -815,4 +829,4 @@ class MyGeneTestTornadoClient(AsyncHTTPTestCase, MyGeneTest):
         self._settings = MyGeneWebSettings(config='config')
 
     def get_app(self):
-        return Application(self._settings.generate_app_list())
+        return Application(self._settings.generate_app_list(), static_path=self._settings.STATIC_PATH)
