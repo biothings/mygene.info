@@ -99,6 +99,7 @@ COMMANDS["dump_all"] = dmanager.dump_all
 COMMANDS["upload"] = upload_manager.upload_src
 COMMANDS["upload_all"] = upload_manager.upload_all
 # building/merging
+COMMANDS["whatsnew"] = build_manager.whatsnew
 COMMANDS["lsmerge"] = build_manager.list_merge
 COMMANDS["merge"] = build_manager.merge
 COMMANDS["es_sync_gene_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE)
@@ -149,13 +150,9 @@ EXTRA_NS = {
         "done" : done,
         }
 
-passwords = {
-        'guest': '', # guest account with no password
-        }
-
 from biothings.utils.hub import start_server
 
-server = start_server(loop,"MyGene hub",passwords=passwords,
+server = start_server(loop,"MyGene hub",passwords=config.HUB_PASSWD,
     port=config.HUB_SSH_PORT,commands=COMMANDS,extra_ns=EXTRA_NS)
 
 try:

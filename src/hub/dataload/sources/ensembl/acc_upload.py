@@ -35,6 +35,10 @@ class EnsemblAccUploader(uploader.MergerSourceUploader):
                             "enabled": False,
                             "include_in_all": False,
                             },
+                        "type_of_gene": {
+                            "index": "not_analyzed",
+                            "type": "string",
+                            "include_in_all": False},
                         }
                     }
                 }
