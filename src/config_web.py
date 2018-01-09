@@ -132,7 +132,7 @@ DATASOURCE_TRANSLATIONS = {
     "homologene:":  r"homologene.\\\*:",
     "reagent:":     r"reagent.\\\*:",
     "uniprot:":     r"uniprot.\\\*:",
-
+    "wikipedia:":   r"wikipedia.\\\*:",
     "ensemblgene:":         "ensembl.gene:",
     "ensembltranscript:":   "ensembl.transcript:",
     "ensemblprotein:":      "ensembl.protein:",

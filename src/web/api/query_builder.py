@@ -213,19 +213,19 @@ class ESQueryBuilder(ESQueryBuilder):
                     # downgrade "pseudogene" matches
                     {
                         "filter": {"term": {"name": "pseudogene"}},
-                        "boost_factor": "0.5"
+                        "weight": "0.5"
                     },
                     {
                         "filter": {"term": {"taxid": 9606}},
-                        "boost_factor": "1.55"
+                        "weight": "1.55"
                     },
                     {
                         "filter": {"term": {"taxid": 10090}},
-                        "boost_factor": "1.3"
+                        "weight": "1.3"
                     },
                     {
                         "filter": {"term": {"taxid": 10116}},
-                        "boost_factor": "1.1"
+                        "weight": "1.1"
                     },
                 ],
                 "score_mode": "first"
