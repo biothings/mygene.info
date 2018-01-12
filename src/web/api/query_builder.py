@@ -82,8 +82,8 @@ class ESQueryBuilder(ESQueryBuilder):
         if _filters:
             if len(_filters) == 1:
                 _filters = _filters[0]
-            else:
-                _filters = {"and": _filters}
+            #else:
+                #_filters = {"and": _filters}
 
         return _filters            
 
@@ -325,7 +325,7 @@ class ESQueryBuilder(ESQueryBuilder):
                                 "multi_match": {
                                     "query": "%(q)s",
                                     "fields": [
-                                        'refseq.*', 'accession.*'
+                                        'refseq.rna', 'refseq.protein', 'accession.rna', 'accession.protein'
                                     ],
                                     "operator": "or"
                                 }
