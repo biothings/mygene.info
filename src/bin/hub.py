@@ -22,6 +22,10 @@ logging.getLogger("boto").setLevel(logging.ERROR)
 logging.info("Hub DB backend: %s" % biothings.config.HUB_DB_BACKEND)
 logging.info("Hub database: %s" % biothings.config.DATA_HUB_DB_DATABASE)
 
+from biothings.utils.hub import start_server, HubShell
+shell = HubShell()
+
+
 from biothings.utils.manager import JobManager
 loop = asyncio.get_event_loop()
 process_queue = concurrent.futures.ProcessPoolExecutor(max_workers=config.HUB_MAX_WORKERS)
@@ -45,7 +49,7 @@ import biothings.utils.mongo as mongo
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
 upload_manager.register_sources(hub.dataload.__sources_dict__)
-upload_manager.poll('upload',lambda doc: upload_manager.upload_src(doc["_id"]))
+upload_manager.poll('upload',lambda doc: shell.launch(partial(upload_manager.upload_src,doc["_id"])))
 
 dmanager = dumper.DumperManager(job_manager=job_manager)
 dmanager.register_sources(hub.dataload.__sources_dict__)
@@ -62,8 +66,8 @@ build_manager.configure()
 differ_manager = differ.DifferManager(job_manager=job_manager,
         poll_schedule="* * * * * */10")
 differ_manager.configure()
-differ_manager.poll("diff",lambda doc: differ_manager.diff("jsondiff-selfcontained",old=None,new=doc["_id"]))
-differ_manager.poll("release_note",lambda doc: differ_manager.release_note(old=None,new=doc["_id"]))
+differ_manager.poll("diff",lambda doc: shell.launch(partial(differ_manager.diff,"jsondiff-selfcontained",old=None,new=doc["_id"])))
+differ_manager.poll("release_note",lambda doc: shell.launch(partial(differ_manager.release_note,old=None,new=doc["_id"])))
 
 # test will access localhost ES, no need to throttle
 syncer_manager_test = syncer.SyncerManager(job_manager=job_manager)
@@ -85,10 +89,10 @@ def trigger_merge(build_name):
     def do():
         build_manager.merge(build_name)
     return asyncio.ensure_future(do())
-mygene = partial(build_manager.merge,"mygene")
-allspecies = partial(build_manager.merge,"mygene_allspecies")
-demo = partial(build_manager.merge,"demo_allspecies")
-job_manager.submit(partial(_and,mygene,allspecies,demo),"0 2 * * 7")
+##mygene = partial(build_manager.merge,"mygene")
+allspecies = partial(shell.launch,partial(build_manager.merge,"mygene_allspecies"))
+demo = partial(shell.launch,partial(build_manager.merge,"demo_allspecies"))
+job_manager.submit(partial(_and,allspecies,demo),"0 2 * * 7")
 
 
 COMMANDS = OrderedDict()
@@ -150,10 +154,10 @@ EXTRA_NS = {
         "done" : done,
         }
 
-from biothings.utils.hub import start_server
+shell.set_commands(COMMANDS,EXTRA_NS)
 
 server = start_server(loop,"MyGene hub",passwords=config.HUB_PASSWD,
-    port=config.HUB_SSH_PORT,commands=COMMANDS,extra_ns=EXTRA_NS)
+                      port=config.HUB_SSH_PORT,shell=shell)
 
 try:
     loop.run_until_complete(server)
