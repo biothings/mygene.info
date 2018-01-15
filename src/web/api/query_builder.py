@@ -57,6 +57,19 @@ class ESQueryBuilder(ESQueryBuilder):
     def _annotation_POST_query(self, bids):
         return self._POST_query(qs=bids, scopes=['entrezgene', 'retired', 'ensembl.gene'])
 
+    def get_missing_filters(self):
+        _filters = self._get_missing_filters()
+
+        if self.options.missing:
+            for _filter in self.options.missing:
+                _filters.append({"exists":{"field":_filter}})    
+
+        if _filters:
+            if len(_filters) == 1:
+                _filters = _filters[0]
+
+        return _filters
+
     def get_query_filters(self):
         # BioThings filters
         _filters = self._get_query_filters()
@@ -76,9 +89,6 @@ class ESQueryBuilder(ESQueryBuilder):
         if self.options.exists:
             for _filter in self.options.exists:
                 _filters.append({"exists":{"field":_filter}})
-        if self.options.missing:
-            for _filter in self.options.missing:
-                _filters.append({"missing":{"field":_filter}})    
         if _filters:
             if len(_filters) == 1:
                 _filters = _filters[0]
@@ -256,7 +266,7 @@ class ESQueryBuilder(ESQueryBuilder):
                 _filters = {"and": _filters}
 
             # this will not change facet counts
-            _query["filter"] = _filters
+            _query["post_filter"] = _filters
 
         return _query
 
