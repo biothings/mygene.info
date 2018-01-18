@@ -69,7 +69,7 @@ facets
 
 facet_size
 """"""""""
-    Optional, an integer (1 <= **facet_size <= 1000) that specifies how many buckets to ret
+    Optional, an integer (1 <= **facet_size** <= 1000) that specifies how many buckets to ret
 urn in a faceted query.
 
 species_facet_filter
