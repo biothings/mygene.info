@@ -82,7 +82,7 @@ Documentation
 .. toctree::
    :maxdepth: 3
 
-   Try it live on interactive API page <http://mygene.info/v3/api>
+   Try it live on interactive API page <http://mygene.info/tryapi/>
    doc/migration_from_v2
    doc/data
    doc/release_changes
