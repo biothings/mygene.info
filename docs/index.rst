@@ -88,6 +88,7 @@ Documentation
    doc/release_changes
    doc/query_service
    doc/annotation_service
+   doc/response_status_codes
    doc/usage_demo
    doc/packages
    terms
