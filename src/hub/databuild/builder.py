@@ -34,8 +34,8 @@ class MyGeneDataBuilder(builder.DataBuilder):
         tgt = mongo.get_target_db()[self.target_name]
         tgt.create_index("taxid",background=True)
 
-    def get_metadata(self,sources,job_manager):
-        self.stats = super(MyGeneDataBuilder,self).get_metadata(sources,job_manager)
+    def get_stats(self,sources,job_manager):
+        self.stats = super(MyGeneDataBuilder,self).get_stats(sources,job_manager)
         # enrich with some specific mygene counts, specially regarding ensembl vs. entrez
         entrez_col = mongo.get_src_db()[EntrezGeneUploader.name]
         ensembl_col = mongo.get_src_db()[EnsemblGeneUploader.name]
@@ -49,7 +49,6 @@ class MyGeneDataBuilder(builder.DataBuilder):
         self.stats["total_species"] = len(tgt.distinct("taxid"))
 
         return self.stats
-
 
 
 def cleaner(doc):
