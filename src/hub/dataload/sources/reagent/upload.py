@@ -53,13 +53,13 @@ class ReagentUploader(uploader.DummySourceUploader):
             "dynamic": False,
             "properties": {
                 "id": {
-                    "type": "string",
+                    "type": "text",
                     "analyzer": "string_lowercase",
+                    'copy_to': ['all'],
                 },
                 "relationship": {
-                    "type": "string",
-                    "index": "no",
-                    "include_in_all": False
+                    "type": "text",
+                    "index": False,
                 }
             }
         }

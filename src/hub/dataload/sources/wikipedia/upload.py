@@ -11,10 +11,8 @@ class WikipediaUploader(uploader.DummySourceUploader):
                     "dynamic": False,
                     "properties": {
                         "url_stub": {
-                            "copy_to": [
-                                "wikipedia"
-                                ],
-                            "type": "string"
+                            "type": "text",
+                            'copy_to': ['all'],
                             }
                         }
                     }

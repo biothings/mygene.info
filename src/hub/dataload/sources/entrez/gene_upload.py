@@ -27,127 +27,103 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "entrezgene": {
-                "type": "long"
+                "type": "long",
+                'copy_to': ['all'],
             },
             "taxid": {
                 "type": "integer",
-                "include_in_all": False
             },
             "alias": {
-                "type": "string"
+                "type": "text",
+                'copy_to': ['all'],
             },
             "name": {
-                "type": "string",
-                "boost": 0.8    # downgrade name field a little bit
+                "type": "text",
+                "boost": 0.8,    # downgrade name field a little bit
+                'copy_to': ['all'],
             },
             "other_names": {
-                "type": "string",
+                "type": "text",
+                'copy_to': ['all'],
             },
             "symbol": {
-                "type": "string",
+                "type": "text",
                 "analyzer": "string_lowercase",
-                "boost": 5.0
+                "boost": 5.0,
+                'copy_to': ['all'],
             },
             "locus_tag": {
-                "type": "string",
-                "analyzer": "string_lowercase"
+                "type": "text",
+                "analyzer": "string_lowercase",
+                'copy_to': ['all'],
             },
 
             # do not index map_location and type_of_gene
             "map_location": {
-                "index": "no",
-                "type": "string",
-                "include_in_all": False
+                "index": False,
+                "type": "text",
             },
             "type_of_gene": {
-                # "index": "no",
-                "index": "not_analyzed",
-                "type": "string",
-                "include_in_all": False
+                'analyzer': 'string_lowercase',
+                "type": "text",
             },
             "AnimalQTLdb": {
-                "index": "no",
-                "type": "string",
-                "include_in_all": False
+                "index": False,
+                "type": "text",
             },
             "Vega": {
-                "index": "no",
-                "type": "string",
-                "include_in_all": False
+                "index": False,
+                "type": "text",
             },
 
             # convert index_name to lower-case, and excluded from "_all"
             "HGNC": {
-                "type": "string",              # 1771
-                "index": "not_analyzed",
-                "include_in_all": False,
-                "copy_to": 'hgnc'
+                "type": "text",              # 1771
+                'analyzer': 'string_lowercase',
             },
             "HPRD": {
-                "type": "string",              # 00310
-                "index": "not_analyzed",
-                "include_in_all": False,
-                "copy_to": 'hprd'
+                "type": "text",              # 00310
+                'analyzer': 'string_lowercase',
             },
             "MIM": {
-                "type": "string",              # 116953
-                "index": "not_analyzed",
-                "include_in_all": False,
-                "copy_to": 'mim'
+                "type": "text",              # 116953
+                'analyzer': 'string_lowercase',
             },
             "MGI": {
-                "type": "string",              # MGI:104772
-                "index": "not_analyzed",
-                "include_in_all": False,
-                "copy_to": 'mgi'
+                "type": "text",              # MGI:104772
+                'analyzer': 'string_lowercase',
             },
             "RATMAP": {
-                "type": "string",
-                "index": "not_analyzed",
-                "include_in_all": False,
-                "copy_to": 'ratmap'
+                "type": "text",
+                'analyzer': 'string_lowercase',
             },
             "RGD": {
-                "type": "string",             # 70486
-                "index": "not_analyzed",
-                "include_in_all": False,
-                "copy_to": 'rgd'
+                "type": "text",             # 70486
+                'analyzer': 'string_lowercase',
             },
             "FLYBASE": {
-                "type": "string",            # FBgn0004107
-                "analyzer": "string_lowercase",
-                "include_in_all": False,
-                "copy_to": 'flybase'
+                "type": "text",            # FBgn0004107
+                'analyzer': 'string_lowercase',
             },
             "WormBase": {
-                "type": "string",         # WBGene00000871
+                "type": "text",         # WBGene00000871
                 "analyzer": "string_lowercase",
-                "include_in_all": False,
-                "copy_to": 'wormbase'
             },
             "TAIR": {
-                "type": "string",             # AT3G48750
+                "type": "text",             # AT3G48750
                 "analyzer": "string_lowercase",
-                "include_in_all": False,
-                "copy_to": 'tair'
             },
             "ZFIN": {
-                "type": "string",             # ZDB-GENE-040426-2741
+                "type": "text",             # ZDB-GENE-040426-2741
                 "analyzer": "string_lowercase",
-                "include_in_all": False,
-                "copy_to": 'zfin'
             },
             "Xenbase": {
-                "type": "string",
+                "type": "text",
                 "analyzer": "string_lowercase",
-                "include_in_all": False,
-                "copy_to": 'xenbase'
             },
             "miRBase": {
-                "type": "string",
+                "type": "text",
                 "analyzer": "string_lowercase",
-                "include_in_all": True,
-                "copy_to": 'mirbase'
             },
         }
         return mapping

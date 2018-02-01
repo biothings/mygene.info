@@ -14,8 +14,9 @@ class EntrezGeneSummaryUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "summary": {
-                "type": "string",
-                "boost": 0.5      # downgrade summary field.
+                "type": "text",
+                "boost": 0.5,      # downgrade summary field.
+                'copy_to': ['all'],
             },
         }
         return mapping

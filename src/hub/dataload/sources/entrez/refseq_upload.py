@@ -20,24 +20,22 @@ class EntrezRefseqUploader(uploader.MergerSourceUploader):
                     #"path": "just_name",      #make both fields, refseq, refseq.rna, work
                     "properties": {
                         "genomic": {
-                            "type": "string",
-    			"index": "no",
-                            "include_in_all": False,
+                            "type": "text",
+                            "index": False,
                             },
                         "rna": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refseq_analyzer",
-                            "copy_to": "refseq",
+                            'copy_to': ['all'],
                             },
                         'protein': {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refseq_analyzer",
-                            "copy_to": "refseq",
+                            'copy_to': ['all']
                             },
                         'translation': {
                             "type": "object",
                             "enabled": False,
-                            "include_in_all": False,
                             },
                         }
                     }

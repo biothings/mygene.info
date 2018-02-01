@@ -17,22 +17,19 @@ class EnsemblInterproUploader(uploader.MergerSourceUploader):
         mapping = {
             "interpro": {
                 "dynamic": False,
-                #"path": "just_name",
                 "properties": {
                     "id": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "string_lowercase",
-                        #"index_name": "interpro"
+                        'copy_to': ['all'],
                     },
                     "desc": {
-                        "type": "string",
-                        "index": "no",
-                        "include_in_all": False
+                        "type": "text",
+                        "index": False,
                     },
                     "short_desc": {
-                        "type": "string",
-                        "index": "no",
-                        "include_in_all": False
+                        "type": "text",
+                        "index": False,
                     }
                 }
             }

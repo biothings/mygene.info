@@ -20,13 +20,10 @@ class HomologeneUploader(uploader.MergerSourceUploader):
                 "properties": {
                     "genes": {
                         "type": "long",
-                        "index": "no",
-                        "include_in_all": False,
+                        "index": False,
                     },
                     "id": {
                         "type": "long",
-                        "include_in_all": False,
-                        "copy_to": "homologene"
                     }
                 }
             }

@@ -22,20 +22,20 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                         "dynamic": False,
                         "properties": {
                             "term": {
-                                "type": "string",
-                                "include_in_all": False
+                                "type": "text",
                             },
                             "id": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
+                                'copy_to': ['all'],
                             },
                             "evidence": {
-                                "type": "string",
-                                "index": "no"
+                                "type": "text",
+                                "index": False
                             },
                             "pubmed": {
                                 "type": "long",
-                                "index": "no"
+                                "index": False
                             }
                         }
                     },
@@ -43,20 +43,20 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                         "dynamic": False,
                         "properties": {
                             "term": {
-                                "type": "string",
-                                "include_in_all": False
+                                "type": "text",
                             },
                             "id": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
+                                'copy_to': ['all'],
                             },
                             "evidence": {
-                                "type": "string",
-                                "index": "no"
+                                "type": "text",
+                                "index": False
                             },
                             "pubmed": {
                                 "type": "long",
-                                "index": "no"
+                                "index": False
                             }
                         }
                     },
@@ -64,20 +64,20 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                         "dynamic": False,
                         "properties": {
                             "term": {
-                                "type": "string",
-                                "include_in_all": False
+                                "type": "text",
                             },
                             "id": {
-                                "type": "string",
+                                "type": "text",
                                 "analyzer": "string_lowercase",
+                                'copy_to': ['all'],
                             },
                             "evidence": {
-                                "type": "string",
-                                "index": "no"
+                                "type": "text",
+                                "index": False
                             },
                             "pubmed": {
                                 "type": "long",
-                                "index": "no"
+                                "index": False
                             }
                         }
                     }

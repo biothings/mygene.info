@@ -19,26 +19,28 @@ class EnsemblAccUploader(uploader.MergerSourceUploader):
                     #"path": "just_name",
                     "properties": {
                         "transcript": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "string_lowercase",
+                            'copy_to': ['all'],
                             },
                         "gene": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "string_lowercase",
+                            'copy_to': ['all'],
                             },
                         "protein": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "string_lowercase",
+                            'copy_to': ['all'],
                             },
                         'translation': {
                             "type": "object",
                             "enabled": False,
-                            "include_in_all": False,
                             },
                         "type_of_gene": {
-                            "index": "not_analyzed",
-                            "type": "string",
-                            "include_in_all": False},
+                            'analyzer': 'string_lowercase',
+                            "type": "text"
+                            },
                         }
                     }
                 }
