@@ -33,6 +33,8 @@ class MyGeneDataBuilder(builder.DataBuilder):
         # background=true or it'll lock the whole database...
         self.logger.info("Indexing 'taxid'")
         tgt.create_index("taxid",background=True)
+        self.logger.info("Indexing 'entrezgene'")
+        tgt.create_index("entrezgene",background=True)
 
     def get_stats(self,sources,job_manager):
         self.stats = super(MyGeneDataBuilder,self).get_stats(sources,job_manager)
@@ -42,7 +44,7 @@ class MyGeneDataBuilder(builder.DataBuilder):
         # entrez genes are digits only (also, don't count entrez_gene collection,
         # because tgt can be a subset, we have to work with the merged collection)
         self.logger.debug("Counting 'total_entrez_genes'")
-        entrez_cnt = tgt.find({"_id":{"$regex":'''^\\d+$'''}},{"_id":1}).count()
+        entrez_cnt = tgt.find({"entrezgene":{"$exists":1}},{"_id":1}).count()
         self.stats["total_entrez_genes"] = entrez_cnt
         # ensembl genes aount are taken from :
         # 1. "ensembl" field, but it can a list => use aggregation. 
@@ -67,12 +69,19 @@ class MyGeneDataBuilder(builder.DataBuilder):
         # this one can't be computed from merged collection, and is only valid when build
         # involves all data (no filter, no subset)
         self.logger.debug("Counting 'total_ensembl_genes_mapped_to_entrez'")
-        mapped = len(loadobj(("ensembl_gene__2entrezgene_list.pyobj", mongo.get_src_db()), mode='gridfs'))
+        # this one is similar to total_ensembl_genes except we cross with entrezgene (ie. so they're mapped)
+        list_count = next(tgt.aggregate([
+            {"$match" : {"$and" : [{"ensembl.0" : {"$exists" : True}},{"entrezgene":{"$exists":1}}]}},
+            {"$project" : {"num_gene" : {"$size" : "$ensembl"}}},
+            {"$group" : {"_id" : None, "sum" : {"$sum": "$num_gene"}}}
+            ]))["sum"]
+        object_count = tgt.find({"$and": [{"ensembl" : {"$type" : "object"}},{"entrezgene":{"$exists":1}}]},{"_id":1}).count()
+        mapped = list_count + object_count
         self.stats["total_ensembl_genes_mapped_to_entrez"] = mapped
         # ensembl gene contains letters (if it wasn't, it means it would only contain digits
         # so it would be an entrez gene (\\D = non-digits, can't use \\w as a digit *is* a letter)
         self.logger.debug("Counting 'total_ensembl_only_genes'")
-        ensembl_unmapped = entrez_cnt = tgt.find({"_id":{"$regex":'''\\D'''}},{"_id":1}).count()
+        ensembl_unmapped = tgt.find({"_id":{"$regex":'''\\D'''}},{"_id":1}).count()
         self.stats["total_ensembl_only_genes"] = ensembl_unmapped
         self.logger.debug("Counting 'total_species'")
         self.stats["total_species"] = len(tgt.distinct("taxid"))
