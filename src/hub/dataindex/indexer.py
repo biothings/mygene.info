@@ -7,11 +7,20 @@ import biothings.hub.dataindex.indexer as indexer
 class GeneIndexer(indexer.Indexer):
 
     def get_index_creation_settings(self):
-        return {"codec" : "best_compression",
-                "auto_expand_replicas": "0-all"}
+        settings = super(GeneIndexer,self).get_index_creation_settings()
+        # mygene's specific
+        settings["codec"] = "best_compression"
+        settings["auto_expand_replicas"] = "0-all"
+        settings["analysis"]["tokenizer"] = {
+                "refseq_tokenizer": {
+                    "delimiter": ".",
+                    "type": "path_hierarchy"
+                    }
+                }
+        settings["analysis"]["analyzer"]["refseq_analyzer"] = {
+                "tokenizer": "refseq_tokenizer",
+                "type": "custom"
+                }
 
-    def get_mapping(self, enable_timestamp=True):
-        mapping = super(GeneIndexer,self).get_mapping(enable_timestamp)
-        # mygene is "include everything" by default
-        mapping.pop("include_in_all",None)
-        return mapping
+        return settings
+
