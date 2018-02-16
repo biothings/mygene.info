@@ -119,18 +119,18 @@ TAXONOMY = {
 }
 
 DATASOURCE_TRANSLATIONS = {
-    "refseq:":  r"refseq.\\\*:",
-    "accession:":   r"accession.\\\*:",
+    "refseq:":  r"refseq_agg:",
+    "accession:":   r"accession_agg:",
     "reporter:":    r"reporter.\\\*:",
-    "interpro:":    r"interpro.\\\*:",
+    "interpro:":    r"interpro.id:",
     # GO:xxxxx looks like a ES raw query, so just look for 
     # the term as a string in GO's ID (note: searching every keys
     # will raise an error because pubmed key is a int and we're 
     # searching with a string term.
     "GO:":          r"go.\\\*.id:go\\\:",
     #"GO:":          r"go.\\\*:go.",
-    "homologene:":  r"homologene.\\\*:",
-    "reagent:":     r"reagent.\\\*:",
+    "homologene:":  r"homologene.id:",
+    "reagent:":     r"reagent.\\\*.id:",
     "uniprot:":     r"uniprot.\\\*:",
     "wikipedia:":   r"wikipedia.\\\*:",
     "ensemblgene:":         "ensembl.gene:",
