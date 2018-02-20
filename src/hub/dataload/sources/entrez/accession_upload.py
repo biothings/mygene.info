@@ -26,19 +26,23 @@ class EntrezAccessionUploader(uploader.MergerSourceUploader):
                         "rna": {
                             "type": "text",
                             "analyzer": "refseq_analyzer",
-                            'copy_to': ['all'],
+                            'copy_to': ['all','accession_agg'],
                             },
                         'protein': {
                             "type": "text",
                             "analyzer": "refseq_analyzer",
-                            'copy_to': ['all'],
+                            'copy_to': ['all','accession_agg'],
                             },
                         'translation': {
                             "type": "object",
                             "enabled": False,
                             },
                         }
-                    }
+                    },
+                "accession_agg" : {
+                    'analyzer': 'refseq_analyzer',
+                    'type': 'text'
+                    },
                 }
         return mapping
 
