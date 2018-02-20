@@ -386,7 +386,7 @@ v.s.
 
 
 Scrolling queries
-"""""""""""""""""
+-----------------
 If you want to return ALL results of a very large query (>10,000 results), sometimes the paging method described `above <#from>`_ can take too long.  In these cases, you can use a scrolling query.
 This is a two-step process that turns off database sorting to allow very fast retrieval of all query results.  To begin a scrolling query, you first call the query
 endpoint as you normally would, but with an extra parameter **fetch_all** = TRUE.  For example, a GET request to::
