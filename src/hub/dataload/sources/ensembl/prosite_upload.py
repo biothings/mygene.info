@@ -16,8 +16,9 @@ class EnsemblPrositeUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "prosite": {
-                "type": "string",
-                "analyzer": "string_lowercase"
+                "type": "text",
+                "analyzer": "string_lowercase",
+                'copy_to': ['all'],
             }
         }
         return mapping

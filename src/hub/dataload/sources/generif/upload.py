@@ -17,11 +17,11 @@ class GenerifUploader(uploader.MergerSourceUploader):
                 "properties": {
                     "pubmed": {
                         "type": "long",
-                        "index": "no",
+                        "index": False,
                     },
                     "text": {
-                        "type": "string",
-                        "index": "no",
+                        "type": "text",
+                        "index": False,
                     }
                 }
             }

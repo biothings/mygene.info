@@ -18,8 +18,9 @@ class UMLSUploader(uploader.BaseSourceUploader):
             "umls": {
                 "properties": {
                     "cui": {
-                        "type": "string",
-                        "analyzer": "string_lowercase"
+                        "type": "text",
+                        "analyzer": "string_lowercase",
+                        'copy_to': ['all'],
                     },
                 }
             }

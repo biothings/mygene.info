@@ -18,12 +18,12 @@ class EnsemblGenomicPosUploader(uploader.MergerSourceUploader):
                 "dynamic": False,
                 "type": "nested",                 # index as nested
                 "properties": {
-                    "chr": {"type": "string"},
+                    "chr": {"type": "text"},
                     "start": {"type": "long"},
                     "end": {"type": "long"},
                     "strand": {
                         "type": "byte",
-                        "index": "no"
+                        "index": False
                     },
                 },
             },
@@ -31,12 +31,12 @@ class EnsemblGenomicPosUploader(uploader.MergerSourceUploader):
                 "dynamic": False,
                 "type": "nested",                 # index as nested
                 "properties": {
-                    "chr": {"type": "string"},
+                    "chr": {"type": "text"},
                     "start": {"type": "long"},
                     "end": {"type": "long"},
                     "strand": {
                         "type": "byte",
-                        "index": "no"
+                        "index": False
                     },
                 },
             },
@@ -44,12 +44,12 @@ class EnsemblGenomicPosUploader(uploader.MergerSourceUploader):
                 "dynamic": False,
                 "type": "nested",                 # index as nested
                 "properties": {
-                    "chr": {"type": "string"},
+                    "chr": {"type": "text"},
                     "start": {"type": "long"},
                     "end": {"type": "long"},
                     "strand": {
                         "type": "byte",
-                        "index": "no"
+                        "index": False
                     },
                 },
             }

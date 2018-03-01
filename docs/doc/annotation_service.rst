@@ -1,7 +1,7 @@
 Gene annotation service
 ***********************************
 
-This page describes the reference for MyGene.info gene annotation web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/v3/api>`_.
+This page describes the reference for MyGene.info gene annotation web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/tryapi/>`_.
 
 Service endpoint
 =================

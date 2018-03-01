@@ -15,6 +15,9 @@ class EntrezRetiredUploader(uploader.MergerSourceUploader):
     @classmethod
     def get_mapping(klass):
         mapping = {
-            "retired": {"type": "long"},
+            "retired": {
+                "type": "long",
+                'copy_to': ['all']
+                },
         }
         return mapping

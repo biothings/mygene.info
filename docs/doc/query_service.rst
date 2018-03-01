@@ -7,7 +7,7 @@ Gene query service
              :alt: information!
 
 
-This page describes the reference for MyGene.info gene query web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/v3/api>`_.
+This page describes the reference for MyGene.info gene query web service. It's also recommended to try it live on our `interactive API page <http://mygene.info/tryapi/>`_.
 
 
 Service endpoint
@@ -51,6 +51,14 @@ from
     q=cdk*&size=50                     first 50 hits
     q=cdk*&size=50&from=50             the next 50 hits
 
+fetch_all
+"""""""""
+    Optional, a boolean, which when TRUE, allows fast retrieval of all unsorted query hits.  The return object contains a **_scroll_id** field, which when passed as a parameter to the query endpoint, returns the next 1000 query results.  Setting **fetch_all** = TRUE causes the results to be inherently unsorted, therefore the **sort** parameter is ignored.  For more information see `examples using fetch_all here <#scrolling-queries>`_.  Default: FALSE.
+
+scroll_id
+"""""""""
+    Optional, a string containing the **_scroll_id** returned from a query request with **fetch_all** = TRUE.  Supplying a valid **scroll_id** will return the next 1000 unordered results.  If the next results are not obtained within 1 minute of the previous set of results, the **scroll_id** becomes stale, and a new one must be obtained with another query request with **fetch_all** = TRUE.  All other parameters are ignored when the **scroll_id** parameter is supplied.  For more information see `examples using scroll_id here <#scrolling-queries>`_.
+
 sort
 """"
     Optional, the comma-separated fields to sort on. Prefix with "-" for descending order, otherwise in ascending order. Default: sort by matching scores in decending order.
@@ -58,6 +66,11 @@ sort
 facets
 """"""
     Optional, a single field or comma-separated fields to return facets, for example, "facets=taxid", "facets=taxid,type_of_gene". See `examples of faceted queries here <#faceted-queries>`_.
+
+facet_size
+""""""""""
+    Optional, an integer (1 <= **facet_size** <= 1000) that specifies how many buckets to ret
+urn in a faceted query.
 
 species_facet_filter
 """"""""""""""""""""
@@ -76,8 +89,8 @@ callback
     Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
 
 dotfield
-""""""""""
-    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: false.
+""""""""
+    Optional, can be used to control the format of the returned gene object.  If "dotfield" is true, the returned data object is returned flattened (no nested objects) using dotfield notation for key names.  Default: false.
 
 filter
 """"""
@@ -372,7 +385,43 @@ v.s.
     http://mygene.info/v3/query?q=cdk?&size=1&facets=taxid&species_facet_filter=mouse
 
 
+Scrolling queries
+-----------------
+If you want to return ALL results of a very large query (>10,000 results), sometimes the paging method described `above <#from>`_ can take too long.  In these cases, you can use a scrolling query.
+This is a two-step process that turns off database sorting to allow very fast retrieval of all query results.  To begin a scrolling query, you first call the query
+endpoint as you normally would, but with an extra parameter **fetch_all** = TRUE.  For example, a GET request to::
 
+    http://mygene.info/v3/query?q=brain&fetch_all=TRUE
+
+Returns the following object:
+
+.. code-block:: json
+
+    {
+      "_scroll_id": "cXVlcnlUaGVuRmV0Y2g7MTA7MjA1NjY1MzMwOl9HM29rRkg2VFZ5S1c3cTJtYkI4RHc7MjA1NjY1MjY3OlM0V1VCa194UWdLYjlQWTR5NGZCeFE7MjA1NjY1MTM0OlRGWVpXLVZrU2NTWmZLQUlEVnlRRkE7MjA1NjY1MzMxOl9HM29rRkg2VFZ5S1c3cTJtYkI4RHc7MzEyMDY0NzU6TVBZd0FEVF9UcVdSQWhWajlfN2U4ZzsyMDU2NjUxMzM6VEZZWlctVmtTY1NaZktBSURWeVFGQTsyMDU2NjUxMzU6VEZZWlctVmtTY1NaZktBSURWeVFGQTsyMDU2NjUzMzI6X0czb2tGSDZUVnlLVzdxMm1iQjhEdzsyMDU2NjUyNjg6UzRXVUJrX3hRZ0tiOVBZNHk0ZkJ4UTszMTIwNjQ3NDpNUFl3QURUX1RxV1JBaFZqOV83ZThnOzA7",
+      "max_score": 13.958638,
+      "took": 270,
+      "total": 14571,
+      "hits": [
+        {
+          "_id": "390259",
+          "_score": 13.958638,
+          "entrezgene": 390259,
+          "name": "brain specific homeobox",
+          "symbol": "BSX",
+          "taxid": 9606
+        },
+        .
+        .
+        .
+      ]
+    }
+
+At this point, the first 1000 hits have been returned (of ~14,000 total), and a scroll has been set up for your query.  To get the next batch of 1000 unordered results, simply execute a GET request to the following address, supplying the _scroll_id from the first step into the **scroll_id** parameter in the second step::
+
+    http://mygene.info/v3/query?scroll_id=cXVlcnlUaGVuRmV0Y2g7MTA7MjA1NjY1MzMwOl9HM29rRkg2VFZ5S1c3cTJtYkI4RHc7MjA1NjY1MjY3OlM0V1VCa194UWdLYjlQWTR5NGZCeFE7MjA1NjY1MTM0OlRGWVpXLVZrU2NTWmZLQUlEVnlRRkE7MjA1NjY1MzMxOl9HM29rRkg2VFZ5S1c3cTJtYkI4RHc7MzEyMDY0NzU6TVBZd0FEVF9UcVdSQWhWajlfN2U4ZzsyMDU2NjUxMzM6VEZZWlctVmtTY1NaZktBSURWeVFGQTsyMDU2NjUxMzU6VEZZWlctVmtTY1NaZktBSURWeVFGQTsyMDU2NjUzMzI6X0czb2tGSDZUVnlLVzdxMm1iQjhEdzsyMDU2NjUyNjg6UzRXVUJrX3hRZ0tiOVBZNHk0ZkJ4UTszMTIwNjQ3NDpNUFl3QURUX1RxV1JBaFZqOV83ZThnOzA7
+
+.. Hint:: Your scroll will remain active for 1 minute from the last time you requested results from it.  If your scroll expires before you get the last batch of results, you must re-request the scroll_id by setting **fetch_all** = TRUE as in step 1.
 
 
 Batch queries via POST

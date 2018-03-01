@@ -15,13 +15,13 @@ class EnsemblGenomicPosHg19Uploader(uploader.DummySourceUploader):
                             "type" : "long"
                             },
                         "chr" : {
-                            "type" : "string"
+                            "type" : "text"
                             },
                         "end" : {
                             "type" : "long"
                             },
                         "strand" : {
-                            "index" : "no",
+                            "index" : False,
                             "type" : "byte"
                             }
                         }

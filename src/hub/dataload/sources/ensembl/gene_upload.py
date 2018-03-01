@@ -26,13 +26,14 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
     @classmethod
     def get_mapping(klass):
         mapping = {
-            "taxid":  {"type": "integer",
-                       "include_in_all": False},
-            "symbol": {"type": "string",
+            "taxid":  {"type": "integer"},
+            "symbol": {"type": "text",
                        "analyzer": "string_lowercase",
-                       "boost": 5.0},
-            "name":   {"type": "string",
-                       "boost": 0.8},    # downgrade name field a little bit
+                       "boost": 5.0,
+                       'copy_to': ['all'],},
+            "name":   {"type": "text",
+                       "boost": 0.8,    # downgrade name field a little bit
+                       'copy_to': ['all'],},
         }
         return mapping
 

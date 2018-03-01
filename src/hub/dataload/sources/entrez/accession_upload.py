@@ -17,29 +17,32 @@ class EntrezAccessionUploader(uploader.MergerSourceUploader):
         mapping = {
                 "accession": {
                     "dynamic": False,
-                    #"path": "just_name",      #make both fields, accession.rna and rna, work
+                    #make both fields, accession.rna and rna, work
                     "properties": {
                         "genomic": {
-                            "type": "string",
-    			"index": "no",
-                            "include_in_all": False,
+                            "type": "text",
+                            "index": False,
                             },
                         "rna": {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refseq_analyzer",
+                            'copy_to': ['all','accession_agg'],
                             },
                         'protein': {
-                            "type": "string",
+                            "type": "text",
                             "analyzer": "refseq_analyzer",
-                            #"index_name": "accession",
+                            'copy_to': ['all','accession_agg'],
                             },
                         'translation': {
                             "type": "object",
-    			"enabled": False,
-                            "include_in_all": False,
+                            "enabled": False,
                             },
                         }
-                    }
+                    },
+                "accession_agg" : {
+                    'analyzer': 'refseq_analyzer',
+                    'type': 'text'
+                    },
                 }
         return mapping
 

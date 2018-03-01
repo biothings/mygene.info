@@ -14,9 +14,8 @@ class EntrezECUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "ec": {
-                "type": "string",
+                "type": "text",
                 "analyzer": "string_lowercase",
-                "include_in_all": False
             },
         }
         return mapping

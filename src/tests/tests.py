@@ -560,11 +560,11 @@ class MyGeneTest(BiothingTestHelperMixin):
         self._filter_hits(explicit_protein)
         u = "/query?q=refseq.rna:NM_001679&fields=refseq"
         explicit_rna = self.json_ok(self.get_ok(self.api + u), filter=True)
-        u = "/query?q=refseq.genomic:NT_005612&fields=refseq"
-        explicit_genomic = self.json_ok(self.get_ok(self.api + u), filter=True)
+        #u = "/query?q=refseq.genomic:NT_005612&fields=refseq"
+        #explicit_genomic = self.json_ok(self.get_ok(self.api + u), filter=True)
         eq_(protein["hits"], explicit_protein["hits"])
         eq_(rna["hits"], explicit_rna["hits"])
-        eq_(genomic["hits"], explicit_genomic["hits"])
+        #eq_(genomic["hits"], explicit_genomic["hits"])
         eq_(protein["hits"], rna["hits"])  # same result whatever the query
         eq_(genomic["hits"], [])  # genomic not indexed
         eq_(rna["total"], 1)
@@ -586,11 +586,11 @@ class MyGeneTest(BiothingTestHelperMixin):
         explicit_protein = self.json_ok(self.get_ok(self.api + u), filter=True)
         u = "/query?q=accession.rna:BC068303&fields=accession"
         explicit_rna = self.json_ok(self.get_ok(self.api + u), filter=True)
-        u = "/query?q=accession.genomic:FJ497232&fields=accession"
-        explicit_genomic = self.json_ok(self.get_ok(self.api + u), filter=True)
+        #u = "/query?q=accession.genomic:FJ497232&fields=accession"
+        #explicit_genomic = self.json_ok(self.get_ok(self.api + u), filter=True)
         eq_(protein["hits"], explicit_protein["hits"])
         eq_(rna["hits"], explicit_rna["hits"])
-        eq_(genomic["hits"], explicit_genomic["hits"])
+        #eq_(genomic["hits"], explicit_genomic["hits"])
         eq_(protein["hits"], rna["hits"])  # same result whatever the query
         eq_(genomic["hits"], [])  # genomic not indexed
         eq_(rna["total"], 1)

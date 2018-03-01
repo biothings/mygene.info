@@ -17,7 +17,6 @@ class CPDBUploader(uploader.BaseSourceUploader):
         mapping = {
             "pathway": {
                 "dynamic": False,
-                #"path": "just_name",
                 "properties": {
                 }
             }
@@ -25,19 +24,14 @@ class CPDBUploader(uploader.BaseSourceUploader):
         for p_source in klass.PATHWAYS:
             mapping['pathway']['properties'][p_source] = {
                 "dynamic": False,
-                #"path": "just_name",
                 "properties": {
                     'id': {
-                        "type": "string",
-                        "include_in_all": False,
-                        #"index_name": p_source
-                        "copy_to": p_source
+                        "type": "text",
+                        "copy_to": ["all"], 
                     },
                     'name': {
-                        "type": "string",
-                        "include_in_all": False,
-                        #"index_name": p_source
-                        "copy_to": p_source
+                        "type": "text",
+                        "copy_to": ["all"],
                     }
                 }
             }
@@ -47,8 +41,8 @@ class CPDBUploader(uploader.BaseSourceUploader):
                 # this would override the datasource's mapping
                 continue
             mapping[p_source] = {
-                "type": "string",
-                "include_in_all": False
+                "type": "text",
             }
+
 
         return mapping

@@ -19,25 +19,24 @@ class ExacUploader(uploader.MergerSourceUploader):
                 #"path": "just_name",
                 "properties": {
                     "transcript": {
-                        "type": "string",
+                        "type": "text",
                         "analyzer": "refseq_analyzer",
-                        "include_in_all": False,
                         },
                     "n_exons": {
                         "type": "integer",
-                        "index": "no",
+                        "index": False,
                         },
                     "cds_start": {
                         "type": "integer",
-                        "index": "no",
+                        "index": False,
                         },
                     "cds_end": {
                         "type": "integer",
-                        "index": "no",
+                        "index": False,
                         },
                     "bp": {
                         "type": "integer",
-                        "index": "no",
+                        "index": False,
                         },
                     "all": {
                         "type": "object",
