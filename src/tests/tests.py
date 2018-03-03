@@ -772,7 +772,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2"),filter=True)
         # old test...needs revisiting, sometimes the orders of results are *slightly* different for cdk2 and CDK2
         eq_(lower["hits"],upper["hits"])
-        #eq_(sorted(lower["hits"],key=lambda e: e["_id"]),sorted(upper["hits"],key=lambda e: e["_id"]))
+        #eq_(sorted(lower["hits"],key=lambda e: e["entrezgene"]),sorted(upper["hits"],key=lambda e: e["entrezgene"]))
 
     def test_symbolnamespecies_order(self):
         res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2&species=human,mouse,rat"))
