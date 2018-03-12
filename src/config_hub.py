@@ -175,8 +175,6 @@ HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
 #        "host" : "localhost:9200",
 #        }
 
-ES_HOST = ConfigurationError("Define ElasticSearch host used for index creation (eg localhost:9200)")
-
 # Path to a folder to store all downloaded files, logs, caches, etc...
 DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")
 

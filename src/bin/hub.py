@@ -122,8 +122,8 @@ COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
 COMMANDS["snapshot_demo"] = partial(index_manager.snapshot,repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 #COMMANDS["publish_snapshot_gene"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "gene")
-COMMANDS["publish_snapshot"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER)
-COMMANDS["publish_snapshot_demo"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo",
+COMMANDS["publish_snapshot"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER)
+COMMANDS["publish_snapshot_demo"] = partial(index_manager.publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo",
                                             repository=config.READONLY_SNAPSHOT_REPOSITORY)
 
 # admin/advanced
