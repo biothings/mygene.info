@@ -90,7 +90,6 @@ def trigger_merge(build_name):
     def do():
         build_manager.merge(build_name)
     return asyncio.ensure_future(do())
-##mygene = partial(build_manager.merge,"mygene")
 allspecies = partial(shell.launch,partial(build_manager.merge,"mygene_allspecies"))
 demo = partial(shell.launch,partial(build_manager.merge,"demo_allspecies"))
 job_manager.submit(partial(_and,allspecies,demo),"0 2 * * 7")
@@ -107,15 +106,8 @@ COMMANDS["upload_all"] = upload_manager.upload_all
 COMMANDS["whatsnew"] = build_manager.whatsnew
 COMMANDS["lsmerge"] = build_manager.list_merge
 COMMANDS["merge"] = build_manager.merge
-COMMANDS["es_sync_gene_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE)
-COMMANDS["es_sync_gene_allspecies_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
-COMMANDS["es_sync_gene_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE)
-COMMANDS["es_sync_gene_allspecies_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
-# TODO: replace above with these ones when switching only one allspecies index 
-##COMMANDS["es_sync_gene_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE)
-#COMMANDS["es_sync_test"] = partial(syncer_manager_test.sync_test,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
-##COMMANDS["es_sync_gene_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE)
-#COMMANDS["es_sync_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
+COMMANDS["es_sync_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
+COMMANDS["es_sync_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
 COMMANDS["es_prod"] = {"gene":config.ES_PROD_GENE,"gene_allspecies":config.ES_PROD_GENE_ALLSPECIES}
 COMMANDS["es_test"] = {"gene":config.ES_TEST_GENE,"gene_allspecies":config.ES_TEST_GENE_ALLSPECIES}
 # diff
@@ -128,9 +120,11 @@ COMMANDS["publish_diff_demo"] = partial(differ_manager.publish_diff,config.S3_AP
 # indexing j
 COMMANDS["index"] = index_manager.index
 COMMANDS["snapshot"] = index_manager.snapshot
+COMMANDS["snapshot_demo"] = partial(index_manager.snapshot,repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
 #COMMANDS["publish_snapshot_gene"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER % "gene")
 COMMANDS["publish_snapshot"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER)
-COMMANDS["publish_snapshot_demo"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo")
+COMMANDS["publish_snapshot_demo"] = partial(index_manager.publish_snapshot,config.S3_APP_FOLDER + "-demo",
+                                            repository=config.READONLY_SNAPSHOT_REPOSITORY)
 
 # admin/advanced
 EXTRA_NS = {
@@ -143,8 +137,6 @@ EXTRA_NS = {
         "im" : index_manager,
         "jm" : job_manager,
         "mongo_sync" : partial(syncer_manager_test.sync,"mongo"),
-        "es_sync_test" : partial(syncer_manager_test.sync,"es"),
-        "es_sync_prod" : partial(syncer_manager_prod.sync,"es"),
         "loop" : loop,
         "pqueue" : process_queue,
         "tqueue" : thread_queue,
