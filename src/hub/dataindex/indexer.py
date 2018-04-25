@@ -18,6 +18,7 @@ class GeneIndexer(indexer.Indexer):
                     }
                 }
         settings["analysis"]["analyzer"]["refseq_analyzer"] = {
+                "filter": "lowercase",
                 "tokenizer": "refseq_tokenizer",
                 "type": "custom"
                 }
