@@ -79,16 +79,37 @@ S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
 S3_APP_FOLDER = "mygene.info" # gene/gene_allspecies
 
-ES_DOC_TYPE = "gene" # also used during snapshot
-# Pre-prod/test ES definitions
-# (see bt.databuild.backend.create_backend() for the notation)
-ES_TEST_HOST = 'localhost:9200'
-ES_TEST_GENE = (ES_TEST_HOST,"mygene_gene_current","gene")
-ES_TEST_GENE_ALLSPECIES = (ES_TEST_HOST,"mygene_gene_allspecies_current","gene")
-# Prod ES definitions
-ES_PROD_HOST = 'prodserver:9200'
-ES_PROD_GENE = (ES_PROD_HOST,"mygene_gene_current","gene")
-ES_PROD_GENE_ALLSPECIES = (ES_PROD_HOST,"mygene_gene_allspecies_current","gene")
+### Pre-prod/test ES definitions
+ES_CONFIG = {
+		"indexer_select": {
+			# default
+			None : "hub.dataindex.indexer.GeneIndexer",
+			},
+		"env" : {
+			"prod" : {
+				"host" : "prodserver:9200",
+				"indexer" : {
+					"args" : {
+						"timeout" : 300,
+						"retry_on_timeout" : True,
+						"max_retries" : 10,
+						},
+					},
+				"index" : [{"index": "mygene_gene_allspecies_current", "doc_type": "gene"}]
+				},
+			"test" : {
+				"host" : "localhost:9200",
+				"indexer" : {
+					"args" : {
+						"timeout" : 300,
+						"retry_on_timeout" : True,
+						"max_retries" : 10,
+						},
+					},
+				"index" : [{"index": "mygene_gene_allspecies_current", "doc_type": "gene"}]
+				},
+			},
+		}
 
 
 # fill with "token", "roomid" and "from" keys

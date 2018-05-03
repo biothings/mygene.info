@@ -58,7 +58,7 @@ class BioMart(HTTPDumper):
                  "gene_ensembl__prot_interpro__dm.txt":"get_interpro",
                  "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
 
-    SCHEDULE = "0 6 * * *"
+    #SCHEDULE = "0 6 * * *"
 
 
     def download(self,remotefile,localfile):
