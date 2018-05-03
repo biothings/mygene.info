@@ -43,7 +43,6 @@ import biothings.hub.databuild.syncer as syncer
 import biothings.hub.dataindex.indexer as indexer
 from hub.databuild.builder import MyGeneDataBuilder
 from hub.databuild.mapper import EntrezRetired2Current, Ensembl2Entrez
-from hub.dataindex.indexer import GeneIndexer
 import biothings.utils.mongo as mongo
 
 # will check every 10 seconds for sources to upload
@@ -79,9 +78,7 @@ syncer_manager_prod.configure(klasses=[partial(ThrottledESJsonDiffSyncer,config.
                                        partial(ThrottledESJsonDiffSelfContainedSyncer,config.MAX_SYNC_WORKERS)])
 
 index_manager = indexer.IndexerManager(job_manager=job_manager)
-prod_pindexer = partial(GeneIndexer,es_host=config.ES_PROD_HOST)
-test_pindexer = partial(GeneIndexer,es_host=config.ES_TEST_HOST)
-index_manager.configure([{"prod" : prod_pindexer}, {"test" : test_pindexer}])
+index_manager.configure(config.ES_CONFIG)
 
 from biothings.utils.hub import schedule, pending, done, _and
 
@@ -106,10 +103,16 @@ COMMANDS["upload_all"] = upload_manager.upload_all
 COMMANDS["whatsnew"] = build_manager.whatsnew
 COMMANDS["lsmerge"] = build_manager.list_merge
 COMMANDS["merge"] = build_manager.merge
-COMMANDS["es_sync_test"] = partial(syncer_manager_test.sync,"es",target_backend=config.ES_TEST_GENE_ALLSPECIES)
-COMMANDS["es_sync_prod"] = partial(syncer_manager_prod.sync,"es",target_backend=config.ES_PROD_GENE_ALLSPECIES)
-COMMANDS["es_prod"] = {"gene":config.ES_PROD_GENE,"gene_allspecies":config.ES_PROD_GENE_ALLSPECIES}
-COMMANDS["es_test"] = {"gene":config.ES_TEST_GENE,"gene_allspecies":config.ES_TEST_GENE_ALLSPECIES}
+COMMANDS["es_sync_test"] = partial(syncer_manager_test.sync,"es",
+                                   target_backend=(config.ES_CONFIG["env"]["test"]["host"],
+                                                   config.ES_CONFIG["env"]["test"]["index"][0]["index"],
+                                                   config.ES_CONFIG["env"]["test"]["index"][0]["doc_type"]))
+COMMANDS["es_sync_prod"] = partial(syncer_manager_prod.sync,"es",
+                                   target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
+                                                   config.ES_CONFIG["env"]["prod"]["index"][0]["index"],
+                                                   config.ES_CONFIG["env"]["prod"]["index"][0]["doc_type"]))
+#COMMANDS["es_prod"] = {"gene":config.ES_PROD_GENE,"gene_allspecies":config.ES_PROD_GENE_ALLSPECIES}
+#COMMANDS["es_test"] = {"gene":config.ES_TEST_GENE,"gene_allspecies":config.ES_TEST_GENE_ALLSPECIES}
 # diff
 COMMANDS["diff"] = partial(differ_manager.diff,"jsondiff-selfcontained")
 COMMANDS["report"] = differ_manager.diff_report
