@@ -23,7 +23,6 @@ logging.info("Hub DB backend: %s" % biothings.config.HUB_DB_BACKEND)
 logging.info("Hub database: %s" % biothings.config.DATA_HUB_DB_DATABASE)
 
 from biothings.utils.hub import start_server, HubShell
-shell = HubShell()
 
 
 from biothings.utils.manager import JobManager
@@ -33,6 +32,8 @@ thread_queue = concurrent.futures.ThreadPoolExecutor()
 loop.set_default_executor(process_queue)
 job_manager = JobManager(loop,num_workers=config.HUB_MAX_WORKERS,
                       max_memory_usage=config.HUB_MAX_MEM_USAGE)
+
+shell = HubShell(job_manager)
 
 import hub.dataload
 import biothings.hub.dataload.uploader as uploader

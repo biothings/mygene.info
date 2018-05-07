@@ -7,6 +7,9 @@ DATA_HUB_DB_DATABASE = "gene_hubdb"         # db containing the following (inter
 DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
 DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
 DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
+EVENT_COLLECTION = 'event'
+API_COLLECTION = 'api'
+CMD_COLLECTION = 'cmd'
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
@@ -95,7 +98,7 @@ ES_CONFIG = {
 						"max_retries" : 10,
 						},
 					},
-				"index" : [{"index": "mygene_gene_allspecies_current", "doc_type": "gene"}]
+				"index" : [{"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}]
 				},
 			"test" : {
 				"host" : "localhost:9200",
