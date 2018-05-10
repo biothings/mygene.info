@@ -2,7 +2,7 @@ import os.path
 from biothings.utils.dataload import tab2dict_iter
 
 def load_data(data_folder):
-    datafile = os.path.join(data_folder, 'NCBI2Reactome.txt')
+    datafile = os.path.join(data_folder, 'NCBI2Reactome_All_Levels.txt')
     data = tab2dict_iter(datafile, (0, 1, 3), 0, header=0, alwayslist=True)
     def convert(data):
         for dvalue in data:
