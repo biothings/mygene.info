@@ -12,6 +12,7 @@ __sources_dict__ = [
         'hub.dataload.sources.exac',
         'hub.dataload.sources.cpdb',
         'hub.dataload.sources.reagent',
+        'hub.dataload.sources.reactome',
         'hub.dataload.sources.umls',
         'hub.dataload.sources.wikipedia',
 ]
