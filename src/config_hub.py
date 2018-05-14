@@ -7,9 +7,10 @@ DATA_HUB_DB_DATABASE = "gene_hubdb"         # db containing the following (inter
 DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
 DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
 DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
-EVENT_COLLECTION = 'event'
-API_COLLECTION = 'api'
-CMD_COLLECTION = 'cmd'
+DATA_PLUGIN_COLLECTION = 'data_plugin'     # for data plugins information
+API_COLLECTION = 'api'                     # for api information (running under hub control)
+CMD_COLLECTION = 'cmd'                     # for launched/running commands in shell
+EVENT_COLLECTION = 'event'                 # for launched/running commands in shell
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
