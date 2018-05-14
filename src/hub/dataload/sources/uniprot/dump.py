@@ -27,7 +27,7 @@ class UniprotDumper(FTPDumper):
         self.release = datetime.strptime(remote_lastmodified, '%Y%m%d%H%M%S').strftime("%Y%m%d")
 
     def new_release_available(self):
-        current_release = self.src_doc.get("release")
+        current_release = self.src_doc.get("download",{}).get("release")
         if not current_release or self.release > current_release:
             self.logger.info("New release '%s' found" % self.release)
             return True
@@ -50,11 +50,11 @@ class UniprotDependentDumper(FilesystemDumper):
     def create_todump_list(self, force=False):
         uni_doc = get_src_dump().find_one({"_id":UniprotDumper.SRC_NAME}) or {}
         if uni_doc:
-            remotefile = os.path.join(uni_doc["data_folder"],self.__class__.UNIPROT_FILE)
+            remotefile = os.path.join(uni_doc["download"]["data_folder"],self.__class__.UNIPROT_FILE)
             if not os.path.exists(remotefile):
                 self.logger.warning("File '%s' doesn't exist (yet?)" % self.__class__.UNIPROT_FILE)
                 return
-            self.release = uni_doc["release"]
+            self.release = uni_doc["download"]["release"]
             localfile = os.path.join(self.current_data_folder,self.__class__.UNIPROT_FILE)
             if force or not os.path.exists(localfile) or self.remote_is_better(remotefile,localfile):
                 self.to_dump.append({"remote":remotefile,"local":localfile})

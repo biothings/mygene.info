@@ -30,7 +30,7 @@ class ExacDumper(FTPDumper):
         self.release = releases[-1]
 
     def new_release_available(self):
-        current_release = self.src_doc.get("release")
+        current_release = self.src_doc.get("download",{}).get("release")
         if not current_release or self.release > current_release:
             self.logger.info("New release '%s' found" % self.release)
             return True
