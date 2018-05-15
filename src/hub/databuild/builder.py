@@ -61,7 +61,10 @@ class MyGeneDataBuilder(builder.DataBuilder):
             {"$project" : {"num_gene" : {"$size" : "$ensembl"}}},
             {"$group" : {"_id" : None, "sum" : {"$sum": "$num_gene"}}}
             ])
-        list_count = next(res)["sum"]
+        try:
+            list_count = next(res)["sum"]
+        except StopIteration:
+            list_count = 0
         object_count = tgt.find({"ensembl" : {"$type" : "object"}},{"_id":1}).count()
         orphan_count = tgt.find({"_id":{"$regex":'''\\w'''},"ensembl":{"$exists":0}},{"_id":1}).count()
         total_ensembl_genes = list_count + object_count + orphan_count
@@ -70,11 +73,14 @@ class MyGeneDataBuilder(builder.DataBuilder):
         # involves all data (no filter, no subset)
         self.logger.debug("Counting 'total_ensembl_genes_mapped_to_entrez'")
         # this one is similar to total_ensembl_genes except we cross with entrezgene (ie. so they're mapped)
-        list_count = next(tgt.aggregate([
-            {"$match" : {"$and" : [{"ensembl.0" : {"$exists" : True}},{"entrezgene":{"$exists":1}}]}},
-            {"$project" : {"num_gene" : {"$size" : "$ensembl"}}},
-            {"$group" : {"_id" : None, "sum" : {"$sum": "$num_gene"}}}
-            ]))["sum"]
+        try:
+            list_count = next(tgt.aggregate([
+                {"$match" : {"$and" : [{"ensembl.0" : {"$exists" : True}},{"entrezgene":{"$exists":1}}]}},
+                {"$project" : {"num_gene" : {"$size" : "$ensembl"}}},
+                {"$group" : {"_id" : None, "sum" : {"$sum": "$num_gene"}}}
+                ]))["sum"]
+        except StopIteration:
+            list_count = 0
         object_count = tgt.find({"$and": [{"ensembl" : {"$type" : "object"}},{"entrezgene":{"$exists":1}}]},{"_id":1}).count()
         mapped = list_count + object_count
         self.stats["total_ensembl_genes_mapped_to_entrez"] = mapped
