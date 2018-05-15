@@ -6,7 +6,7 @@ class CPDBUploader(uploader.BaseSourceUploader):
 
     name = "cpdb"
     PATHWAYS = ['biocarta','humancyc','kegg','mousecyc',
-                'netpath','pharmgkb','pid','reactome',
+                'netpath','pharmgkb','pid',
                 'smpdb','wikipathways','yeastcyc']
 
     def load_data(self, data_folder):
