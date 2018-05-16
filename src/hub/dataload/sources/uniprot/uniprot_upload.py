@@ -18,23 +18,6 @@ class UniprotUploader(uploader.MergerSourceUploader):
         genedoc_d = load_all(data_folder)
         return genedoc_d
 
-    def post_update_data(self, steps, force, batch_size, job_manager, **kwargs):
-        # move produced files used for other dependent uploaders
-        klass = {"pir":UniprotPIRUploader,"pdb":UniprotPDBUploader}
-        release = os.path.split(self.data_folder)[-1]
-        for ext in ["pir","pdb"]:
-            destdir = os.path.join(config.DATA_ARCHIVE_ROOT,klass[ext].name,release)
-            destfn = "gene2%s.pyobj" % ext
-            try:
-                os.makedirs(destdir)
-            except FileExistsError:
-                # good to go
-                pass
-            self.logger.info("Dispatching file '%s' to %s upload" % (destfn,ext.upper()))
-            os.rename(os.path.join(self.data_folder,destfn),
-                    os.path.join(destdir,destfn))
-            uploader.set_pending_to_upload(klass[ext].name)
-
     @classmethod
     def get_mapping(klass):
         mapping = {
