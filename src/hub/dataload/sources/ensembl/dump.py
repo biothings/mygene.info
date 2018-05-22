@@ -47,8 +47,8 @@ class BioMart(HTTPDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
 
     ENSEMBL_FTP_HOST = "ftp.ensembl.org"
-    #MART_URL = "http://www.biomart.org/biomart/martservice"
-    MART_URL = "http://uswest.ensembl.org/biomart/martservice"
+    MART_URL = "http://www.ensembl.org/biomart/martservice"
+    #MART_URL = "http://uswest.ensembl.org/biomart/martservice"
     TEMPLATE = XML_QUERY_TEMPLATE
     species_li = []
     DUMP_METHOD = {"gene_ensembl__gene__main.txt":"get_gene__main",
@@ -58,7 +58,7 @@ class BioMart(HTTPDumper):
                  "gene_ensembl__prot_interpro__dm.txt":"get_interpro",
                  "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
 
-    #SCHEDULE = "0 6 * * *"
+    SCHEDULE = "0 6 * * *"
 
 
     def download(self,remotefile,localfile):
