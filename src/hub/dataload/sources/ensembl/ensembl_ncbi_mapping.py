@@ -214,10 +214,10 @@ def run_stats(total_ensembl_IDs, ensembl_dict, ensembl_map_count, total_mapped):
 def main(confirm=True):
     src_dump = get_src_dump()
     ensembl_doc = src_dump.find_one({"_id":"ensembl"}) or {}
-    ENSEMBL_DATA_FOLDER = ensembl_doc.get("data_folder")
+    ENSEMBL_DATA_FOLDER = ensembl_doc.get("download",{}).get("data_folder")
     assert ENSEMBL_DATA_FOLDER, "Can't find Ensembl data folder"
     entrez_doc = src_dump.find_one({"_id":"entrez"}) or {}
-    ENTREZ_DATA_FOLDER = entrez_doc.get("data_folder")
+    ENTREZ_DATA_FOLDER = entrez_doc.get("download",{}).get("data_folder")
     assert ENTREZ_DATA_FOLDER, "Can't find Entrez data folder"
 
     gene_ensembl_1_xref_dm_file = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__xref_entrezgene__dm.txt")
