@@ -12,7 +12,7 @@
 
 
 thrift>=0.9.1
-tornado>=3.2
+tornado>=3.2,<5
 tornadoes>=1.4.1
 
 # biothings
