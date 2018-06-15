@@ -293,6 +293,12 @@ class Gene2GOParser(EntrezParserBase):
                 _gocategory = category_d[gocategory]
                 _d = out.get(_gocategory, [])
                 _rec = dict(id=goid, term=goterm)
+                if gocategory == 'Function':
+                    _rec['gocategory'] = 'Molecular function'
+                elif gocategory == 'Process':
+                    _rec['gocategory'] = 'Biological process'
+                elif gocategory == 'Component':
+                    _rec['gocategory'] = 'Cellular component'
                 if evidence != '-':
                     _rec['evidence'] = evidence
                 if qualifier != '-':
