@@ -37,8 +37,9 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                                 "type": "long",
                                 "index": False
                             },
-                            "gocategory":{
+                            "category": {
                                 "type": "text",
+                                "index": False
                             }
                         }
                     },
@@ -61,8 +62,9 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                                 "type": "long",
                                 "index": False
                             },
-                            "gocategory":{
+                            "category": {
                                 "type": "text",
+                                "index": False
                             }
                         }
                     },
@@ -85,8 +87,9 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                                 "type": "long",
                                 "index": False
                             },
-                            "gocategory":{
+                            "category": {
                                 "type": "text",
+                                "index": False
                             }
                         }
                     }
