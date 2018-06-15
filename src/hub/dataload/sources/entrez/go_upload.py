@@ -36,6 +36,9 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                             "pubmed": {
                                 "type": "long",
                                 "index": False
+                            },
+                            "gocategory":{
+                                "type": "text",
                             }
                         }
                     },
@@ -57,6 +60,9 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                             "pubmed": {
                                 "type": "long",
                                 "index": False
+                            },
+                            "gocategory":{
+                                "type": "text",
                             }
                         }
                     },
@@ -78,6 +84,9 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                             "pubmed": {
                                 "type": "long",
                                 "index": False
+                            },
+                            "gocategory":{
+                                "type": "text",
                             }
                         }
                     }
