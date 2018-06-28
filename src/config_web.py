@@ -158,7 +158,7 @@ SPECIES_TYPEDEF = {'species': {'type': list, 'default': ['all'], 'max': 1000,
 # For datasource translations
 DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(pattern, re.I), translation) for 
     (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
-TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(re.sub(r':.*', '', pattern).replace('\\', ''), re.I), 
+TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(re.sub(r':.*', '', pattern).replace('\\', '') + '(?!\\.)', re.I), 
     re.sub(r':.*', '', translation).replace('\\','')) for (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
 
 # Kwarg control update for mygene specific kwargs
