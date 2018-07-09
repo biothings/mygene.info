@@ -43,23 +43,20 @@ class MartException(Exception):
 
 class BioMart(HTTPDumper):
 
-    SRC_NAME = "ensembl"
-    SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
+    # actual biotmart url to use (webservice)
+    MART_URL = None
 
-    ENSEMBL_FTP_HOST = "ftp.ensembl.org"
-    MART_URL = "http://www.ensembl.org/biomart/martservice"
-    #MART_URL = "http://uswest.ensembl.org/biomart/martservice"
-    TEMPLATE = XML_QUERY_TEMPLATE
+    # list of species to download data for.
+    # will be set by implementing select_species()
     species_li = []
-    DUMP_METHOD = {"gene_ensembl__gene__main.txt":"get_gene__main",
-                 "gene_ensembl__translation__main.txt":"get_translation__main",
-                 "gene_ensembl__xref_entrezgene__dm.txt":"get_xref_entrezgene",
-                 "gene_ensembl__prot_profile__dm.txt":"get_profile",
-                 "gene_ensembl__prot_interpro__dm.txt":"get_interpro",
-                 "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
 
-    SCHEDULE = "0 6 * * *"
+    # dict of {filename:method} with filename is the remote file to 
+    # dump and method is a BioMart method implemented in subclass, which
+    # define which fields to get from biotmart
+    DUMP_METHOD = {}
 
+    # xml query template, must be defined in subclass
+    TEMPLATE = None
 
     def download(self,remotefile,localfile):
         self.prepare_local_folders(localfile)
@@ -67,9 +64,6 @@ class BioMart(HTTPDumper):
         # remote is a method name
         method = getattr(self,remotefile)
         method(localfile)
-
-    def get_newest_info(self):
-        self.release = self.get_latest_mart_version()
 
     def new_release_available(self):
         current_release = self.src_doc.get("download",{}).get("release")
@@ -83,51 +77,16 @@ class BioMart(HTTPDumper):
     def create_todump_list(self,force=False):
         self.get_newest_info()
         newrelease = self.new_release_available()
-        for fn in ["gene_ensembl__gene__main.txt",
-                "gene_ensembl__translation__main.txt",
-                "gene_ensembl__xref_entrezgene__dm.txt",
-                "gene_ensembl__prot_profile__dm.txt",
-                "gene_ensembl__prot_interpro__dm.txt",
-                "gene_ensembl__prot_pfam__dm.txt"]:
+        for fn in self.__class__.DUMP_METHOD:
             local_file = os.path.join(self.new_data_folder,os.path.basename(fn))
             if force or not os.path.exists(local_file) or newrelease:
                 if not self.__class__.species_li:
-                    self.__class__.species_li = self.get_all_species()
+                    self.__class__.species_li = self.select_species()
                 method = self.__class__.DUMP_METHOD[fn]
                 self.to_dump.append({"remote":method,"local":local_file})
 
-    def get_latest_mart_version(self):
-        ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
-        ftp.login()
-        #release_li = ftp.nlst('/pub/release-*')
-        release_li = [x for x in ftp.nlst('/pub') if x.startswith('/pub/release-')]
-        return str(sorted([int(fn.split('-')[-1]) for fn in release_li])[-1])
-
-    def get_all_species(self):
-        import tempfile
-        outfile = tempfile.mktemp() + '.txt.gz'
-        try:
-            self.logger.info('Downloading "species.txt.gz"...')
-            out_f = open(outfile, 'wb')
-            ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
-            ftp.login()
-            species_file = '/pub/release-%s/mysql/ensembl_production_%s/species.txt.gz' % (self.release, self.release)
-            ftp.retrbinary("RETR " + species_file, out_f.write)
-            out_f.close()
-            self.logger.info('Done.')
-
-            #load saved file
-            self.logger.info('Parsing "species.txt.gz"...')
-            species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
-            species_li = [x[:-1] + [is_int(x[-1]) and int(x[-1]) or None] for x in species_li]
-            # as of ensembl 87, there are also mouse strains. keep only the "original" one
-            species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
-            self.logger.info('Done.')
-        finally:
-            os.remove(outfile)
-            pass
-
-        return species_li
+    def get_newest_info(self):
+        self.release = self.get_latest_mart_version()
 
     def _query(self, *args, **kwargs):
         req = requests.Request(*args, **kwargs)
@@ -148,16 +107,6 @@ class BioMart(HTTPDumper):
                                      'dataset': dataset,
                                      'attributes': attrib_xml,
                                      'filters': filter_xml}
-
-    def get_virtual_schema(self):
-        return 'default'
-
-    def _get_species_table_prefix(self, species):
-        x = species.split('_')
-        return x[0][0] + x[1]
-
-    def get_dataset_name(self, species):
-        return '%s_gene_ensembl' % self._get_species_table_prefix(species[0])
 
     def query_mart(self, xml):
         return self._query('POST', self.__class__.MART_URL, data='query=%s\n' % xml)
@@ -211,6 +160,97 @@ class BioMart(HTTPDumper):
         out_f.close()
         self.logger.info("Total: %d" % cnt_all)
 
+
+    def get_latest_mart_version(self):
+        raise NotImplementedError("Implement me in sub-class")
+
+    def select_species(self):
+        """
+        Return a list of tuple containing species to download data for.
+        [(species_name1, common_name1, taxid1),(species_name2, common_name2, taxid2), ...]
+        """
+        raise NotImplementedError("Implement me in sub-class")
+
+    def get_virtual_schema(self):
+        """
+        Return BioMart schema for this dumper (eg. 'plants_mart', 'default',...)
+        """
+        raise NotImplementedError("Implement me in sub-class")
+
+    def get_dataset_name(self, species):
+        """Given a species tuple(name,taxid) return the dataset name
+        for that species in BiotMart"""
+        raise NotImplementedError("Implement me in sub-class")
+
+
+
+class EnsemblBioMart(BioMart):
+
+    SRC_NAME = "ensembl"
+    SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
+
+    # used to get latest release number & list of available species
+    ENSEMBL_FTP_HOST = "ftp.ensembl.org"
+    MART_URL = "http://www.ensembl.org/biomart/martservice"
+    #MART_URL = "http://uswest.ensembl.org/biomart/martservice"
+    TEMPLATE = XML_QUERY_TEMPLATE
+    DUMP_METHOD = {"gene_ensembl__gene__main.txt":"get_gene__main",
+                 "gene_ensembl__translation__main.txt":"get_translation__main",
+                 "gene_ensembl__xref_entrezgene__dm.txt":"get_xref_entrezgene",
+                 "gene_ensembl__prot_profile__dm.txt":"get_profile",
+                 "gene_ensembl__prot_interpro__dm.txt":"get_interpro",
+                 "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
+
+    SCHEDULE = "0 6 * * *"
+
+
+    def get_latest_mart_version(self):
+        ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
+        ftp.login()
+        #release_li = ftp.nlst('/pub/release-*')
+        release_li = [x for x in ftp.nlst('/pub') if x.startswith('/pub/release-')]
+        return str(sorted([int(fn.split('-')[-1]) for fn in release_li])[-1])
+
+    def select_species(self):
+        import tempfile
+        outfile = tempfile.mktemp() + '.txt.gz'
+        try:
+            self.logger.info('Downloading "species.txt.gz"...')
+            out_f = open(outfile, 'wb')
+            ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
+            ftp.login()
+            species_file = '/pub/release-%s/mysql/ensembl_production_%s/species.txt.gz' % (self.release, self.release)
+            ftp.retrbinary("RETR " + species_file, out_f.write)
+            out_f.close()
+            self.logger.info('Done.')
+
+            #load saved file
+            self.logger.info('Parsing "species.txt.gz"...')
+            species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
+            species_li = [x[:-1] + [is_int(x[-1]) and int(x[-1]) or None] for x in species_li]
+            # as of ensembl 87, there are also mouse strains. keep only the "original" one
+            species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
+            self.logger.info('Done.')
+        finally:
+            os.remove(outfile)
+            pass
+
+        import pprint
+        self.logger.error(pprint.pformat(species_li))
+        return species_li
+
+
+    def get_virtual_schema(self):
+        return 'default'
+
+    def _get_species_table_prefix(self, species):
+        x = species.split('_')
+        return x[0][0] + x[1]
+
+    def get_dataset_name(self, species):
+        return '%s_gene_ensembl' % self._get_species_table_prefix(species[0])
+
+    # dump methods implementation for each input files
     def get_gene__main(self, outfile, debug=False):
         header = ['taxonomy_id',
                   'ensembl_gene_id',
