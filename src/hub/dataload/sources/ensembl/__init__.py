@@ -1,4 +1,4 @@
-from .dump import BioMart
+from .dump import EnsemblBioMart
 from .prosite_upload import EnsemblPrositeUploader
 from .pfam_upload import EnsemblPfamUploader
 from .interpro_upload import EnsemblInterproUploader
