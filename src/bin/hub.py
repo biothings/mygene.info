@@ -12,12 +12,15 @@ from collections import OrderedDict
 import config, biothings
 biothings.config_for_app(config)
 
+import hub.keylookup
+
 import logging
 # shut some mouths...
 logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
 logging.getLogger("requests").setLevel(logging.ERROR)
 logging.getLogger("boto").setLevel(logging.ERROR)
+logging.getLogger("keylookup").setLevel(logging.INFO)
 
 logging.info("Hub DB backend: %s" % biothings.config.HUB_DB_BACKEND)
 logging.info("Hub database: %s" % biothings.config.DATA_HUB_DB_DATABASE)
@@ -64,6 +67,7 @@ dp_manager = DataPluginManager(job_manager=job_manager)
 assistant_manager = assistant.AssistantManager(data_plugin_manager=dp_manager,
         dumper_manager=dmanager,
         uploader_manager=upload_manager,
+        keylookup=hub.keylookup.MyGeneKeyLookup,
         job_manager=job_manager)
 # register available plugin assitant
 assistant_manager.configure()
