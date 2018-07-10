@@ -18,6 +18,11 @@ class UniprotUploader(uploader.MergerSourceUploader):
         genedoc_d = load_all(data_folder)
         return genedoc_d
 
+    def post_update_data(self, *args, **kwargs):
+        self.logger.info("Indexing 'Swiss-Prot'")
+        # background=true or it'll lock the whole database...
+        self.collection.create_index("uniprot.Swiss-Prot",background=True)
+
     @classmethod
     def get_mapping(klass):
         mapping = {
