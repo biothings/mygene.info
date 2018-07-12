@@ -1,11 +1,15 @@
 {
-    "version": "0.1",
+    "version": "0.2",
     "dumper" : {
         "data_url" : "ftp://ftp.pantherdb.org/ortholog/current_release/RefGenomeOrthologs.tar.gz",
         "uncompress" : true
     },
     "uploader" : {
         "parser" : "parser:load_data",
-        "ignore_duplicates" : false
+        "ignore_duplicates" : false,
+        "keylookup" : {
+            "input_types" : ["swissprot","trembl"],
+            "skip_on_failure" : true
+        }
     }
 }
