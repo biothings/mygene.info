@@ -7,12 +7,12 @@ graph_mygene.add_node('entrez')
 graph_mygene.add_node('ensembl')
 graph_mygene.add_node('uniprot')
 
-graph_mygene.add_edge('uniprot', 'entrez',
+graph_mygene.add_edge('swissprot', 'entrez',
         object={'col': 'uniprot',
             'lookup': 'uniprot.Swiss-Prot',
             'field': '_id'})
 
-graph_mygene.add_edge('uniprot', 'entrez',
+graph_mygene.add_edge('trembl', 'entrez',
         object={'col': 'uniprot',
             'lookup': 'uniprot.TrEMBL',
             'field': '_id'})
