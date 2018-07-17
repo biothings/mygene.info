@@ -1,0 +1,15 @@
+beautifulsoup4
+aiocron
+asyncssh==1.7.1 # needs libffi-dev installed (apt-get)
+pymongo
+psutil
+IPython
+boto
+jsonpointer
+prettytable # diff report renderer
+multiprocessing_on_dill # to replace pickler in concurrent.futures
+dill # default pickler for job_manager (so we can pickle lambda)
+pyinotify # hub reloader
+tornado==4.5.3 # hub webserver
+sockjs-tornado==1.0.3 # websocket for hub webapp
+elasticsearch==6.1.1

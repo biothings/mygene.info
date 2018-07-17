@@ -1,0 +1,11 @@
+# Requirements for virtualenv when building sphinx documentation
+sphinx_rtd_theme
+beautifulsoup4
+aiocron
+asyncssh==1.7.1
+pymongo
+psutil
+IPython
+boto
+jsonpointer
+elasticsearch==2.4

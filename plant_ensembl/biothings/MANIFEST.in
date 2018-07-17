@@ -1,0 +1,4 @@
+recursive-include biothings/conf *
+include biothings/.git-info
+global-exclude __pycache__
+global-exclude *.py[co]
