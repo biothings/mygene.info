@@ -7,6 +7,10 @@ DATA_HUB_DB_DATABASE = "gene_hubdb"         # db containing the following (inter
 DATA_SRC_MASTER_COLLECTION = 'src_master'   # for metadata of each src collections
 DATA_SRC_DUMP_COLLECTION = 'src_dump'       # for src data download information
 DATA_SRC_BUILD_COLLECTION = 'src_build'     # for src data build information
+DATA_PLUGIN_COLLECTION = 'data_plugin'     # for data plugins information
+API_COLLECTION = 'api'                     # for api information (running under hub control)
+CMD_COLLECTION = 'cmd'                     # for launched/running commands in shell
+EVENT_COLLECTION = 'event'                 # for launched/running commands in shell
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
@@ -72,6 +76,11 @@ MONITOR_SNAPSHOT_DELAY = 5 * 60
 # "" means production
 HUB_ENV = ""
 
+# Hub name/icon url/version, for display purpose
+HUB_NAME = "MyGene"
+HUB_ICON = "http://18.237.6.45/static/img/mygene-logo-shiny.svg"
+HUB_VERSION = "0.2"
+
 # S3 bucket, root of all biothings releases information
 S3_RELEASE_BUCKET = "biothings-releases"
 # S3 bucket, root of all biothings diffs
@@ -79,16 +88,37 @@ S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
 S3_APP_FOLDER = "mygene.info" # gene/gene_allspecies
 
-ES_DOC_TYPE = "gene" # also used during snapshot
-# Pre-prod/test ES definitions
-# (see bt.databuild.backend.create_backend() for the notation)
-ES_TEST_HOST = 'localhost:9200'
-ES_TEST_GENE = (ES_TEST_HOST,"mygene_gene_current","gene")
-ES_TEST_GENE_ALLSPECIES = (ES_TEST_HOST,"mygene_gene_allspecies_current","gene")
-# Prod ES definitions
-ES_PROD_HOST = 'prodserver:9200'
-ES_PROD_GENE = (ES_PROD_HOST,"mygene_gene_current","gene")
-ES_PROD_GENE_ALLSPECIES = (ES_PROD_HOST,"mygene_gene_allspecies_current","gene")
+### Pre-prod/test ES definitions
+ES_CONFIG = {
+		"indexer_select": {
+			# default
+			None : "hub.dataindex.indexer.GeneIndexer",
+			},
+		"env" : {
+			"prod" : {
+				"host" : "prodserver:9200",
+				"indexer" : {
+					"args" : {
+						"timeout" : 300,
+						"retry_on_timeout" : True,
+						"max_retries" : 10,
+						},
+					},
+				"index" : [{"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}]
+				},
+			"test" : {
+				"host" : "localhost:9200",
+				"indexer" : {
+					"args" : {
+						"timeout" : 300,
+						"retry_on_timeout" : True,
+						"max_retries" : 10,
+						},
+					},
+				"index" : [{"index": "mygene_gene_allspecies_current", "doc_type": "gene"}]
+				},
+			},
+		}
 
 
 # fill with "token", "roomid" and "from" keys
@@ -103,6 +133,7 @@ HIPCHAT_CONFIG = {
 
 # SSH port for hub console
 HUB_SSH_PORT = 8022
+HUB_API_PORT = 7080
 
 ################################################################################
 # HUB_PASSWD
@@ -142,7 +173,7 @@ biothings.utils.jsondiff.UNORDERED_LIST = True
 # any other variables in this file as required. Variables defined as ValueError() exceptions
 # *must* be defined
 #
-from biothings import ConfigurationError
+from biothings import ConfigurationError, ConfigurationDefault, ConfigurationValue
 
 # Individual source database connection
 DATA_SRC_SERVER = ConfigurationError("Define hostname for source database")
@@ -175,28 +206,40 @@ HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
 #        "host" : "localhost:9200",
 #        }
 
-ES_HOST = ConfigurationError("Define ElasticSearch host used for index creation (eg localhost:9200)")
-
 # Path to a folder to store all downloaded files, logs, caches, etc...
 DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")
 
+# Path to a folder to store all 3rd party parsers, dumpers, etc...
+DATA_PLUGIN_FOLDER = ConfigurationDefault(
+        default="./plugins",
+        desc="Define path to folder which will contain all 3rd party parsers, dumpers, etc...")
+
 # Path to folder containing diff files
-DIFF_PATH = ConfigurationError("Define path to folder which will contain output files from diff")
+DIFF_PATH = ConfigurationDefault(
+        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"diff")"""),
+        desc="Define path to folder which will contain output files from diff")
 # Usually inside DATA_ARCHIVE_ROOT
 #DIFF_PATH = os.path.join(DATA_ARCHIVE_ROOT,"diff")
 
 # Path to folder containing release note files
-RELEASE_PATH = ConfigurationError("Define path to folder which will contain release files")
+RELEASE_PATH = ConfigurationDefault(
+        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"release")"""),
+        desc="Define path to folder which will contain release files")
+
 # Usually inside DATA_ARCHIVE_ROOT
 #RELEASE_PATH = os.path.join(DATA_ARCHIVE_ROOT,"release")
 
 # this dir must be created manually
-LOG_FOLDER = ConfigurationError("Define path to folder which will contain log files")
+LOG_FOLDER = ConfigurationDefault(
+        default=ConfigurationValue("""os.path.join(DATA_ARCHIVE_ROOT,"logs")"""),
+        desc="Define path to folder which will contain log files")
 # Usually inside DATA_ARCHIVE_ROOT
 #LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
 
 # default hub logger
-logger = ConfigurationError("Provide a default hub logger instance (use setup_default_log(name,log_folder)")
+logger = ConfigurationDefault(
+        default=logging,
+        desc="Provide a default hub logger instance (use setup_default_log(name,log_folder)")
 # Usually use default setup
 #logger = setup_default_log("hub", LOG_FOLDER)
 
