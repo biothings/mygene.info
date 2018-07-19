@@ -22,8 +22,12 @@ def load_data():
             logger.info('Processed %s pharos target IDs!', i)
             logger.info('Total time used to process these docs is %s', time.clock() - start_time)
             start_time = time.clock()
-        response = requests.get(URL_TEMPLATE.replace('ID', str(i)))
-        if response.ok:
+        try:
+            response = requests.get(URL_TEMPLATE.replace('ID', str(i)))
+        except ConnectionError as e:
+            logging.exception(e, exc_info=True)
+            response = None
+        if response and response.ok:
             data = response.json()
             entrez_id = [int(_doc['term']) for _doc in data]
             if len(entrez_id) > 1:
