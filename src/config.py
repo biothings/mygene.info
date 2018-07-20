@@ -15,8 +15,8 @@ DATA_TARGET_SERVER_PASSWORD = None
 
 # I have kept this unchanged as it seems to be the default port according to MongoDB documentation 
 HUB_DB_BACKEND = {
-		"module" : "biothings.utils.mongo",
-		"uri" : "mongodb://myhost:27017",
+		"module" : "biothings.utils.sqlite3",
+        "sqlite_db_folder" : "./db",
 		}
 
 # I have changed these to the paths that direct to files I would like to have my data in

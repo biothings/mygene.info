@@ -1,9 +1,11 @@
-from dump import BioMart
+import os
+from config import DATA_ARCHIVE_ROOT, logger as logging
+from hub.dataload.sources.ensembl.dump import BioMart, XML_QUERY_TEMPLATE
 
 class EnsemblPlantBioMart(BioMart):
-  
-    SRC_NAME = "ensembl"
-    (DATA_ARCHIVE_ROOT, SRC_NAME)
+
+    SRC_NAME = "ensembl_plant"
+    SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     # used to get latest release number & list of available species
     ENSEMBL_FTP_HOST = "ftp.ensembl.org"
     MART_URL = "https://plants.ensembl.org/biomart/martservice"
@@ -56,14 +58,14 @@ class EnsemblPlantBioMart(BioMart):
 
 
     def get_virtual_schema(self):
-        return 'default'
+        return 'plants_mart'
 
     def _get_species_table_prefix(self, species):
         x = species.split('_')
         return x[0][0] + x[1]
 
     def get_dataset_name(self, species):
-        return '%s_gene_ensembl' % self._get_species_table_prefix(species[0])
+        return '%s_eg_gene' % self._get_species_table_prefix(species[0])
 
     # dump methods implementation for each input files
     def get_gene__main(self, outfile, debug=False):
@@ -96,6 +98,5 @@ Plant_Query_trial = '''<?xml version="1.0" encoding="UTF-8"?>
 	</Dataset>
 </Query>
 '''
-EnsemblPlantBiomart.get_gene_main(Plant_Query_Trial)
 
 
