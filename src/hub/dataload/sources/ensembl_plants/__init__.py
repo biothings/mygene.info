@@ -1,1 +1,1 @@
-from .dump import EnsemblBioMart
+from .dump import BioMart
