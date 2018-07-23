@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import asyncio, asyncssh, sys
+import asyncio, asyncssh, sys, os
 
 import concurrent.futures
 import multiprocessing_on_dill
@@ -8,13 +8,17 @@ concurrent.futures.process.multiprocessing = multiprocessing_on_dill
 
 from functools import partial
 from collections import OrderedDict
+import logging
 
 import config, biothings
+from biothings.utils.version import set_versions
+logging.error("file %s" % repr(__file__))
+app_folder,_src = os.path.split(os.path.split(os.path.split(os.path.abspath(__file__))[0])[0])
+set_versions(config,app_folder)
 biothings.config_for_app(config)
 
 import hub.keylookup
 
-import logging
 # shut some mouths...
 logging.getLogger("elasticsearch").setLevel(logging.ERROR)
 logging.getLogger("urllib3").setLevel(logging.ERROR)
@@ -122,7 +126,8 @@ def trigger_merge(build_name):
     return asyncio.ensure_future(do())
 allspecies = partial(shell.launch,partial(build_manager.merge,"mygene_allspecies"))
 demo = partial(shell.launch,partial(build_manager.merge,"demo_allspecies"))
-job_manager.submit(partial(_and,allspecies,demo),"0 2 * * 7")
+job_manager.submit(allspecies,"0 2 * * 7")
+job_manager.submit(demo,"0 4 * * 7")
 
 
 COMMANDS = OrderedDict()
