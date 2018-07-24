@@ -7,6 +7,7 @@ __sources_dict__ = [
         'hub.dataload.sources.entrez',
         'hub.dataload.sources.uniprot',
         'hub.dataload.sources.pharmgkb',
+        'hub.dataload.sources.pharos',
         'hub.dataload.sources.reporter',
         'hub.dataload.sources.ucsc',
         'hub.dataload.sources.exac',

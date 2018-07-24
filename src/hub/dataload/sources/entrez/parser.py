@@ -162,7 +162,7 @@ class GeneInfoParser(EntrezParserBase):
 
     def format(self,doc):
         gid, info = list(doc.items())[0]
-        info['entrezgene'] = int(gid)
+        info['entrezgene'] = str(gid)
         info["_id"] = gid
         return info
 

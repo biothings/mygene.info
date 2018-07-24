@@ -22,12 +22,16 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
         self.logger.info('Uploading "geneid_d" to GridFS...')
         geneid_d = self.get_geneid_d(load_cache=False,save_cache=False)
         dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
+        for field in ["MGI","HGNC","RGD","TAIR","WormBase","ZFIN","SGD","FLYBASE"]:
+            self.logger.info("Indexing '%s'" % field)
+            self.collection.create_index(field,background=True)
 
     @classmethod
     def get_mapping(klass):
         mapping = {
             "entrezgene": {
-                "type": "long",
+                "type": "text",
+                "analyzer": "string_lowercase",
                 'copy_to': ['all'],
             },
             "taxid": {
