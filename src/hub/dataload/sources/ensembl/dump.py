@@ -55,6 +55,8 @@ class BioMart(HTTPDumper):
     # define which fields to get from biotmart
     DUMP_METHOD = {}
 
+    SCHEDULE = "0 6 * * *"
+
     # xml query template, must be defined in subclass
     TEMPLATE = None
 
