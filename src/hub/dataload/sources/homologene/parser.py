@@ -29,8 +29,8 @@ class HomologeneParser(EntrezParserBase):
         from biothings.utils.hub_db import get_src_dump
         homo_d = tab2dict(self.datafile,(2,1),0,header=0)
         entrez_doc = get_src_dump().find_one({"_id":"entrez"}) or {}
-        entrez_dir = entrez_doc.get("data_folder")
-        assert entrez_dir, "Can't find Entez data directory"
+        entrez_dir = entrez_doc.get("download",{}).get("data_folder")
+        assert entrez_dir, "Can't find Entrez data directory"
         DATAFILE = os.path.join(entrez_dir, 'gene_history.gz')
         assert os.path.exists(DATAFILE), "gene_history.gz is missing (entrez_dir: %s)" % entrez_dir
         retired2gene = tab2dict(DATAFILE, (1, 2), 1, alwayslist=0,includefn=lambda ld: ld[1] != '-')
