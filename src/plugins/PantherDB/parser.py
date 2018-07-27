@@ -28,6 +28,9 @@ def load_data (data_folder):
             ortholog_uniprot_id = c [1]
             ortholog_type = y [6]
             ortholog_family = y [8]
+            _trash = y.pop()
+            assert _trash == ''
+            ortholog_family = y[-1]
 
             # normalize from ref db so values can be search in other mygene's collections
             if ref_gene_db_name == "MGI":
