@@ -44,7 +44,7 @@ class ESQueryBuilder(ESQueryBuilder):
             if is_int(term) and set(scopes).intersection(INT_FIELDS):
                 _q.extend(['{}', json.dumps(self._POST_single_query(term, scopes=
                     list(set(scopes).intersection(INT_FIELDS))))])
-            elif not is_int(term) and set(scopes).difference(INT_FIELDS):
+            elif set(scopes).difference(INT_FIELDS):
                 _q.extend(['{}', json.dumps(self._POST_single_query(term, scopes=
                     list(set(scopes).difference(INT_FIELDS))))])
             else:
