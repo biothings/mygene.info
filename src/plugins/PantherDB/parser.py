@@ -1,6 +1,25 @@
 import re
 import os.path
 
+
+def set_taxid(doc,taxname):
+    TAXONOMY = {
+        "ARATH" : 3702,
+        "CAEEL" : 6239,
+        "CHICK" : 9031,
+        "DANRE" : 7955,
+        "DICDI" : 352472,
+        "DROME" : 7227,
+        "ECOLI" : 562,
+        "HUMAN" : 9606,
+        "MOUSE" : 10090,
+        "RAT"   : 10116,
+        "SCHPO" : 4896,
+        "YEAST" : 4932,
+    }
+    if TAXONOMY.get(taxname):
+        doc["pantherdb"]["taxid"] = TAXONOMY[taxname]
+
 def load_data (data_folder):
 
     data_file = os.path.join(data_folder, "RefGenomeOrthologs")
@@ -20,6 +39,7 @@ def load_data (data_folder):
             a = re.split("=", y [1])
             b = re.split("=", y [4])
             c = re.split("=", y [5])
+            taxname = y[0]
             ref_gene_uniprot_id = z [1]
             ref_gene_db_name = a [0]
             ref_gene_db_id = a[-1]
@@ -47,6 +67,7 @@ def load_data (data_folder):
 
             if ref_gene_uniprot_id != e: # if read up to a different ref. gene
                 d ["pantherdb"] ["ortholog"] = o
+                set_taxid(d,taxname)
                 yield d
                 e = ref_gene_uniprot_id
                 d = { "_id": ref_gene_uniprot_id,
