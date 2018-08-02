@@ -2,7 +2,7 @@ import re
 import os.path
 
 
-def set_taxid(doc,taxname):
+def get_taxid(taxname):
     TAXONOMY = {
         "ARATH" : 3702,
         "CAEEL" : 6239,
@@ -17,8 +17,7 @@ def set_taxid(doc,taxname):
         "SCHPO" : 4896,
         "YEAST" : 4932,
     }
-    if TAXONOMY.get(taxname):
-        doc["pantherdb"]["taxid"] = TAXONOMY[taxname]
+    return TAXONOMY[taxname]
 
 def load_data (data_folder):
 
@@ -35,11 +34,12 @@ def load_data (data_folder):
         # This function is for splitting the line
         for line in f:
             y = re.split("[\| \t \n]", line)
+            taxname = y[0]
             z = re.split("=", y [2])
             a = re.split("=", y [1])
+            orthtaxname = y[3]
             b = re.split("=", y [4])
             c = re.split("=", y [5])
-            taxname = y[0]
             ref_gene_uniprot_id = z [1]
             ref_gene_db_name = a [0]
             ref_gene_db_id = a[-1]
@@ -67,7 +67,6 @@ def load_data (data_folder):
 
             if ref_gene_uniprot_id != e: # if read up to a different ref. gene
                 d ["pantherdb"] ["ortholog"] = o
-                set_taxid(d,taxname)
                 yield d
                 e = ref_gene_uniprot_id
                 d = { "_id": ref_gene_uniprot_id,
@@ -76,18 +75,20 @@ def load_data (data_folder):
                       "uniprot_kb": ref_gene_uniprot_id
                       }
                     }
-                o = [{ortholog_db_name: ortholog_db_id,
+                new = {ortholog_db_name: ortholog_db_id,
                        "uniprot_kb": ortholog_uniprot_id,
                        "ortholog_type": ortholog_type,
-                       "panther_family": ortholog_family
+                       "panther_family": ortholog_family,
+                       "taxid": get_taxid(orthtaxname),
                        }
-                    ]
+                o = [new]
 
             else: # in this case the ref. gene is the same, just append the ortholog
                 new = {ortholog_db_name: ortholog_db_id,
                        "uniprot_kb": ortholog_uniprot_id,
                        "ortholog_type": ortholog_type,
-                       "panther_family": ortholog_family
+                       "panther_family": ortholog_family,
+                       "taxid": get_taxid(orthtaxname),
                        }
                 o.append(new)
 
