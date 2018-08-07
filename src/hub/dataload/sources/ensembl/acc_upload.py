@@ -19,18 +19,18 @@ class EnsemblAccUploader(uploader.MergerSourceUploader):
                     #"path": "just_name",
                     "properties": {
                         "transcript": {
-                            "type": "text",
-                            "analyzer": "string_lowercase",
+                            "type": "keyword",
+                            "normalizer" : "keyword_lowercase_normalizer",
                             'copy_to': ['all'],
                             },
                         "gene": {
-                            "type": "text",
-                            "analyzer": "string_lowercase",
+                            "type": "keyword",
+                            "normalizer" : "keyword_lowercase_normalizer",
                             'copy_to': ['all'],
                             },
                         "protein": {
-                            "type": "text",
-                            "analyzer": "string_lowercase",
+                            "type": "keyword",
+                            "normalizer" : "keyword_lowercase_normalizer",
                             'copy_to': ['all'],
                             },
                         'translation': {
@@ -38,8 +38,8 @@ class EnsemblAccUploader(uploader.MergerSourceUploader):
                             "enabled": False,
                             },
                         "type_of_gene": {
-                            'analyzer': 'string_lowercase',
-                            "type": "text"
+                            "normalizer" : "keyword_lowercase_normalizer",
+                            "type": "keyword"
                             },
                         }
                     }

@@ -15,7 +15,8 @@ class EnsemblGenomicPosHg19Uploader(uploader.DummySourceUploader):
                             "type" : "long"
                             },
                         "chr" : {
-                            "type" : "text"
+                            "normalizer" : "keyword_lowercase_normalizer",
+                            "type": "keyword"
                             },
                         "end" : {
                             "type" : "long"

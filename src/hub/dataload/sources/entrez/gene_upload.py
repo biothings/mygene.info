@@ -30,15 +30,16 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "entrezgene": {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
                 'copy_to': ['all'],
             },
             "taxid": {
                 "type": "integer",
             },
             "alias": {
-                "type": "text",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
                 'copy_to': ['all'],
             },
             "name": {
@@ -51,14 +52,14 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
                 'copy_to': ['all'],
             },
             "symbol": {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
                 "boost": 5.0,
                 'copy_to': ['all'],
             },
             "locus_tag": {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
                 'copy_to': ['all'],
             },
 
@@ -68,8 +69,8 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
                 "type": "text",
             },
             "type_of_gene": {
-                'analyzer': 'string_lowercase',
-                "type": "text",
+                "normalizer" : "keyword_lowercase_normalizer",
+                "type": "keyword",
             },
             "AnimalQTLdb": {
                 "index": False,
@@ -82,52 +83,52 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
 
             # convert index_name to lower-case, and excluded from "_all"
             "HGNC": {
-                "type": "text",              # 1771
-                'analyzer': 'string_lowercase',
+                "type": "keyword",              # 1771
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "HPRD": {
-                "type": "text",              # 00310
-                'analyzer': 'string_lowercase',
+                "type": "keyword",              # 00310
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "MIM": {
-                "type": "text",              # 116953
-                'analyzer': 'string_lowercase',
+                "type": "keyword",              # 116953
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "MGI": {
-                "type": "text",              # MGI:104772
-                'analyzer': 'string_lowercase',
+                "type": "keyword",              # MGI:104772
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "RATMAP": {
-                "type": "text",
-                'analyzer': 'string_lowercase',
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "RGD": {
-                "type": "text",             # 70486
-                'analyzer': 'string_lowercase',
+                "type": "keyword",             # 70486
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "FLYBASE": {
-                "type": "text",            # FBgn0004107
-                'analyzer': 'string_lowercase',
+                "type": "keyword",            # FBgn0004107
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "WormBase": {
-                "type": "text",         # WBGene00000871
-                "analyzer": "string_lowercase",
+                "type": "keyword",         # WBGene00000871
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "TAIR": {
-                "type": "text",             # AT3G48750
-                "analyzer": "string_lowercase",
+                "type": "keyword",             # AT3G48750
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "ZFIN": {
-                "type": "text",             # ZDB-GENE-040426-2741
-                "analyzer": "string_lowercase",
+                "type": "keyword",             # ZDB-GENE-040426-2741
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "Xenbase": {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
             },
             "miRBase": {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
             },
         }
         return mapping

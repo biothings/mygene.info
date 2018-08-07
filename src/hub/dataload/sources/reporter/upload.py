@@ -28,8 +28,8 @@ class ReporterUploader(uploader.DummySourceUploader):
     @classmethod
     def get_mapping(klass):
         platform_mapping = {
-            "type": "text",
-            "analyzer": "string_lowercase",
+            "type": "keyword",
+            "normalizer" : "keyword_lowercase_normalizer",
             'copy_to': ['all'],
         }
 

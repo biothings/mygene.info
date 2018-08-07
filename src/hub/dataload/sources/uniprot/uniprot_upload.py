@@ -31,13 +31,13 @@ class UniprotUploader(uploader.MergerSourceUploader):
                 #"path": "just_name",
                 "properties": {
                     "Swiss-Prot": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
+                        "type": "keyword",
+                        "normalizer" : "keyword_lowercase_normalizer",
                         'copy_to': ['all'],
                     },
                     "TrEMBL": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
+                        "type": "keyword",
+                        "normalizer" : "keyword_lowercase_normalizer",
                         'copy_to': ['all'],
                     }
                 }

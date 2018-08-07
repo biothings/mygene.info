@@ -25,8 +25,8 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                                 "type": "text",
                             },
                             "id": {
-                                "type": "text",
-                                "analyzer": "string_lowercase",
+                                "type": "keyword",
+                                "normalizer" : "keyword_lowercase_normalizer",
                                 'copy_to': ['all'],
                             },
                             "evidence": {
@@ -50,8 +50,8 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                                 "type": "text",
                             },
                             "id": {
-                                "type": "text",
-                                "analyzer": "string_lowercase",
+                                "type": "keyword",
+                                "normalizer" : "keyword_lowercase_normalizer",
                                 'copy_to': ['all'],
                             },
                             "evidence": {
@@ -75,8 +75,8 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                                 "type": "text",
                             },
                             "id": {
-                                "type": "text",
-                                "analyzer": "string_lowercase",
+                                "type": "keyword",
+                                "normalizer" : "keyword_lowercase_normalizer",
                                 'copy_to': ['all'],
                             },
                             "evidence": {

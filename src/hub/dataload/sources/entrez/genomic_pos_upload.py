@@ -65,7 +65,10 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
                 "dynamic": False,
                 "type": "nested",
                 "properties": {
-                    "chr": {"type": "text"},
+                    "chr": {
+                        "type": "keyword",
+                        "normalizer" : "keyword_lowercase_normalizer",
+                        },
                     "start": {"type": "long"},
                     "end": {"type": "long"},
                     "strand": {

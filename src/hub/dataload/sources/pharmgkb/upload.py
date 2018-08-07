@@ -12,8 +12,8 @@ class PharmgkbUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "pharmgkb": {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
                 'copy_to': ['all'],
             }
         }

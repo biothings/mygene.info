@@ -19,8 +19,8 @@ class EnsemblInterproUploader(uploader.MergerSourceUploader):
                 "dynamic": False,
                 "properties": {
                     "id": {
-                        "type": "text",
-                        "analyzer": "string_lowercase",
+                        "type": "keyword",
+                        "normalizer" : "keyword_lowercase_normalizer",
                         'copy_to': ['all'],
                     },
                     "desc": {

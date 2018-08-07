@@ -17,8 +17,8 @@ class EntrezUnigeneUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "unigene":  {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
                 'copy_to': ['all']
             }
         }

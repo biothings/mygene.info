@@ -15,8 +15,8 @@ class EnsemblPfamUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "pfam": {
-                "type": "text",
-                "analyzer": "string_lowercase",
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
                 'copy_to': ['all'],
             }
         }

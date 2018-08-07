@@ -27,8 +27,8 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "taxid":  {"type": "integer"},
-            "symbol": {"type": "text",
-                       "analyzer": "string_lowercase",
+            "symbol": {"type": "keyword",
+                       "normalizer" : "keyword_lowercase_normalizer",
                        "boost": 5.0,
                        'copy_to': ['all'],},
             "name":   {"type": "text",

@@ -12,8 +12,8 @@ class UniprotIPIUploader(uploader.DummySourceUploader):
     def get_mapping(klass):
         mapping = {
                 "ipi" : {
-                    "type" : "text",
-                    "analyzer" : "string_lowercase",
+                    "type" : "keyword",
+                    "normalizer" : "keyword_lowercase_normalizer",
                     'copy_to': ['all'],
                     }
                 }

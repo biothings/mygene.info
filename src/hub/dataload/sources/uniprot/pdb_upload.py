@@ -13,8 +13,8 @@ class UniprotPDBUploader(uploader.MergerSourceUploader):
     def get_mapping(klass):
         mapping = {
             "pdb": {
-                "type": "text",
-                'analyzer': 'string_lowercase',
+                "type": "keyword",
+                "normalizer" : "keyword_lowercase_normalizer",
             }
         }
         return mapping
