@@ -2,7 +2,7 @@ Migration from v2 API
 =====================
 
 Migrating from v2 API to v3 API is easy. Here's a summary of the changes.
-You may also want to read our `blog <http://mygene.info/mygene-info-v3-is-out>`_
+You may also want to read our `blog <http://mygene.info/blog/mygene-info-v3-is-out>`_
 for complementary information.
 
 
