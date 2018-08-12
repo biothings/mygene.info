@@ -22,7 +22,7 @@ About this widget
 
 This autocomplete widget for gene query provides suggestions while you type a gene symbol or name into the field. Here the gene suggestions are displayed as "<Symbol>:<Name>", automatically triggered when at least two characters are entered into the field.
 
-At the backend, this widget is powered by `the gene query web service </doc/query_service.html>`_ from `MyGene.info <http://mygene.info>`_. By default, the gene suggestions display human genes only.
+At the backend, this widget is powered by `the gene query web service <query_service.html>`_ from `MyGene.info <http://mygene.info>`_. By default, the gene suggestions display human genes only.
 
 
 Use it in your website
