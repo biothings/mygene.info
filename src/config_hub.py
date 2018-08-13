@@ -78,7 +78,7 @@ HUB_ENV = ""
 
 # Hub name/icon url/version, for display purpose
 HUB_NAME = "MyGene"
-HUB_ICON = "http://18.237.6.45/static/img/mygene-logo-shiny.svg"
+HUB_ICON = "http://mygene.info/static/img/mygene-logo-shiny.svg"
 HUB_VERSION = "0.2"
 
 # S3 bucket, root of all biothings releases information
