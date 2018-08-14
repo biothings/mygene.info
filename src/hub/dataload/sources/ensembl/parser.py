@@ -1,8 +1,12 @@
-import os.path
+import os.path, os
 import copy
 from biothings.utils.common import SubStr
 from biothings.utils.dataload import tab2dict, tab2list, value_convert, normalized_value, \
                                      list2dict, dict_nodup, dict_attrmerge, tab2dict_iter
+
+from multiprocessing import Lock
+
+extra_mapping_lock = Lock()
 
 #fn to skip lines with LRG records.'''
 def _not_LRG(ld):
@@ -65,10 +69,18 @@ class EnsemblParser(object):
     def _load_ensembl2entrez_li(self):
         """gene_ensembl__xref_entrezgene__dm"""
         CUSTOM_MAPPING_FILE = os.path.join(self.data_folder, 'gene_ensembl__gene__extra.txt')
-        if not os.path.exists(CUSTOM_MAPPING_FILE):
-            print("Missing extra mapping file, now generating")
-            from . import ensembl_ncbi_mapping
-            ensembl_ncbi_mapping.main(confirm=False)
+        global extra_mapping_lock
+        try:
+            print("Trying to acquire extra mapping lock")
+            extra_mapping_lock.acquire()
+            print("Lock acquired")
+            if not os.path.exists(CUSTOM_MAPPING_FILE) or os.stat(CUSTOM_MAPPING_FILE).st_size == 0:
+                print("Missing extra mapping file, now generating")
+                from . import ensembl_ncbi_mapping
+                ensembl_ncbi_mapping.main(confirm=False)
+        finally:
+            print("Releasing lock")
+            extra_mapping_lock.release()
         extra = tab2dict(CUSTOM_MAPPING_FILE,(0, 1), 0, alwayslist=True)
         datafile = os.path.join(self.data_folder, 'gene_ensembl__xref_entrezgene__dm.txt')
         ensembl2entrez = tab2dict(datafile, (1, 2), 0, includefn=_not_LRG, alwayslist=True)   # [(ensembl_gid, entrez_gid),...]
