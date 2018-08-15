@@ -120,7 +120,7 @@ def find_ncbi_symbols(gene_info_file,ensembl_dict):
         if ld[1] in ncbi_list_to_find:
             ncbi_id_symbols[ld[1]] = ld[2]
 
-    print("number of unique NCBI gene IDs to be queried using mygene.info: ", len(ncbi_list_to_find))
+    print("number of unique NCBI gene IDs to be queried using Entrez gene_info file: ", len(ncbi_list_to_find))
     print("number symbols found in NCBI file: ", len(ncbi_id_symbols))
     print("step 4 end")
     return ncbi_id_symbols
@@ -128,7 +128,7 @@ def find_ncbi_symbols(gene_info_file,ensembl_dict):
 
 def merge_mapping(ensembl_dict, mygene_website_dict, add_source=False):
     """First use gene2ensembl as single match NCBI gene ID (if == 1 match).
-    Next, if no gene2ensembl match, then look at mygene.info to find which NCBI
+    Next, if no gene2ensembl match, then look at gene_info (Entrez) to find which NCBI
     ID from the NCBI multi mapping list returns the same ensembl symbol as the
     ensembl main file, and use corresponding NCBI gene ID as single match.
 
@@ -136,7 +136,7 @@ def merge_mapping(ensembl_dict, mygene_website_dict, add_source=False):
     ---------------------
     Tuple with ensembl gene ID and NCBI gene ID
     """
-    print("step 5 start: Generator-decide whether to use gene2ensembl or mygene.info for mapping")
+    print("step 5 start: Generator-decide whether to use gene2ensembl or symbol for mapping")
     for key in ensembl_dict:
         ncbi_list = ensembl_dict[key]['data']['ncbi_list']
         ensembl_symbol = ensembl_dict[key]['data']['symbol'].upper()
@@ -175,9 +175,8 @@ def write_mapping_file(mapping_generator, outfile, confirm=True):
     the optional parameter "add_source=True" to merge_mapping() function
     col0: Ensembl gene ID
     col2 "add_source" == 1: NCBI ID gene ID from gene2ensembl
-    col2 "add_source" == 2: NCBI ID gene ID from ncbi_list if mygene.info symbol == ensembl symbol
-        (i.e. iterate through ncbi list (for each Ensembl ID) on mygene.info
-        (ex: http://mygene.info/v2/gene/100894237?fields=symbol )
+    col2 "add_source" == 2: NCBI ID gene ID from ncbi_list if symbol == ensembl symbol
+        (i.e. iterate through ncbi list (for each Ensembl ID) on gene_info file
         and when the symbol found matches the ensembl symbol use this
         NCBI ID if symbols match only once)
     """
@@ -206,7 +205,7 @@ def run_stats(total_ensembl_IDs, ensembl_dict, ensembl_map_count, total_mapped):
     print("Percent of Ensembl gene IDs with multiple NCBI gene IDs: ", round((len(ensembl_dict) * 1. / (total_ensembl_IDs)) * 100, 1))
     print("Total Ensembl gene IDs successfully and uniquely mapped to 1 NCBI gene ID: ", total_mapped)
     print("Total mapped using gene2ensembl: ", ensembl_map_count)
-    print("Total mapped from mygene.info: ", total_mapped - ensembl_map_count)
+    print("Total mapped from symbol: ", total_mapped - ensembl_map_count)
     print("Percent of Ensembl IDs uniquely mapped out of Ensembl IDs with > 1 NCBI gene ID: ", round((total_mapped * 1. / (len(ensembl_dict))) * 100, 1))
 
 
@@ -233,6 +232,9 @@ def main(confirm=True):
     ensembl_dict = create_ensembl_gene_id_dict(gene_ensembl_2_main_file, multi_mapping_dict)
     ensembl_dict, ensembl_match_count = find_ncbi_ids_from_gene2ensembl(ensembl_dict, gene2ensembl_file)
     ncbi_id_symbols = find_ncbi_symbols(gene_main_file, ensembl_dict)
+    ##import pickle
+    ##pickle.dump(ensembl_dict,open("/tmp/ensembl_dict","wb"))
+    ##pickle.dump(ncbi_id_symbols,open("/tmp/ncbi_id_symbols","wb"))
     mapping_generator = merge_mapping(ensembl_dict, ncbi_id_symbols, add_source=False)
     total_mapped = write_mapping_file(mapping_generator, outfile, confirm=confirm)
     run_stats(total_ensembl_IDs, ensembl_dict, ensembl_match_count, total_mapped)

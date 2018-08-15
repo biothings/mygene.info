@@ -85,8 +85,13 @@ class EnsemblParser(object):
         datafile = os.path.join(self.data_folder, 'gene_ensembl__xref_entrezgene__dm.txt')
         ensembl2entrez = tab2dict(datafile, (1, 2), 0, includefn=_not_LRG, alwayslist=True)   # [(ensembl_gid, entrez_gid),...]
         # replace with our custom mapping
+        ##adjusted = {}
         for k in extra:
+            ##if k in ensembl2entrez:
+            ##    adjusted[k] = {"ensembl2entrez":ensembl2entrez[k],"extra":extra[k]}
             ensembl2entrez[k] = extra[k]
+        ##import pickle
+        ##pickle.dump(adjusted,open("/tmp/adjusted","wb"))
         # back to list of tuples
         ensembl2entrez_li = []
         for ensembl_id, entrez_ids in ensembl2entrez.items():
