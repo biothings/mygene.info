@@ -214,7 +214,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_gene(self):
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
-        eq_(res['entrezgene'], 1017)
+        eq_(res['entrezgene'], "1017")
         # testing non-ascii character
         self.get_404(self.api + '/gene/' +
                      '54097\xef\xbf\xbd\xef\xbf\xbdmouse')
@@ -244,8 +244,8 @@ class MyGeneTest(BiothingTestHelperMixin):
                                     'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                    'exons', 'exac','other_names','umls']))
-        eq_(res[0]['entrezgene'], 1017)
+                                    'exons', 'exac','other_names','umls','pantherdb','pharos']))
+        eq_(res[0]['entrezgene'], "1017")
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
                                         {'ids': '1017, 1018'}))
@@ -707,9 +707,9 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=entrezgene&species=human,mouse,rat"))
         hits = res["hits"]
         assert len(hits) == 3
-        eq_(hits[0]["entrezgene"],69606)
-        eq_(hits[1]["entrezgene"],123263)
-        eq_(hits[2]["entrezgene"],315763)
+        eq_(hits[0]["entrezgene"],"123263")
+        eq_(hits[1]["entrezgene"],"315763")
+        eq_(hits[2]["entrezgene"],"69606")
 
     def test_refseq_versioning(self):
         # no version, _all
@@ -732,13 +732,13 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + "/query?q=ensembl.transcript:ENSMUST00000161459"))
         eq_(len(res["hits"]),1)
         eq_(res["hits"][0]["symbol"],"Setdb2")
-        # This test is now one to many => returns a list
-        #res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000011454"))
-        #eq_(type(res),dict)
-        #eq_(res["entrezgene"],23637)
-        res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000237613"))
+        res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000011454"))
         eq_(type(res),dict)
-        eq_(res["entrezgene"],645520)
+        eq_(res["entrezgene"],"23637")
+        # mapping no longer valid
+        ##res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000237613"))
+        ##eq_(type(res),dict)
+        ##eq_(res["entrezgene"],"645520")
         ### test "orphan" EntrezID (associated EnsemblIDs were all resolved into other EntrezIDs but we want to keep ambiguated
         ### Ensembl data for those)
         ###res = self.json_ok(self.get_ok(self.api + "/gene/100287596"))
@@ -815,6 +815,19 @@ class MyGeneTest(BiothingTestHelperMixin):
         resall = self.json_ok(self.get_ok(self.api + "/gene/1017?fields=homologene,exons"))
         check_homologene(resall)
         check_exons(resall)
+
+    def test_pantherdb(self):
+        res = self.json_ok(self.get_ok(self.api + "/gene/348158?fields=pantherdb"))
+        assert "pantherdb" in res
+        eq_(type(res["pantherdb"]["ortholog"]),list)
+        res = self.json_ok(self.get_ok(self.api + \
+            "/query?q=pantherdb.ortholog.taxid:10090%20AND%20pantherdb.uniprot_kb:O95867"))
+        eq_(len(res["hits"]),1)
+        eq_(res["hits"][0]["_id"],"80740")
+
+    def test_pharos(self):
+        res = self.json_ok(self.get_ok(self.api + "/gene/56141?fields=pharos"))
+        eq_(res["pharos"]["target_id"],4745)
 
 # Self contained test class, used for CI tools such as Travis
 # This will start a Tornado server on its own and perform tests
