@@ -50,4 +50,3 @@ class MyGeneKeyLookup(KeyLookup):
                 output_types=["entrez","ensembl"],
                 skip_on_failure=skip_on_failure)
 
-

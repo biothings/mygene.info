@@ -12,11 +12,11 @@
 
 
 thrift>=0.9.1
-tornado>=3.2
+tornado>=3.2,<5
 tornadoes>=1.4.1
 
 # biothings
-git+https://github.com/biothings/biothings.api.git@67c7d2d82246b9e30f2e7e215c88070cf0251344#egg=biothings
+git+https://github.com/biothings/biothings.api.git@f840ab54b9e7910d1250b9312fa34d7cafcbe3a6#egg=biothings
 
 #for build sphinx docs
 sphinx==1.5.6
