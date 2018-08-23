@@ -14,6 +14,7 @@
 thrift>=0.9.1
 tornado>=3.2,<5
 tornadoes>=1.4.1
+gitpython
 
 # biothings
 git+https://github.com/biothings/biothings.api.git@f840ab54b9e7910d1250b9312fa34d7cafcbe3a6#egg=biothings
