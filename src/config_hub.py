@@ -130,6 +130,7 @@ HIPCHAT_CONFIG = {
 #    'from': '',
 #    'host': '',
 }
+SLACK_WEBHOOK = None
 
 # SSH port for hub console
 HUB_SSH_PORT = 8022
@@ -150,7 +151,6 @@ CACHE_FOLDER = None
 BIOTHINGS_ROLE = "slave"
 
 import logging
-from biothings.utils.loggers import setup_default_log
 
 # don't bother with elements order in a list when diffing,
 # mygene optmized uploaders can't produce different results

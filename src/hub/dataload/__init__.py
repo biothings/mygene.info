@@ -16,5 +16,6 @@ __sources_dict__ = [
         'hub.dataload.sources.reactome',
         'hub.dataload.sources.umls',
         'hub.dataload.sources.wikipedia',
+        'hub.dataload.sources.pharos',
 ]
 
