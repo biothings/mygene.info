@@ -3,8 +3,6 @@
 import asyncio, asyncssh, sys, os
 
 import concurrent.futures
-import multiprocessing_on_dill
-concurrent.futures.process.multiprocessing = multiprocessing_on_dill
 
 from functools import partial
 from collections import OrderedDict
