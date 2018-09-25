@@ -57,6 +57,9 @@ ES_QUERY = ESQuery
 # *****************************************************************************
 ES_RESULT_TRANSFORMER = ESResultTransformer
 
+# Fields to exclude from the /metadata/fields endpoint
+AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
+
 GA_ACTION_QUERY_GET = 'query_get'
 GA_ACTION_QUERY_POST = 'query_post'
 GA_ACTION_ANNOTATION_GET = 'gene_get'
