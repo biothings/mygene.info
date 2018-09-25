@@ -17,7 +17,7 @@ tornadoes>=1.4.1
 gitpython
 
 # biothings
-git+https://github.com/biothings/biothings.api.git@f840ab54b9e7910d1250b9312fa34d7cafcbe3a6#egg=biothings
+git+https://github.com/biothings/biothings.api.git@61b212698e0eb9e3d2d4e88d394548ed279dd5c5#egg=biothings
 
 #for build sphinx docs
 sphinx==1.5.6
