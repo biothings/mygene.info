@@ -12,7 +12,7 @@ from biothings.utils.hipchat import hipchat_msg
 from biothings.utils.hub_db import get_src_dump
 from biothings.utils.dataload import tab2list
 from config import DATA_ARCHIVE_ROOT, logger as logging
-from biothings.hub.dataload.dumper import HTTPDumper
+from biothings.hub.dataload.dumper import HTTPDumper, DumperException
 
 
 XML_QUERY_TEMPLATE_EXAMPLE = '''<?xml version="1.0" encoding="UTF-8"?>
@@ -64,6 +64,9 @@ class BioMart(HTTPDumper):
         # remote is a method name
         method = getattr(self,remotefile)
         method(localfile)
+        # rough sanity check against "empty" files w/ just headers
+        if os.stat(localfile).st_size < 1024*1024: # at least 1MiB
+            raise DumperException("'%s' is too small, no data ?" % localfile)
 
     def new_release_available(self):
         current_release = self.src_doc.get("download",{}).get("release")
