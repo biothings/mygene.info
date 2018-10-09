@@ -12,12 +12,14 @@
 
 
 thrift>=0.9.1
-tornado>=3.2,<5
+# installed in biothings...
+#tornado>=3.2,<5
+# still necessary?
 tornadoes>=1.4.1
 gitpython
 
 # biothings
-git+https://github.com/biothings/biothings.api.git@61b212698e0eb9e3d2d4e88d394548ed279dd5c5#egg=biothings
+git+https://github.com/biothings/biothings.api.git@a4b54d796c43fce3f0f89d8b8c840c8162ff19ca#egg=biothings
 
 #for build sphinx docs
 sphinx==1.5.6
