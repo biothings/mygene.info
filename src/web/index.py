@@ -22,5 +22,5 @@ if options.debug:
 if __name__ == '__main__':
     # set debug level on app settings
     web_settings.set_debug_level(options.debug)
-    main(APP_LIST, debug_settings={"static_path": web_settings.STATIC_PATH},
+    main(APP_LIST, debug_settings={"static_path": web_settings.STATIC_PATH, "debug": True},
          sentry_client_key=web_settings.SENTRY_CLIENT_KEY)
