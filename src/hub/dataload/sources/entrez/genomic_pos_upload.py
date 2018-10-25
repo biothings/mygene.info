@@ -10,6 +10,7 @@ import os.path
 from biothings.utils.common import (dump, loadobj, get_timestamp)
 from biothings.utils.dataload import tab2list
 import biothings.hub.dataload.uploader as uploader
+from biothings.utils.hub_db import get_src_dump
 
 class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
 
@@ -24,7 +25,9 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
         :return:
         """
 
-        taxids_file = os.path.join(data_folder, "../ref_microbe_taxids.pyobj")
+        refsrc = get_src_dump().find_one({"_id":"ref_microbe_taxids"})
+        assert refsrc, "ref_microbe_taxids dump not found"
+        taxids_file = os.path.join(refsrc["download"]["data_folder"], "ref_microbe_taxids.pyobj")
         datafile = os.path.join(data_folder, 'gene2refseq.gz')
 
         taxids = loadobj(taxids_file)
