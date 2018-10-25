@@ -54,18 +54,18 @@ from hub.databuild.builder import MyGeneDataBuilder
 from hub.databuild.mapper import EntrezRetired2Current, Ensembl2Entrez
 import biothings.utils.mongo as mongo
 
+from biothings.hub.dataplugin.manager import DataPluginManager
+dp_manager = DataPluginManager(job_manager=job_manager)
 # will check every 10 seconds for sources to upload
 upload_manager = uploader.UploaderManager(poll_schedule = '* * * * * */10', job_manager=job_manager)
 dmanager = dumper.DumperManager(job_manager=job_manager)
 sources_path = hub.dataload.__sources_dict__
-smanager = source.SourceManager(sources_path,dmanager,upload_manager)
+smanager = source.SourceManager(sources_path,dmanager,upload_manager,dp_manager)
 dmanager.schedule_all()
 upload_manager.poll('upload',lambda doc: shell.launch(partial(upload_manager.upload_src,doc["_id"])))
 
 # deal with 3rdparty datasources
 import biothings.hub.dataplugin.assistant as assistant
-from biothings.hub.dataplugin.manager import DataPluginManager
-dp_manager = DataPluginManager(job_manager=job_manager)
 assistant_manager = assistant.AssistantManager(data_plugin_manager=dp_manager,
         dumper_manager=dmanager,
         uploader_manager=upload_manager,

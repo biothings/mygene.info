@@ -239,6 +239,7 @@ LOG_FOLDER = ConfigurationDefault(
 STANDALONE_VERSION = ConfigurationError("Define standalone version targetted by this Hub")
 
 # default hub logger
+from biothings.utils.loggers import setup_default_log
 logger = ConfigurationDefault(
         default=logging,
         desc="Provide a default hub logger instance (use setup_default_log(name,log_folder)")
