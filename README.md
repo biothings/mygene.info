@@ -40,7 +40,7 @@ This project is a web front-end of next generation (v2) of MyGene.info (Gene Ann
 
 
     cd src
-    cp config.py.exmaple config.py
+    cp config.py.example config.py
 
 
 Make changes if needed.
