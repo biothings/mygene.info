@@ -8,7 +8,7 @@ var DATA_FORMAT_VERSION = "1.0";
 jQuery(document).ready(function() {
     if( jQuery(' .indexed-field-table ').length ) {
         jQuery.ajax({
-            url: "http://mygene.info/v3/metadata/fields",
+            url: "//mygene.info/v3/metadata/fields",
             dataType: "JSONP",
             jsonpCallback: "callback",
             type: "GET",
