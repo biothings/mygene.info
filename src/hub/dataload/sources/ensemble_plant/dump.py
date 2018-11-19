@@ -62,5 +62,6 @@ class EnsemblPlantBioMart(GenericBioMart):
 
     def _get_species_table_prefix(self, species):
         return species
+        
     def get_dataset_name(self, species):
         return '%s_gene' % self._get_species_table_prefix(species[0])
