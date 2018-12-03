@@ -59,6 +59,9 @@ class MyGeneHubServer(HubServer):
         self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
         self.commands["publish_snapshot_demo"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo",
                                             repository=config.READONLY_SNAPSHOT_REPOSITORY)
+        # replace default
+        self.commands["publish_diff"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER)
+        self.commands["publish_snapshot"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER)
 
     def before_start(self):
         self.logger.info("Scheduling builds")
