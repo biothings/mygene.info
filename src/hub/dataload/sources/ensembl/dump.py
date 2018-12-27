@@ -151,15 +151,16 @@ class BioMart(HTTPDumper):
             except MartException:
                 import traceback
                 err_msg = traceback.format_exc()
-                self.logger.error("%s %s" % (species[0], err_msg))
+                self.logger.error("%s %s %s" % (species[0], outfile, err_msg))
                 continue
             cnt = 0
+            # if len(con) == 0 it's not right
             for line in con.split('\n'):
                 if line.strip() != '':
                     out_f.write(str(taxid) + '\t' + line + '\n')
                     cnt += 1
                     cnt_all += 1
-            self.logger.info("%s %s" % (species[0], cnt))
+            self.logger.info("%s %s %s" % (species[0], cnt, outfile))
         out_f.close()
         self.logger.info("Total: %d" % cnt_all)
 
@@ -291,30 +292,38 @@ class EnsemblBioMart(GenericBioMart):
         import tempfile
         outfile = tempfile.mktemp() + '.txt.gz'
         try:
-            self.logger.info('Downloading "species.txt.gz"...')
+            self.logger.info('Downloading Species List...')
+            self.logger.debug(self.get_species_file())
             out_f = open(outfile, 'wb')
             ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
             ftp.login()
-            species_file = '/pub/release-%s/mysql/ensembl_production_%s/species.txt.gz' % (self.release, self.release)
+            species_file = self.get_species_file()
             ftp.retrbinary("RETR " + species_file, out_f.write)
             out_f.close()
             self.logger.info('Done.')
 
             #load saved file
-            self.logger.info('Parsing "species.txt.gz"...')
-            species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
-            species_li = [x[:-1] + [is_int(x[-1]) and int(x[-1]) or None] for x in species_li]
-            # as of ensembl 87, there are also mouse strains. keep only the "original" one
-            species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
+            self.logger.info('Loading Species List...')
+            species_li = self._load_species(outfile)
             self.logger.info('Done.')
         finally:
             os.remove(outfile)
             pass
 
         import pprint
-        self.logger.error(pprint.pformat(species_li))
+        self.logger.debug(pprint.pformat(species_li))
         return species_li
+    
+    def get_species_file(self):
+        return '/pub/release-%s/mysql/ensembl_production_%s/species.txt.gz' % (self.release, self.release)
 
+    def _load_species(self, outfile):
+        species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
+        species_li = [x[:-1] + [is_int(x[-1]) and int(x[-1]) or None] for x in species_li]
+        # as of ensembl 87, there are also mouse strains. keep only the "original" one
+        species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
+        # species_li = _load_species_extra_processing(species_li)
+        return species_li
 
     def get_virtual_schema(self):
         return 'default'
