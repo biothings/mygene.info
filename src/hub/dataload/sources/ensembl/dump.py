@@ -128,7 +128,8 @@ class BioMart(HTTPDumper):
         return out
 
     def _fetch_data(self, outfile, attributes, filters='', header=None, debug=False, setname=''):
-        cnt_all = 0
+        cnt_lines_all = 0
+        cnt_species_success = 0
         out_f, outfile = safewfile(outfile,prompt=False,default='O')
         if header:
             out_f.write('\t'.join(header) + '\n')
@@ -154,16 +155,16 @@ class BioMart(HTTPDumper):
                 # self.logger.warn("%s %s %s" % (species[0], attrset, err_msg))
                 self.logger.warn("%s %s %s" % (setname, species[0], e))
                 continue
-            cnt = 0
+            cnt_lines = 0
             # if len(con) == 0 it's not right
             for line in con.split('\n'):
                 if line.strip() != '':
                     out_f.write(str(taxid) + '\t' + line + '\n')
-                    cnt += 1
-                    cnt_all += 1
-            self.logger.info("%s %s %s" % (setname, species[0], cnt))
+                    cnt_lines += 1
+                    cnt_lines_all += 1
+            self.logger.info("%s %s %d" % (setname, species[0], cnt_lines))
         out_f.close()
-        self.logger.info("Total: %s %d" % (setname, cnt_all))
+        self.logger.info("Total: %s %d %d" % (setname, cnt_species_success, cnt_lines_all))
 
 
     def get_latest_mart_version(self):
