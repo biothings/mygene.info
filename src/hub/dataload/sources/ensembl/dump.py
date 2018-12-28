@@ -156,6 +156,7 @@ class BioMart(HTTPDumper):
                 self.logger.warn("%s:: %s %s" % (setname, species[0], e))
                 continue
             cnt_lines = 0
+            cnt_species_success += 1
             # if len(con) == 0 it's not right
             for line in con.split('\n'):
                 if line.strip() != '':
