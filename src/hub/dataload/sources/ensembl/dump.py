@@ -127,7 +127,7 @@ class BioMart(HTTPDumper):
                 out.append((ld[1], ld[2], ld[4]))
         return out
 
-    def _fetch_data(self, outfile, attributes, filters='', header=None, debug=False, attrset='-'):
+    def _fetch_data(self, outfile, attributes, filters='', header=None, debug=False, attrset=''):
         cnt_all = 0
         out_f, outfile = safewfile(outfile,prompt=False,default='O')
         if header:
@@ -152,7 +152,7 @@ class BioMart(HTTPDumper):
                 import traceback
                 # err_msg = traceback.format_exc()
                 # self.logger.warn("%s %s %s" % (species[0], attrset, err_msg))
-                self.logger.warn("%s %s %s" % (species[0], attrset, e))
+                self.logger.warn("%s %s %s" % (attrset, species[0], e))
                 continue
             cnt = 0
             # if len(con) == 0 it's not right
@@ -161,9 +161,9 @@ class BioMart(HTTPDumper):
                     out_f.write(str(taxid) + '\t' + line + '\n')
                     cnt += 1
                     cnt_all += 1
-            self.logger.info("%s %s %s" % (species[0], cnt, outfile))
+            self.logger.info("%s %s %s" % (attrset, species[0], cnt))
         out_f.close()
-        self.logger.info("Total: %d" % cnt_all)
+        self.logger.info("%d Total: %d" % (attrset, cnt_all))
 
 
     def get_latest_mart_version(self):
@@ -245,6 +245,8 @@ class GenericBioMart(BioMart):
         attributes = ["ensembl_gene_id",
                       "ensembl_transcript_id",
                       "ensembl_peptide_id"]
+        attributes_test = self.get_attributes(header)
+        assert attributes == attributes_test
         self._fetch_data(outfile, attributes, header=header, debug=debug)
 
     def get_xref_entrezgene(self, outfile, debug=False):
@@ -254,6 +256,8 @@ class GenericBioMart(BioMart):
         attributes = ["ensembl_gene_id",
                       "entrezgene"]
         filters = ["with_entrezgene"]
+        attributes_test = self.get_attributes(header)
+        assert attributes == attributes_test
         self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
 
     def get_profile(self, outfile, debug=False):
@@ -267,6 +271,8 @@ class GenericBioMart(BioMart):
                       "ensembl_peptide_id",
                       "pfscan"]
         filters = ["with_pfscan"]
+        attributes_test = self.get_attributes(header)
+        assert attributes == attributes_test
         self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
 
     def get_interpro(self, outfile, debug=False):
@@ -274,12 +280,18 @@ class GenericBioMart(BioMart):
                   'gene_stable_id',
                   'transcript_stable_id',
                   'translation_stable_id',
-                  'interpro_id', 'short_description', 'description']
+                  'interpro_id']
         attributes = ["ensembl_gene_id",
                       "ensembl_transcript_id",
                       "ensembl_peptide_id",
-                      "interpro", "interpro_short_description", "interpro_description"]     # pay attention!
+                      "interpro", "interpro_short_description", "interpro_description"]     # pay attention! need to remove last two
+        header_additional = ['short_description', 'description']
+        attributes_additional = ["interpro_short_description", "interpro_description"]
         filters = ["with_interpro"]
+        attributes_test = self.get_attributes(header)
+        attributes_test.append(attributes_additional)
+        assert attributes == attributes_test
+        header.append(header_additional)
         self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
 
     def get_pfam(self, outfile, debug=False):
@@ -292,6 +304,8 @@ class GenericBioMart(BioMart):
                       "ensembl_transcript_id",
                       "ensembl_peptide_id",
                       "pfam"]
+        attributes_test = self.get_attributes(header)
+        assert attributes == attributes_test
         filters = ["with_pfam"]
         self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
 
