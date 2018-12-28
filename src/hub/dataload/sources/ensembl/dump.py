@@ -127,7 +127,7 @@ class BioMart(HTTPDumper):
                 out.append((ld[1], ld[2], ld[4]))
         return out
 
-    def _fetch_data(self, outfile, attributes, filters='', header=None, debug=False, attrset=''):
+    def _fetch_data(self, outfile, attributes, filters='', header=None, debug=False, setname=''):
         cnt_all = 0
         out_f, outfile = safewfile(outfile,prompt=False,default='O')
         if header:
@@ -152,7 +152,7 @@ class BioMart(HTTPDumper):
                 import traceback
                 # err_msg = traceback.format_exc()
                 # self.logger.warn("%s %s %s" % (species[0], attrset, err_msg))
-                self.logger.warn("%s %s %s" % (attrset, species[0], e))
+                self.logger.warn("%s %s %s" % (setname, species[0], e))
                 continue
             cnt = 0
             # if len(con) == 0 it's not right
@@ -161,9 +161,9 @@ class BioMart(HTTPDumper):
                     out_f.write(str(taxid) + '\t' + line + '\n')
                     cnt += 1
                     cnt_all += 1
-            self.logger.info("%s %s %s" % (attrset, species[0], cnt))
+            self.logger.info("%s %s %s" % (setname, species[0], cnt))
         out_f.close()
-        self.logger.info("%s Total: %d" % (attrset, cnt_all))
+        self.logger.info("Total: %s %d" % (setname, cnt_all))
 
 
     def get_latest_mart_version(self):
@@ -193,7 +193,16 @@ class BioMart(HTTPDumper):
 
 class GenericBioMart(BioMart):
 
-    # as of Christmas 2018
+    TEMPLATE = XML_QUERY_TEMPLATE
+    DUMP_METHOD = {"gene_ensembl__gene__main.txt":"get_gene__main",
+                 "gene_ensembl__translation__main.txt":"get_translation__main",
+                 "gene_ensembl__xref_entrezgene__dm.txt":"get_xref_entrezgene",
+                 "gene_ensembl__prot_profile__dm.txt":"get_profile",
+                 "gene_ensembl__prot_interpro__dm.txt":"get_interpro",
+                 "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
+
+    SCHEDULE = "0 6 * * *"
+
     BIOMART_ATTRIBUTES = {                              # gene_main trans_main xref_entrez profile interpro pfam
         'ensembl_gene_id':"ensembl_gene_id",            #     x
         'gene_stable_id':"ensembl_gene_id",             #                x          x         x        x      x
@@ -212,16 +221,6 @@ class GenericBioMart(BioMart):
         'pfam':"pfam"                                   #                                                    x
     }
 
-    def get_attributes(self, header):
-        attr = []
-        assert header[0] == 'taxonomy_id'
-        self.logger.debug(header)
-        for h in header[1:]:
-            attr.append(self.BIOMART_ATTRIBUTES[h])
-        self.logger.debug(attr)
-        return attr
-
-
     # dump methods implementation for each input files
     def get_gene__main(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -229,25 +228,16 @@ class GenericBioMart(BioMart):
                   'symbol',
                   'gene_chrom_start', 'gene_chrom_end', 'chr_name', 'chrom_strand',
                   'description','type_of_gene']
-        attributes = ["ensembl_gene_id",
-                      "external_gene_name",   # symbols, called "external_gene_id" before release 76
-                      "start_position", "end_position", "chromosome_name", "strand",
-                      "description","gene_biotype"]
-        attributes_test = self.get_attributes(header)
-        assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, header=header, debug=debug, attrset='gene_main')
+        attributes = self._get_attributes(header)
+        self._fetch_data(outfile, attributes, header=header, debug=debug, setname='gene_main')
 
     def get_translation__main(self, outfile, debug=False):
         header = ['taxonomy_id',
                   'gene_stable_id',
                   'transcript_stable_id',
                   'translation_stable_id']
-        attributes = ["ensembl_gene_id",
-                      "ensembl_transcript_id",
-                      "ensembl_peptide_id"]
-        attributes_test = self.get_attributes(header)
-        assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, header=header, debug=debug, attrset='translation_main')
+        attributes = self._get_attributes(header)
+        self._fetch_data(outfile, attributes, header=header, debug=debug, setname='translation_main')
 
     def get_xref_entrezgene(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -256,9 +246,8 @@ class GenericBioMart(BioMart):
         attributes = ["ensembl_gene_id",
                       "entrezgene"]
         filters = ["with_entrezgene"]
-        attributes_test = self.get_attributes(header)
-        assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='xref_entrezgene')
+        attributes = self._get_attributes(header)
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, setname='xref_entrezgene')
 
     def get_profile(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -266,14 +255,9 @@ class GenericBioMart(BioMart):
                   'transcript_stable_id',
                   'translation_stable_id',
                   'profile_id']
-        attributes = ["ensembl_gene_id",
-                      "ensembl_transcript_id",
-                      "ensembl_peptide_id",
-                      "pfscan"]
         filters = ["with_pfscan"]
-        attributes_test = self.get_attributes(header)
-        assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='profile')
+        attributes = self._get_attributes(header)
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, setname='profile')
 
     def get_interpro(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -281,18 +265,13 @@ class GenericBioMart(BioMart):
                   'transcript_stable_id',
                   'translation_stable_id',
                   'interpro_id']
-        attributes = ["ensembl_gene_id",
-                      "ensembl_transcript_id",
-                      "ensembl_peptide_id",
-                      "interpro", "interpro_short_description", "interpro_description"]     # pay attention! need to remove last two
+        attributes = self._get_attributes(header)
         header_additional = ['short_description', 'description']
         attributes_additional = ["interpro_short_description", "interpro_description"]
-        filters = ["with_interpro"]
-        attributes_test = self.get_attributes(header)
-        attributes_test.extend(attributes_additional)
-        assert attributes == attributes_test
         header.extend(header_additional)
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='interpro')
+        attributes.extend(attributes_additional)
+        filters = ["with_interpro"]
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, setname='interpro')
 
     def get_pfam(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -300,15 +279,18 @@ class GenericBioMart(BioMart):
                   'transcript_stable_id',
                   'translation_stable_id',
                   'pfam']
-        attributes = ["ensembl_gene_id",
-                      "ensembl_transcript_id",
-                      "ensembl_peptide_id",
-                      "pfam"]
-        attributes_test = self.get_attributes(header)
-        assert attributes == attributes_test
+        attributes = self._get_attributes(header)
         filters = ["with_pfam"]
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='pfam')
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, setname='pfam')
 
+    def _get_attributes(self, header):
+        attr = []
+        assert header[0] == 'taxonomy_id'
+        self.logger.debug(header)
+        for h in header[1:]:
+            attr.append(self.BIOMART_ATTRIBUTES[h])
+        self.logger.debug(attr)
+        return attr
 
 class EnsemblBioMart(GenericBioMart):
 
@@ -318,16 +300,6 @@ class EnsemblBioMart(GenericBioMart):
     # used to get latest release number & list of available species
     ENSEMBL_FTP_HOST = "ftp.ensembl.org"
     MART_URL = "http://www.ensembl.org/biomart/martservice"
-    #MART_URL = "http://uswest.ensembl.org/biomart/martservice"
-    TEMPLATE = XML_QUERY_TEMPLATE
-    DUMP_METHOD = {"gene_ensembl__gene__main.txt":"get_gene__main",
-                 "gene_ensembl__translation__main.txt":"get_translation__main",
-                 "gene_ensembl__xref_entrezgene__dm.txt":"get_xref_entrezgene",
-                 "gene_ensembl__prot_profile__dm.txt":"get_profile",
-                 "gene_ensembl__prot_interpro__dm.txt":"get_interpro",
-                 "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
-
-    SCHEDULE = "0 6 * * *"
 
     # overide
     def get_latest_mart_version(self):
