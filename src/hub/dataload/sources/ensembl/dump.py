@@ -163,7 +163,7 @@ class BioMart(HTTPDumper):
                     cnt_all += 1
             self.logger.info("%s %s %s" % (attrset, species[0], cnt))
         out_f.close()
-        self.logger.info("%d Total: %d" % (attrset, cnt_all))
+        self.logger.info("%s Total: %d" % (attrset, cnt_all))
 
 
     def get_latest_mart_version(self):
@@ -235,7 +235,7 @@ class GenericBioMart(BioMart):
                       "description","gene_biotype"]
         attributes_test = self.get_attributes(header)
         assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, header=header, debug=debug, attrset=self.__class__.__name__)
+        self._fetch_data(outfile, attributes, header=header, debug=debug, attrset='gene_main')
 
     def get_translation__main(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -247,7 +247,7 @@ class GenericBioMart(BioMart):
                       "ensembl_peptide_id"]
         attributes_test = self.get_attributes(header)
         assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, header=header, debug=debug)
+        self._fetch_data(outfile, attributes, header=header, debug=debug, attrset='translation_main')
 
     def get_xref_entrezgene(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -258,7 +258,7 @@ class GenericBioMart(BioMart):
         filters = ["with_entrezgene"]
         attributes_test = self.get_attributes(header)
         assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='xref_entrezgene')
 
     def get_profile(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -273,7 +273,7 @@ class GenericBioMart(BioMart):
         filters = ["with_pfscan"]
         attributes_test = self.get_attributes(header)
         assert attributes == attributes_test
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='profile')
 
     def get_interpro(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -289,10 +289,10 @@ class GenericBioMart(BioMart):
         attributes_additional = ["interpro_short_description", "interpro_description"]
         filters = ["with_interpro"]
         attributes_test = self.get_attributes(header)
-        attributes_test.append(attributes_additional)
+        attributes_test.extend(attributes_additional)
         assert attributes == attributes_test
-        header.append(header_additional)
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
+        header.extend(header_additional)
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='interpro')
 
     def get_pfam(self, outfile, debug=False):
         header = ['taxonomy_id',
@@ -307,7 +307,7 @@ class GenericBioMart(BioMart):
         attributes_test = self.get_attributes(header)
         assert attributes == attributes_test
         filters = ["with_pfam"]
-        self._fetch_data(outfile, attributes, filters, header=header, debug=debug)
+        self._fetch_data(outfile, attributes, filters, header=header, debug=debug, attrset='pfam')
 
 
 class EnsemblBioMart(GenericBioMart):
