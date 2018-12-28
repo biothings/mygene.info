@@ -164,7 +164,7 @@ class BioMart(HTTPDumper):
                     cnt_lines_all += 1
             self.logger.info("%s %s %d" % (setname, species[0], cnt_lines))
         out_f.close()
-        self.logger.info("Total: %s %d %d" % (setname, cnt_species_success, cnt_lines_all))
+        self.logger.info("Total: %s %d/%d %d" % (setname, cnt_species_success, len(self.__class__.species_li), cnt_lines_all))
 
 
     def get_latest_mart_version(self):
