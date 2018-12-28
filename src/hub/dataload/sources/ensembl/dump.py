@@ -133,7 +133,7 @@ class BioMart(HTTPDumper):
         out_f, outfile = safewfile(outfile,prompt=False,default='O')
         if header:
             out_f.write('\t'.join(header) + '\n')
-        for species in self.__class__.species_li:
+        for c, species in enumerate(self.__class__.species_li):
             try:
                 dataset = self.get_dataset_name(species)
             except IndexError:
@@ -153,7 +153,7 @@ class BioMart(HTTPDumper):
                 import traceback
                 # err_msg = traceback.format_exc()
                 # self.logger.warn("%s %s %s" % (species[0], attrset, err_msg))
-                self.logger.warn("%s %s %s" % (setname, species[0], e))
+                self.logger.warn("%s:: %s %s" % (setname, species[0], e))
                 continue
             cnt_lines = 0
             # if len(con) == 0 it's not right
@@ -162,9 +162,9 @@ class BioMart(HTTPDumper):
                     out_f.write(str(taxid) + '\t' + line + '\n')
                     cnt_lines += 1
                     cnt_lines_all += 1
-            self.logger.info("%s %s %d" % (setname, species[0], cnt_lines))
+            self.logger.info("%s:: %d/%d %s %d" % (setname, c, len(self.__class__.species_li), species[0], cnt_lines))
         out_f.close()
-        self.logger.info("Total: %s %d/%d %d" % (setname, cnt_species_success, len(self.__class__.species_li), cnt_lines_all))
+        self.logger.info("Total: %s:: %d/%d successes %d lines" % (setname, cnt_species_success, len(self.__class__.species_li), cnt_lines_all))
 
 
     def get_latest_mart_version(self):
