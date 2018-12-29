@@ -189,9 +189,6 @@ class BioMart(HTTPDumper):
         for that species in BiotMart"""
         raise NotImplementedError("Implement me in sub-class")
 
-    def get_species_file(self):
-        """TODO"""
-        raise NotImplementedError("Implement me in sub-class")
 
 class GenericBioMart(BioMart):
 
@@ -204,6 +201,11 @@ class GenericBioMart(BioMart):
                  "gene_ensembl__prot_pfam__dm.txt":"get_pfam"}
 
     SCHEDULE = "0 6 * * *"
+    
+    # override in sub-class
+    ENSEMBL_FTP_HOST = '' 
+    RELEASE_FOLDER = ''
+    RELEASE_PREFIX = ''
 
     BIOMART_ATTRIBUTES = {                              # gene_main trans_main xref_entrez profile interpro pfam
         'ensembl_gene_id':"ensembl_gene_id",            #     x
@@ -268,10 +270,8 @@ class GenericBioMart(BioMart):
                   'translation_stable_id',
                   'interpro_id']
         attributes = self._get_attributes(header)
-        header_additional = ['short_description', 'description']
-        attributes_additional = ["interpro_short_description", "interpro_description"]
-        header.extend(header_additional)
-        attributes.extend(attributes_additional)
+        header.extend(['short_description', 'description'])
+        attributes.extend(["interpro_short_description", "interpro_description"])
         filters = ["with_interpro"]
         self._fetch_data(outfile, attributes, filters, header=header, debug=debug, setname='interpro')
 
@@ -293,23 +293,6 @@ class GenericBioMart(BioMart):
             attr.append(self.BIOMART_ATTRIBUTES[h])
         self.logger.debug(attr)
         return attr
-
-class EnsemblBioMart(GenericBioMart):
-
-    SRC_NAME = "ensembl"
-    SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-
-    # used to get latest release number & list of available species
-    ENSEMBL_FTP_HOST = "ftp.ensembl.org"
-    MART_URL = "http://www.ensembl.org/biomart/martservice"
-
-    # overide
-    def get_latest_mart_version(self):
-        ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
-        ftp.login()
-        #release_li = ftp.nlst('/pub/release-*')
-        release_li = [x for x in ftp.nlst('/pub') if x.startswith('/pub/release-')]
-        return str(sorted([int(fn.split('-')[-1]) for fn in release_li])[-1])
 
     # overide
     def select_species(self):
@@ -335,28 +318,68 @@ class EnsemblBioMart(GenericBioMart):
             pass
 
         import pprint
-        self.logger.debug(pprint.pformat(species_li))
+        self.logger.debug('\n'+pprint.pformat(species_li))
         return species_li
-    
+
+    # overide
+    def get_latest_mart_version(self):
+        ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
+        ftp.login()
+        #release_li = ftp.nlst('/pub/release-*')
+        release_li = [x for x in ftp.nlst(self.RELEASE_FOLDER) if x.startswith(self.RELEASE_PREFIX)]
+        return str(sorted([int(fn.split('-')[-1]) for fn in release_li])[-1])
+
+    # to override in sub-class, only ensembl main db needs to override now
+    def _load_species(self, outfile):
+        species_li = tab2list(outfile, (0, 4, 5), header=0)
+        species_li = [[x[0]] + [x[2]] + [x[1]] for x in species_li]
+        species_li = [x[:-1] + [is_int(x[-1]) and int(x[-1]) or None] for x in species_li]
+        return species_li
+
+    # to override in sub-class, only ensembl main db needs to override for now
+    def _get_species_table_prefix(self, species):
+        return species
+
+    # to override in sub-class, only ensembl main db needs to override for now
+    def get_dataset_name(self, species):
+        return '%s_gene' % self._get_species_table_prefix(species[0])
+
+    def get_species_file(self):
+        """TODO"""
+        raise NotImplementedError("Implement me in sub-class")
+
+class EnsemblBioMart(GenericBioMart):
+
+    SRC_NAME = "ensembl"
+    SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
+
+    # used to get latest release number & list of available species
+    ENSEMBL_FTP_HOST = "ftp.ensembl.org"
+    MART_URL = "http://www.ensembl.org/biomart/martservice"
+
+    RELEASE_FOLDER = '/pub'
+    RELEASE_PREFIX = '/pub/release-'
+
     def get_species_file(self):
         return '/pub/release-%s/mysql/ensembl_production_%s/species.txt.gz' % (self.release, self.release)
 
+    # override
+    def get_virtual_schema(self):
+        return 'default'
+
+    # override
+    def get_dataset_name(self, species):
+        return '%s_gene_ensembl' % self._get_species_table_prefix(species[0])
+        
+    # override
     def _load_species(self, outfile):
         species_li = tab2list(outfile, (1, 2, 7), header=0)   # db_name,common_name,taxid
         species_li = [x[:-1] + [is_int(x[-1]) and int(x[-1]) or None] for x in species_li]
         # as of ensembl 87, there are also mouse strains. keep only the "original" one
         species_li = [s for s in species_li if not s[0].startswith("mus_musculus_")]
-        # species_li = _load_species_extra_processing(species_li)
         return species_li
 
-    # overide
-    def get_virtual_schema(self):
-        return 'default'
-
+    # override
     def _get_species_table_prefix(self, species):
         x = species.split('_')
         return x[0][0] + x[1]
-
-    # overide
-    def get_dataset_name(self, species):
-        return '%s_gene_ensembl' % self._get_species_table_prefix(species[0])
