@@ -37,18 +37,16 @@ XML_QUERY_TEMPLATE = '''<?xml version="1.0" encoding="UTF-8"?>
 </Query>
 '''
 
+from autologging import traced
 
 class MartException(Exception):
     pass
 
+@traced
 class BioMart(HTTPDumper):
 
     # actual biotmart url to use (webservice)
     MART_URL = None
-
-    # list of species to download data for.
-    # will be set by implementing select_species()
-    species_li = []
 
     # dict of {filename:method} with filename is the remote file to 
     # dump and method is a BioMart method implemented in subclass, which
@@ -57,6 +55,10 @@ class BioMart(HTTPDumper):
 
     # xml query template, must be defined in subclass
     TEMPLATE = None
+
+    # list of species to download data for.
+    # will be set by implementing select_species()
+    species_li = []
 
     def download(self,remotefile,localfile):
         self.prepare_local_folders(localfile)
@@ -150,10 +152,15 @@ class BioMart(HTTPDumper):
             try:
                 con = self.query_mart(xml)
             except MartException as e:
-                import traceback
+                # import traceback
                 # err_msg = traceback.format_exc()
                 # self.logger.warn("%s %s %s" % (species[0], attrset, err_msg))
-                self.logger.warn("%s:: %s %s" % (setname, species[0], e))
+                _handled, _message = self._handle_mart_exceptions(e)
+                if _handled:
+                    cnt_species_success += 1
+                    self.logger.warn("%s:: %s %s" % (setname, species[0], _message))
+                else:
+                    self.logger.error("%s:: %s %s" % (setname, species[0], _message))
                 continue
             cnt_lines = 0
             cnt_species_success += 1
@@ -163,9 +170,9 @@ class BioMart(HTTPDumper):
                     out_f.write(str(taxid) + '\t' + line + '\n')
                     cnt_lines += 1
                     cnt_lines_all += 1
-            self.logger.info("%s:: %d/%d %s %d" % (setname, c, len(self.__class__.species_li), species[0], cnt_lines))
+            self.logger.info("%s:: %d/%d %s %d records" % (setname, c, len(self.__class__.species_li), species[0], cnt_lines))
         out_f.close()
-        self.logger.info("Total: %s:: %d/%d successes %d lines" % (setname, cnt_species_success, len(self.__class__.species_li), cnt_lines_all))
+        self.logger.info("Total: %s:: %d/%d successes %d records" % (setname, cnt_species_success, len(self.__class__.species_li), cnt_lines_all))
 
 
     def get_latest_mart_version(self):
@@ -189,7 +196,11 @@ class BioMart(HTTPDumper):
         for that species in BiotMart"""
         raise NotImplementedError("Implement me in sub-class")
 
+    def _handle_mart_exceptions(self, e):
+        return False, str(e)
 
+
+@traced
 class GenericBioMart(BioMart):
 
     TEMPLATE = XML_QUERY_TEMPLATE
@@ -294,6 +305,13 @@ class GenericBioMart(BioMart):
         self.logger.debug(attr)
         return attr
 
+    # override
+    # def _handle_mart_exceptions(self, e):
+    #     if str(e) == '':
+    #         return True, 'okay'
+        
+    #     return False, str(e)
+
     # overide
     def select_species(self):
         import tempfile
@@ -348,6 +366,8 @@ class GenericBioMart(BioMart):
         """TODO"""
         raise NotImplementedError("Implement me in sub-class")
 
+
+@traced
 class EnsemblBioMart(GenericBioMart):
 
     SRC_NAME = "ensembl"
