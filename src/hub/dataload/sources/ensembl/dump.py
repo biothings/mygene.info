@@ -44,6 +44,9 @@ class MartException(Exception):
 class EntrezgeneNotFound(MartException):
     pass
 
+class GeneNameNotFound(MartException):
+    pass
+
 class GenericBioMart(HTTPDumper):
 
     # actual biotmart url to use (webservice)
@@ -191,7 +194,33 @@ class GenericBioMart(HTTPDumper):
                     self.logger.warn("%s:: %s: %s" % (setname, species[0], 'Skipping species without entrez gene id'))
                 else:
                     self.logger.error("%s:: %s %s" % (setname, species[0], e))
-                continue                   
+                continue
+            except GeneNameNotFound as e:
+                _attributes = attributes.copy()
+                _attr_ext_gene_index = attributes.index('external_gene_name')
+                _attributes.remove('external_gene_name')
+                self.logger.debug(_attributes) # TODO
+                _xml = self._make_query_xml(dataset, attributes=_attributes, filters=filters)
+                try:
+                    con = self.query_mart(_xml)
+                except MartException as e:
+                    self.logger.error("%s:: %s %s" % (setname, species[0], e))
+                self.logger.warn("%s:: %s: %s" % (setname, species[0], 'Retried to request species without external gene name'))
+                cnt_lines = 0
+                cnt_species_success += 1
+                for line in con.split('\n'):
+                    if line.strip() != '':
+                        tsv = line.split('\t')
+                        out_f.write(str(taxid) + '\t' + tsv[0] + '\t\t'.join(tsv[1:]) + '\n')       #use empty string at this part TODO
+                        self.logger.debug('!!!!!!!!!!!!!!' + str(taxid) + '\t' + tsv[0] + '\t\t'.join(tsv[1:]) + '\n')
+                        cnt_lines += 1
+                        cnt_lines_all += 1
+                    else:
+                        #TODO debug
+                        self.logger.debug('EMPTY LINE!!')
+                self.logger.info("%s:: %d/%d %s %d records" % (setname, c + 1, len(self.__class__.species_li), species[0], cnt_lines))               
+                # deal with the file it returns
+                continue     
             except MartException as e:
                 # import traceback
                 # err_msg = traceback.format_exc()
@@ -228,6 +257,8 @@ class GenericBioMart(HTTPDumper):
             raise MartException(res)
         elif res.text == 'Query ERROR: caught BioMart::Exception::Usage: Attribute entrezgene NOT FOUND':
             raise EntrezgeneNotFound(res.text)
+        elif res.text == 'Query ERROR: caught BioMart::Exception::Usage: Attribute external_gene_name NOT FOUND':
+            raise GeneNameNotFound(res.text)
         elif res.text.startswith('Query ERROR:'):
             raise MartException(res.text)
         return res.text
