@@ -214,14 +214,13 @@ class GenericBioMart(HTTPDumper):
                         cnt_lines += 1
                         cnt_lines_all += 1
                 self.logger.info("%s:: %d/%d %s %d records" % (setname, c + 1, len(self.__class__.species_li), species[0], cnt_lines))               
-                # deal with the file it returns
                 continue     
             except MartException as e:
                 self.logger.error("%s:: %s %s" % (setname, species[0], e))
                 continue
             cnt_lines = 0
             cnt_species_success += 1
-            # if len(con) == 0 it's not right
+            # if len(con) == 0 it's not right TODO
             for line in con.split('\n'):
                 if line.strip() != '':
                     out_f.write(str(taxid) + '\t' + line + '\n')
