@@ -188,9 +188,10 @@ class GenericBioMart(HTTPDumper):
             except EntrezgeneNotFound as e:
                 if setname == 'xref_entrezgene':
                     cnt_species_success += 1
-                    self.logger.warn("%s:: %s %s" % (setname, species[0], 'Skipping species without entrez gene id'))
+                    self.logger.warn("%s:: %s: %s" % (setname, species[0], 'Skipping species without entrez gene id'))
                 else:
-                    self.logger.error("%s:: %s %s" % (setname, species[0], e))                    
+                    self.logger.error("%s:: %s %s" % (setname, species[0], e))
+                continue                   
             except MartException as e:
                 # import traceback
                 # err_msg = traceback.format_exc()
