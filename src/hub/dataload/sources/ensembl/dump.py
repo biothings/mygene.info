@@ -175,7 +175,6 @@ class GenericBioMart(HTTPDumper):
             out_f.write('\t'.join(header) + '\n')
         for c, species in enumerate(self.__class__.species_li):
             try:
-                # Given a species tuple(name,taxid) return the dataset name for that species
                 dataset = self.get_dataset_name(species)
             except IndexError:
                 self.logger.debug("Skip species '%s'" % species)
@@ -218,9 +217,6 @@ class GenericBioMart(HTTPDumper):
                 # deal with the file it returns
                 continue     
             except MartException as e:
-                # import traceback
-                # err_msg = traceback.format_exc()
-                # self.logger.warn("%s %s %s" % (species[0], attrset, err_msg))
                 self.logger.error("%s:: %s %s" % (setname, species[0], e))
                 continue
             cnt_lines = 0
@@ -276,6 +272,7 @@ class GenericBioMart(HTTPDumper):
         return out
 
     def get_dataset_name(self, species):
+        # Given a species tuple(name,taxid) return the dataset name for that species
         # overrided in EnsemblBioMart only
         return '%s_gene' % species[0]
 
