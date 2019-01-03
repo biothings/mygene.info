@@ -173,7 +173,7 @@ class GenericBioMart(HTTPDumper):
         for c, species in enumerate(self.__class__.species_li):
             try:
                 # Given a species tuple(name,taxid) return the dataset name for that species
-                dataset = '%s_gene' % species[0]
+                dataset = self.get_dataset_name(species)
             except IndexError:
                 self.logger.debug("Skip species '%s'" % species)
                 continue
@@ -247,6 +247,9 @@ class GenericBioMart(HTTPDumper):
                 out.append((ld[1], ld[2], ld[4]))
         return out
 
+    def get_dataset_name(self, species):
+        # overrided in EnsemblBioMart only
+        return '%s_gene' % species[0]
 
     ###################################################
     #          dump methods implementations           #
@@ -350,3 +353,6 @@ class EnsemblBioMart(GenericBioMart):
 
     def get_virtual_schema(self):
         return 'default'
+
+    def get_dataset_name(self, species):
+        return '%s_gene_ensembl' % species[0]
