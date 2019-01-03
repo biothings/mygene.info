@@ -210,10 +210,10 @@ class GenericBioMart(HTTPDumper):
                 for line in con.split('\n'):
                     if line.strip() != '':
                         tsv = line.split('\t')
-                        out_f.write(str(taxid) + '\t' + tsv[0] + '\t' + '\t'.join(tsv[1:]) + '\n')
+                        out_f.write(str(taxid) + '\t' + tsv[0] + '\t\t' + '\t'.join(tsv[1:]) + '\n')
                         cnt_lines += 1
                         cnt_lines_all += 1
-                self.logger.info("%s:: %d/%d %s %d records" % (setname, c + 1, len(self.__class__.species_li), species[0], cnt_lines))               
+                self.logger.info("%s:: %d/%d %s %d records" % (setname, c + 1, len(self.__class__.species_li), species[0], cnt_lines))
                 continue     
             except MartException as e:
                 self.logger.error("%s:: %s %s" % (setname, species[0], e))
