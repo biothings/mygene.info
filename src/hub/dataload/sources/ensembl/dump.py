@@ -220,7 +220,8 @@ class GenericBioMart(HTTPDumper):
                 continue
             cnt_lines = 0
             cnt_species_success += 1
-            # if len(con) == 0 it's not right TODO
+            if len(con) == 0:
+                self.logger.error('Empty Response.')
             for line in con.split('\n'):
                 if line.strip() != '':
                     out_f.write(str(taxid) + '\t' + line + '\n')
@@ -230,6 +231,7 @@ class GenericBioMart(HTTPDumper):
         out_f.close()
         self.logger.info("Total: %s:: %d/%d successes %d records" % (setname, cnt_species_success, len(self.__class__.species_li), cnt_lines_all))
 
+    # helper method for _fetch_data
     def _make_query_xml(self, dataset, attributes, filters=None):
         attrib_xml = '\n'.join(['<Attribute name = "%s" />' % attrib for attrib in attributes])
         if filters:
@@ -241,6 +243,7 @@ class GenericBioMart(HTTPDumper):
                                      'attributes': attrib_xml,
                                      'filters': filter_xml}
 
+    # helper method for the three methods below
     def _query(self, *args, **kwargs):
         req = requests.Request(*args, **kwargs)
         res = self.client.send(req.prepare())
@@ -270,10 +273,6 @@ class GenericBioMart(HTTPDumper):
                 out.append((ld[1], ld[2], ld[4]))
         return out
 
-    def get_dataset_name(self, species):
-        # Given a species tuple(name,taxid) return the dataset name for that species
-        # overrided in EnsemblBioMart only
-        return '%s_gene' % species[0]
 
     ###################################################
     #          dump methods implementations           #
@@ -346,6 +345,13 @@ class GenericBioMart(HTTPDumper):
             attr.append(self.BIOMART_ATTRIBUTES[h])
         self.logger.debug(attr)
         return attr
+
+    def get_dataset_name(self, species):
+        """ 
+        Given a species tuple(name,taxid) return the dataset name for that species
+        """
+        # overridden in EnsemblBioMart only
+        return '%s_gene' % species[0]
 
     def get_species_file(self):
         """
