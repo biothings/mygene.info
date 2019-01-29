@@ -61,7 +61,7 @@ class MyGeneHubServer(HubServer):
                                                            config.ES_CONFIG["env"]["prod"]["index"][0]["doc_type"]))
         self.commands["publish_diff_demo"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-demo",
                                                 s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-        self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.READONLY_SNAPSHOT_REPOSITORY + "-demo")
+        self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
         self.commands["publish_snapshot_demo"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo",
                                             repository=config.READONLY_SNAPSHOT_REPOSITORY)
         # replace default
