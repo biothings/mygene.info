@@ -236,8 +236,6 @@ LOG_FOLDER = ConfigurationDefault(
 # Usually inside DATA_ARCHIVE_ROOT
 #LOG_FOLDER = os.path.join(DATA_ARCHIVE_ROOT,'logs')
 
-STANDALONE_VERSION = ConfigurationError("Define standalone version targetted by this Hub")
-
 # default hub logger
 from biothings.utils.loggers import setup_default_log
 logger = ConfigurationDefault(
