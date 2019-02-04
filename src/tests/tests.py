@@ -1,4 +1,4 @@
-import random, os, httplib2
+import random, os
 from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
 from nose.tools import ok_, eq_
 from tornado.testing import AsyncHTTPTestCase
@@ -17,7 +17,6 @@ class MyGeneTest(BiothingTestHelperMixin):
     #    raise ValueError("Missing HOST_ENVAR_NAME")
     host = host.rstrip('/')
     api = host + '/v3'
-    h = httplib2.Http()
 
     def _filter_hits(self, res, field=None):
         for hit in res.get("hits"):
