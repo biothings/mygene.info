@@ -16,7 +16,9 @@ class EnsemblProtistsBioMart(GenericBioMart):
 
     RELEASE_FOLDER = '/pub/protists'
     RELEASE_PREFIX = '/pub/protists/release-'
-        
+
+    species_li = []
+
     def get_species_file(self):
         return '/pub/protists/release-%s/mysql/protists_mart_%s/dataset_names.txt.gz' % (self.release, self.release)
 

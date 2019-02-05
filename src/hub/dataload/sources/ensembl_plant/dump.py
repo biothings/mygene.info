@@ -16,7 +16,9 @@ class EnsemblPlantBioMart(GenericBioMart):
 
     RELEASE_FOLDER = '/pub/plants'
     RELEASE_PREFIX = '/pub/plants/release-'
-        
+
+    species_li = []
+
     def get_species_file(self):
         return '/pub/plants/release-%s/mysql/plants_mart_%s/dataset_names.txt.gz' % (self.release, self.release)
 
