@@ -90,10 +90,6 @@ class GenericBioMart(HTTPDumper):
 
     SCHEDULE = "0 6 * * *"
 
-    # list of species to download data for.
-    # will be set by implementing select_species()
-    species_li = []
-
     # override BaseDumper
     def create_todump_list(self,force=False):
         self.release = self._get_latest_mart_version()
@@ -198,7 +194,7 @@ class GenericBioMart(HTTPDumper):
                 _attributes = attributes.copy()
                 _attr_ext_gene_index = attributes.index('external_gene_name')
                 _attributes.remove('external_gene_name')
-                self.logger.debug(_attributes) # TODO
+                self.logger.debug(_attributes)
                 _xml = self._make_query_xml(dataset, attributes=_attributes, filters=filters)
                 try:
                     con = self.query_mart(_xml)
@@ -377,6 +373,10 @@ class EnsemblBioMart(GenericBioMart):
 
     RELEASE_FOLDER = '/pub'
     RELEASE_PREFIX = '/pub/release-'
+
+    # list of species to download data for.    
+    # will be set by select_species()
+    species_li = []
 
     def get_species_file(self):
         return '/pub/release-%s/mysql/ensembl_mart_%s/dataset_names.txt.gz' % (self.release, self.release)
