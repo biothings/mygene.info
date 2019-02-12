@@ -17,8 +17,6 @@ class EnsemblMetazoaBioMart(GenericBioMart):
     RELEASE_FOLDER = '/pub/metazoa'
     RELEASE_PREFIX = '/pub/metazoa/release-'
 
-    species_li = []
-
     def get_species_file(self):
         return '/pub/metazoa/release-%s/mysql/metazoa_mart_%s/dataset_names.txt.gz' % (self.release, self.release)
 
