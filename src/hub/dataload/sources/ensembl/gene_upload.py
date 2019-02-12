@@ -15,7 +15,7 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
 
     def get_mapping_to_entrez(self, data_folder):
         ep = EnsemblParser(self.main_source, data_folder)
-        ep._load_ensembl2entrez_li()
+        ep._load_ensembl2entrez_li(self.main_source)
         return ep.ensembl2entrez_li
 
     def post_update_data(self,*args,**kwargs):
