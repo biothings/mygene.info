@@ -30,12 +30,12 @@ def map_id(hdocs,mapdict):
 
 
 class EnsemblParser(object):
-    def __init__(self, data_folder, load_ensembl2entrez=True):
+    def __init__(self, src_name, data_folder, load_ensembl2entrez=True):
         self.data_folder = data_folder
         self.ensembl2entrez_li = None
         self.ensembl_main = None
         if load_ensembl2entrez:
-            self._load_ensembl2entrez_li()
+            self._load_ensembl2entrez_li(src_name)
             self.ensembl2entrez = list2dict(self.ensembl2entrez_li, 0,alwayslist=True)
 
 
@@ -66,7 +66,7 @@ class EnsemblParser(object):
         ensembl2name = value_convert(ensembl2name, _fn)
         return ensembl2name
 
-    def _load_ensembl2entrez_li(self):
+    def _load_ensembl2entrez_li(self, src_name):
         """gene_ensembl__xref_entrezgene__dm"""
         CUSTOM_MAPPING_FILE = os.path.join(self.data_folder, 'gene_ensembl__gene__extra.txt')
         global extra_mapping_lock
@@ -77,7 +77,7 @@ class EnsemblParser(object):
             if not os.path.exists(CUSTOM_MAPPING_FILE) or os.stat(CUSTOM_MAPPING_FILE).st_size == 0:
                 print("Missing extra mapping file, now generating")
                 from . import ensembl_ncbi_mapping
-                ensembl_ncbi_mapping.main(confirm=False)
+                ensembl_ncbi_mapping.main(src_name, confirm=False)
         finally:
             print("Releasing lock")
             extra_mapping_lock.release()
