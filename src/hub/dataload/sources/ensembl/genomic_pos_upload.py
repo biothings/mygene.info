@@ -7,7 +7,7 @@ class EnsemblGenomicPosUploader(uploader.MergerSourceUploader):
     main_source = "ensembl"
 
     def load_data(self, data_folder):
-        ep = EnsemblParser(data_folder)
+        ep = EnsemblParser(self.main_source, data_folder)
         ensembl2pos = ep.load_ensembl2pos()
         return ensembl2pos
 

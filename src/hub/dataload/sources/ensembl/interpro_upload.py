@@ -8,7 +8,7 @@ class EnsemblInterproUploader(uploader.MergerSourceUploader):
     __metadata__ = {"mapper" : 'ensembl2entrez'}
 
     def load_data(self, data_folder):
-        ep = EnsemblParser(data_folder)
+        ep = EnsemblParser(self.main_source, data_folder)
         ensembl2interpro = ep.load_ensembl2interpro()
         return ensembl2interpro
 

@@ -7,7 +7,7 @@ class EnsemblAccUploader(uploader.MergerSourceUploader):
     main_source = "ensembl"
 
     def load_data(self, data_folder):
-        ep = EnsemblParser(data_folder)
+        ep = EnsemblParser(self.main_source, data_folder)
         ensembl2acc = ep.load_ensembl2acc()
         return ensembl2acc
 
