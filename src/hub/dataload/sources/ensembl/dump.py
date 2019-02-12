@@ -353,13 +353,13 @@ class GenericBioMart(HTTPDumper):
         self._fetch_data(outfile, attributes, filters, header=header)
 
     def _lookup_attributes(self, header):
-        attr = []
+        attrs = []
         assert header[0] == 'taxonomy_id'
         self.logger.debug(header)
         for attr in header[1:]:
-            attr.append(self.BIOMART_ATTRIBUTES[attr])
-        self.logger.debug(attr)
-        return attr
+            attrs.append(self.BIOMART_ATTRIBUTES[attr])
+        self.logger.debug(attrs)
+        return attrs
 
     def get_dataset_name(self, species):
         """
