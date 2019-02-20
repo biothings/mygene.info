@@ -1,20 +1,30 @@
-import random, os
-from biothings.tests.test_helper import BiothingTestHelperMixin, _d, TornadoRequestHelper
-from nose.tools import ok_, eq_
-from tornado.testing import AsyncHTTPTestCase
+''' MyGene Data-aware Tests
+nosetests tests
+nosetests tests:MyGeneTest
+nosetests tests:MyGeneTestTornadoClient
+'''
+
+import os
+import random
+
+from nose.tools import eq_, ok_
 from tornado.web import Application
+
+from biothings.tests.test_helper import (BiothingsTestHelper,
+                                         TornadoTestServerMixin)
 from web.settings import MyGeneWebSettings
 
-class MyGeneTest(BiothingTestHelperMixin):
-    __test__ = True  # explicitly set this to be a test class
+
+class MyGeneTest(BiothingsTestHelper):
+    ''' Test against server specified in environment variable MG_HOST
+        or MyGene.info production server if MG_HOST is not specified
+        MG_HOST must start with its protocol like http:// or https:// '''
 
     #############################################################
     # Test functions                                            #
     #############################################################
 
-    host = os.getenv("MG_HOST","http://mygene.info")
-    #if not host:
-    #    raise ValueError("Missing HOST_ENVAR_NAME")
+    host = os.getenv("MG_HOST", "http://mygene.info")
     host = host.rstrip('/')
     api = host + '/v3'
 
@@ -32,16 +42,18 @@ class MyGeneTest(BiothingTestHelperMixin):
                 [hit.pop(i) for i in topop]
 
     def json_ok(self, url, filter=False, **kwargs):
-        res = super(MyGeneTest, self).json_ok(url,**kwargs)
+        res = super(MyGeneTest, self).json_ok(url, **kwargs)
         if filter:
             self._filter_hits(res)
         return res
 
-    def test_main(self):
+    def test_00_main(self):
+        ''' Asserts connection to server '''
         self.get_ok(self.host)
 
-    def test_gene_object(self):
-        # test all fields are load in gene objects
+    def test_01_gene_object(self):
+        ''' Asserts all fields are loaded in gene objects via gene endpoint '''
+
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
 
         attr_li = ['HGNC', 'MIM', 'Vega', '_id', 'accession', 'alias',
@@ -52,42 +64,51 @@ class MyGeneTest(BiothingTestHelperMixin):
                    'unigene', 'uniprot', 'exons', 'generif']
 
         for attr in attr_li:
-            assert res.get(attr, None) is not None, 'Missing field "{}" in gene "1017" {}'.format(attr,res)
+            assert res.get(
+                attr, None) is not None, 'Missing field "{}" in gene "1017"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/12566'))
         attr = 'MGI'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "12566"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "12566"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/245962'))
         attr = 'RGD'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "245962"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "245962"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/493498'))
         attr = 'Xenbase'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "493498"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "493498"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/406715'))
         attr = 'ZFIN'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "406715"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "406715"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/824036'))
         attr = 'TAIR'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "824036"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "824036"'.format(attr)
 
         res = self.json_ok(self.get_ok(self.api + '/gene/42453'))
         attr = 'FLYBASE'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "42453"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "42453"'.format(attr)
 
         # pig
         res = self.json_ok(self.get_ok(self.api + '/gene/397593'))
-        assert 'snowball' in res.get('reporter', {}), 'Missing field "reporter.snowball" in gene "397593"'
+        assert 'snowball' in res.get(
+            'reporter', {}), 'Missing field "reporter.snowball" in gene "397593"'
 
         # nematode
         res = self.json_ok(self.get_ok(self.api + '/gene/172677'))
         # this is not nematode, "taxid": 31234
         res = self.json_ok(self.get_ok(self.api + '/gene/9821293'))
         attr = 'WormBase'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "9821293"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "9821293"'.format(attr)
 
         # fission yeast
         res = self.json_ok(self.get_ok(self.api + '/gene/2539869'))
@@ -98,9 +119,12 @@ class MyGeneTest(BiothingTestHelperMixin):
         # mirna
         res = self.json_ok(self.get_ok(self.api + '/gene/406881'))
         attr = 'miRBase'
-        assert res.get(attr, None) is not None, 'Missing field "{}" in gene "406881"'.format(attr)
+        assert res.get(
+            attr, None) is not None, 'Missing field "{}" in gene "406881"'.format(attr)
 
-    def test_query(self):
+    def test_02_query_get(self):
+        ''' Tests GET query endpoint'''
+
         # public query api at /query via get
         self.query_has_hits('cdk2')
         self.query_has_hits('GO:0004693')
@@ -119,15 +143,16 @@ class MyGeneTest(BiothingTestHelperMixin):
 
         # testing non-ascii character
         res = self.json_ok(self.get_ok(self.api +
-                           '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
+                                       '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
         eq_(res['hits'], [])
 
         self.get_status_code(self.api + '/query', status_code=400)
         #res = self.json_ok(self.get_ok(self.api + '/query'), checkerror=False)
         #assert 'error' in res
 
-        self.get_status_code(self.api + '/query?q=tRNA:Y1:85Ae', status_code=400)
-        
+        self.get_status_code(
+            self.api + '/query?q=tRNA:Y1:85Ae', status_code=400)
+
         # ensure returned fields by default
         res = self.json_ok(self.get_ok(self.api + '/query?q=cdk'))
         # pick one
@@ -137,14 +162,14 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert sorted(list(deffields)) == sorted(expected), \
             "%s != %s" % (sorted(list(deffields)), sorted(expected))
 
-    def test_query_post(self):
-        # /query via post
-        #self.json_ok(self.post_ok(self.api + '/query', {'q': '1017'}))
+    def test_03_query_post(self):
+        ''' Tests POST query endpoint'''
 
         res = self.json_ok(self.post_ok(self.api + '/query',
                                         {'q': '1017', 'scopes': 'entrezgene'}))
         eq_(len(res), 1)
-        eq_(set(res[0].keys()),set(['query', 'taxid', '_score', 'entrezgene', 'symbol', '_id', 'name']))
+        eq_(set(res[0].keys()), set(
+            ['query', 'taxid', '_score', 'entrezgene', 'symbol', '_id', 'name']))
         eq_(res[0]['_id'], '1017')
 
         res = self.json_ok(self.post_ok(self.api + '/query',
@@ -161,7 +186,7 @@ class MyGeneTest(BiothingTestHelperMixin):
                                          'fields': 'name,symbol'}))
         assert len(res) >= 4, (res, len(res))
         self.post_status_code(self.api + '/query', {}, status_code=400)
-        #res = self.json_ok(self.post_ok(self.api + '/query', {}),
+        # res = self.json_ok(self.post_ok(self.api + '/query', {}),
         #                   checkerror=False)
         #assert 'error' in res, res
 
@@ -175,7 +200,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_interval(self):
         res = self.json_ok(self.get_ok(self.api +
-                           '/query?q=chr1:1000-100000&species=human'))
+                                       '/query?q=chr1:1000-100000&species=human'))
         ok_(len(res['hits']) > 1)
         ok_('_id' in res['hits'][0])
 
@@ -191,9 +216,9 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(len(res['hits']), 20)
 
         res1 = self.json_ok(self.get_ok(self.api +
-                            '/query?q=cdk?&from=0&size=20'))
+                                        '/query?q=cdk?&from=0&size=20'))
         res = self.json_ok(self.get_ok(self.api +
-                           '/query?q=cdk?&skip=10&size=20'))
+                                       '/query?q=cdk?&skip=10&size=20'))
         eq_(len(res['hits']), 20)
         # print res1['hits'].index(res['hits'][0])
         # print [x['_id'] for x in res1['hits']]
@@ -209,12 +234,13 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(len(res['hits']), 1000)
 
         # assert 1==0
-        self.get_status_code(self.api + '/query?q=cdk?&size=1a', status_code=400)
+        self.get_status_code(
+            self.api + '/query?q=cdk?&size=1a', status_code=400)
 
     def test_gene(self):
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
         eq_(res['entrezgene'], "1017")
-        
+
         # testing non-ascii character
         self.get_404(self.api + '/gene/' +
                      '54097\xef\xbf\xbd\xef\xbf\xbdmouse')
@@ -225,10 +251,10 @@ class MyGeneTest(BiothingTestHelperMixin):
 
         # testing filtering parameters
         res = self.json_ok(self.get_ok(self.api +
-                           '/gene/1017?fields=symbol,name,entrezgene'))
+                                       '/gene/1017?fields=symbol,name,entrezgene'))
         eq_(set(res), set(['_id', '_score', 'symbol', 'name', 'entrezgene']))
         res = self.json_ok(self.get_ok(self.api +
-                           '/gene/1017?filter=symbol,go.MF'))
+                                       '/gene/1017?filter=symbol,go.MF'))
         eq_(set(res), set(['_id', '_score', 'symbol', 'go']))
         assert "MF" in res["go"]
 
@@ -239,12 +265,13 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.post_ok(self.api + '/gene', {'ids': '1017'}))
         eq_(len(res), 1)
         # check default fields returned
-        eq_(set(res[0].keys()),set(['symbol', 'reporter', 'refseq', '_score', 'pdb', 'interpro', 'entrezgene',
-                                    'summary', 'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
-                                    'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
-                                    'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
-                                    'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                    'exons', 'exac','other_names','umls','pantherdb','pharos']))
+        eq_(set(res[0].keys()), set(['symbol', 'reporter', 'refseq', '_score', 'pdb', 'interpro', 'entrezgene',
+                                     'summary', 'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
+                                     'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
+                                     'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
+                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
+                                     'exons', 'exac', 'other_names', 'umls', 'pantherdb', 'pharos']),
+            msg='set(1017.keys())!=set(default_fields)')
         eq_(res[0]['entrezgene'], "1017")
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
@@ -254,23 +281,23 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res[1]['_id'], '1018')
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
-                           {'ids': '1017,1018',
-                            'fields': 'symbol,name,entrezgene'}))
+                                        {'ids': '1017,1018',
+                                         'fields': 'symbol,name,entrezgene'}))
         eq_(len(res), 2)
         for _g in res:
             eq_(set(_g), set(['_id', '_score', 'query', 'symbol',
                               'name', 'entrezgene']))
 
         res = self.json_ok(self.post_ok(self.api + '/gene',
-                           {'ids': '1017,1018',
-                            'filter': 'symbol,go.MF'}))
+                                        {'ids': '1017,1018',
+                                         'filter': 'symbol,go.MF'}))
         eq_(len(res), 2)
         for _g in res:
             eq_(set(_g), set(['_id', '_score', 'query', 'symbol', 'go']))
             assert "MF" in _g["go"]
 
         # get retired gene (make sure _search ES query is run)
-        res = self.json_ok(self.post_ok(self.api + '/gene',{'ids': '791256'}))
+        res = self.json_ok(self.post_ok(self.api + '/gene', {'ids': '791256'}))
         eq_(res[0]['_id'], '50846')  # this is the corresponding _id field
 
     def test_status(self):
@@ -281,8 +308,9 @@ class MyGeneTest(BiothingTestHelperMixin):
     def test_metadata(self):
         root = self.json_ok(self.get_ok(self.host + '/metadata'))
         v3 = self.json_ok(self.get_ok(self.api + '/metadata'))
-        eq_(root, v3)
-        eq_(set(root.keys()), set(['available_fields', 'src_version','build_version',
+        eq_(root, v3, msg='res({})!=res({})'.format(
+            self.host + '/metadata', self.api + '/metadata'))
+        eq_(set(root.keys()), set(['available_fields', 'src_version', 'build_version',
                                    'app_revision', 'build_date', 'taxonomy',
                                    'stats', 'genome_assembly', 'src', 'source']))
         fields = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
@@ -295,13 +323,14 @@ class MyGeneTest(BiothingTestHelperMixin):
         # This test no longer works (I believe because pip.freeze gives an error?)
         # debug info
         #debug = self.json_ok(self.get_ok(self.api + '/metadata?dev=1'))
-        #print(debug.keys())
+        # print(debug.keys())
         #assert "software" in debug.keys()
         nodebug = self.json_ok(self.get_ok(self.api + '/metadata?dev=0'))
         assert not "software" in nodebug.keys()
 
     def test_always_list_allow_null(self):
-        res = self.json_ok(self.get_ok(self.api + '/gene/1017?always_list=entrezgene&allow_null=test.test2'))
+        res = self.json_ok(self.get_ok(
+            self.api + '/gene/1017?always_list=entrezgene&allow_null=test.test2'))
         assert 'entrezgene' in res
         assert isinstance(res['entrezgene'], list)
         assert 'test' in res
@@ -317,37 +346,39 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res['facets']['taxid']['other'], 0)
         eq_(res['facets']['taxid']['missing'], 0)
 
-        res_t = self.json_ok(self.get_ok(self.api + '/query?q=symbol:cdk?&facets=type_of_gene&species=human,mouse,rat'))
+        res_t = self.json_ok(self.get_ok(
+            self.api + '/query?q=symbol:cdk?&facets=type_of_gene&species=human,mouse,rat'))
         ok_('facets' in res_t)
         ok_('type_of_gene' in res_t['facets'])
         assert "term" in res_t['facets']['type_of_gene']['terms'][0]
-        eq_(res_t['facets']['type_of_gene']['terms'][0]['term'], 'protein-coding')
+        eq_(res_t['facets']['type_of_gene']
+            ['terms'][0]['term'], 'protein-coding')
 
         u = '/query?q=cdk?&facets=taxid&species_facet_filter=human&species=human,mouse,rat'
         res2 = self.json_ok(self.get_ok(self.api + u))
         eq_(res2['facets']['taxid']['total'], res['total'])
         eq_(res2['facets']['taxid'], res['facets']['taxid'])
         eq_([x["count"] for x in res2['facets']['taxid']['terms']
-            if x["term"] == 9606][0], res2['total'])
+             if x["term"] == 9606][0], res2['total'])
 
     def test_query_userfilter(self):
         res1 = self.json_ok(self.get_ok(self.api + '/query?q=cdk'))
         res2 = self.json_ok(self.get_ok(self.api +
-                            '/query?q=cdk&userfilter=bgood_cure_griffith'))
+                                        '/query?q=cdk&userfilter=bgood_cure_griffith'))
         ok_(res1['total'] > res2['total'])
 
         # nonexisting user filter gets ignored.
         res2 = self.json_ok(self.get_ok(self.api +
-                            '/query?q=cdk&userfilter=aaaa'))
+                                        '/query?q=cdk&userfilter=aaaa'))
         eq_(res1['total'], res2['total'])
 
     def test_existsfilter(self):
         res1 = self.json_ok(self.get_ok(self.api + '/query?q=cdk'))
         res2 = self.json_ok(self.get_ok(self.api +
-                            '/query?q=cdk&exists=pharmgkb'))
+                                        '/query?q=cdk&exists=pharmgkb'))
         ok_(res1['total'] > res2['total'])
         res3 = self.json_ok(self.get_ok(self.api +
-                            '/query?q=cdk&exists=pharmgkb,pdb'))
+                                        '/query?q=cdk&exists=pharmgkb,pdb'))
         ok_(res2['total'] > res3['total'])
 
     def test_missingfilter(self):
@@ -355,7 +386,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         res2 = self.json_ok(self.get_ok(self.api + '/query?q=cdk&missing=pdb'))
         ok_(res1['total'] > res2['total'])
         res3 = self.json_ok(self.get_ok(self.api +
-                            '/query?q=cdk&missing=pdb,MIM'))
+                                        '/query?q=cdk&missing=pdb,MIM'))
         ok_(res2['total'] > res3['total'])
 
     def test_unicode(self):
@@ -367,7 +398,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res[0]['notfound'], True)
         eq_(len(res), 1)
         res = self.json_ok(self.post_ok(self.api + '/gene',
-                           {'ids': '1017, ' + s}))
+                                        {'ids': '1017, ' + s}))
         eq_(res[1]['notfound'], True)
         eq_(len(res), 2)
 
@@ -375,12 +406,12 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(res['hits'], [])
 
         res = self.json_ok(self.post_ok(self.api + '/query',
-                           {"q": s, "scopes": 'symbol'}))
+                                        {"q": s, "scopes": 'symbol'}))
         eq_(res[0]['notfound'], True)
         eq_(len(res), 1)
 
         res = self.json_ok(self.post_ok(self.api + '/query',
-                           {"q": 'cdk2+' + s}))
+                                        {"q": 'cdk2+' + s}))
         eq_(res[1]['notfound'], True)
         eq_(len(res), 2)
 
@@ -415,17 +446,17 @@ class MyGeneTest(BiothingTestHelperMixin):
     def test_msgpack(self):
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
         res2 = self.msgpack_ok(self.get_ok(self.api +
-                               '/gene/1017?msgpack=true'))
+                                           '/gene/1017?msgpack=true'))
         ok_(res, res2)
 
         res = self.json_ok(self.get_ok(self.api + '/query/?q=cdk'))
         res2 = self.msgpack_ok(self.get_ok(self.api +
-                               '/query/?q=cdk&msgpack=true'))
+                                           '/query/?q=cdk&msgpack=true'))
         ok_(res, res2)
 
         res = self.json_ok(self.get_ok(self.api + '/metadata'))
         res2 = self.msgpack_ok(self.get_ok(self.api +
-                               '/metadata?msgpack=true'))
+                                           '/metadata?msgpack=true'))
         ok_(res, res2)
 
     def test_taxonomy(self):
@@ -433,11 +464,11 @@ class MyGeneTest(BiothingTestHelperMixin):
         ok_("lineage" in res)
 
         res = self.json_ok(self.get_ok(self.api +
-                           '/species/46170?include_children=true'))
+                                       '/species/46170?include_children=true'))
         ok_(len(res['children']) >= 305)
 
         res2 = self.json_ok(self.get_ok(self.api +
-                            '/species/46170?include_children=true&has_gene=1'))
+                                        '/species/46170?include_children=true&has_gene=1'))
         ok_(len(res2['children']) >= 16)
         ok_(len(res2['children']) <= len(res['children']))
 
@@ -445,7 +476,7 @@ class MyGeneTest(BiothingTestHelperMixin):
         res = self.json_ok(self.get_ok(self.api + u))
         ok_(res['total'] >= 2)
         res2 = self.json_ok(self.get_ok(self.api +
-                            '/query?q=lytic%20enzyme&species=1386'))
+                                        '/query?q=lytic%20enzyme&species=1386'))
         eq_(res2['total'], 0)
 
     def test_static(self):
@@ -454,19 +485,21 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_fetch_all(self):
         res = self.json_ok(self.get_ok(self.api +
-                           '/query?q=cdk*&species=all&fetch_all=true'))
+                                       '/query?q=cdk*&species=all&fetch_all=true'))
         assert '_scroll_id' in res
 
         res2 = self.json_ok(self.get_ok(self.api +
-                            '/query?scroll_id=' + res['_scroll_id']))
+                                        '/query?scroll_id=' + res['_scroll_id']))
         assert 'hits' in res2
         ok_(len(res2['hits']) >= 2)
 
     def test_list_handling(self):
-        res = self.json_ok(self.post_ok(self.api + '/query', {'q': '"cyclin dependent kinase 2", "cyclin dependent kinase 3"', 'scopes': 'name', 'fields':'entrezgene,  name', 'species': 'human'}))
+        res = self.json_ok(self.post_ok(
+            self.api + '/query', {'q': '"cyclin dependent kinase 2", "cyclin dependent kinase 3"', 'scopes': 'name', 'fields': 'entrezgene,  name', 'species': 'human'}))
         query_set = set([l['query'] for l in res])
         # make sure queries are interpreted correctly and returned
-        assert query_set == set(["cyclin dependent kinase 2", "cyclin dependent kinase 3"])
+        assert query_set == set(
+            ["cyclin dependent kinase 2", "cyclin dependent kinase 3"])
         # make sure fields are interpreted correctly
         field_set = set()
         for l in res:
@@ -480,16 +513,16 @@ class MyGeneTest(BiothingTestHelperMixin):
         # /query service
         # default dotfield=0
         rdefault = self.json_ok(self.get_ok(self.api +
-                                '/query?q=ccnk&fields=refseq.rna&size=3'))
+                                            '/query?q=ccnk&fields=refseq.rna&size=3'))
         # force no dotfield
         rfalse = self.json_ok(self.get_ok(self.api +
-                              '/query?q=ccnk&fields=refseq.rna&dotfield=false&size=3'))
+                                          '/query?q=ccnk&fields=refseq.rna&dotfield=false&size=3'))
         # force dotfield
         rtrue = self.json_ok(self.get_ok(self.api +
-                             '/query?q=ccnk&fields=refseq.rna&dotfield=true&size=3'))
+                                         '/query?q=ccnk&fields=refseq.rna&dotfield=true&size=3'))
         # check defaults and bool params
         # TODO: put this in json_ok as post-process filter ?
-        for d in [rdefault,rfalse,rtrue]:
+        for d in [rdefault, rfalse, rtrue]:
             for h in d["hits"]:
                 del h["_score"]
         eq_(rdefault["hits"], rfalse["hits"])
@@ -502,11 +535,11 @@ class MyGeneTest(BiothingTestHelperMixin):
 
         # /gene service
         rdefault = self.json_ok(self.get_ok(self.api +
-                                '/gene/1017?filter=symbol,go.MF'))
+                                            '/gene/1017?filter=symbol,go.MF'))
         rtrue = self.json_ok(self.get_ok(self.api +
-                             '/gene/1017?filter=symbol,go.MF&dotfield=true'))
+                                         '/gene/1017?filter=symbol,go.MF&dotfield=true'))
         rfalse = self.json_ok(self.get_ok(self.api +
-                              '/gene/1017?filter=symbol,go.MF&dotfield=false'))
+                                          '/gene/1017?filter=symbol,go.MF&dotfield=false'))
         # sharding makes scoring slightly variable
         rdefault.pop("_score")
         rfalse.pop("_score")
@@ -530,19 +563,23 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "timed_out" in raw1
         assert "timed_out" not in raw0
         # /query
-        raw1 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=1&size=3'))
-        rawtrue = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=true&size=3'))
-        raw0 = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=0&size=3'))
-        rawfalse = self.json_ok(self.get_ok(self.api + '/query?q=ccnk&raw=false&size=3'))
+        raw1 = self.json_ok(self.get_ok(
+            self.api + '/query?q=ccnk&raw=1&size=3'))
+        rawtrue = self.json_ok(self.get_ok(
+            self.api + '/query?q=ccnk&raw=true&size=3'))
+        raw0 = self.json_ok(self.get_ok(
+            self.api + '/query?q=ccnk&raw=0&size=3'))
+        rawfalse = self.json_ok(self.get_ok(
+            self.api + '/query?q=ccnk&raw=false&size=3'))
         # this may vary so remove in comparison
         for d in [raw1, rawtrue, raw0, rawfalse]:
             del d["took"]
         # score should be the same. approx... so remove
-        for d in [raw1,rawtrue]:
+        for d in [raw1, rawtrue]:
             for h in d["hits"]["hits"]:
                 del h["_score"]
             del d["hits"]["max_score"]
-        for d in [raw0,rawfalse]:
+        for d in [raw0, rawfalse]:
             for h in d["hits"]:
                 del h["_score"]
             del d["max_score"]
@@ -552,23 +589,21 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "_shards" not in raw0
 
     def test_species(self):
-        res, con = self.h.request(self.api + "/species/9606")
-        eq_(res.status, 200)
-        d = _d(con.decode('utf-8'))
-        eq_(set(d.keys()), set(['taxid', 'authority', 'lineage', '_id',
-                                'common_name', 'genbank_common_name',
-                                '_version', 'parent_taxid', 'scientific_name',
-                                'has_gene', 'children', 'rank',
-                                'uniprot_name']))
+        dic = self.json_ok(self.get_ok(self.api + "/species/9606"))
+        eq_(set(dic.keys()), set(['taxid', 'authority', 'lineage', '_id',
+                                  'common_name', 'genbank_common_name',
+                                  '_version', 'parent_taxid', 'scientific_name',
+                                  'has_gene', 'children', 'rank',
+                                  'uniprot_name']))
 
     def test_query_dotstar_refseq(self):
         protein = self.json_ok(self.get_ok(self.api +
-                               "/query?q=refseq:NP_001670&fields=refseq"),
+                                           "/query?q=refseq:NP_001670&fields=refseq"),
                                filter=True)
         u = "/query?q=refseq:NM_001679&fields=refseq"
         rna = self.json_ok(self.get_ok(self.api + u), filter=True)
         genomic = self.json_ok(self.get_ok(self.api +
-                               "/query?q=refseq:NT_005612&fields=refseq"),
+                                           "/query?q=refseq:NT_005612&fields=refseq"),
                                filter=True)
         u = "/query?q=refseq.protein:NP_001670&fields=refseq"
         explicit_protein = self.json_ok(self.get_ok(self.api + u), filter=True)
@@ -589,13 +624,13 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_accession(self):
         protein = self.json_ok(self.get_ok(self.api +
-                               "/query?q=accession:AAH68303&fields=accession"),
+                                           "/query?q=accession:AAH68303&fields=accession"),
                                filter=True)
         rna = self.json_ok(self.get_ok(self.api +
-                           "/query?q=accession:BC068303&fields=accession"),
+                                       "/query?q=accession:BC068303&fields=accession"),
                            filter=True)
         genomic = self.json_ok(self.get_ok(self.api +
-                               "/query?q=accession:FJ497232&fields=accession"),
+                                           "/query?q=accession:FJ497232&fields=accession"),
                                filter=True)
         u = "/query?q=accession.protein:AAH68303&fields=accession"
         explicit_protein = self.json_ok(self.get_ok(self.api + u), filter=True)
@@ -615,13 +650,13 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_reporter(self):
         human = self.json_ok(self.get_ok(self.api +
-                             "/query?q=reporter:2842429&fields=reporter"),
+                                         "/query?q=reporter:2842429&fields=reporter"),
                              filter=True)
         mouse = self.json_ok(self.get_ok(self.api +
-                             "/query?q=reporter:1452128_a_at&fields=reporter"),
+                                         "/query?q=reporter:1452128_a_at&fields=reporter"),
                              filter=True)
         rat = self.json_ok(self.get_ok(self.api +
-                           "/query?q=reporter:1387540_at&fields=reporter"),
+                                       "/query?q=reporter:1387540_at&fields=reporter"),
                            filter=True)
         # human
         eq_(human["total"], 3)
@@ -651,7 +686,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_interpro(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat"))
+                                       "/query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat"))
         eq_(res["total"], 6)
         assert set([pro["id"] for hit in res["hits"]
                     for pro in hit["interpro"]]) == set(['IPR008389',
@@ -659,13 +694,13 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_go(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=GO:0016324&fields=go&sort=_id"))
+                                       "/query?q=GO:0016324&fields=go&sort=_id"))
         assert res["total"] > 800, \
             "Total is {}, should more than 800".format(res["total"])
 
     def test_query_dotstar_homologene(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=homologene:44221&fields=homologene&species=human,mouse,rat"))
+                                       "/query?q=homologene:44221&fields=homologene&species=human,mouse,rat"))
         eq_(res["total"], 3)
         h = res["hits"][0]
         assert set([i[0] for i in h["homologene"]["genes"]]) == \
@@ -673,7 +708,7 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_reagent(self):
         res = self.json_ok(self.get_ok(self.api +
-                           "/query?q=reagent:GNF190467&fields=reagent"))
+                                       "/query?q=reagent:GNF190467&fields=reagent"))
         eq_(res["total"], 1)
         hit = res["hits"][0]
         assert {"relationship": "is", "id": "GNF168655"} in \
@@ -685,10 +720,10 @@ class MyGeneTest(BiothingTestHelperMixin):
 
     def test_query_dotstar_uniprot(self):
         swissid = self.json_ok(self.get_ok(self.api +
-                               "/query?q=uniprot:Q8NEB7&fields=uniprot"),
+                                           "/query?q=uniprot:Q8NEB7&fields=uniprot"),
                                filter=True)
         trembid = self.json_ok(self.get_ok(self.api +
-                               "/query?q=uniprot:F5H2C2&fields=uniprot"),
+                                           "/query?q=uniprot:F5H2C2&fields=uniprot"),
                                filter=True)
         eq_(swissid["hits"], trembid["hits"])
         eq_(trembid["total"], 1)
@@ -713,53 +748,75 @@ class MyGeneTest(BiothingTestHelperMixin):
         assert "ENSP00000216211" in hit["ensembl"]["protein"]
         assert "ENST00000216211" in hit["ensembl"]["transcript"]
         # POST /gene batch
-        resl = self.json_ok(self.post_ok(self.api + '/gene', {'ids': 'ENSG00000148795'}))
+        resl = self.json_ok(self.post_ok(
+            self.api + '/gene', {'ids': 'ENSG00000148795'}))
         eq_(len(resl), 1)
         res = resl[0]
         eq_(res["_id"], "1586")
 
+    def test_query_ensembl_additional(self):
+        ''' Asserts the existance of the 4 other ensembl sources,
+        by querying unique genes in each individual databases '''
+
+        query_string = "ensembl.gene:{}&fields=ensembl"
+
+        plant = "g00297"
+        fungi = "ACLA_057550"
+        metazoa = "ADAC005537"
+        protists = "ALNC14_077170"
+        sample_list = [plant, fungi, metazoa, protists]
+
+        for sample in sample_list:
+            self.query_has_hits(query_string.format(sample))
+
     def test_sort_by_fields(self):
-        res = self.json_ok(self.get_ok(self.api + "/query?q=MTFMT&sort=taxid&species=human,mouse,rat"))
+        res = self.json_ok(self.get_ok(
+            self.api + "/query?q=MTFMT&sort=taxid&species=human,mouse,rat"))
         hits = res["hits"]
         assert len(hits) == 3
-        eq_(hits[0]["entrezgene"],"123263")
-        eq_(hits[1]["entrezgene"],"69606")
-        eq_(hits[2]["entrezgene"],"315763")
+        eq_(hits[0]["entrezgene"], "123263")
+        eq_(hits[1]["entrezgene"], "69606")
+        eq_(hits[2]["entrezgene"], "315763")
 
     def test_refseq_versioning(self):
         # no version, _all
-        res = self.json_ok(self.get_ok(self.api + "/query?q=NM_001798&fields=refseq"),filter=True)
+        res = self.json_ok(self.get_ok(
+            self.api + "/query?q=NM_001798&fields=refseq"), filter=True)
         hits = res["hits"]
-        assert len(hits) == 1
-        assert "NM_001798.4" in hits[0]["refseq"]["rna"]
+        eq_(len(hits), 1)
+        ok_("NM_001798.4" in hits[0]["refseq"]["rna"])
         # with version, _all
-        sameres = self.json_ok(self.get_ok(self.api + "/query?q=NM_001798.4&fields=refseq"),filter=True)
+        sameres = self.json_ok(self.get_ok(
+            self.api + "/query?q=NM_001798.4&fields=refseq"), filter=True)
         assert sameres["hits"] == res["hits"]
         # using protein ID
-        sameres = self.json_ok(self.get_ok(self.api + "/query?q=XP_011536034&fields=refseq"),filter=True)
+        sameres = self.json_ok(self.get_ok(
+            self.api + "/query?q=XP_011536034&fields=refseq"), filter=True)
         assert sameres["hits"] == res["hits"]
         # using explicit field
-        sameres = self.json_ok(self.get_ok(self.api + "/query?q=refseq:XP_011536034&fields=refseq"),filter=True)
+        sameres = self.json_ok(self.get_ok(
+            self.api + "/query?q=refseq:XP_011536034&fields=refseq"), filter=True)
         assert sameres["hits"] == res["hits"]
 
     def test_disambiguate_ensembl_entrez_ids(self):
         # some random test reported by users
-        res = self.json_ok(self.get_ok(self.api + "/query?q=ensembl.transcript:ENSMUST00000161459"))
-        eq_(len(res["hits"]),1)
-        eq_(res["hits"][0]["symbol"],"Setdb2")
+        res = self.json_ok(self.get_ok(
+            self.api + "/query?q=ensembl.transcript:ENSMUST00000161459"))
+        eq_(len(res["hits"]), 1)
+        eq_(res["hits"][0]["symbol"], "Setdb2")
         res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000011454"))
         # is now a list...these should all be redone
-        #eq_(type(res),dict)
-        #eq_(res["entrezgene"],"23637")
+        # eq_(type(res),dict)
+        # eq_(res["entrezgene"],"23637")
         # mapping no longer valid
         ##res = self.json_ok(self.get_ok(self.api + "/gene/ENSG00000237613"))
-        ##eq_(type(res),dict)
-        ##eq_(res["entrezgene"],"645520")
-        ### test "orphan" EntrezID (associated EnsemblIDs were all resolved into other EntrezIDs but we want to keep ambiguated
-        ### Ensembl data for those)
+        # eq_(type(res),dict)
+        # eq_(res["entrezgene"],"645520")
+        # test "orphan" EntrezID (associated EnsemblIDs were all resolved into other EntrezIDs but we want to keep ambiguated
+        # Ensembl data for those)
         ###res = self.json_ok(self.get_ok(self.api + "/gene/100287596"))
         ###ensids = [e["gene"] for e in res["ensembl"]]
-        ###eq_(set(endids),{"ENSG00000248472","ENSG00000223972"})
+        # eq_(set(endids),{"ENSG00000248472","ENSG00000223972"})
 
     def test_caseinsentive_datasources(self):
         self.query_has_hits('mirbase:MI0017267')
@@ -769,8 +826,10 @@ class MyGeneTest(BiothingTestHelperMixin):
         self.query_has_hits(r'mgi:MGI\\:104772')
 
     def test_exac(self):
-        res = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970.4&fields=exac"),filter=True)
-        resnover = self.json_ok(self.get_ok(self.api + "/query?q=exac.transcript:ENST00000266970&fields=exac"),filter=True)
+        res = self.json_ok(self.get_ok(
+            self.api + "/query?q=exac.transcript:ENST00000266970.4&fields=exac"), filter=True)
+        resnover = self.json_ok(self.get_ok(
+            self.api + "/query?q=exac.transcript:ENST00000266970&fields=exac"), filter=True)
         eq_(res["hits"], resnover["hits"])
         eq_(len(res["hits"]), 1)
         hit = res["hits"][0]
@@ -784,78 +843,86 @@ class MyGeneTest(BiothingTestHelperMixin):
         eq_(hit["exac"]["nontcga"]["mu_mis"], 0.00000919091133625)
 
     def test_caseinsensitive(self):
-        lower = self.json_ok(self.get_ok(self.api + "/query?q=cdk2&size=5"),filter=True)
-        upper = self.json_ok(self.get_ok(self.api + "/query?q=CDK2&size=5"),filter=True)
-        # old test...needs revisiting, sometimes the orders of results are *slightly* different for cdk2 and CDK2
-        eq_(lower["hits"],upper["hits"])
-        #eq_(sorted(lower["hits"],key=lambda e: e["entrezgene"]),sorted(upper["hits"],key=lambda e: e["entrezgene"]))
+        # sometimes the orders of results are *slightly* different for cdk2 and CDK2
+        # so limit to top 3 more stable results
+        lower = self.json_ok(self.get_ok(
+            self.api + "/query?q=cdk2&size=3"), filter=True)
+        upper = self.json_ok(self.get_ok(
+            self.api + "/query?q=CDK2&size=3"), filter=True)
+        eq_(lower["hits"], upper["hits"])
 
     def test_symbolnamespecies_order(self):
-        res =  self.json_ok(self.get_ok(self.api + "/query?q=cdk2&species=human,mouse,rat"))
+        res = self.json_ok(self.get_ok(
+            self.api + "/query?q=cdk2&species=human,mouse,rat"))
         hits = res["hits"]
         # first is 1017, it's human and cdk2 is a symbol
-        eq_(hits[0]["_id"],"1017")
+        eq_(hits[0]["_id"], "1017")
         # second is 12566, mouse
-        eq_(hits[1]["_id"],"12566")
+        eq_(hits[1]["_id"], "12566")
         # third is 362817, rat
-        eq_(hits[2]["_id"],"362817")
+        eq_(hits[2]["_id"], "362817")
 
     def test_gene_other_names(self):
         # this one has some
         res = self.json_ok(self.get_ok(self.api + "/gene/107924918"))
         assert "other_names" in res, "No other_names found in %s" % res
-        eq_(res["other_names"],['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3'])
+        eq_(res["other_names"], ['aquaporin NIP1-2-like',
+                                 'aquaporin NIP1;2', 'aquaporin NIP1;3'])
         # that one not
         res = self.json_ok(self.get_ok(self.api + "/gene/1246509"))
         assert not "other_names" in res
         # query by other_names:
-        res = self.json_ok(self.get_ok(self.api + "/query?q=other_names:p33&size=50"))
-        assert res["total"] > 30 # currently 35...
-        #eq_(len(res["hits"]),10)
+        res = self.json_ok(self.get_ok(
+            self.api + "/query?q=other_names:p33&size=50"))
+        assert res["total"] > 30  # currently 35...
+        # eq_(len(res["hits"]),10)
         ids = [h["_id"] for h in res["hits"]]
         assert "1017" in ids, "Should have 1017 in results"
 
     def test_int_float(self):
         def check_homologene(res):
             for h in res["homologene"]["genes"]:
-                eq_(type(h[0]),int)
-                eq_(type(h[1]),int)
+                eq_(type(h[0]), int)
+                eq_(type(h[1]), int)
+
         def check_exons(res):
             for ex in res["exons"]:
                 for pos in ex["position"]:
-                    eq_(type(pos[0]),int)
-                    eq_(type(pos[1]),int)
-        res = self.json_ok(self.get_ok(self.api + "/gene/1017?species=9606&fields=homologene,exons"))
+                    eq_(type(pos[0]), int)
+                    eq_(type(pos[1]), int)
+        res = self.json_ok(self.get_ok(
+            self.api + "/gene/1017?species=9606&fields=homologene,exons"))
         check_homologene(res)
         check_exons(res)
-        resall = self.json_ok(self.get_ok(self.api + "/gene/1017?fields=homologene,exons"))
+        resall = self.json_ok(self.get_ok(
+            self.api + "/gene/1017?fields=homologene,exons"))
         check_homologene(resall)
         check_exons(resall)
 
     def test_pantherdb(self):
-        res = self.json_ok(self.get_ok(self.api + "/gene/348158?fields=pantherdb"))
+        res = self.json_ok(self.get_ok(
+            self.api + "/gene/348158?fields=pantherdb"))
         assert "pantherdb" in res
-        eq_(type(res["pantherdb"]["ortholog"]),list)
-        res = self.json_ok(self.get_ok(self.api + \
-            "/query?q=pantherdb.ortholog.taxid:10090%20AND%20pantherdb.uniprot_kb:O95867"))
-        eq_(len(res["hits"]),1)
-        eq_(res["hits"][0]["_id"],"80740")
+        eq_(type(res["pantherdb"]["ortholog"]), list)
+        res = self.json_ok(self.get_ok(self.api +
+                                       "/query?q=pantherdb.ortholog.taxid:10090%20AND%20pantherdb.uniprot_kb:O95867"))
+        eq_(len(res["hits"]), 1)
+        eq_(res["hits"][0]["_id"], "80740")
 
     def test_pharos(self):
         res = self.json_ok(self.get_ok(self.api + "/gene/56141?fields=pharos"))
-        eq_(res["pharos"]["target_id"],4745)
+        eq_(res["pharos"]["target_id"], 4745)
 
 # Self contained test class, used for CI tools such as Travis
 # This will start a Tornado server on its own and perform tests
 # against this server.
 
-class MyGeneTestTornadoClient(AsyncHTTPTestCase, MyGeneTest):
+
+WEB_SETTINGS = MyGeneWebSettings(config='config')
+
+
+class MyGeneTestTornadoClient(TornadoTestServerMixin, MyGeneTest):
     __test__ = True
 
-    def __init__(self, methodName='runTest', **kwargs):
-        super(AsyncHTTPTestCase, self).__init__(methodName, **kwargs)
-        self.h = TornadoRequestHelper(self)
-        self._settings = MyGeneWebSettings(config='config')
-
     def get_app(self):
-        return Application(self._settings.generate_app_list(), static_path=self._settings.STATIC_PATH)
+        return Application(WEB_SETTINGS.generate_app_list(), static_path=WEB_SETTINGS.STATIC_PATH)
