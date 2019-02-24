@@ -1,7 +1,6 @@
-''' MyGene Data-aware Tests
-nosetests tests
-nosetests tests:MyGeneTest
-nosetests tests:MyGeneTestTornadoClient
+''' MyGene Data-Aware Tests
+    nosetests tests:MyGeneTestHTTPClient
+    nosetests tests:MyGeneTestTornadoClient
 '''
 
 import os
@@ -10,19 +9,15 @@ import random
 from nose.tools import eq_, ok_
 from tornado.web import Application
 
-from biothings.tests.test_helper import (BiothingsTestHelper,
+from biothings.tests.test_helper import (BiothingsTestCase,
                                          TornadoTestServerMixin)
 from web.settings import MyGeneWebSettings
 
 
-class MyGeneTest(BiothingsTestHelper):
+class MyGeneTestHTTPClient(BiothingsTestCase):
     ''' Test against server specified in environment variable MG_HOST
         or MyGene.info production server if MG_HOST is not specified
-        MG_HOST must start with its protocol like http:// or https:// '''
-
-    #############################################################
-    # Test functions                                            #
-    #############################################################
+        MG_HOST must start with its protocol like http://mygene.info '''
 
     host = os.getenv("MG_HOST", "http://mygene.info")
     host = host.rstrip('/')
@@ -42,7 +37,7 @@ class MyGeneTest(BiothingsTestHelper):
                 [hit.pop(i) for i in topop]
 
     def json_ok(self, url, filter=False, **kwargs):
-        res = super(MyGeneTest, self).json_ok(url, **kwargs)
+        res = super(MyGeneTestHTTPClient, self).json_ok(url, **kwargs)
         if filter:
             self._filter_hits(res)
         return res
@@ -146,11 +141,11 @@ class MyGeneTest(BiothingsTestHelper):
                                        '/query?q=54097\xef\xbf\xbd\xef\xbf\xbdmouse'))
         eq_(res['hits'], [])
 
-        self.get_status_code(self.api + '/query', status_code=400)
+        self.get_status_match(self.api + '/query', status_code=400)
         #res = self.json_ok(self.get_ok(self.api + '/query'), checkerror=False)
         #assert 'error' in res
 
-        self.get_status_code(
+        self.get_status_match(
             self.api + '/query?q=tRNA:Y1:85Ae', status_code=400)
 
         # ensure returned fields by default
@@ -185,7 +180,7 @@ class MyGeneTest(BiothingsTestHelper):
                                          'scopes': 'symbol',
                                          'fields': 'name,symbol'}))
         assert len(res) >= 4, (res, len(res))
-        self.post_status_code(self.api + '/query', {}, status_code=400)
+        self.post_status_match(self.api + '/query', {}, status_code=400)
         # res = self.json_ok(self.post_ok(self.api + '/query', {}),
         #                   checkerror=False)
         #assert 'error' in res, res
@@ -234,7 +229,7 @@ class MyGeneTest(BiothingsTestHelper):
         eq_(len(res['hits']), 1000)
 
         # assert 1==0
-        self.get_status_code(
+        self.get_status_match(
             self.api + '/query?q=cdk?&size=1a', status_code=400)
 
     def test_gene(self):
@@ -913,16 +908,18 @@ class MyGeneTest(BiothingsTestHelper):
         res = self.json_ok(self.get_ok(self.api + "/gene/56141?fields=pharos"))
         eq_(res["pharos"]["target_id"], 4745)
 
-# Self contained test class, used for CI tools such as Travis
-# This will start a Tornado server on its own and perform tests
-# against this server.
 
+class MyGeneTestTornadoClient(TornadoTestServerMixin, MyGeneTestHTTPClient):
+    ''' Self contained test class, can be used for CI tools such as Travis
+        Starts a Tornado server on its own and perform tests against this server.
+    '''
 
-WEB_SETTINGS = MyGeneWebSettings(config='config')
-
-
-class MyGeneTestTornadoClient(TornadoTestServerMixin, MyGeneTest):
-    __test__ = True
+    @classmethod
+    def setup_class(cls):
+        ''' Reads Tornado Settings from config.py '''
+        cls.WEB_SETTINGS = MyGeneWebSettings(config='config')
+        cls.APP_LIST = cls.WEB_SETTINGS.generate_app_list()
+        cls.STATIC_PATH = cls.WEB_SETTINGS.STATIC_PATH
 
     def get_app(self):
-        return Application(WEB_SETTINGS.generate_app_list(), static_path=WEB_SETTINGS.STATIC_PATH)
+        return Application(self.APP_LIST, static_path=self.STATIC_PATH)
