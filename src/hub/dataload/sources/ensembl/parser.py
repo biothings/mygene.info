@@ -1,10 +1,13 @@
-import os.path, os
 import copy
-from biothings.utils.common import SubStr
-from biothings.utils.dataload import tab2dict, tab2list, value_convert, normalized_value, \
-                                     list2dict, dict_nodup, dict_attrmerge, tab2dict_iter
-
+import os
+import os.path
 from multiprocessing import Lock
+
+from biothings.utils.common import SubStr
+from biothings.utils.dataload import (dict_attrmerge, dict_nodup, list2dict,
+                                      normalized_value, tab2dict,
+                                      tab2dict_iter, tab2list, value_convert)
+from biothings.utils.loggers import get_logger
 
 extra_mapping_lock = Lock()
 
@@ -37,6 +40,7 @@ class EnsemblParser(object):
         if load_ensembl2entrez:
             self._load_ensembl2entrez_li(src_name)
             self.ensembl2entrez = list2dict(self.ensembl2entrez_li, 0,alwayslist=True)
+        self.logger, self.logfile = get_logger("parse_%s" % src_name)
 
 
     #TODO: not used
@@ -118,6 +122,9 @@ class EnsemblParser(object):
         for datadict in tab2dict_iter(datafile, (0, 1, 2, 7, 8), 1, includefn=_not_LRG):
             datadict = value_convert(datadict, _fn)
             for id,doc in datadict.items():
+                if self.id.isdigit():
+                    self.logger.warn("Document Skipped: All-digit id " + id)
+                    continue
                 doc['_id'] = id
                 yield doc
 
