@@ -1,11 +1,11 @@
-This project is a web front-end of next generation (v2) of MyGene.info (Gene Annotation Query as a Service)
+Web front-end of next generation (v2) MyGene.info (Gene Annotation Query as a Service)
 
-## Setup mygene.info working folder ##
+## Setup Mygene.info Web Server Locally ##
 
 
 #### 1. Prerequisites
 
-    python (>=2.7)
+    python (>=3.4)
     git 
 
    In Ubuntu/Debian system, you can install all prerequisites by
@@ -18,7 +18,7 @@ This project is a web front-end of next generation (v2) of MyGene.info (Gene Ann
 #### 2. Clone this repo:
 
 
-    git clone https://github.com/SuLab/mygene.info.git
+    git clone https://github.com/biothings/mygene.info.git
 
 
 #### 3. Setup a Python "virtualenv" (optional, but highly recommended):
@@ -33,22 +33,23 @@ This project is a web front-end of next generation (v2) of MyGene.info (Gene Ann
 #### 4. Install required python modules:
 
 
-    pip install -r ./requirements.txt
+    pip install -r ./requirements_web.txt
 
 
 #### 5. Make your own "config.py" file
 
 
     cd src
-    cp config.py.example config.py
+    vim config.py
+    
+   >from config_web import *  
+   >from config_hub import *  
+   >#additional customizations
 
-
-Make changes if needed.
 
 #### 6. Run your dev server
 
 
-    cd src
     python index.py --debug
 
 
