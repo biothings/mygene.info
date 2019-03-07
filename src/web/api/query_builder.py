@@ -218,7 +218,7 @@ class ESQueryBuilder(ESQueryBuilder):
     def add_species_custom_filters_score(self, _query):
         _query = {
             "function_score": {
-                "query": _query,
+                "query": _query.get('query', _query),
                 "functions": [
                     # downgrade "pseudogene" matches
                     {
