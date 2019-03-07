@@ -1,5 +1,5 @@
 # biothings
-git+https://github.com/biothings/biothings.api.git@c98737b0b67d0f6e9f7b5004c8af36698c1bd0d4#egg=biothings
+git+https://github.com/biothings/biothings.api.git@6c02376b4efb988ebf3cf9b29f59b997aa2b3170#egg=biothings
 
 #for build sphinx docs
 sphinx>=1.5.6
