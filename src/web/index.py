@@ -1,15 +1,16 @@
-# -*- coding: utf-8 -*-
 # Simple template example used to instantiate a new biothing API
+import os.path
+
+from tornado.web import StaticFileHandler
+
 from biothings.web.index_base import main, options
 from web.settings import MyGeneWebSettings
-from tornado.web import StaticFileHandler
-import os
 
 # Instantiate settings class to configure biothings web
 web_settings = MyGeneWebSettings(config='config')
 
 if web_settings.INCLUDE_DOCS and not os.path.exists(web_settings.DOCS_STATIC_PATH):
-    raise IOError('Run "make html" to generate sphinx docs first.')
+    raise IOError('Run "make html" to generate sphinx docs first, or set "INCLUDE_DOCS=False".')
 
 APP_LIST = web_settings.generate_app_list()
 

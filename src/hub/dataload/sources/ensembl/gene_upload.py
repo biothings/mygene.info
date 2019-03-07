@@ -9,13 +9,13 @@ class EnsemblGeneUploader(uploader.MergerSourceUploader):
     __metadata__ = {"mapper" : 'ensembl2entrez'}
 
     def load_data(self, data_folder):
-        ep = EnsemblParser(data_folder,load_ensembl2entrez=False)
+        ep = EnsemblParser(self.main_source, data_folder,load_ensembl2entrez=False)
         ensembl_genes = ep.load_ensembl_main()
         return ensembl_genes
 
     def get_mapping_to_entrez(self, data_folder):
-        ep = EnsemblParser(data_folder)
-        ep._load_ensembl2entrez_li()
+        ep = EnsemblParser(self.main_source, data_folder)
+        ep._load_ensembl2entrez_li(self.main_source)
         return ep.ensembl2entrez_li
 
     def post_update_data(self,*args,**kwargs):

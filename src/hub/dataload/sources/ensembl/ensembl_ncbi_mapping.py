@@ -210,9 +210,9 @@ def run_stats(total_ensembl_IDs, ensembl_dict, ensembl_map_count, total_mapped):
 
 
 # def main(gene_ensembl_1, gene_ensembl_2, gene2ensembl):
-def main(confirm=True):
+def main(src_name, confirm=True):
     src_dump = get_src_dump()
-    ensembl_doc = src_dump.find_one({"_id":"ensembl"}) or {}
+    ensembl_doc = src_dump.find_one({"_id":src_name}) or {}
     ENSEMBL_DATA_FOLDER = ensembl_doc.get("download",{}).get("data_folder")
     assert ENSEMBL_DATA_FOLDER, "Can't find Ensembl data folder"
     entrez_doc = src_dump.find_one({"_id":"entrez"}) or {}

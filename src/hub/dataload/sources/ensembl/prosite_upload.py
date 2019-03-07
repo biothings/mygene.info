@@ -8,7 +8,7 @@ class EnsemblPrositeUploader(uploader.MergerSourceUploader):
     __metadata__ = {"mapper" : 'ensembl2entrez'}
 
     def load_data(self, data_folder):
-        ep = EnsemblParser(data_folder)
+        ep = EnsemblParser(self.main_source, data_folder)
         ensembl2prosite = ep.load_ensembl2prosite()
         return ensembl2prosite
 

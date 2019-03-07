@@ -7,7 +7,7 @@ class EnsemblPfamUploader(uploader.MergerSourceUploader):
     main_source = "ensembl"
 
     def load_data(self, data_folder):
-        ep = EnsemblParser(data_folder)
+        ep = EnsemblParser(self.main_source, data_folder)
         ensembl2pfam = ep.load_ensembl2pfam()
         return ensembl2pfam
 
