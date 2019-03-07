@@ -51,7 +51,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
 
         res = self.json_ok(self.get_ok(self.api + '/gene/1017'))
 
-        attr_li = ['HGNC', 'MIM', 'Vega', '_id', 'accession', 'alias',
+        attr_li = ['HGNC', 'MIM', '_id', 'accession', 'alias', #'Vega',
                    'ec', 'ensembl', 'entrezgene', 'genomic_pos', 'go',
                    'homologene', 'interpro', 'ipi', 'map_location', 'name',
                    'pdb', 'pharmgkb', 'pir', 'prosite', 'reagent', 'refseq',
@@ -264,8 +264,8 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
                                      'summary', 'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene',
                                      'ensembl', 'ec', 'pir', 'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif',
                                      'HGNC', 'name', 'reagent', 'uniprot', 'pharmgkb', 'alias', 'genomic_pos',
-                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'Vega', 'map_location',
-                                     'exons', 'exac', 'other_names', 'umls', 'pantherdb', 'pharos']),
+                                     'accession', '_id', 'prosite', 'wikipedia', 'go', 'query', 'map_location',
+                                     'exons', 'exac', 'other_names', 'umls', 'pantherdb', 'pharos']),#'Vega'
             msg='set(1017.keys())!=set(default_fields)')
         eq_(res[0]['entrezgene'], "1017")
 
@@ -307,7 +307,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
             self.host + '/metadata', self.api + '/metadata'))
         eq_(set(root.keys()), set(['available_fields', 'src_version', 'build_version',
                                    'app_revision', 'build_date', 'taxonomy',
-                                   'stats', 'genome_assembly', 'src', 'source']))
+                                   'stats', 'genome_assembly', 'src', 'source', 'doc_type']))
         fields = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
         # test random field
         assert "refseq" in fields
@@ -615,7 +615,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
         eq_(rna["total"], 1)
         hit = rna["hits"][0]
         eq_(hit["refseq"]["protein"], "NP_001670.1")
-        eq_(hit["refseq"]["rna"], "NM_001679.3")
+        eq_(hit["refseq"]["rna"], "NM_001679.4")
 
     def test_query_dotstar_accession(self):
         protein = self.json_ok(self.get_ok(self.api +
@@ -779,10 +779,10 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
             self.api + "/query?q=NM_001798&fields=refseq"), filter=True)
         hits = res["hits"]
         eq_(len(hits), 1)
-        ok_("NM_001798.4" in hits[0]["refseq"]["rna"])
+        ok_("NM_001798.5" in hits[0]["refseq"]["rna"])
         # with version, _all
         sameres = self.json_ok(self.get_ok(
-            self.api + "/query?q=NM_001798.4&fields=refseq"), filter=True)
+            self.api + "/query?q=NM_001798.5&fields=refseq"), filter=True)
         assert sameres["hits"] == res["hits"]
         # using protein ID
         sameres = self.json_ok(self.get_ok(
