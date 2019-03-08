@@ -11,7 +11,7 @@ from biothings.utils.loggers import get_logger
 
 extra_mapping_lock = Lock()
 
-ERR_THRESHOLD = 100
+ERR_THRESHOLD = 1000
 
 # fn to skip lines with LRG records.'''
 def _not_LRG(ld):
