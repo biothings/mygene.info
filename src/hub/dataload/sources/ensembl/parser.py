@@ -11,15 +11,16 @@ from biothings.utils.loggers import get_logger
 
 extra_mapping_lock = Lock()
 
+ERR_THRESHOLD = 100
+
 # fn to skip lines with LRG records.'''
-
-
 def _not_LRG(ld):
     return not ld[1].startswith("LRG_")
 
 
 def map_id(hdocs, mapdict):
     res = []
+    skip_count = 0
     for k, v in hdocs.items():
         entrez_ids = mapdict.get(k)
         if entrez_ids:
@@ -29,7 +30,11 @@ def map_id(hdocs, mapdict):
                 res.append(d)
         else:
             if k.isdigit():
-                continue
+                if skip_count < ERR_THRESHOLD:
+                    skip_count += 1
+                    continue
+                else:
+                    raise ValueError('Too many ensembl ids are entirely numeric')
             d = {"_id": k}
             d.update(v)
             res.append(d)
@@ -48,8 +53,8 @@ class EnsemblParser(object):
                 self.ensembl2entrez_li, 0, alwayslist=True)
         self.logger, self.logfile = get_logger("parse_%s" % src_name)
 
-    #TODO: not used
 
+    #TODO: not used
     def _load_ensembl_2taxid(self):
         """ensembl2taxid"""
         datafile = os.path.join(
@@ -129,12 +134,17 @@ class EnsemblParser(object):
                     out['name'] = _name
             return out
 
+        skip_count = 0
         datafile = os.path.join(
             self.data_folder, 'gene_ensembl__gene__main.txt')
         for datadict in tab2dict_iter(datafile, (0, 1, 2, 7, 8), 1, includefn=_not_LRG):
             datadict = value_convert(datadict, _fn)
             for id, doc in datadict.items():
                 if id.isdigit():
+                    if skip_count < ERR_THRESHOLD:
+                        skip_count += 1
+                    else:
+                        raise ValueError('Too many ensembl ids are entirely numeric')
                     self.logger.warning(
                         "Document Skipped: All-digit id {}".format(id))
                     continue
