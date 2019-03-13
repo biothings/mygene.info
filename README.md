@@ -44,7 +44,7 @@ Web front-end of next generation (v2) MyGene.info (Gene Annotation Query as a Se
     
    >from config_web import *  
    >from config_hub import *  
-   >#additional customizations
+   >&#35; And additional customizations
 
 
 #### 6. Run your dev server
