@@ -1,7 +1,10 @@
 
 __sources_dict__ = [
         'hub.dataload.sources.ensembl',
+        'hub.dataload.sources.ensembl_fungi',
+        'hub.dataload.sources.ensembl_metazoa',
         'hub.dataload.sources.ensembl_plant',
+        'hub.dataload.sources.ensembl_protists',
         'hub.dataload.sources.homologene',
         'hub.dataload.sources.generif',
         'hub.dataload.sources.refseq',
