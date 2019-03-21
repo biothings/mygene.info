@@ -6,6 +6,10 @@ from hub.dataload.sources.entrez.gene_upload import EntrezGeneUploader
 from hub.dataload.sources.ensembl.gene_upload import EnsemblGeneUploader
 
 class MyGeneDataBuilder(builder.DataBuilder):
+    """
+    MyGene.info specific data builder, computing custom statistics
+    about Ensembl-to-Entrez mapping.
+    """
 
     def generate_document_query(self, src_name):
         """Root documents are created according to species list"""
