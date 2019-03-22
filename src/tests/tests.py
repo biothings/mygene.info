@@ -307,7 +307,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
             self.host + '/metadata', self.api + '/metadata'))
         eq_(set(root.keys()), set(['available_fields', 'src_version', 'build_version',
                                    'app_revision', 'build_date', 'taxonomy',
-                                   'stats', 'genome_assembly', 'src', 'source', 'doc_type']))
+                                   'stats', 'genome_assembly', 'src', 'source', 'biothing_type']))
         fields = self.json_ok(self.get_ok(self.api + '/metadata/fields'))
         # test random field
         assert "refseq" in fields
