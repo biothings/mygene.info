@@ -61,7 +61,7 @@ class RefseqDumper(FTPDumper):
         # we're in a new thread, we need to "bring back" the loop to run jobs
         # (it's fine, processes we'll use are independent)
         gbff_files = glob.glob(os.path.join(self.new_data_folder, '*.rna.gbff.gz'))
-        assert len(gbff_files) >= 15, 'Missing "*.gbff.gz" files? Found %d in %s:\n%s' % (len(gbff_files), self.new_data_folder, '\n'.join(gbff_files))
+        assert len(gbff_files) >= 14, 'Missing "*.gbff.gz" files? Found %d in %s:\n%s' % (len(gbff_files), self.new_data_folder, '\n'.join(gbff_files))
         self.logger.info("Parsing %d refseq gbff files" % len(gbff_files))
         asyncio.set_event_loop(job_manager.loop)
         job = self.parse_gbff(gbff_files,job_manager)
