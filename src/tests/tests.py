@@ -180,7 +180,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
                                          'scopes': 'symbol',
                                          'fields': 'name,symbol'}))
         assert len(res) >= 4, (res, len(res))
-        self.post_status_match(self.api + '/query', {}, status_code=400)
+        self.post_status_match(self.api + '/query', 400)
         # res = self.json_ok(self.post_ok(self.api + '/query', {}),
         #                   checkerror=False)
         #assert 'error' in res, res
@@ -356,7 +356,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
         eq_([x["count"] for x in res2['facets']['taxid']['terms']
              if x["term"] == 9606][0], res2['total'])
 
-    def test_query_userfilter(self):
+    def test_query_userfilter(self): # change to userquery TODO
         res1 = self.json_ok(self.get_ok(self.api + '/query?q=cdk'))
         res2 = self.json_ok(self.get_ok(self.api +
                                         '/query?q=cdk&userfilter=bgood_cure_griffith'))
@@ -615,7 +615,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
         eq_(rna["total"], 1)
         hit = rna["hits"][0]
         eq_(hit["refseq"]["protein"], "NP_001670.1")
-        eq_(hit["refseq"]["rna"], "NM_001679.4")
+        eq_(hit["refseq"]["rna"], "NM_001679.4") #TODO
 
     def test_query_dotstar_accession(self):
         protein = self.json_ok(self.get_ok(self.api +
@@ -779,7 +779,7 @@ class MyGeneTestHTTPClient(BiothingsTestCase):
             self.api + "/query?q=NM_001798&fields=refseq"), filter=True)
         hits = res["hits"]
         eq_(len(hits), 1)
-        ok_("NM_001798.5" in hits[0]["refseq"]["rna"])
+        ok_("NM_001798.5" in hits[0]["refseq"]["rna"]) #TODO
         # with version, _all
         sameres = self.json_ok(self.get_ok(
             self.api + "/query?q=NM_001798.5&fields=refseq"), filter=True)
