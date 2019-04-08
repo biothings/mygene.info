@@ -8,8 +8,7 @@ import random
 from nose.core import runmodule
 from nose.tools import eq_, ok_
 
-from biothings.tests import BiothingsTestCase, TornadoTestServerMixin
-from web.settings import MyGeneWebSettings
+from biothings.tests import BiothingsTestCase
 
 
 class MyGeneRemoteTest(BiothingsTestCase):
@@ -20,7 +19,6 @@ class MyGeneRemoteTest(BiothingsTestCase):
     __test__ = True
 
     host = os.getenv("MG_HOST", "http://mygene.info").rstrip('/')
-    # host = os.getenv("MG_HOST", "http://localhost:8000")
     api = '/v3'
 
     def filter_hits(self, dic, field=None):
@@ -839,16 +837,6 @@ class MyGeneRemoteTest(BiothingsTestCase):
     def test_pharos(self):
         res = self.request("gene/56141?fields=pharos").json()
         eq_(res["pharos"]["target_id"], 4745)
-
-
-class MyGeneLocalTest(TornadoTestServerMixin, MyGeneRemoteTest):
-    ''' Self contained test class, can be used for CI tools such as Travis
-        Starts a Tornado server on its own and perform tests against this server.
-    '''
-    # __test__ = True
-
-    # Reads Tornado Settings from config.py
-    WEB_SETTINGS = MyGeneWebSettings(config='config')
 
 
 if __name__ == '__main__':
