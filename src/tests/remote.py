@@ -885,4 +885,7 @@ class MyGeneRemoteTest(BiothingsTestCase):
 
 
 if __name__ == '__main__':
+    print()
+    print('MyGene Remote Test:', MyGeneRemoteTest.host)
+    print('-'*70)
     runmodule(argv=['', '--logging-level=INFO', '-v'])
