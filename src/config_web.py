@@ -78,7 +78,7 @@ ANNOTATION_DOCS_URL = "http://docs.mygene.info/en/latest/doc/annotation_service.
 
 # kwargs for status check
 STATUS_CHECK = {
-    'id':'1017',
+    'id': '1017',
     'index': 'genedoc_mygene_allspecies_current',
     'doc_type': 'gene'
 }
@@ -99,7 +99,7 @@ DOCS_STATIC_PATH = '../docs/_build/html'
 STATIC_PATH = 'static'
 
 # url template to redirect for 'include_tax_tree' parameter
-INCLUDE_TAX_TREE_REDIRECT_TEMPLATE = 'http://t.biothings.io/v1/taxon?ids={ids}&expand_species=true'
+INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = 'http://t.biothings.io/v1/taxon'
 
 # This essentially bypasses the es.get fallback as in myvariant...
 # The first regex matched integers, in which case the query becomes against entrezgeneall annotation queries are now multimatch
@@ -117,7 +117,7 @@ TAXONOMY = {
     "nematode": {"tax_id": "6239", "assembly": "ce10"},
     "zebrafish": {"tax_id": "7955", "assembly": "zv9"},
     "thale-cress": {"tax_id": "3702"},
-    "frog": {"tax_id": "8364", "assembly": "xenTro3"}, 
+    "frog": {"tax_id": "8364", "assembly": "xenTro3"},
     "pig": {"tax_id": "9823", "assembly": "susScr2"}
 }
 
@@ -126,12 +126,12 @@ DATASOURCE_TRANSLATIONS = {
     "accession:":   r"accession_agg:",
     "reporter:":    r"reporter.\\\*:",
     "interpro:":    r"interpro.id:",
-    # GO:xxxxx looks like a ES raw query, so just look for 
+    # GO:xxxxx looks like a ES raw query, so just look for
     # the term as a string in GO's ID (note: searching every keys
-    # will raise an error because pubmed key is a int and we're 
+    # will raise an error because pubmed key is a int and we're
     # searching with a string term.
     "GO:":          r"go.\\\*.id:go\\\:",
-    #"GO:":          r"go.\\\*:go.",
+    # "GO:":          r"go.\\\*:go.",
     "homologene:":  r"homologene.id:",
     "reagent:":     r"reagent.\\\*.id:",
     "uniprot:":     r"uniprot.\\\*:",
@@ -155,24 +155,28 @@ DATASOURCE_TRANSLATIONS = {
     "mirbase:":     r"miRBase:",
 }
 
-SPECIES_TYPEDEF = {'species': {'type': list, 'default': ['all'], 'max': 1000, 
-                   'translations': [(re.compile(pattern, re.I), translation['tax_id']) for (pattern, translation) in TAXONOMY.items()]}}
+SPECIES_TYPEDEF = {'species': {'type': list, 'default': ['all'], 'max': 1000, 'translations': [
+    (re.compile(pattern, re.I), translation['tax_id']) for (pattern, translation) in TAXONOMY.items()]}}
 
 # For datasource translations
-DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(pattern, re.I), translation) for 
-    (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
-TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(re.sub(r':.*', '', pattern).replace('\\', '') + '(?!\\.)', re.I), 
-    re.sub(r':.*', '', translation).replace('\\','')) for (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
+DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(pattern, re.I), translation) for
+                                  (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
+TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [
+    (re.compile(re.sub(r':.*', '', pattern).replace('\\', '') + '(?!\\.)', re.I),
+     re.sub(r':.*', '', translation).replace('\\', ''))
+    for(pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
 
 # Kwarg control update for mygene specific kwargs
 
-# ES KWARGS (_source, scopes, 
-#ANNOTATION_GET_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
+# ES KWARGS (_source, scopes,
+# ANNOTATION_GET_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS,
 #    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-#ANNOTATION_POST_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS, 
+# ANNOTATION_POST_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS,
 #    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-QUERY_GET_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})#, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-QUERY_POST_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})#, 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+# , 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+QUERY_GET_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})
+# , 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+QUERY_POST_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})
 
 # Control KWARGS
 QUERY_GET_CONTROL_KWARGS['q'].update({'translations': DATASOURCE_TRANSLATION_TYPEDEF})
@@ -182,16 +186,16 @@ ANNOTATION_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 ANNOTATION_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 # ES query goes to these species by default?
-#QUERY_GET_ESQB_KWARGS['species']['default'] = [9606, 10090, 10116]  
+#QUERY_GET_ESQB_KWARGS['species']['default'] = [9606, 10090, 10116]
 QUERY_GET_ESQB_KWARGS.update({
     'include_tax_tree': {'type': bool, 'default': False},
-    'entrezonly':{'type': bool, 'default': False}, 
-    'ensemblonly': {'type':bool, 'default': False}, 
-    'exists': {'type': list, 'default': None, 'max': 1000}, 
-    'missing': {'type': list, 'default': None, 'max': 1000}, 
-    'species_facet_filter': {'type': list, 'default': None, 'max': 1000, 
-        'translations': [(re.compile(pattern, re.I), translation['tax_id']) for 
-                        (pattern, translation) in TAXONOMY.items()]}
+    'entrezonly': {'type': bool, 'default': False},
+    'ensemblonly': {'type': bool, 'default': False},
+    'exists': {'type': list, 'default': None, 'max': 1000},
+    'missing': {'type': list, 'default': None, 'max': 1000},
+    'species_facet_filter': {'type': list, 'default': None, 'max': 1000,
+                             'translations': [(re.compile(pattern, re.I), translation['tax_id']) for
+                                              (pattern, translation) in TAXONOMY.items()]}
 })
 QUERY_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
 QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
