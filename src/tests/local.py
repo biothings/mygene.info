@@ -1,5 +1,6 @@
-''' MyGene Data-Aware Tests
-    > python tests.py
+'''
+    MyGene Local Tester
+    > python local.py
 '''
 
 from nose.core import run
@@ -10,15 +11,20 @@ from web.settings import MyGeneWebSettings
 
 
 class MyGeneLocalTest(TornadoTestServerMixin, MyGeneRemoteTest):
-    ''' Self contained test class, can be used for CI tools such as Travis
+    '''
         Starts a Tornado server on its own and perform tests against this server.
+        Requires config.py under src folder.
     '''
 
     __test__ = True
 
-    # Reads Settings from config.py
-    WEB_SETTINGS = MyGeneWebSettings(config='config')
+    # Override default setting loader
+    settings = MyGeneWebSettings(config='config')
 
 
 if __name__ == '__main__':
-    run(argv=['', '--logging-level=INFO', '-v'], defaultTest='tests.local.MyGeneLocalTest')
+    print()
+    print('MyGene Local Test')
+    print('-'*70)
+    print()
+    run(argv=['', '--logging-level=INFO', '-v'], defaultTest='__main__.MyGeneLocalTest')
