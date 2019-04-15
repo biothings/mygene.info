@@ -739,7 +739,7 @@ class MyGeneRemoteTest(BiothingsTestCase):
             "Total is {}, should more than 800".format(res["total"])
 
     def test_608_homologene(self):
-        ''' DATAFIELD Momologene '''
+        ''' DATAFIELD Homologene '''
         res = self.request(
             "query?q=homologene:44221&fields=homologene&species=human,mouse,rat").json()
         eq_(res["total"], 3)
@@ -817,8 +817,8 @@ class MyGeneRemoteTest(BiothingsTestCase):
         ids = [h["_id"] for h in res["hits"]]
         assert "1017" in ids, "Should have 1017 in results"
 
-    def test_701_uniprot(self):
-        ''' DATASOURCE Uniport '''
+    def test_613_uniprot(self):
+        ''' DATAFIELD Uniport '''
         swissid = self.filter_hits(self.request("query?q=uniprot:Q8NEB7&fields=uniprot").json())
         trembid = self.filter_hits(self.request("query?q=uniprot:F5H2C2&fields=uniprot").json())
         eq_(swissid["hits"], trembid["hits"])
@@ -827,8 +827,8 @@ class MyGeneRemoteTest(BiothingsTestCase):
         assert set(trembid["hits"][0]["uniprot"]["TrEMBL"]), \
             set(["E7EP66", "F5H2C2", "F5H3P4", "F5H5S8"])
 
-    def test_702_ensembl(self):
-        ''' DATASOURCE Ensembl '''
+    def test_614_ensembl(self):
+        ''' DATAFIELD Ensembl Vertebrate '''
         url = "query?q=ensemblprotein:ENSP00000379391&fields=ensembl"
         prot = self.request(url).json()
         url = "query?q=ensembltranscript:ENST00000396082&fields=ensembl"
@@ -851,8 +851,8 @@ class MyGeneRemoteTest(BiothingsTestCase):
         res = resl[0]
         eq_(res["_id"], "1586")
 
-    def test_703_ensembl_additional(self):
-        ''' DATASOURCE Ensembl+
+    def test_615_ensembl_additional(self):
+        ''' DATAFIELD Ensembl Others
         Asserts the existance of the 4 other ensembl sources,
         by querying unique genes in each individual databases '''
 
@@ -867,8 +867,8 @@ class MyGeneRemoteTest(BiothingsTestCase):
         for sample in sample_list:
             self.query(q="ensembl.gene:" + sample, fields="ensembl")
 
-    def test_704_pantherdb(self):
-        ''' DATASOURCE Panther '''
+    def test_616_pantherdb(self):
+        ''' DATAFIELD Panther '''
         res = self.request("gene/348158?fields=pantherdb").json()
         assert "pantherdb" in res
         eq_(type(res["pantherdb"]["ortholog"]), list)
@@ -877,8 +877,8 @@ class MyGeneRemoteTest(BiothingsTestCase):
         eq_(len(res["hits"]), 1)
         eq_(res["hits"][0]["_id"], "80740")
 
-    def test_705_pharos(self):
-        ''' DATASOURCE Pharos '''
+    def test_617_pharos(self):
+        ''' DATAFIELD Pharos '''
         # https://pharos.nih.gov/idg/about
         res = self.request("gene/56141?fields=pharos").json()
         eq_(res["pharos"]["target_id"], 4745)
