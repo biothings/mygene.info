@@ -121,15 +121,6 @@ ES_CONFIG = {
 		}
 
 
-# fill with "token", "roomid" and "from" keys
-# to broadcast message to a Hipchat room
-HIPCHAT_CONFIG = {
-#    'token': '',
-#    "usertoken" : "",
-#    'roomid': '',
-#    'from': '',
-#    'host': '',
-}
 SLACK_WEBHOOK = None
 
 # SSH port for hub console
