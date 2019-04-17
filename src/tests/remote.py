@@ -818,7 +818,7 @@ class MyGeneRemoteTest(BiothingsTestCase):
         assert "1017" in ids, "Should have 1017 in results"
 
     def test_613_uniprot(self):
-        ''' DATAFIELD Uniport '''
+        ''' DATAFIELD Uniprot '''
         swissid = self.filter_hits(self.request("query?q=uniprot:Q8NEB7&fields=uniprot").json())
         trembid = self.filter_hits(self.request("query?q=uniprot:F5H2C2&fields=uniprot").json())
         eq_(swissid["hits"], trembid["hits"])
