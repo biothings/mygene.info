@@ -18,7 +18,7 @@ Ensembl          whenever a new              | Ensembl Pre! and EnsemblGenomes
                  release is available        | are not included at the moment
 Uniprot          whenever a new
                  release is available
-NetAffy          whenever a new
+NetAffx          whenever a new               For "reporter" field
                  release is available
 PharmGKB         whenever a new
                  release is available
@@ -40,7 +40,7 @@ Gene annotation data are both stored and returned as a gene object, which is ess
 .. code-block :: json
 
     {
-        "_id": "1017"
+        "_id": "1017",
         "_score": 20.4676,
         "taxid": 9606,
         "symbol": "CDK2",
