@@ -197,6 +197,11 @@ HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
 #        "host" : "localhost:9200",
 #        }
 
+# List of package paths for active datasources (expect data-plugin based sources)
+ACTIVE_DATASOURCES = ConfigurationDefault(
+        default=[],
+        desc="List of package paths for active datasources")
+
 # Path to a folder to store all downloaded files, logs, caches, etc...
 DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")
 

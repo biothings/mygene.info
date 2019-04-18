@@ -78,7 +78,7 @@ class MyGeneHubServer(HubServer):
 import hub.dataload
 from hub.datatransform.keylookup import MyGeneKeyLookup
 # pass explicit list of datasources (no auto-discovery)
-server = MyGeneHubServer(hub.dataload.__sources_dict__,name="MyGene.info",
+server = MyGeneHubServer(config.ACTIVE_DATASOURCES,name="MyGene.info",
         managers_custom_args={"dataplugin" : {"keylookup" : MyGeneKeyLookup}})
 
 if __name__ == "__main__":
