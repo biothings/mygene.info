@@ -13,6 +13,8 @@ Introduction
 
 .. image:: _static/logo.png
    :align: left
+   :height: 100pt
+   :alt: myvariant.info
 
 .. cssclass:: head-paragraph
 
