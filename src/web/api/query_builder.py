@@ -385,7 +385,7 @@ class ESQueryBuilder(ESQueryBuilder):
             }
         }
         _query = json.dumps(_query)
-        _query = json.loads(_query % {'q': repr(q)})
+        _query = json.loads(_query % {'q': json.dumps(q)[1:-1]})
 
         if is_int(q):
             _query['dis_max']['queries'] = []
