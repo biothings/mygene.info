@@ -378,10 +378,10 @@ class MyGeneRemoteTest(BiothingsTestCase):
         api_res = self.request('metadata').json()
         equal(f"res({self.host + '/metadata'})", root_res,
               f"res({self.host + self.api + '/metadata'})", api_res)
-        available_fields = ['available_fields', 'src_version', 'build_version',
+        available_fields = {'available_fields', 'src_version', 'build_version',
                             'app_revision', 'build_date', 'taxonomy',
-                            'stats', 'genome_assembly', 'src', 'source', 'biothing_type']
-        eq_(set(root_res.keys()), set(available_fields))
+                            'stats', 'genome_assembly', 'src', 'source', 'biothing_type'}
+        equal('Retrieved Meta fields', set(root_res.keys()), 'Reference fields', available_fields)
         fields = self.request('metadata/fields').json()
         # test random field
         assert "refseq" in fields
