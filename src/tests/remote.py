@@ -15,13 +15,13 @@ from biothings.tests.helper import equal
 
 
 class MyGeneRemoteTest(BiothingsTestCase):
-    ''' Test against server specified in environment variable MG_HOST
-        or MyGene.info production server if MG_HOST is not specified
-        MG_HOST must start with its protocol like http://mygene.info '''
+    ''' Test against server specified in environment variable BT_HOST
+        or MyGene.info production server if BT_HOST is not specified
+        BT_HOST must start with its protocol like http://mygene.info '''
 
     __test__ = True
 
-    host = os.getenv("MG_HOST", "http://mygene.info").rstrip('/')
+    host = os.getenv("BT_HOST", "http://mygene.info").rstrip('/')
     api = '/v3'
 
     # Helper Function
