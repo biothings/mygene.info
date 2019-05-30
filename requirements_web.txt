@@ -1,13 +1,5 @@
 # biothings
-git+https://github.com/biothings/biothings.api.git@6c02376b4efb988ebf3cf9b29f59b997aa2b3170#egg=biothings
-
-#for build sphinx docs
-sphinx>=1.5.6
-
-#for nosetests
-nose>=1.3.0
+biothings[web_extra]
 
 #Optional
-msgpack>=0.6.0
-PyYAML
 raven
