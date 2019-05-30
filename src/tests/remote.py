@@ -2,7 +2,8 @@
     MyGene Remote Server Tester
     
     Run:
-    > python remote.py
+    > python tests/remote.py OR
+    > python -m tests.remote
 
     Cases:
     - 0** Network check
