@@ -256,7 +256,7 @@ try:
     'bootswatch_theme': "simplex",
     'navbar_site_name': "Documentation",
     'navbar_links': [('Home', '/', True),
-                     ("Try API live!", 'http://mygene.info/v2/api', 1),
+                     ("Try API live!", 'http://mygene.info/v3/api', 1),
                      ],
     'source_link_position': 'footer',
     }

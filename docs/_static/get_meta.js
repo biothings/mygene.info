@@ -111,15 +111,19 @@ domready(function () {
   var update_status = function (oXML) {
     if (oXML.status == 200){
       meta = eval('('+oXML.responseText+')');
-      var d = meta['src_version'];
+      //var d = meta['src_version'];
+      var d = {};
+      for (src in meta['src']){
+          d[src] = meta['src'][src]['version'];
+      }
       d['total_genes'] = meta['stats']['total_genes'];
       //var status_text = 'Status: NCBI snapshot: %NCBI_SNAPSHOT%, ensembl release: %ENSEMBL_MART_VERSION%, NetAffy: %NETAFFY_RELEASE%, <a href="/metadata">view complete</a>.'
       //var status_text = 'Stats: total genes: %total_genes% Status: NCBI snapshot: %entrez%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  NetAffy: %netaffy%,  <a href="/v2/metadata">view complete</a>.'
-      var status_text = 'Status: NCBI snapshot: %entrez%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  UCSC: %ucsc%, NetAffy: %netaffy%,  <a href="/v2/metadata">view complete</a>.'
+      var status_text = 'Status: NCBI snapshot: %entrez%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  UCSC: %ucsc%, NetAffx: %reporter%,  <a href="https://mygene.info/v3/metadata">view complete</a>.'
       var status_text = template(status_text, d)
       var el = document.getElementById('status_text')
       if (el) el.innerHTML = status_text;
     }
   };
-  myConn.connect("http://mygene.info/metadata", "GET", "", update_status);
+  myConn.connect("https://mygene.info/v3/metadata", "GET", "", update_status);
 })

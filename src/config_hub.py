@@ -121,15 +121,6 @@ ES_CONFIG = {
 		}
 
 
-# fill with "token", "roomid" and "from" keys
-# to broadcast message to a Hipchat room
-HIPCHAT_CONFIG = {
-#    'token': '',
-#    "usertoken" : "",
-#    'roomid': '',
-#    'from': '',
-#    'host': '',
-}
 SLACK_WEBHOOK = None
 
 # SSH port for hub console
@@ -205,6 +196,11 @@ HUB_DB_BACKEND = ConfigurationError("Define Hub DB connection")
 #        "module" : "biothings.utils.es",
 #        "host" : "localhost:9200",
 #        }
+
+# List of package paths for active datasources (expect data-plugin based sources)
+ACTIVE_DATASOURCES = ConfigurationDefault(
+        default=[],
+        desc="List of package paths for active datasources")
 
 # Path to a folder to store all downloaded files, logs, caches, etc...
 DATA_ARCHIVE_ROOT = ConfigurationError("Define path to folder which will contain all downloaded data, cache files, etc...")

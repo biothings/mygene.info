@@ -3,23 +3,19 @@ from biothings.hub.datatransform.datatransform_mdb import DataTransformMDB, Mong
 
 graph_mygene = nx.DiGraph()
 
-#graph_mygene.add_node('entrez')
-#graph_mygene.add_node('ensembl')
-#graph_mygene.add_node('uniprot')
-
 for field in ["entrez","ensembl","uniprot","mgi","hgnc","rgd","tair","wormbase","zfin","sgd","flybase"]:
     graph_mygene.add_node(field)
 
 
 graph_mygene.add_edge('swissprot', 'entrez',
         object=MongoDBEdge('uniprot',
-                           lookup='uniprot.swiss-prot',
+                           lookup='uniprot.Swiss-Prot',
                            field='_id'))
 
 graph_mygene.add_edge('swissprot', 'swissprot',
         object=MongoDBEdge('uniprot',
-                           lookup='uniprot.swiss-prot',
-                           field='uniprot.swiss-prot'))
+                           lookup='uniprot.Swiss-Prot',
+                           field='uniprot.Swiss-Prot'))
 
 graph_mygene.add_edge('trembl', 'entrez',
         object=MongoDBEdge('uniprot',
