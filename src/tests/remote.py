@@ -23,7 +23,7 @@ from nose.core import runmodule
 from nose.tools import eq_, ok_
 
 from biothings.tests import BiothingsTestCase
-from biothings.tests.helper import equal
+from biothings.tests.web.helper import equal
 
 
 class MyGeneRemoteTest(BiothingsTestCase):
