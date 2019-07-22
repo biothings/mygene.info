@@ -10,9 +10,9 @@
 .release-info pre {overflow-x:auto;font-size:12px;padding-bottom:15px;}
 .release-link {margin-left:10px;}
 .release-version {font-weight:bold;}
-.release-date {font-style: italic; font:monospace; margin-bottom:0px}
+.release-date {font-style: italic; font:monospace; margin-bottom:4px; font-weight: 500}
 #mygene-releases h2 {margin-bottom:5px;}
-.release-pane {padding-left:7px;/*border-left:1px solid grey;*/}
+.release-pane {margin-bottom: 6px}
 .release-collapse {margin-left:10px;}
 .release-expand {margin-right:10px;}
 .release-control-line {margin-bottom: 5px;}
