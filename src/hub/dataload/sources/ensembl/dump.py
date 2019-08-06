@@ -76,7 +76,7 @@ class GenericBioMart(HTTPDumper):
         'type_of_gene':"gene_biotype",                  #     x
         'transcript_stable_id':"ensembl_transcript_id", #                x                    x        x     x
         'translation_stable_id':"ensembl_peptide_id",   #                x                    x        x     x
-        'dbprimary_id':"entrezgene",                    #                           x
+        'dbprimary_id':"entrezgene_id",                 #                           x
         'profile_id':"pfscan",                          #                                     x
         'interpro_id':"interpro",                       #                                              x
         'pfam':"pfam"                                   #                                                    x
