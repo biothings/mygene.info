@@ -19,7 +19,7 @@ class UniprotDumper(FTPDumper):
     FTP_HOST = 'ftp.uniprot.org'
     CWD_DIR = '/pub/databases/uniprot/current_release/knowledgebase/idmapping'
 
-    SCHEDULE = "0 6 * * *"
+    SCHEDULE = "30 7 * * *"
 
     def get_newest_info(self):
         res = self.client.sendcmd("MDTM idmapping_selected.tab.gz") # pick one, assuming all other on the same data

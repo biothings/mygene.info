@@ -18,7 +18,7 @@ class GenerifDumper(FTPDumper):
     FTP_HOST = 'ftp.ncbi.nih.gov'
     CWD_DIR = '/gene/GeneRIF'
 
-    SCHEDULE = "0 6 * * *"
+    SCHEDULE = "0 7 * * *"
 
     def get_newest_info(self):
         res = self.client.sendcmd("MDTM generifs_basic.gz") # pick one, assuming all other on the same data
