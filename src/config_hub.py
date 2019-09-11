@@ -1,3 +1,5 @@
+from biothings import ConfigurationError, ConfigurationDefault, ConfigurationValue
+
 # ######### #
 # HUB VARS  #
 # ######### #
@@ -11,6 +13,7 @@ DATA_PLUGIN_COLLECTION = 'data_plugin'     # for data plugins information
 API_COLLECTION = 'api'                     # for api information (running under hub control)
 CMD_COLLECTION = 'cmd'                     # for launched/running commands in shell
 EVENT_COLLECTION = 'event'                 # for launched/running commands in shell
+HUB_CONFIG_COLLECTION = 'hub_config'       # for values overrifing config files'
 
 DATA_TARGET_MASTER_COLLECTION = 'db_master'
 
@@ -29,6 +32,8 @@ TAXONOMY = {
     "pig": {"tax_id": "9823", "assembly": "susScr2"}
 }
 
+#* Publishing *#
+
 # reporting diff results, number of IDs to consider (to avoid too much mem usage)
 MAX_REPORTED_IDS = 1000
 # for diff updates, number of IDs randomly picked as examples when rendering the report
@@ -36,7 +41,6 @@ MAX_RANDOMLY_PICKED = 10
 # size of a diff file when in memory (used when merged/reduced)
 MAX_DIFF_SIZE = 50 * 1024**2  # 50MiB (~1MiB on disk when compressed)
 
-# ES s3 repository to use snapshot/restore (must be pre-configured in ES)
 SNAPSHOT_REPOSITORY = "gene_repository"
 # ES snapshot name accessible (usually using a URL)
 # These two snapshot configs should point to
@@ -51,6 +55,7 @@ CACHE_FORMAT = "xz"
 # - "auto", let hub decides (will use 50%-60% of available RAM)
 # - None: no limit
 # - otherwise specify a number in bytes
+#- skip -#
 HUB_MAX_MEM_USAGE = None
 
 # Max number of *processes* hub can access to run jobs
@@ -62,12 +67,6 @@ MAX_SYNC_WORKERS = HUB_MAX_WORKERS
 # at any time (avoiding job submission preparation) but also not a huge number
 # as any pending job will consume some memory).
 MAX_QUEUED_JOBS = os.cpu_count() * 4
-
-# when creating a snapshot, how long should we wait before querying ES
-# to check snapshot status/completion ? (in seconds)
-# Since myvariant's indices are pretty big, a whole snaphost won't happen in few secs,
-# let's just monitor the status every 5min
-MONITOR_SNAPSHOT_DELAY = 5 * 60
 
 # Hub environment (like, prod, dev, ...)
 # Used to generate remote metadata file, like "latest.json", "versions.json"
@@ -81,21 +80,21 @@ HUB_NAME = "MyGene"
 HUB_ICON = "http://mygene.info/static/img/mygene-logo-shiny.svg"
 HUB_VERSION = "0.2"
 
-# S3 bucket, root of all biothings releases information
-S3_RELEASE_BUCKET = "biothings-releases"
-# S3 bucket, root of all biothings diffs
+# TODO: delete
 S3_DIFF_BUCKET = "biothings-diffs"
 # what sub-folder should be used within diff bucket to upload diff files
 S3_APP_FOLDER = "mygene.info" # gene/gene_allspecies
 
-### Pre-prod/test ES definitions
-ES_CONFIG = {
+#- Indexing -#
+# Pre-prod/test ES definitions
+INDEX_CONFIG = {
 		"indexer_select": {
 			# default
 			None : "hub.dataindex.indexer.GeneIndexer",
 			},
 		"env" : {
 			"prod" : {
+                # placeholder
 				"host" : "prodserver:9200",
 				"indexer" : {
 					"args" : {
@@ -120,18 +119,107 @@ ES_CONFIG = {
 			},
 		}
 
+#- Publishing -#
+# Snapshot environment configuration
+SNAPSHOT_CONFIG = {
+        "env" : {
+            "test" : {
+                "repository" : {
+                    "name" : "mygene_test_repository_%(build_version)s",
+                    "type" : "fs",
+                    "settings" : {
+                        "location" : "mygene/%(build_version)s",
+                        },
+                    # for s3, bucket policy
+                    #"acl" : "private",
+                    # for fs, root folder containing backups
+                    "es_backups_folder" : ConfigurationValue("""ES_BACKUPS_FOLDER"""),
+                    },
+                "indexer" : {
+                    # reference to INDEX_CONFIG
+                    "env" : "test", 
+                    # or use specific definition
+                    #"host" : "localhost:9200",
+                    #"args" : {
+                    #    "timeout" : 300,
+                    #    "retry_on_timeout" : True,
+                    #    "max_retries" : 10,
+                    #    },
+                    },
+                # when creating a snapshot, how long should we wait before querying ES
+                # to check snapshot status/completion ? (in seconds)
+                # Since myvariant's indices are pretty big, a whole snaphost won't happen in few secs,
+                # let's just monitor the status every 5min
+                "monitor_delay" : 10,
+                }
+            }
+        }
 
+# Release configuration
+# Each root keys define a release environment (test, prod, ...)
+RELEASE_CONFIG = {
+        "env" : {
+            "tests3" : {
+                "cloud" : {
+                    "type" : "aws", # default, only one supported by now
+                    "access_key" : None,
+                    "secret_key" : None,
+                    },
+                "release" : {
+                    "bucket" : "biothings-tests-releases",
+                    "region" : "us-west-2",
+                    "folder" : "mygene",
+                    "auto" : True, # automatically generate release-note ?
+                    },
+                "diff" : {
+                    "bucket" : "biothings-tests-diffs",
+                    "folder" : "mygene",
+                    "region" : "us-west-2",
+                    "auto" : True, # automatically generate diff ? Careful if lots of changes
+                    },
+                "publish" : {
+                    "pre" : [
+                        {
+                            "action" : "archive",
+                            "format" : "tar.xz",
+                            "name" : "mygene_snapshot_%(build_version)s.tar.xz",
+                            "es_backups_folder" : ConfigurationValue("""ES_BACKUPS_FOLDER"""),
+                            },
+                        {
+                            "action" : "upload",
+                            "type" : "s3", 
+                            "bucket" : "biothings-tests-snapshots",
+                            "region" : "us-west-2",
+                            "base_path" : "mygene/$(Y)",
+                            "file" : "mygene_snapshot_%(build_version)s.tar.xz",
+                            "acl" : "private",
+                            "es_backups_folder" : ConfigurationValue("""ES_BACKUPS_FOLDER"""),
+                            "overwrite" : True
+                            }
+                        ]
+                    },
+                }
+            }
+        }
+
+# Root folder containing ElasticSearch backups, created
+# by snapshots with repo type "fs". This setting must match
+# elasticsearch.yml value, param "path.repo"
+# If using "fs" type repository with post-step "archive",
+# this folder must have permissions set for user/group running the hub
+ES_BACKUPS_FOLDER = "/opt/es_backups"
+
+# Webhook to publish notifications to a Slack channel
 SLACK_WEBHOOK = None
 
 # SSH port for hub console
 HUB_SSH_PORT = 7022
 HUB_API_PORT = 7080
 
-################################################################################
-# HUB_PASSWD
-################################################################################
 # The format is a dictionary of 'username': 'cryptedpassword'
 # Generate crypted passwords with 'openssl passwd -crypt'
+#- hide -#
+#- readonly -#
 HUB_PASSWD = {"guest":"9RKfd8gDuNf0Q"}
 
 # cached data (it None, caches won't be used at all)
@@ -139,6 +227,7 @@ CACHE_FOLDER = None
 
 # Role, when master, hub will publish data (updates, snapshot, etc...) that
 # other instances can use (production, standalones)
+#- skip -#
 BIOTHINGS_ROLE = "slave"
 
 import logging
@@ -239,4 +328,10 @@ logger = ConfigurationDefault(
         desc="Provide a default hub logger instance (use setup_default_log(name,log_folder)")
 # Usually use default setup
 #logger = setup_default_log("hub", LOG_FOLDER)
+
+# Set whether configuration parameters can be edited
+# and superseded by user through ConfigurationManger
+# Note: once config manager has been configured with this
+# field, it's deleted to make sure we can't change it at runtime
+CONFIG_READONLY = True
 
