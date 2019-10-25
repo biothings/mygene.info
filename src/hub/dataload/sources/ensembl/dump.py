@@ -172,74 +172,87 @@ class GenericBioMart(HTTPDumper):
 
     # called by dump methods
     def _fetch_data(self, outfile, attributes, filters='', header=None):
-        cnt_lines_all = 0
-        cnt_species_success = 0
         out_f, outfile = safewfile(outfile, prompt=False, default='O')
         if header:
             out_f.write('\t'.join(header) + '\n')
-        for count, species in enumerate(self.species_li):
-            try:
-                dataset = self.get_dataset_name(species)
-            except IndexError:
-                self.logger.debug("Skip species '%s'", species)
-                continue
-            if not dataset:
-                continue
-            taxid = species[2]
-            xml = self._make_query_xml(
-                dataset, attributes=attributes, filters=filters)
-            try:
-                con = self.query_mart(xml)
-            except EntrezgeneNotFound as err:
-                if 'xref_entrezgene' in outfile:
-                    cnt_species_success += 1
-                    self.logger.warning("%s:: %s: %s", os.path.basename(outfile),
-                                        species[0], 'Skipping species without entrez gene id')
-                else:
-                    self.logger.error("%s:: %s %s", os.path.basename(outfile), species[0], err)
-                continue
-            except GeneNameNotFound as err:
-                _attributes = attributes.copy()
-                _attr_ext_gene_index = attributes.index('external_gene_name')
-                _attributes.remove('external_gene_name')
-                self.logger.debug(_attributes)
-                _xml = self._make_query_xml(
-                    dataset, attributes=_attributes, filters=filters)
+        failed = []
+        def do(species_li, keep_failed=True):
+            cnt_lines_all = 0
+            cnt_species_success = 0
+            for count, species in enumerate(species_li):
                 try:
-                    con = self.query_mart(_xml)
+                    dataset = self.get_dataset_name(species)
+                except IndexError:
+                    self.logger.debug("Skip species '%s'", species)
+                    continue
+                if not dataset:
+                    continue
+                taxid = species[2]
+                xml = self._make_query_xml(
+                    dataset, attributes=attributes, filters=filters)
+                try:
+                    con = self.query_mart(xml)
+                except EntrezgeneNotFound as err:
+                    if 'xref_entrezgene' in outfile:
+                        cnt_species_success += 1
+                        self.logger.warning("%s:: %s: %s", os.path.basename(outfile),
+                                            species[0], 'Skipping species without entrez gene id')
+                    else:
+                        self.logger.error("%s:: %s %s", os.path.basename(outfile), species[0], err)
+                    continue
+                except GeneNameNotFound as err:
+                    _attributes = attributes.copy()
+                    _attr_ext_gene_index = attributes.index('external_gene_name')
+                    _attributes.remove('external_gene_name')
+                    self.logger.debug(_attributes)
+                    _xml = self._make_query_xml(
+                        dataset, attributes=_attributes, filters=filters)
+                    try:
+                        con = self.query_mart(_xml)
+                    except MartException as err:
+                        self.logger.error("%s:: %s %s", os.path.basename(outfile), species[0], err)
+                    self.logger.warning("%s:: %s: %s", os.path.basename(outfile), species[0],
+                                        'Retried to request species without external gene name')
+                    cnt_lines = 0
+                    cnt_species_success += 1
+                    for line in con.split('\n'):
+                        if line.strip() != '':
+                            tsv = line.split('\t')
+                            out_f.write(str(taxid) + '\t' +
+                                        tsv[0] + '\t\t' + '\t'.join(tsv[1:]) + '\n')
+                            cnt_lines += 1
+                            cnt_lines_all += 1
+                    self.logger.info("%s:: %d/%d %s %d records", os.path.basename(outfile),
+                                     count + 1, len(species_li), species[0], cnt_lines)
+                    continue
                 except MartException as err:
                     self.logger.error("%s:: %s %s", os.path.basename(outfile), species[0], err)
-                self.logger.warning("%s:: %s: %s", os.path.basename(outfile), species[0],
-                                    'Retried to request species without external gene name')
+                    continue
+                except requests.models.ChunkedEncodingError:
+                    self.logger.error("Error getting data for: %s (%s)" % (species[0],os.path.basename(outfile)))
+                    if keep_failed:
+                        failed.append(species)
+                        continue
+                    else:
+                        raise
                 cnt_lines = 0
                 cnt_species_success += 1
+                if not con:
+                    self.logger.error('Empty Response.')
                 for line in con.split('\n'):
                     if line.strip() != '':
-                        tsv = line.split('\t')
-                        out_f.write(str(taxid) + '\t' +
-                                    tsv[0] + '\t\t' + '\t'.join(tsv[1:]) + '\n')
+                        out_f.write(str(taxid) + '\t' + line + '\n')
                         cnt_lines += 1
                         cnt_lines_all += 1
                 self.logger.info("%s:: %d/%d %s %d records", os.path.basename(outfile),
-                                 count + 1, len(self.species_li), species[0], cnt_lines)
-                continue
-            except MartException as err:
-                self.logger.error("%s:: %s %s", os.path.basename(outfile), species[0], err)
-                continue
-            cnt_lines = 0
-            cnt_species_success += 1
-            if not con:
-                self.logger.error('Empty Response.')
-            for line in con.split('\n'):
-                if line.strip() != '':
-                    out_f.write(str(taxid) + '\t' + line + '\n')
-                    cnt_lines += 1
-                    cnt_lines_all += 1
-            self.logger.info("%s:: %d/%d %s %d records", os.path.basename(outfile),
-                             count + 1, len(self.species_li), species[0], cnt_lines)
+                                 count + 1, len(species_li), species[0], cnt_lines)
+            self.logger.info("Total: %s:: %d/%d successes %d records", os.path.basename(outfile),
+                             cnt_species_success, len(species_li), cnt_lines_all)
+        do(self.species_li)
+        if failed:
+            self.logger.info("Retry failed species: %s" % failed)
+            do(failed,keep_failed=False)
         out_f.close()
-        self.logger.info("Total: %s:: %d/%d successes %d records", os.path.basename(outfile),
-                         cnt_species_success, len(self.species_li), cnt_lines_all)
 
     # helper method for _fetch_data
     def _make_query_xml(self, dataset, attributes, filters=None):
