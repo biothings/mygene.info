@@ -115,6 +115,7 @@ class GenericBioMart(HTTPDumper):
         ftp.login()
         release_li = [x for x in ftp.nlst(
             self.RELEASE_FOLDER) if x.startswith(self.RELEASE_PREFIX)]
+        self.logger.debug("release_li = %s", str(release_li))
         return str(sorted([int(fn.split('-')[-1]) for fn in release_li])[-1])
 
     # helper for self.create_todump_list()
