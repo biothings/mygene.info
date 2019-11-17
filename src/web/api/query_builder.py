@@ -34,7 +34,7 @@ class ESQueryBuilder(ESQueryBuilder):
 
     def _POST_query(self, qs, scopes):
         _q = []
-        INT_FIELDS = set(['entrezgene', 'retired'])
+        INT_FIELDS = set(('entrezgene', 'retired', 'HGNC', 'MIM'))
         
         if not scopes:
             scopes = self.default_scopes
