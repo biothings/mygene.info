@@ -5,6 +5,13 @@ class ExacUploader(uploader.MergerSourceUploader):
 
     name = "broadinstitute_exac"
     main_source = "exac"
+    __metadata__ = {
+        "src_meta": {
+            "license": "ODbL",
+            "license_url": "http://exac.broadinstitute.org/terms",
+            "license_url_short": "http://bit.ly/2H9c4hg",
+        }
+    }
 
     def load_data(self, data_folder):
         genedoc_d = load_broadinstitute_exac(data_folder)
