@@ -1,5 +1,10 @@
 {
     "version": "0.2",
+    "__metadata__": {
+        "url": "http://pantherdb.org/",
+        "license_url": "http://pantherdb.org/tou.jsp",
+        "licence": "GNU General Public License Version 2"
+    },
     "dumper" : {
         "data_url" : "ftp://ftp.pantherdb.org/ortholog/current_release/RefGenomeOrthologs.tar.gz",
         "uncompress" : true

@@ -154,5 +154,6 @@ function displayReleases() {
 
     if (window.location.hash) {
         location.href = window.location.hash
+        jQuery(window.location.hash).children("div").children("a").click()
     }
 }
