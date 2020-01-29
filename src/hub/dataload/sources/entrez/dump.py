@@ -37,7 +37,7 @@ class EntrezGeneDumper(FTPDumper):
     def create_todump_list(self, force=False):
         self.get_newest_info()
         for fn in ["gene_info.gz","gene2accession.gz","gene2refseq.gz",
-                "gene2unigene","gene2go.gz","gene_history.gz","gene2ensembl.gz"]:
+                   "gene2go.gz","gene_history.gz","gene2ensembl.gz"]:
             local_file = os.path.join(self.new_data_folder,fn)
             if force or not os.path.exists(local_file) or self.remote_is_better(fn,local_file) or self.new_release_available():
                 self.to_dump.append({"remote": fn, "local":local_file})
