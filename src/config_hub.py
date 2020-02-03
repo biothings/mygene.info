@@ -110,7 +110,7 @@ SNAPSHOT_CONFIG = {
                     "name" : "gene_repository",
                     "type" : "s3",
                     "settings" : {
-                        "bucket" : "biothings-es6-snapshots-test",
+                        "bucket" : "<SNAPSHOT_BUCKET_NAME>",
                         "base_path" : "mygene.info/$(Y)", # per year
                         "region" : "us-west-2",
                         },
@@ -134,7 +134,7 @@ SNAPSHOT_CONFIG = {
                     "name" : "gene_repository-demo",
                     "type" : "s3",
                     "settings" : {
-                        "bucket" : "biothings-es6-snapshots-demo-test",
+                        "bucket" : "<SNAPSHOT_DEMO_BUCKET_NAME>",
                         "base_path" : "mygene.info/$(Y)", # per year
                         "region" : "us-west-2",
                         },
@@ -162,13 +162,13 @@ RELEASE_CONFIG = {
                     "secret_key" : None,
                     },
                 "release" : {
-                    "bucket" : "biothings-releases-test",
+                    "bucket" : "<RELEASES_BUCKET_NAME>",
                     "region" : "us-west-2",
                     "folder" : "mygene.info",
                     "auto" : True, # automatically generate release-note ?
                     },
                 "diff" : {
-                    "bucket" : "biothings-diffs-test",
+                    "bucket" : "<DIFFS_BUCKET_NAME>",
                     "folder" : "mygene.info",
                     "region" : "us-west-2",
                     "auto" : True, # automatically generate diff ? Careful if lots of changes
@@ -181,13 +181,13 @@ RELEASE_CONFIG = {
                     "secret_key" : None,
                     },
                 "release" : {
-                    "bucket" : "biothings-releases-test",
+                    "bucket" : "<RELEASES_BUCKET_NAME>",
                     "region" : "us-west-2",
                     "folder" : "mygene.info-demo",
                     "auto" : True, # automatically generate release-note ?
                     },
                 "diff" : {
-                    "bucket" : "biothings-diffs-demo-test",
+                    "bucket" : "<DIFFS_BUCKET_NAME>",
                     "folder" : "mygene.info",
                     "region" : "us-west-2",
                     "auto" : True, # automatically generate diff ? Careful if lots of changes
