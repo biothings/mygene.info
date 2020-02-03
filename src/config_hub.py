@@ -12,8 +12,6 @@ API_COLLECTION = 'api'                     # for api information (running under 
 CMD_COLLECTION = 'cmd'                     # for launched/running commands in shell
 EVENT_COLLECTION = 'event'                 # for launched/running commands in shell
 
-DATA_TARGET_MASTER_COLLECTION = 'db_master'
-
 # where to store info about processes launched by the hub
 RUN_DIR = './run'
 
@@ -36,14 +34,6 @@ MAX_RANDOMLY_PICKED = 10
 # size of a diff file when in memory (used when merged/reduced)
 MAX_DIFF_SIZE = 50 * 1024**2  # 50MiB (~1MiB on disk when compressed)
 
-# ES s3 repository to use snapshot/restore (must be pre-configured in ES)
-SNAPSHOT_REPOSITORY = "gene_repository"
-# ES snapshot name accessible (usually using a URL)
-# These two snapshot configs should point to
-# the same location in a way. The different is the first 
-# used access controller to write data, and the second is read-only
-READONLY_SNAPSHOT_REPOSITORY ="gene_url"
-
 # cache file format ("": ascii/text uncompressed, or "gz|zip|xz"
 CACHE_FORMAT = "xz"
 
@@ -63,12 +53,6 @@ MAX_SYNC_WORKERS = HUB_MAX_WORKERS
 # as any pending job will consume some memory).
 MAX_QUEUED_JOBS = os.cpu_count() * 4
 
-# when creating a snapshot, how long should we wait before querying ES
-# to check snapshot status/completion ? (in seconds)
-# Since myvariant's indices are pretty big, a whole snaphost won't happen in few secs,
-# let's just monitor the status every 5min
-MONITOR_SNAPSHOT_DELAY = 5 * 60
-
 # Hub environment (like, prod, dev, ...)
 # Used to generate remote metadata file, like "latest.json", "versions.json"
 # If non-empty, this constant will be used to generate those url, as a prefix 
@@ -79,24 +63,16 @@ HUB_ENV = ""
 # Hub name/icon url/version, for display purpose
 HUB_NAME = "MyGene"
 HUB_ICON = "http://mygene.info/static/img/mygene-logo-shiny.svg"
-HUB_VERSION = "0.2"
-
-# S3 bucket, root of all biothings releases information
-S3_RELEASE_BUCKET = "biothings-releases"
-# S3 bucket, root of all biothings diffs
-S3_DIFF_BUCKET = "biothings-diffs"
-# what sub-folder should be used within diff bucket to upload diff files
-S3_APP_FOLDER = "mygene.info" # gene/gene_allspecies
 
 ### Pre-prod/test ES definitions
-ES_CONFIG = {
+INDEX_CONFIG = {
 		"indexer_select": {
 			# default
 			None : "hub.dataindex.indexer.GeneIndexer",
 			},
 		"env" : {
 			"prod" : {
-				"host" : "prodserver:9200",
+				"host" : "<PRODSERVER>:9200",
 				"indexer" : {
 					"args" : {
 						"timeout" : 300,
@@ -121,6 +97,105 @@ ES_CONFIG = {
 		}
 
 
+# Snapshot environment configuration
+SNAPSHOT_CONFIG = {
+        "env" : {
+            "prod" : {
+                "cloud" : {
+                    "type" : "aws", # default, only one supported by now
+                    "access_key" : None,
+                    "secret_key" : None,
+                    },
+                "repository" : {
+                    "name" : "gene_repository",
+                    "type" : "s3",
+                    "settings" : {
+                        "bucket" : "biothings-es6-snapshots-test",
+                        "base_path" : "mygene.info/$(Y)", # per year
+                        "region" : "us-west-2",
+                        },
+                    "acl" : "private",
+                    },
+                "indexer" : {
+                    # reference to INDEX_CONFIG
+                    "env" : "prod",
+                    },
+                # when creating a snapshot, how long should we wait before querying ES
+                # to check snapshot status/completion ? (in seconds)
+                "monitor_delay" : 60 * 5,
+                },
+            "demo" : {
+                "cloud" : {
+                    "type" : "aws", # default, only one supported by now
+                    "access_key" : None,
+                    "secret_key" : None,
+                    },
+                "repository" : {
+                    "name" : "gene_repository-demo",
+                    "type" : "s3",
+                    "settings" : {
+                        "bucket" : "biothings-es6-snapshots-demo-test",
+                        "base_path" : "mygene.info/$(Y)", # per year
+                        "region" : "us-west-2",
+                        },
+                    "acl" : "public",
+                    },
+                "indexer" : {
+                    # reference to INDEX_CONFIG
+                    "env" : "test",
+                    },
+                # when creating a snapshot, how long should we wait before querying ES
+                # to check snapshot status/completion ? (in seconds)
+                "monitor_delay" : 10,
+                }
+            }
+        }
+
+# Release configuration
+# Each root keys define a release environment (test, prod, ...)
+RELEASE_CONFIG = {
+        "env" : {
+            "prod" : {
+                "cloud" : {
+                    "type" : "aws", # default, only one supported by now
+                    "access_key" : None,
+                    "secret_key" : None,
+                    },
+                "release" : {
+                    "bucket" : "biothings-releases-test",
+                    "region" : "us-west-2",
+                    "folder" : "mygene.info",
+                    "auto" : True, # automatically generate release-note ?
+                    },
+                "diff" : {
+                    "bucket" : "biothings-diffs-test",
+                    "folder" : "mygene.info",
+                    "region" : "us-west-2",
+                    "auto" : True, # automatically generate diff ? Careful if lots of changes
+                    },
+                },
+            "demo": {
+                "cloud" : {
+                    "type" : "aws", # default, only one supported by now
+                    "access_key" : None,
+                    "secret_key" : None,
+                    },
+                "release" : {
+                    "bucket" : "biothings-releases-test",
+                    "region" : "us-west-2",
+                    "folder" : "mygene.info-demo",
+                    "auto" : True, # automatically generate release-note ?
+                    },
+                "diff" : {
+                    "bucket" : "biothings-diffs-demo-test",
+                    "folder" : "mygene.info",
+                    "region" : "us-west-2",
+                    "auto" : True, # automatically generate diff ? Careful if lots of changes
+                    },
+                }
+            }
+        }
+
 SLACK_WEBHOOK = None
 
 # SSH port for hub console
@@ -137,9 +212,8 @@ HUB_PASSWD = {"guest":"9RKfd8gDuNf0Q"}
 # cached data (it None, caches won't be used at all)
 CACHE_FOLDER = None
 
-# Role, when master, hub will publish data (updates, snapshot, etc...) that
-# other instances can use (production, standalones)
-BIOTHINGS_ROLE = "slave"
+# when publishing releases, specify the targetted (ie. required) standalone version
+STANDALONE_VERSION = "standalone_v3"
 
 import logging
 
