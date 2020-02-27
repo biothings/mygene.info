@@ -1,4 +1,4 @@
-Web front-end of next generation (v2) MyGene.info (Gene Annotation Query as a Service)
+Web front-end of next generation (v3) MyGene.info (Gene Annotation Query as a Service)
 
 ## Setup Mygene.info Web Server Locally ##
 
