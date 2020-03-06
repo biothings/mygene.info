@@ -107,7 +107,7 @@ SNAPSHOT_CONFIG = {
                     "secret_key" : None,
                     },
                 "repository" : {
-                    "name" : "gene_repository",
+                    "name" : "gene_repository-$(Y)",
                     "type" : "s3",
                     "settings" : {
                         "bucket" : "<SNAPSHOT_BUCKET_NAME>",
@@ -131,7 +131,7 @@ SNAPSHOT_CONFIG = {
                     "secret_key" : None,
                     },
                 "repository" : {
-                    "name" : "gene_repository-demo",
+                    "name" : "gene_repository-demo-$(Y)",
                     "type" : "s3",
                     "settings" : {
                         "bucket" : "<SNAPSHOT_DEMO_BUCKET_NAME>",
