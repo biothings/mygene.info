@@ -52,21 +52,21 @@ class MyGeneHubServer(HubServer):
     def configure_commands(self):
         super().configure_commands() # keep all originals...
         self.commands["es_sync_test"] = partial(self.managers["sync_manager_test"].sync,"es",
-                                           target_backend=(config.ES_CONFIG["env"]["test"]["host"],
-                                                           config.ES_CONFIG["env"]["test"]["index"][0]["index"],
-                                                           config.ES_CONFIG["env"]["test"]["index"][0]["doc_type"]))
+                                           target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
+                                                           config.INDEX_CONFIG["env"]["test"]["index"][0]["index"],
+                                                           config.INDEX_CONFIG["env"]["test"]["index"][0]["doc_type"]))
         self.commands["es_sync_prod"] = partial(self.managers["sync_manager"].sync,"es",
-                                           target_backend=(config.ES_CONFIG["env"]["prod"]["host"],
-                                                           config.ES_CONFIG["env"]["prod"]["index"][0]["index"],
-                                                           config.ES_CONFIG["env"]["prod"]["index"][0]["doc_type"]))
-        self.commands["publish_diff_demo"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-demo",
-                                                s3_bucket=config.S3_DIFF_BUCKET + "-demo")
-        self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
-        self.commands["publish_snapshot_demo"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo",
-                                            repository=config.READONLY_SNAPSHOT_REPOSITORY)
-        # replace default
-        self.commands["publish_diff"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER)
-        self.commands["publish_snapshot"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER)
+                                           target_backend=(config.INDEX_CONFIG["env"]["prod"]["host"],
+                                                           config.INDEX_CONFIG["env"]["prod"]["index"][0]["index"],
+                                                           config.INDEX_CONFIG["env"]["prod"]["index"][0]["doc_type"]))
+        #self.commands["publish_diff_demo"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER + "-demo",
+        #                                        s3_bucket=config.S3_DIFF_BUCKET + "-demo")
+        #self.commands["snapshot_demo"] = partial(self.managers["index_manager"].snapshot,repository=config.SNAPSHOT_REPOSITORY + "-demo")
+        #self.commands["publish_snapshot_demo"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER + "-demo",
+        #                                    repository=config.READONLY_SNAPSHOT_REPOSITORY)
+        ## replace default
+        #self.commands["publish_diff"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER)
+        #self.commands["publish_snapshot"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER)
 
     def before_start(self):
         self.logger.info("Scheduling builds")
