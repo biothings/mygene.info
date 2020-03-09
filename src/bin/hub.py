@@ -52,9 +52,9 @@ class MyGeneHubServer(HubServer):
     def configure_commands(self):
         super().configure_commands() # keep all originals...
         self.commands["es_sync_test"] = partial(self.managers["sync_manager_test"].sync,"es",
-                                           target_backend=(config.INDEX_CONFIG["env"]["test"]["host"],
-                                                           config.INDEX_CONFIG["env"]["test"]["index"][0]["index"],
-                                                           config.INDEX_CONFIG["env"]["test"]["index"][0]["doc_type"]))
+                                           target_backend=(config.INDEX_CONFIG["env"]["local"]["host"],
+                                                           config.INDEX_CONFIG["env"]["local"]["index"][0]["index"],
+                                                           config.INDEX_CONFIG["env"]["local"]["index"][0]["doc_type"]))
         self.commands["es_sync_prod"] = partial(self.managers["sync_manager"].sync,"es",
                                            target_backend=(config.INDEX_CONFIG["env"]["prod"]["host"],
                                                            config.INDEX_CONFIG["env"]["prod"]["index"][0]["index"],
@@ -72,8 +72,8 @@ class MyGeneHubServer(HubServer):
         self.logger.info("Scheduling builds")
         allspecies = partial(server.shell.launch,partial(server.managers["build_manager"].merge,"mygene_allspecies"))
         demo = partial(server.shell.launch,partial(server.managers["build_manager"].merge,"demo_allspecies"))
-        server.managers["job_manager"].submit(allspecies,"0 2 * * 7")
-        server.managers["job_manager"].submit(demo,"0 4 * * 7")
+        server.managers["job_manager"].submit(allspecies,"0 4 * * 7")
+        server.managers["job_manager"].submit(demo,"0 6 * * 7")
 
 import hub.dataload
 from hub.datatransform.keylookup import MyGeneKeyLookup
