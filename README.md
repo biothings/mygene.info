@@ -1,7 +1,9 @@
 # MyGene.info
 
 ## Description
-MyGene.info is a web API for accessing gene annotation information (Gene Annotation Query as a Service).  This repo contains the web front-end of MyGene.info.  For more information see this reference:
+MyGene.info is a web API for accessing gene annotation information (Gene Annotation Query as a Service).  MyGene.info is part of [BioThings API](http://biothings.io) collection, together with [MyVariant.info](https://myvariant.info), [MyChem.info](https://mychem.info) and [more](https://biothings.io/).
+
+For more information see this reference:
 
 > Xin J, Mark A, Afrasiabi C, Tsueng G, Juchler M, Gopal N, Stupp GS, Putman TE, Ainscough BJ, Griffith OL, Torkamani A, Whetzel PL, Mungall CJ, Mooney SD, Su AI, Wu C.
 > **High-performance web services for querying gene and variant annotation.**
