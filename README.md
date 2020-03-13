@@ -1,4 +1,12 @@
-Web front-end of next generation (v3) MyGene.info (Gene Annotation Query as a Service)
+# MyGene.info
+
+## Description
+MyGene.info is a web API for accessing gene annotation information (Gene Annotation Query as a Service).  This repo contains the web front-end of MyGene.info.  For more information see this reference:
+
+> Xin J, Mark A, Afrasiabi C, Tsueng G, Juchler M, Gopal N, Stupp GS, Putman TE, Ainscough BJ, Griffith OL, Torkamani A, Whetzel PL, Mungall CJ, Mooney SD, Su AI, Wu C.
+> **High-performance web services for querying gene and variant annotation.**
+> Genome Biol. 2016 May 6;17(1):91. doi: 10.1186/s13059-016-0953-9.
+> https://www.ncbi.nlm.nih.gov/pubmed/27154141
 
 ## Setup Mygene.info Web Server Locally ##
 
