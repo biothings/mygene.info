@@ -1,6 +1,7 @@
 import biothings.utils.mongo as mongo
 import biothings.hub.databuild.builder as builder
 from biothings.utils.common import loadobj
+from biothings.hub import BUILDER_CATEGORY
 
 from hub.dataload.sources.entrez.gene_upload import EntrezGeneUploader
 from hub.dataload.sources.ensembl.gene_upload import EnsemblGeneUploader
@@ -10,6 +11,21 @@ class MyGeneDataBuilder(builder.DataBuilder):
     MyGene.info specific data builder, computing custom statistics
     about Ensembl-to-Entrez mapping.
     """
+
+    def get_predicates(self):
+        def no_other_merge_job_for_ensembl_gene(job_manager):
+            """
+            ensembl to entrez ID conversion can produce duplicates
+            which are not handled by mongo as upserts and produce duplicated
+            errors. For this datasource in particular, we allow only one merge job
+            """
+            return len([j for j in job_manager.jobs.values() if \
+                    j["category"] == BUILDER_CATEGORY \
+                    and j["step"] == "ensembl_gene"]) == 0
+        preds = super().get_predicates()
+        preds.append(no_other_merge_job_for_ensembl_gene)
+        return preds
+
 
     def generate_document_query(self, src_name):
         """Root documents are created according to species list"""
