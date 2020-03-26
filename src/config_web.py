@@ -92,7 +92,7 @@ ID_REQUIRED_MESSAGE = 'Gene ID Required'
 ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
 
 # for docs
-INCLUDE_DOCS = True
+INCLUDE_DOCS = False
 DOCS_STATIC_PATH = '../docs/_build/html'
 
 # for static server
