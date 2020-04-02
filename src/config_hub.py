@@ -201,6 +201,7 @@ SLACK_WEBHOOK = None
 # SSH port for hub console
 HUB_SSH_PORT = 7022
 HUB_API_PORT = 7080
+READONLY_HUB_API_PORT = 7081
 
 ################################################################################
 # HUB_PASSWD
