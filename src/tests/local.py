@@ -7,7 +7,7 @@ from nose.core import run
 
 from biothings.tests import TornadoTestServerMixin
 from tests.remote import MyGeneRemoteTest
-from web.settings import MyGeneWebSettings
+from biothings.web.settings import BiothingESWebSettings
 
 
 class MyGeneLocalTest(TornadoTestServerMixin, MyGeneRemoteTest):
@@ -19,7 +19,7 @@ class MyGeneLocalTest(TornadoTestServerMixin, MyGeneRemoteTest):
     __test__ = True
 
     # Override default setting loader
-    settings = MyGeneWebSettings(config='config')
+    settings = BiothingESWebSettings(config='config')
 
 
 if __name__ == '__main__':
@@ -27,4 +27,4 @@ if __name__ == '__main__':
     print('MyGene Local Test')
     print('-'*70)
     print()
-    run(argv=['', '--logging-level=INFO', '-v'], defaultTest='__main__.MyGeneLocalTest')
+    run(argv=['', '--logging-level=WARNING', '-v'], defaultTest='__main__.MyGeneLocalTest')
