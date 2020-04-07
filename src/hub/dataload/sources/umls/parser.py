@@ -1,28 +1,37 @@
 # Determine UMLS CUI to Entrez Gene id mappings for genes
 # 1. Parse UMLS to determine HGNC ids for each CUI
 # 2. Use HGNC to convert HGNC ids to Entrez Gene ids
-
+import os
 from collections import defaultdict
+from biothings_client import get_client
 
-import pandas as pd
+GENE_CLIENT = get_client('gene')
 
-def parse_hgnc():
-    """Determine HGNC to Entrez gene id mapping.
-
-    Drops all genes without Entrez Gene ids.
+def query_hgnc(hgnc_ids: list) -> dict:
+    """Use biothings_client.py to query hgnc ids and get back '_id' in mygene.info
+    
+    :param: hgnc_ids: list of HGNC ids
     """
+    res = GENE_CLIENT.querymany(hgnc_ids, scopes='HGNC', fields='_id')
+    new_res = defaultdict(list)
+    for item in res:
+        if not "notfound" in item:
+            new_res[item['query']].append(item['_id'])
+    return new_res
 
-    file_url = "ftp://ftp.ebi.ac.uk/pub/databases/genenames/new/tsv/hgnc_complete_set.txt"
+def query_uniprot(uniprot_ids: list) -> dict:
+    """Use biothings_client.py to query uniprot ids and get back '_id' in mygene.info
+    
+    :param: uniprot_ids: list of UniProt IDs
+    """
+    res = GENE_CLIENT.querymany(uniprot_ids, scopes='uniprot.Swiss-Prot', fields='_id')
+    new_res = defaultdict(list)
+    for item in res:
+        if not item.get("notfound"):
+            new_res[item['query']].append(item['_id'])
+    return new_res
 
-    # drops any HGNC genes with missing Entrez ids
-    return (pd
-        .read_csv(file_url, sep='\t', low_memory=False)
-        [["hgnc_id", "symbol", "status", "entrez_id"]]
-        .dropna(axis=0, how="any", subset=["entrez_id"])
-        .assign(entrez_id = lambda df: df["entrez_id"].astype(int))
-    )
-
-def parse_umls(rrf_file):
+def parse_mrcon(rrf_file):
     """Parse the UMLS to determine the HGNC identifier of each gene CUI.
 
     The relevant files are in the archive <version>-1-meta.nlm (a zip file)
@@ -32,7 +41,8 @@ def parse_umls(rrf_file):
     final MRCONSO.RRF file, which is a | delimited text file without a header.
     """
 
-    res = defaultdict(list)
+    res = defaultdict(set)
+    hgnc_ids = set()
     with open(rrf_file, "r") as fin:
         for line in fin:
             if "HGNC:" in line:
@@ -41,21 +51,50 @@ def parse_umls(rrf_file):
                 cui = vals[0]
                 for val in vals[1:]:
                     if val.startswith("HGNC:"):
-                        res["cui"].append(cui)
-                        res["hgnc_id"].append(val)
+                        res[val.split(':')[-1]].add(cui)
+                        hgnc_ids.add(val.split(':')[-1])
+    return res, hgnc_ids
 
-    return pd.DataFrame(res).drop_duplicates()
+def parse_mrsat(rrf_file):
+    """Parse the UMLS to determine the UniProt identifier of each protein CUI.
 
-def load_data(rrf_file):
-    hgnc_map = parse_hgnc()
-    cui_map = parse_umls(rrf_file)
+    The relevant file is MRSAT.RRF, which is downloaded from https://download.nlm.nih.gov/umls/kss/2019AB/umls-2019AB-metathesaurus.zip
+    """
 
-    res = hgnc_map.merge(cui_map, how="inner", on="hgnc_id")
+    res = defaultdict(set)
+    uniprot_ids = set()
+    with open(rrf_file, "r") as fin:
+        for line in fin:
+            if "SWISS_PROT" in line:
+                vals = line.rstrip("\n").split("|")
+                cui = vals[0]
+                res[vals[-4]].add(cui)
+                uniprot_ids.add(vals[-4])
+    return res, uniprot_ids
 
-    for idx, row in res.iterrows():
-        yield {
-            "_id": str(row["entrez_id"]),
-            "umls": {
-                "cui": row["cui"]
-            }
-        }
+def unlist(l):
+    l = list(l)
+    if len(l) == 1:
+        return l[0]
+    return l
+
+def load_data(data_folder):
+    mrsat_file = os.path.join(data_folder, 'MRSAT.RRF')
+    mrconso_file = os.path.join(data_folder, 'MRCONSO.RRF') 
+    hgnc_map, hgnc_ids = parse_mrcon(mrconso_file)
+    uniprot_map, uniprot_ids = parse_mrsat(mrsat_file)
+    res = {}
+    hgnc2mygeneids = query_hgnc(hgnc_ids)
+    uniprot2mygeneids = query_uniprot(uniprot_ids)
+    for hgnc, _ids in hgnc2mygeneids.items():
+        for _id in _ids:
+            res[_id] = {'cui': unlist(hgnc_map[hgnc])}
+    for uniprot, _ids in uniprot2mygeneids.items():
+        for _id in _ids:
+            if _id not in res:
+                res[_id] = {}
+            res[_id]['protein_cui'] = unlist(uniprot_map[uniprot])
+    for _id, item in res.items():
+        yield {'_id': _id,
+               'umls': item}
+
