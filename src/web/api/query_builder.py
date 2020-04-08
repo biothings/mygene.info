@@ -75,6 +75,6 @@ class MygeneQueryBuilder(ESQueryBuilder):
             if 'all' not in options.species:  # TODO
                 search = search.filter('terms', taxid=options.species)
         if options.aggs and options.species_facet_filter:
-            search.post_filter('terms', taxid=options.species_facet_filter)
+            search = search.post_filter('terms', taxid=options.species_facet_filter)
 
         return search
