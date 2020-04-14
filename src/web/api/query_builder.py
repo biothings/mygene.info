@@ -1,7 +1,7 @@
 import re
 
 from biothings.utils.web.es_dsl import AsyncSearch
-from biothings.web.api.es.query_builder import ESQueryBuilder
+from biothings.web.api.es.pipelines import ESQueryBuilder
 
 from .queries import dismax, wildcard, interval
 
