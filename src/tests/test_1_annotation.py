@@ -11,12 +11,11 @@ class TestAnnotationGET(BiothingsTestCase):
             'HGNC', 'MIM', '_id', 'accession', 'alias',
             'ec', 'ensembl', 'entrezgene', 'genomic_pos',
             'go', 'homologene', 'interpro', 'ipi', 'map_location',
-            'name', 'pdb', 'pharmgkb', 'prosite', 'reagent',
+            'name', 'pir', 'pdb', 'pharmgkb', 'prosite', 'reagent',
             'refseq', 'reporter', 'summary', 'symbol', 'taxid',
             'type_of_gene', 'unigene', 'uniprot', 'exons', 'generif'
-        ]  
+        ]
         # Removed 'Vega' as an attribute in tests 2019/3
-        # Removed 'pir' on 4/7/2020
 
         for attr in attr_li:
             assert attr in res
@@ -88,7 +87,7 @@ class TestAnnotationGET(BiothingsTestCase):
             "missing": "id"
         }
         """
-        self.request('gene', expect=400) 
+        self.request('gene', expect=400)
 
     def test_113(self):
 
@@ -108,7 +107,7 @@ class TestAnnotationPOST(BiothingsTestCase):
             'symbol', 'reporter', 'refseq', 'pdb', 'interpro', 'entrezgene', 'summary',
             'genomic_pos_hg19', 'unigene', 'ipi', 'taxid', 'pfam', 'homologene', 'ensembl', 'ec',
             'type_of_gene', 'pathway', 'exons_hg19', 'MIM', 'generif', 'HGNC', 'name', 'reagent',
-            'uniprot', 'pharmgkb', 'alias', 'genomic_pos', 'accession', '_id', 'prosite',
+            'uniprot', 'pharmgkb', 'alias', 'genomic_pos', 'accession', '_id', 'pir', 'prosite',
             'wikipedia', 'go', 'query', 'map_location', 'exons', 'exac', 'other_names', 'umls',
             'pantherdb', 'pharos', '_version']
 
