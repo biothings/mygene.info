@@ -48,9 +48,12 @@ class TestSpecialInput(BiothingsTestCase):
         self.query(q='Xenbase:XB-GENE-1001990', species='frog')
 
     def test_415_case_sensitivity(self):
-        self.query(q=r'mgi:MGI\\:104772')
+        self.query(q=r'MGI:MGI\:104772')
 
     def test_416_case_sensitivity(self):
+        self.query(q=r'mgi:MGI\:104772')
+
+    def test_417_case_sensitivity(self):
         # sometimes the orders of results are *slightly* different for cdk2 and CDK2
         # so limit to top 3 more stable results
         lower = filter_hits(self.request("query?q=cdk2&size=3").json())
