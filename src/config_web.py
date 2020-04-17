@@ -37,7 +37,7 @@ APP_LIST = [
 ]
 
 # for static server
-STATIC_PATH = 'static'
+STATIC_PATH = 'src/static'
 
 # html header image
 HTML_OUT_HEADER_IMG = "/static/favicon.ico"
