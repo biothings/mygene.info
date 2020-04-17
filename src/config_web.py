@@ -5,13 +5,7 @@
 
 import re
 
-from biothings.web.api.es.handlers import (BiothingHandler,
-                                           MetadataFieldHandler,
-                                           StatusHandler)
 from biothings.web.settings.default import *
-from web.api.handlers import MygeneQueryHandler, MygeneSourceHandler
-from web.api.query_builder import MygeneQueryBuilder
-from web.handlers import DemoHandler, FrontPageHandler, TaxonHandler
 
 # *****************************************************************************
 # Elasticsearch Settings
@@ -28,18 +22,18 @@ ES_DOC_TYPE = 'gene'
 # *****************************************************************************
 API_VERSION = 'v3'
 APP_LIST = [
-    (r"/", FrontPageHandler),
-    (r"/demo/?$", DemoHandler),
-    (r"/status", StatusHandler),
-    (r"/metadata/?", MygeneSourceHandler),
-    (r"/metadata/fields/?", MetadataFieldHandler),
-    (r"/{}/species/(\d+)/?".format(API_VERSION), TaxonHandler),
-    (r"/{}/taxon/(\d+)/?".format(API_VERSION), TaxonHandler),
-    (r"/{}/gene/(.+)/?".format(API_VERSION), BiothingHandler),
-    (r"/{}/gene/?$".format(API_VERSION), BiothingHandler),
-    (r"/{}/query/?".format(API_VERSION), MygeneQueryHandler),
-    (r"/{}/metadata/?".format(API_VERSION), MygeneSourceHandler),
-    (r"/{}/metadata/fields/?".format(API_VERSION), MetadataFieldHandler),
+    (r"/", "web.handlers.FrontPageHandler"),
+    (r"/demo/?$", "web.handlers.DemoHandler"),
+    (r"/status", "biothings.web.handlers.StatusHandler"),
+    (r"/metadata/?", "web.api.handlers.MygeneSourceHandler"),
+    (r"/metadata/fields/?", "biothings.web.api.es.handlers.MetadataFieldHandler"),
+    (r"/{}/species/(\d+)/?".format(API_VERSION), "web.handlers.TaxonHandler"),
+    (r"/{}/taxon/(\d+)/?".format(API_VERSION), "web.handlers.TaxonHandler"),
+    (r"/{}/gene/(.+)/?".format(API_VERSION), "biothings.web.api.es.handlers.BiothingHandler"),
+    (r"/{}/gene/?$".format(API_VERSION), "biothings.web.api.es.handlers.BiothingHandler"),
+    (r"/{}/query/?".format(API_VERSION), "web.api.handlers.MygeneQueryHandler"),
+    (r"/{}/metadata/?".format(API_VERSION), "web.api.handlers.MygeneSourceHandler"),
+    (r"/{}/metadata/fields/?".format(API_VERSION), "biothings.web.api.es.handlers.MetadataFieldHandler"),
 ]
 
 # for static server
@@ -159,14 +153,10 @@ QUERY_GET_ESQB_KWARGS.update({
 # *****************************************************************************
 # Elasticsearch Query Pipeline
 # *****************************************************************************
-ES_QUERY_BUILDER = MygeneQueryBuilder
+ES_QUERY_BUILDER = "web.api.query_builder.MygeneQueryBuilder"
 
 AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
-# This essentially bypasses the es.get fallback as in myvariant...
-# The first regex matched integers, in which case the query becomes against
-# entrezgeneall annotation queries are now multimatch against the following fields
-ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired']),
-                            (re.compile(r'.*'), ['ensembl.gene'])]
+
 # *****************************************************************************
 # Analytics Settings
 # *****************************************************************************
@@ -189,8 +179,11 @@ STATUS_CHECK = {
 
 JSONLD_CONTEXT_PATH = 'web/context/context.json'
 
-# MYGENE THINGS
-
+# This essentially bypasses the es.get fallback as in myvariant...
+# The first regex matched integers, in which case the query becomes against
+# entrezgeneall annotation queries are now multimatch against the following fields
+ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired']),
+                            (re.compile(r'.*'), ['ensembl.gene'])]
 # for error messages
 ID_REQUIRED_MESSAGE = 'Gene ID Required'
 ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
@@ -201,6 +194,4 @@ DOCS_STATIC_PATH = '../docs/_build/html'
 
 # url template to redirect for 'include_tax_tree' parameter
 INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = 'http://t.biothings.io/v1/taxon'
-
-
 
