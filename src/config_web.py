@@ -27,13 +27,13 @@ APP_LIST = [
     (r"/status", "biothings.web.handlers.StatusHandler"),
     (r"/metadata/?", "web.api.handlers.MygeneSourceHandler"),
     (r"/metadata/fields/?", "biothings.web.api.es.handlers.MetadataFieldHandler"),
-    (r"/{}/species/(\d+)/?".format(API_VERSION), "web.handlers.TaxonHandler"),
-    (r"/{}/taxon/(\d+)/?".format(API_VERSION), "web.handlers.TaxonHandler"),
-    (r"/{}/gene/(.+)/?".format(API_VERSION), "biothings.web.api.es.handlers.BiothingHandler"),
-    (r"/{}/gene/?$".format(API_VERSION), "biothings.web.api.es.handlers.BiothingHandler"),
-    (r"/{}/query/?".format(API_VERSION), "web.api.handlers.MygeneQueryHandler"),
-    (r"/{}/metadata/?".format(API_VERSION), "web.api.handlers.MygeneSourceHandler"),
-    (r"/{}/metadata/fields/?".format(API_VERSION), "biothings.web.api.es.handlers.MetadataFieldHandler"),
+    (r"/{ver}/species/(\d+)/?", "web.handlers.TaxonHandler"),
+    (r"/{ver}/taxon/(\d+)/?", "web.handlers.TaxonHandler"),
+    (r"/{ver}/gene/(.+)/?", "biothings.web.api.es.handlers.BiothingHandler"),
+    (r"/{ver}/gene/?$", "biothings.web.api.es.handlers.BiothingHandler"),
+    (r"/{ver}/query/?", "web.api.handlers.MygeneQueryHandler"),
+    (r"/{ver}/metadata/?", "web.api.handlers.MygeneSourceHandler"),
+    (r"/{ver}/metadata/fields/?", "biothings.web.api.es.handlers.MetadataFieldHandler"),
 ]
 
 # for static server
