@@ -21,21 +21,15 @@ ES_DOC_TYPE = 'gene'
 # Web Application
 # *****************************************************************************
 API_VERSION = 'v3'
-APP_LIST = [
+APP_LIST += [
     (r"/", "web.handlers.FrontPageHandler"),
     (r"/demo/?$", "web.handlers.DemoHandler"),
-    (r"/status", "biothings.web.handlers.StatusHandler"),
     (r"/metadata/?", "web.api.handlers.MygeneSourceHandler"),
-    (r"/metadata/fields/?", "biothings.web.api.es.handlers.MetadataFieldHandler"),
     (r"/{ver}/species/(\d+)/?", "web.handlers.TaxonHandler"),
     (r"/{ver}/taxon/(\d+)/?", "web.handlers.TaxonHandler"),
-    (r"/{ver}/gene/(.+)/?", "biothings.web.api.es.handlers.BiothingHandler"),
-    (r"/{ver}/gene/?$", "biothings.web.api.es.handlers.BiothingHandler"),
     (r"/{ver}/query/?", "web.api.handlers.MygeneQueryHandler"),
     (r"/{ver}/metadata/?", "web.api.handlers.MygeneSourceHandler"),
-    (r"/{ver}/metadata/fields/?", "biothings.web.api.es.handlers.MetadataFieldHandler"),
 ]
-
 # for static server
 STATIC_PATH = 'src/static'
 
@@ -194,4 +188,3 @@ DOCS_STATIC_PATH = '../docs/_build/html'
 
 # url template to redirect for 'include_tax_tree' parameter
 INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = 'http://t.biothings.io/v1/taxon'
-
