@@ -113,15 +113,10 @@ class TestControlKeywords(BiothingsTestCase):
         assert "MF" in rdefault["go"].keys()
 
     def test_541_list_null(self):
-        ##
-        # TODO test.test2 syntax is non deterministic, does not make sense to inject
-        ##
-        res = self.request('gene/1017?always_list=entrezgene&allow_null=test.test2').json()
+        res = self.request('gene/1017?always_list=entrezgene&allow_null=accession.test').json()
         assert 'entrezgene' in res
         assert isinstance(res['entrezgene'], list)
-        assert 'test' in res
-        assert 'test2' in res['test']
-        assert res['test']['test2'] is None
+        assert res['accession']['test'] is None
 
 
 def msgpack_ok(packed_bytes, checkerror=True):
