@@ -103,7 +103,22 @@ SPECIES_TYPEDEF = {
             (re.compile(pattern, re.I), translation['tax_id'])
             for (pattern, translation) in TAXONOMY.items()
         ]
+    },
+    'species_facet_filter': {
+        'type': list,
+        'default': None,
+        'max': 1000,
+        'translations': [
+            (re.compile(pattern, re.I), translation['tax_id']) for
+            (pattern, translation) in TAXONOMY.items()
+        ]
     }
+}
+FIELD_FILTERS = {
+    'entrezonly': {'type': bool, 'default': False},
+    'ensemblonly': {'type': bool, 'default': False},
+    'exists': {'type': list, 'default': None, 'max': 1000},
+    'missing': {'type': list, 'default': None, 'max': 1000},
 }
 
 DATASOURCE_TRANSLATION_TYPEDEF = [
@@ -127,22 +142,9 @@ QUERY_POST_ESQB_KWARGS['_source'].update({'default': DEFAULT_FIELDS})
 QUERY_GET_ESQB_KWARGS['q'].update({'translations': DATASOURCE_TRANSLATION_TYPEDEF})
 QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
 
-QUERY_GET_ESQB_KWARGS.update({
-    'include_tax_tree': {'type': bool, 'default': False},
-    'entrezonly': {'type': bool, 'default': False},
-    'ensemblonly': {'type': bool, 'default': False},
-    'exists': {'type': list, 'default': None, 'max': 1000},
-    'missing': {'type': list, 'default': None, 'max': 1000},
-    'species_facet_filter': {
-        'type': list,
-        'default': None,
-        'max': 1000,
-        'translations': [
-            (re.compile(pattern, re.I), translation['tax_id']) for
-            (pattern, translation) in TAXONOMY.items()
-        ]
-    }
-})
+QUERY_GET_ESQB_KWARGS.update({'include_tax_tree': {'type': bool, 'default': False}})
+QUERY_GET_ESQB_KWARGS.update(FIELD_FILTERS)
+QUERY_POST_ESQB_KWARGS.update(FIELD_FILTERS)
 
 # *****************************************************************************
 # Elasticsearch Query Pipeline

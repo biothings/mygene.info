@@ -45,8 +45,20 @@ class TestQueryGET(BiothingsTestCase):
         expected = ["_id", "_score", "taxid", "entrezgene", "name", "symbol"]
         assert sorted(list(deffields)) == sorted(expected)
 
+    def test_209_query(self):
+        # entrezonly for match query
+        query_data = {
+            "q": "FAM86B3P",
+            "scopes": "symbol, alias",
+            "entrezonly": "True"
+        }
+        res = self.query(method='POST', data=query_data)
+        assert len(res) == 1
+        del query_data["entrezonly"]
+        res = self.query(method='POST', data=query_data)
+        assert len(res) == 3
+
     def test_210_size(self):
-        ''' QUERY GET ES_KWarg Size '''
         res = self.request('query?q=cdk?').json()
         assert len(res['hits']) == 10  # default is 10
         assert res['total'] > 10
