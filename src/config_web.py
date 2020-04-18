@@ -21,14 +21,14 @@ ES_DOC_TYPE = 'gene'
 # Web Application
 # *****************************************************************************
 API_VERSION = 'v3'
+TAX_REDIRECT = "http://t.biothings.io/v1/taxon/{0}?include_children=1"
 APP_LIST += [
-    (r"/", "web.handlers.FrontPageHandler"),
-    (r"/demo/?$", "web.handlers.DemoHandler"),
-    (r"/metadata/?", "web.api.handlers.MygeneSourceHandler"),
-    (r"/{ver}/species/(\d+)/?", "web.handlers.TaxonHandler"),
-    (r"/{ver}/taxon/(\d+)/?", "web.handlers.TaxonHandler"),
+    (r"/{ver}/species/(\d+)/?", "tornado.web.RedirectHandler", {"url": TAX_REDIRECT}),
+    (r"/{ver}/taxon/(\d+)/?", "tornado.web.RedirectHandler", {"url": TAX_REDIRECT}),
     (r"/{ver}/query/?", "web.api.handlers.MygeneQueryHandler"),
     (r"/{ver}/metadata/?", "web.api.handlers.MygeneSourceHandler"),
+    (r"/demo/?(.*)", "tornado.web.StaticFileHandler", {"path": "docs/demo", "default_filename": "index.html"}),
+    (r"/metadata/?", "web.api.handlers.MygeneSourceHandler"),
 ]
 # for static server
 STATIC_PATH = 'src/static'
@@ -184,7 +184,7 @@ ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
 
 # for docs
 INCLUDE_DOCS = False
-DOCS_STATIC_PATH = '../docs/_build/html'
+DOCS_STATIC_PATH = 'docs/_build/html'
 
 # url template to redirect for 'include_tax_tree' parameter
 INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = 'http://t.biothings.io/v1/taxon'
