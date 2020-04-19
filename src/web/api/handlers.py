@@ -101,5 +101,5 @@ class DemoHandler(RequestHandler):
         pass
 
     def get(self):
-        with open('../docs/demo/index.html', 'r') as demo_file:
+        with open('docs/demo/index.html', 'r') as demo_file:
             self.write(demo_file.read())
