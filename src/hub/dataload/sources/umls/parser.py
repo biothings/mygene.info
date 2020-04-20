@@ -97,4 +97,3 @@ def load_data(data_folder):
     for _id, item in res.items():
         yield {'_id': _id,
                'umls': item}
-

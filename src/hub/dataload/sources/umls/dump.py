@@ -15,15 +15,3 @@ class UMLSDumper(ManualDumper):
 
     SRC_NAME = "umls"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
-
-    def __init__(self, *args, **kwargs):
-        super(UMLSDumper,self).__init__(*args,**kwargs)
-        self.logger.info("""
-Assuming manual download from: https://www.nlm.nih.gov/research/umls/licensedcontent/umlsknowledgesources.html
-- umls-2017AA-full.zip
-""")
-
-    def post_dump(self, *args, **kwargs):
-        pass
-
-

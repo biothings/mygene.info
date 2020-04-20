@@ -30,4 +30,3 @@ class UMLSUploader(uploader.BaseSourceUploader):
             }
         }
         return mapping
-

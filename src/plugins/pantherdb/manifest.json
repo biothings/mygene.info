@@ -5,65 +5,29 @@
         "license_url": "http://pantherdb.org/tou.jsp",
         "licence": "GNU General Public License Version 2"
     },
-    "dumper": {
-        "data_url": "ftp://ftp.pantherdb.org/ortholog/current_release/RefGenomeOrthologs.tar.gz",
-        "uncompress": true
+    "dumper" : {
+        "data_url" : "ftp://ftp.pantherdb.org/ortholog/current_release/RefGenomeOrthologs.tar.gz",
+        "uncompress" : true
     },
-    "uploader": {
-        "parser": "parser:load_data",
-        "on_duplicates": "merge",
-        "keylookup": {
-            "input_types": [
-                [
-                    "entrez",
-                    "pantherdb.GeneID"
-                ],
-                [
-                    "hgnc",
-                    "pantherdb.HGNC"
-                ],
-                [
-                    "mgi",
-                    "pantherdb.MGI"
-                ],
-                [
-                    "rgd",
-                    "pantherdb.RGD"
-                ],
-                [
-                    "tair",
-                    "pantherdb.TAIR"
-                ],
-                [
-                    "wormbase",
-                    "pantherdb.WormBase"
-                ],
-                [
-                    "zfin",
-                    "pantherdb.ZFIN"
-                ],
-                [
-                    "sgd",
-                    "pantherdb.SGD"
-                ],
-                [
-                    "flybase",
-                    "pantherdb.FlyBase"
-                ],
-                [
-                    "sgd",
-                    "pantherdb.SGD"
-                ],
-                [
-                    "swissprot",
-                    "pantherdb.uniprot_kb"
-                ],
-                [
-                    "trembl",
-                    "pantherdb.uniprot_kb"
-                ]
+    "uploader" : {
+        "parser" : "parser:load_data",
+        "on_duplicates" : "merge",
+        "keylookup" : {
+            "input_types" : [
+                ["entrez","pantherdb.GeneID"],
+                ["hgnc","pantherdb.HGNC"],
+                ["mgi","pantherdb.MGI"],
+                ["rgd","pantherdb.RGD"],
+                ["tair","pantherdb.TAIR"],
+                ["wormbase","pantherdb.WormBase"],
+                ["zfin","pantherdb.ZFIN"],
+                ["sgd","pantherdb.SGD"],
+                ["flybase","pantherdb.FlyBase"],
+                ["sgd","pantherdb.SGD"],
+                ["swissprot","pantherdb.uniprot_kb"],
+                ["trembl","pantherdb.uniprot_kb"]
             ],
-            "skip_on_failure": true
+            "skip_on_failure" : true
         }
     }
 }

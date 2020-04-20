@@ -10,7 +10,9 @@ class GeneIndexer(indexer.Indexer):
         settings = super(GeneIndexer,self).get_index_creation_settings()
         # mygene's specific
         settings["codec"] = "best_compression"
-        settings["auto_expand_replicas"] = "0-all"
+        #settings["auto_expand_replicas"] = "0-all"
+        settings["number_of_replicas"] = 1
+        settings["number_of_shards"] = 3
         settings["analysis"]["tokenizer"] = {
                 "refseq_tokenizer": {
                     "delimiter": ".",
