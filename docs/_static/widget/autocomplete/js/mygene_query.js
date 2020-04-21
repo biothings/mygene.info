@@ -8,7 +8,7 @@
 
 mygene={};
 
-mygene.url_root = '//mygene.info/widget/autocomplete/';
+mygene.url_root = '//docs.mygene.info/en/latest/_static/widget/autocomplete/';
 //any input tag with class "mygene_query_target" will be enabled for gene autocompletion feature.
 mygene.input_selector = "input.mygene_query_target";
 //this is the name of callback function should be defined by user.

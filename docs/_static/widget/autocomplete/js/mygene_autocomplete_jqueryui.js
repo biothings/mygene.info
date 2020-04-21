@@ -97,7 +97,7 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
 
 	},
 
-    _url_root : '//mygene.info/widget/autocomplete/',
+    _url_root : '//docs.mygene.info/en/latest/_static/widget/autocomplete/',
 
     //helper function for adding custom css style.
     _add_css : function(cssCode) {
