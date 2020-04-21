@@ -1,11 +1,11 @@
 Third-party packages
 ======================
 
-This page lists third-party packages/modules built upon `MyGene.info <http://mygene.info>`_ services.
+This page lists third-party packages/modules built upon `MyGene.info <https://mygene.info>`_ services.
 
 MyGene python module
 ----------------------
-"`mygene <https://pypi.python.org/pypi/mygene>`_" is an easy-to-use Python wrapper to access `MyGene.info <http://mygene.info>`_ services.
+"`mygene <https://pypi.python.org/pypi/mygene>`_" is an easy-to-use Python wrapper to access `MyGene.info <https://mygene.info>`_ services.
 
 You can install it easily using either `pip <http://www.pip-installer.org>`_ or `easy_install <https://pypi.python.org/pypi/setuptools>`_::
 
@@ -77,8 +77,7 @@ You can also play with this `jsFiddle <http://jsfiddle.net/frm3X/>`_ example:
 
 .. raw:: html
 
-    <script async src="//jsfiddle.net/frm3X/embed/"></script>
-
+    <script async src="//jsfiddle.net/newgene/frm3X/29/embed/"></script>
 
 
 Another MyGene Python wrapper
@@ -88,7 +87,7 @@ This is yet another Python wrapper of MyGene.info services created by `Brian Sch
 It's available from `PyPI <https://pypi.python.org/pypi/mygene-api>`__ as well::
 
     pip install mygene-api
-    
+
 
 Some basic examples:
 
@@ -96,7 +95,7 @@ Some basic examples:
 
 .. code-block :: python
 
-    """ Use the query API to find a gene with 
+    """ Use the query API to find a gene with
     the given symbol.
     """
     from mygene.gene import Gene
@@ -111,12 +110,12 @@ Some basic examples:
     52004 CDK2-associated protein 2
     ...
 
-  
-*  Given an known gene, get it's begin and end coordinates. 
+
+*  Given an known gene, get it's begin and end coordinates.
 
 .. code-block :: python
 
-    """ Use the annotation API to find the full 
+    """ Use the annotation API to find the full
     details of a given gene.
     """
     from mygene.gene import gene
@@ -125,12 +124,12 @@ Some basic examples:
     print gene._id, gene.genomic_pos_hg19['start'], gene.genomic_pos_hg19['end']
 
     >>> 1017 56360553 56366568
-   
+
 
 *  This library also supports the metadata API.
 
 .. code-block :: python
-   
+
     from mygene.metadata import Metadata
 
     metadata = Metadata.get_metadata()
