@@ -35,7 +35,7 @@ if (!cors_ok){
 $.support.cors=true;
 
 function mygene_info_gene_query(query){
-    var gene_query_url = 'http://mygene.info/v2/query';
+    var gene_query_url = '//mygene.info/v3/query';
     var url = gene_query_url + "?species=mouse&limit=100&q="+query;
     $.getJSON(url, mygene_info_gene_query_callback);
 }
@@ -62,7 +62,7 @@ function mygene_info_gene_query_callback(result){
 }
 
 function showgene(geneid){
-    var gene_url = 'http://mygene.info/v2/gene/'+geneid+'?fields=reporter';
+    var gene_url = '//mygene.info/v3/gene/'+geneid+'?fields=reporter';
     show_loading("#mygene_info_gene_datachart");
     $.getJSON(gene_url, mygene_info_get_gene_callback);
 }
@@ -85,7 +85,7 @@ function mygene_info_get_gene_callback(result){
 
 function show_loading(el){
   $(el).empty();
-  $(el).append('<img src="http://mygene.info/static/img/ajax-loader.gif" style="width:35px;height:35px">');
+  $(el).append('<img src="//mygene.info/static/img/ajax-loader.gif" style="width:35px;height:35px">');
 }
 
 $(document).ready(function(){

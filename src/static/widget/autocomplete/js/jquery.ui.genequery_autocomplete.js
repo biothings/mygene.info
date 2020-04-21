@@ -25,7 +25,7 @@ String.prototype.format = function (args) {
 $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
 
 	options: {
-        mygene_url: 'http://mygene.info/v2/query',
+        mygene_url: '//mygene.info/v3/query',
         //exact match with symbol is boosted.
 //        q: "(symbol:{term} OR symbol: {term}* OR name:{term}* OR summary:{term}*) AND species:human",
         q: "{term}*",
@@ -98,7 +98,7 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
 
 	},
 
-    _url_root : 'http://mygene.info/widget/autocomplete/',
+    _url_root : '//mygene.info/widget/autocomplete/',
 
     //helper function for adding custom css style.
     _add_css : function(cssCode) {

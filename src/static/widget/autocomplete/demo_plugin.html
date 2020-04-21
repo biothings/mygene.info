@@ -1,14 +1,14 @@
 <html>
 <head>
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/ui-lightness/jquery-ui.min.css" type="text/css" media="all" />
-    <link rel="stylesheet" href="http://static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/ui-lightness/jquery-ui.min.css" type="text/css" media="all" />
+    <link rel="stylesheet" href="//static.jquery.com/ui/css/demo-docs-theme/ui.theme.css" type="text/css" media="all" />
 </head>
 <body class="ui-widget">
     <label for="gene_query">Enter a gene here: </label>
     <input id="gene_query" style="width:250px" class="mygene_query_target">
 
-<script src="http://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript"></script>
-<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
+<script src="//code.jquery.com/jquery-1.9.1.min.js" type="text/javascript"></script>
+<script src="//code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"></script>
 
     <script src="js/jquery.ui.genequery_autocomplete.js" type="text/javascript"></script>
     <script type="text/javascript">
@@ -28,7 +28,7 @@ pre {
         <h2> JQuery UI widget for gene query autocomplete</h2>
         <p>This autocomplete widget for gene query provides suggestions while you type a gene symbol or name into the field. Here the gene suggestions are displayed as "&lt;Symbol&gt;:&lt;Name&gt;", automatically triggered when at least two characters are entered into the field.</p>
 
-        <p>This widget is powered by "<a href="http://http://mygene.info">mygene.info</a>" web service. By default, the gene suggestions are limited to human genes only. You can customize it to allow queries against other species.
+        <p>This widget is powered by "<a href="https://mygene.info">mygene.info</a>" web service. By default, the gene suggestions are limited to human genes only. You can customize it to allow queries against other species.
         </p>
 
         <p>To use this widget in your own website is very easy, just following this example:
@@ -36,10 +36,10 @@ pre {
             <pre>
                 &lt;html&gt;
                 &lt;head&gt;
-                    &lt;link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/ui-lightness/jquery-ui.min.css" type="text/css" media="all" /&gt;
-                    &lt;script src="http://code.jquery.com/jquery-1.9.1.min.js" type="text/javascript"&gt;&lt;/script&gt;
-                    &lt;script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"&gt;&lt;/script&gt;
-                    &lt;script src="http://dev.mygene.info/widget/autocomplete/js/jquery.ui.genequery_autocomplete.js" type="text/javascript"&gt;&lt;/script&gt;
+                    &lt;link rel="stylesheet" href="//code.jquery.com/ui/1.10.3/themes/ui-lightness/jquery-ui.min.css" type="text/css" media="all" /&gt;
+                    &lt;script src="//code.jquery.com/jquery-1.9.1.min.js" type="text/javascript"&gt;&lt;/script&gt;
+                    &lt;script src="//code.jquery.com/ui/1.10.3/jquery-ui.min.js" type="text/javascript"&gt;&lt;/script&gt;
+                    &lt;script src="//mygene.info/widget/autocomplete/js/jquery.ui.genequery_autocomplete.js" type="text/javascript"&gt;&lt;/script&gt;
                 &lt;/head&gt;
                 &lt;body class="ui-widget"&gt;
                     &lt;label for="gene_query"&gt;Enter a gene here: &lt;/label&gt;
@@ -65,10 +65,10 @@ pre {
             </pre>
         </p>
         <p>
-            To customized this widget to fit your need, you can refer to options/events listed for the original <a href="http://jqueryui.com/demos/autocomplete/">JQueryUI autocomplete widget</a>. Besides them, these are some options specific to this widget only (with their default values):
+            To customized this widget to fit your need, you can refer to options/events listed for the original <a href="//jqueryui.com/demos/autocomplete/">JQueryUI autocomplete widget</a>. Besides them, these are some options specific to this widget only (with their default values):
             <pre>
                 {
-                    "mygene_url": "http://mygene.info/v2/query",
+                    "mygene_url": "//mygene.info/v3/query",
                     "q": "{term}",
                     "species": "human",
                     "fields": "name,symbol,taxid,entrezgene",
