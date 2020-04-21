@@ -64,7 +64,7 @@ function mygene_info_get_gene_callback(result){
 
 function show_loading(el){
   $(el).empty();
-  $(el).append('<img src="//mygene.info/static/img/ajax-loader.gif" style="width:35px;height:35px">');
+  $(el).append('<img src="//docs.mygene.info/en/latest/_static/ajax-loader.gif" style="width:35px;height:35px">');
 }
 
 $(document).ready(function(){
