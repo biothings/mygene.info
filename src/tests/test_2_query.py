@@ -24,8 +24,9 @@ class TestQueryGET(BiothingsTestCase):
         self.query(q='chr1:151,073,054-151,383,976&species=human')
 
     def test_204_query(self):
-        con = self.request('query?q=cdk2&callback=mycallback').content
-        assert con.startswith(b'mycallback(')
+        pass # feature removed in biothings 0.7.0
+        # con = self.request('query?q=cdk2&callback=mycallback').content
+        # assert con.startswith(b'mycallback(')
 
     def test_205_query(self):
         # non-ascii character

@@ -23,11 +23,6 @@ class TestControlKeywords(BiothingsTestCase):
         res2 = msgpack_ok(self.request("query/?q=cdk&format=msgpack").content)
         assert res, res2
 
-    def test_503_format_msgpack(self):
-        res = self.request('metadata').json()
-        res2 = msgpack_ok(self.request("metadata?format=msgpack").content)
-        assert res, res2
-
     def test_511_raw(self):
         raw1 = self.request('gene/1017?raw=1').json()
         rawtrue = self.request('gene/1017?raw=true').json()
