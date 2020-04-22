@@ -1,11 +1,8 @@
 
 import requests
 
-from biothings.utils.version import (get_repository_information,
-                                     get_software_info)
-from biothings.web.api.es.handlers import (QueryHandler,
-                                           MetadataFieldHandler,
-                                           MetadataSourceHandler)
+from biothings.utils.version import get_software_info
+from biothings.web.api.es.handlers import MetadataSourceHandler, QueryHandler
 
 
 class MygeneQueryHandler(QueryHandler):
@@ -13,6 +10,7 @@ class MygeneQueryHandler(QueryHandler):
 
     def pre_query_builder_hook(self, options):
 
+        options = super().pre_query_builder_hook(options)
         if self.request.method == 'GET':
             if options.esqb.include_tax_tree and \
                     'all' not in options.esqb.species:
@@ -69,9 +67,9 @@ class MygeneSourceHandler(MetadataSourceHandler):
     }
     """
 
-    def get(self):
+    async def get(self):
 
-        self.web_settings.read_index_mappings()
+        await self.web_settings.read_index_mappings()
         res = self.web_settings.source_metadata[self.biothing_type]
         software = get_software_info(app_dir=self.web_settings.get_git_repo_path())
 
