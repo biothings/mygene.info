@@ -45,7 +45,6 @@ ANNOTATION_DOCS_URL = "http://docs.mygene.info/en/latest/doc/annotation_service.
 # *****************************************************************************
 # User Input Control
 # *****************************************************************************
-DEFAULT_SCOPES = ['_id', 'entrezgene', 'retired', 'ensembl.gene']
 DEFAULT_FIELDS = ['name', 'symbol', 'taxid', 'entrezgene']
 
 TAXONOMY = {
@@ -178,8 +177,9 @@ JSONLD_CONTEXT_PATH = 'web/context/context.json'
 # This essentially bypasses the es.get fallback as in myvariant...
 # The first regex matched integers, in which case the query becomes against
 # entrezgeneall annotation queries are now multimatch against the following fields
-ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired']),
-                            (re.compile(r'.*'), ['ensembl.gene'])]
+ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired'])]
+ANNOTATION_DEFAULT_SCOPES = ['_id', 'ensembl.gene']
+
 # for error messages
 ID_REQUIRED_MESSAGE = 'Gene ID Required'
 ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
