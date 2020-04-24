@@ -91,15 +91,20 @@ class TestDataFields(BiothingsTestCase):
 
     def test_620_reporter(self):
         # human
-        human = filter_hits(self.request("query?q=reporter:2842429&fields=reporter").json())
+        human = self.request("query?q=reporter:2842429&fields=reporter").json()
         assert human["total"] == 3
-        assert human["hits"][0]["reporter"]["HuGene-1_1"] == "8110147"
-        assert "2889211" in human["hits"][0]["reporter"]["HuEx-1_0"]
-        assert "TC05002114.hg.1" in human["hits"][0]["reporter"]["HTA-2_0"]
-        assert human["hits"][0]["reporter"]["HG-U133_Plus_2"] == "228805_at"
-        assert "gnf1h08801_at" in human["hits"][0]["reporter"]["GNF1H"]
-        assert human["hits"][0]["reporter"]["HuGene-1_1"] == "8110147"
-        assert human["hits"][0]["reporter"]["HuGene-2_1"] == "16992761"
+        for hit in human["hits"]:
+            if hit["_id"] == "375484":
+                assert hit["reporter"]["HuGene-1_1"] == "8110147"
+                assert "2889211" in hit["reporter"]["HuEx-1_0"]
+                assert "TC05002114.hg.1" in hit["reporter"]["HTA-2_0"]
+                assert hit["reporter"]["HG-U133_Plus_2"] == "228805_at"
+                assert "gnf1h08801_at" in hit["reporter"]["GNF1H"]
+                assert hit["reporter"]["HuGene-1_1"] == "8110147"
+                assert hit["reporter"]["HuGene-2_1"] == "16992761"
+                break
+        else:
+            assert False, "Expected doc not found."
 
     def test_621_reporter(self):
         # rat
