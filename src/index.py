@@ -12,7 +12,9 @@ import os.path
 import config
 from biothings.web.index_base import main
 
-ADDON_HANDLERS = []
+ADDON_HANDLERS = [
+    (r"/demo/?(.*)", "tornado.web.StaticFileHandler", {"path": "docs/demo", "default_filename": "index.html"}),
+]
 if config.INCLUDE_DOCS:
     if not os.path.exists(config.DOCS_STATIC_PATH):
         raise IOError('Run "make html" to generate sphinx docs first.')

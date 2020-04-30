@@ -4,8 +4,9 @@
 """
 
 import re
+import copy
 
-from biothings.web.settings.default import *
+from biothings.web.settings.default import APP_LIST, ANNOTATION_KWARGS, QUERY_KWARGS
 
 # *****************************************************************************
 # Elasticsearch Settings
@@ -25,19 +26,16 @@ TAX_REDIRECT = "http://t.biothings.io/v1/taxon/{0}?include_children=1"
 APP_LIST += [
     (r"/{ver}/species/(\d+)/?", "tornado.web.RedirectHandler", {"url": TAX_REDIRECT}),
     (r"/{ver}/taxon/(\d+)/?", "tornado.web.RedirectHandler", {"url": TAX_REDIRECT}),
-    (r"/{ver}/query/?", "web.api.handlers.MygeneQueryHandler"),
-    (r"/{ver}/metadata/?", "web.api.handlers.MygeneSourceHandler"),
-    (r"/demo/?(.*)", "tornado.web.StaticFileHandler", {"path": "docs/demo", "default_filename": "index.html"}),
-    (r"/metadata/?", "web.api.handlers.MygeneSourceHandler"),
+    (r"/{ver}/query/?", "web.handlers.MygeneQueryHandler"),
+    (r"/{ver}/metadata/?", "web.handlers.MygeneSourceHandler"),
+    (r"/metadata/?", "web.handlers.MygeneSourceHandler"),
 ]
-# for static server
-STATIC_PATH = 'src/static'
 
 # html header image
 HTML_OUT_HEADER_IMG = "/static/favicon.ico"
+
 # for title line on format=html
 HTML_OUT_TITLE = """<p style="font-family:'Open Sans',sans-serif;font-weight:bold; font-size:16px;"><a href="http://mygene.info" target="_blank" style="text-decoration: none; color: black">MyGene.info - Gene Annotation as a Service</a></p>"""
-
 METADATA_DOCS_URL = "http://docs.mygene.info/en/latest/doc/data.html"
 QUERY_DOCS_URL = "http://docs.mygene.info/en/latest/doc/query_service.html"
 ANNOTATION_DOCS_URL = "http://docs.mygene.info/en/latest/doc/annotation_service.html"
@@ -98,6 +96,7 @@ SPECIES_TYPEDEF = {
         'type': list,
         'default': ['all'],
         'max': 1000,
+        'group': 'esqb',
         'translations': [
             (re.compile(pattern, re.I), translation['tax_id'])
             for (pattern, translation) in TAXONOMY.items()
@@ -107,6 +106,7 @@ SPECIES_TYPEDEF = {
         'type': list,
         'default': None,
         'max': 1000,
+        'group': 'esqb',
         'translations': [
             (re.compile(pattern, re.I), translation['tax_id']) for
             (pattern, translation) in TAXONOMY.items()
@@ -114,10 +114,10 @@ SPECIES_TYPEDEF = {
     }
 }
 FIELD_FILTERS = {
-    'entrezonly': {'type': bool, 'default': False},
-    'ensemblonly': {'type': bool, 'default': False},
-    'exists': {'type': list, 'default': None, 'max': 1000},
-    'missing': {'type': list, 'default': None, 'max': 1000},
+    'entrezonly': {'type': bool, 'default': False, 'group':'esqb'},
+    'ensemblonly': {'type': bool, 'default': False, 'group':'esqb'},
+    'exists': {'type': list, 'default': None, 'max': 1000, 'group':'esqb'},
+    'missing': {'type': list, 'default': None, 'max': 1000, 'group':'esqb'},
 }
 
 DATASOURCE_TRANSLATION_TYPEDEF = [
@@ -129,26 +129,22 @@ TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [
      re.sub(r':.*', '', translation).replace('\\', ''))
     for(pattern, translation) in DATASOURCE_TRANSLATIONS.items()
 ]
+ANNOTATION_KWARGS = copy.deepcopy(ANNOTATION_KWARGS)
+ANNOTATION_KWARGS['*'].update(SPECIES_TYPEDEF)
 
-ANNOTATION_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
-ANNOTATION_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
+QUERY_KWARGS = copy.deepcopy(QUERY_KWARGS)
+QUERY_KWARGS['*'].update(SPECIES_TYPEDEF)
+QUERY_KWARGS['*'].update(FIELD_FILTERS)
+QUERY_KWARGS['*']['_source']['default'] = DEFAULT_FIELDS
+QUERY_KWARGS['GET']['q']['translations'] = DATASOURCE_TRANSLATION_TYPEDEF
+QUERY_KWARGS['POST']['scopes']['translations'] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
+QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'group':'esqb'}
 
-QUERY_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
-QUERY_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
-
-QUERY_GET_ESQB_KWARGS['_source'].update({'default': DEFAULT_FIELDS})
-QUERY_POST_ESQB_KWARGS['_source'].update({'default': DEFAULT_FIELDS})
-QUERY_GET_ESQB_KWARGS['q'].update({'translations': DATASOURCE_TRANSLATION_TYPEDEF})
-QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-
-QUERY_GET_ESQB_KWARGS.update({'include_tax_tree': {'type': bool, 'default': False}})
-QUERY_GET_ESQB_KWARGS.update(FIELD_FILTERS)
-QUERY_POST_ESQB_KWARGS.update(FIELD_FILTERS)
 
 # *****************************************************************************
 # Elasticsearch Query Pipeline
 # *****************************************************************************
-ES_QUERY_BUILDER = "web.api.query_builder.MygeneQueryBuilder"
+ES_QUERY_BUILDER = "web.pipeline.MygeneQueryBuilder"
 
 AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
 
