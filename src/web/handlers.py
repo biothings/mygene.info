@@ -2,11 +2,10 @@
 import requests
 
 from biothings.utils.version import get_software_info
-from biothings.web.api.es.handlers import MetadataSourceHandler, QueryHandler
+from biothings.web.handlers import MetadataSourceHandler, QueryHandler
 
 
 class MygeneQueryHandler(QueryHandler):
-    ''' This class is for the /query endpoint. '''
 
     def pre_query_builder_hook(self, options):
 
@@ -15,15 +14,16 @@ class MygeneQueryHandler(QueryHandler):
             if options.esqb.include_tax_tree and \
                     'all' not in options.esqb.species:
                 headers = {
-                    'user-agent': 'Python-requests_mygene.info/{} (gzip)'.format(requests.__version__)}
+                    'user-agent': 'Python-requests_mygene.info/{} (gzip)'.format(
+                        requests.__version__)}
 
                 body = {
                     "ids": ','.join([str(sid) for sid in options.esqb.species]),
                     "expand_species": 'True'
                 }
-
                 res = requests.post(
-                    self.web_settings.INCLUDE_TAX_TREE_REDIRECT_ENDPOINT, data=body, headers=headers)
+                    self.web_settings.INCLUDE_TAX_TREE_REDIRECT_ENDPOINT, 
+                    data=body, headers=headers)
 
                 if res.status_code == requests.codes.ok:
                     options['esqb']['species'] = [str(x) for x in res.json()]
@@ -38,7 +38,7 @@ class MygeneSourceHandler(MetadataSourceHandler):
     GET /v3/metadata
 
     {
-        "app_revision": "", # TODO
+        "app_revision": " ... ", # gitcommit hash
         "available_fields": "http://mygene.info/metadata/fields",
         "biothing_type": "gene",
         "build_date": "2020-03-29T04:00:00.012426",
@@ -66,29 +66,24 @@ class MygeneSourceHandler(MetadataSourceHandler):
         }
     }
     """
+    def extras(self, _meta):
 
-    async def get(self):
+        appdir = self.web_settings.get_git_repo_path()
+        commit = get_software_info(appdir).get('commit-hash', '')
 
-        await self.web_settings.read_index_mappings()
-        res = self.web_settings.source_metadata[self.biothing_type]
-        software = get_software_info(app_dir=self.web_settings.get_git_repo_path())
-
-        if self.kwargs.source.dev:
-            res['software'] = software
-
-        res['available_fields'] = 'http://mygene.info/metadata/fields'
-        res['app_revision'] = software.get('commit-hash', '')
-        res['genome_assembly'] = {}
-        res['taxonomy'] = {}
+        _meta['available_fields'] = 'http://mygene.info/metadata/fields'
+        _meta['app_revision'] = commit
+        _meta['genome_assembly'] = {}
+        _meta['taxonomy'] = {}
 
         for s, d in self.web_settings.TAXONOMY.items():
             if 'tax_id' in d:
-                res['taxonomy'][s] = int(d['tax_id'])
+                _meta['taxonomy'][s] = int(d['tax_id'])
             if 'assembly' in d:
-                res['genome_assembly'][s] = d['assembly']
+                _meta['genome_assembly'][s] = d['assembly']
 
-        if "source" not in res:
+        if "source" not in _meta:
             # occurs when loaded from scratch, not from a change/diff file
-            res["source"] = None
+            _meta["source"] = None
 
-        self.finish(dict(sorted(res.items())))
+        return _meta

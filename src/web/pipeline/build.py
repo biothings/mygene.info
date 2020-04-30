@@ -1,9 +1,9 @@
 import re
 
 from biothings.utils.web.es_dsl import AsyncSearch
-from biothings.web.api.es.pipelines import ESQueryBuilder
+from biothings.web.pipeline import ESQueryBuilder
 
-from .queries import dismax, wildcard, interval
+from .legacy import dismax, wildcard, interval
 
 
 class MygeneQueryBuilder(ESQueryBuilder):
