@@ -34,7 +34,9 @@ class TestQueryGET(BiothingsTestCase):
         assert res['hits'] == []
 
     def test_206_query(self):
-        self.request('query', expect=400)
+        # default is match all
+        res = self.request('query').json()
+        res['max_score'] == 1
 
     def test_207_query(self):
         self.request('query?q=tRNA:Y1:85Ae', expect=400)
@@ -197,7 +199,6 @@ class TestQueryPOST(BiothingsTestCase):
                 'fields': 'name,symbol'}
         res = self.request('query', method='POST', data=data).json()
         assert len(res) >= 4, (res, len(res))
-        self.request('query', expect=400)
 
     def test_264_post(self):
 
