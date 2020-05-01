@@ -41,9 +41,9 @@ class MygeneQueryBuilder(ESQueryBuilder):
         search = self._extra_query_options(search, options)
         return search
 
-    def default_terms_query(self, q, scopes, options):
+    def default_match_query(self, q, scopes, options):
 
-        search = super().default_terms_query(q, scopes, options)
+        search = super().default_match_query(q, scopes, options)
         search = self._extra_query_options(search, options)
         return search
 
