@@ -168,8 +168,6 @@ STATUS_CHECK = {
     'doc_type': 'gene'
 }
 
-JSONLD_CONTEXT_PATH = 'web/context/context.json'
-
 # This essentially bypasses the es.get fallback as in myvariant...
 # The first regex matched integers, in which case the query becomes against
 # entrezgeneall annotation queries are now multimatch against the following fields
