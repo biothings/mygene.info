@@ -207,7 +207,7 @@ class TestDataFields(BiothingsTestCase):
         res = self.request("gene/1246509").json()
         assert "other_names" not in res
         # query by other_names:
-        res = self.request("query?q=other_names:p33&size=50").json()
+        res = self.request("query?q=other_names:p33&size=100").json()
         assert res["total"] > 30  # currently 35...
         # assert len(res["hits"]) == 10
         ids = [h["_id"] for h in res["hits"]]

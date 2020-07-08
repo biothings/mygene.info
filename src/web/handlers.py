@@ -68,7 +68,7 @@ class MygeneSourceHandler(MetadataSourceHandler):
     """
     def extras(self, _meta):
 
-        appdir = self.web_settings.get_git_repo_path()
+        appdir = self.web_settings.devinfo.get_git_repo_path()
         commit = get_software_info(appdir).get('commit-hash', '')
 
         _meta['available_fields'] = 'http://mygene.info/metadata/fields'

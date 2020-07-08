@@ -1,5 +1,5 @@
 # biothings
-biothings[web_extra]==0.7.0
+biothings[web_extra]==0.8.0
 
 #Optional
 raven
