@@ -1,5 +1,5 @@
 # biothings
-biothings[web_extra]==0.5.0
-gitdb2==2.0.4 # no longer required in biothings 0.6.0
+biothings[web_extra]==0.8.0
+
 #Optional
 raven

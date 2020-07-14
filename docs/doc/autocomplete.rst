@@ -14,7 +14,7 @@ Try it live first
     <div style=' text-align:center'>
      <label for="gene_query">Enter a gene here (e.g., CDK2): </label>
      <input style="width:250px" class="mygene_query_target">
-     <script src="http://mygene.info/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"></script>
+     <script src="//docs.mygene.info/en/latest/_static/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"></script>
     </div>
 
 About this widget
@@ -32,7 +32,7 @@ To use this widget in your own website is very easy, just following these three 
 
 1. Copy/paste this line into your html file::
 
-    <script src="http://mygene.info/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"></script>
+    <script src="//docs.mygene.info/en/latest/_static/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"></script>
 
 
 .. Hint:: if you prefer an un-minified javascript file, using "mygene_query.js" instead.
@@ -61,7 +61,7 @@ As shown in above example, you can access the gene object as **ui.item**::
 
 .. Note:: if you don't define your own callback function (like the minimal HTML page below), the default behavior is to display an alert msg with the gene selected. To change this default behavior, you must overwrite with your own callback function (keep the same name as "**mygene_query_select_callback**").
 
-A minimal HTML page with autocomplete enabled looks just like this (`See it in action here <http://mygene.info/widget/autocomplete/demo_minimal.html>`_):
+A minimal HTML page with autocomplete enabled looks just like this (`See it in action here <//docs.mygene.info/en/latest/_static/widget/autocomplete/demo_minimal.html>`_):
 
 .. code-block:: html
 
@@ -69,7 +69,7 @@ A minimal HTML page with autocomplete enabled looks just like this (`See it in a
     <body>
         <label for="gene_query">Enter a gene here: </label>
         <input style="width:250px" class="mygene_query_target">
-        <script src="http://mygene.info/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"></script>
+        <script src="//docs.mygene.info/en/latest/_static/widget/autocomplete/js/mygene_query_min.js" type="text/javascript"></script>
     </body>
     </html>
 

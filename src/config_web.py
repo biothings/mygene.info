@@ -1,112 +1,48 @@
-# -*- coding: utf-8 -*-
-from biothings.web.settings.default import *
-from web.api.query_builder import ESQueryBuilder
-from web.api.query import ESQuery
-from web.api.transform import ESResultTransformer
-from web.api.handlers import GeneHandler, QueryHandler, MetadataHandler, StatusHandler, TaxonHandler, DemoHandler, FrontPageHandler
+"""
+    Mygene.info API v3
+    https://mygene.info/v3/
+"""
+
 import re
+import copy
+
+from biothings.web.settings.default import APP_LIST, ANNOTATION_KWARGS, QUERY_KWARGS
 
 # *****************************************************************************
-# Elasticsearch variables
+# Elasticsearch Settings
 # *****************************************************************************
 # elasticsearch server transport url
 ES_HOST = 'localhost:9200'
 # elasticsearch index name
 ES_INDEX = 'genedoc_mygene_allspecies_current'
-# index for common species types
-ES_INDEX_TIER1 = 'genedoc_mygene_current'
 # elasticsearch document type
 ES_DOC_TYPE = 'gene'
 
+# *****************************************************************************
+# Web Application
+# *****************************************************************************
 API_VERSION = 'v3'
-
-# *****************************************************************************
-# App URL Patterns
-# *****************************************************************************
-APP_LIST = [
-    (r"/", FrontPageHandler),
-    (r"/status", StatusHandler),
-    (r"/metadata/?", MetadataHandler),
-    (r"/metadata/fields/?", MetadataHandler),
-    (r"/demo/?$", DemoHandler),
-    (r"/{}/species/(\d+)/?".format(API_VERSION), TaxonHandler),
-    (r"/{}/taxon/(\d+)/?".format(API_VERSION), TaxonHandler),
-    (r"/{}/gene/(.+)/?".format(API_VERSION), GeneHandler),
-    (r"/{}/gene/?$".format(API_VERSION), GeneHandler),
-    (r"/{}/query/?".format(API_VERSION), QueryHandler),
-    (r"/{}/metadata/?".format(API_VERSION), MetadataHandler),
-    (r"/{}/metadata/fields/?".format(API_VERSION), MetadataHandler),
+TAX_REDIRECT = "http://t.biothings.io/v1/taxon/{0}?include_children=1"
+APP_LIST += [
+    (r"/{ver}/species/(\d+)/?", "tornado.web.RedirectHandler", {"url": TAX_REDIRECT}),
+    (r"/{ver}/taxon/(\d+)/?", "tornado.web.RedirectHandler", {"url": TAX_REDIRECT}),
+    (r"/{ver}/query/?", "web.handlers.MygeneQueryHandler"),
+    (r"/{ver}/metadata/?", "web.handlers.MygeneSourceHandler"),
+    (r"/metadata/?", "web.handlers.MygeneSourceHandler"),
 ]
-
-###############################################################################
-#   app-specific query builder, query, and result transformer classes
-###############################################################################
-
-# *****************************************************************************
-# Subclass of biothings.web.api.es.query_builder.ESQueryBuilder to build
-# queries for this app
-# *****************************************************************************
-ES_QUERY_BUILDER = ESQueryBuilder
-# *****************************************************************************
-# Subclass of biothings.web.api.es.query.ESQuery to execute queries for this app
-# *****************************************************************************
-ES_QUERY = ESQuery
-# *****************************************************************************
-# Subclass of biothings.web.api.es.transform.ESResultTransformer to transform
-# ES results for this app
-# *****************************************************************************
-ES_RESULT_TRANSFORMER = ESResultTransformer
-
-# Fields to exclude from the /metadata/fields endpoint
-AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
-
-GA_ACTION_QUERY_GET = 'query_get'
-GA_ACTION_QUERY_POST = 'query_post'
-GA_ACTION_ANNOTATION_GET = 'gene_get'
-GA_ACTION_ANNOTATION_POST = 'gene_post'
-GA_TRACKER_URL = 'MyGene.info'
 
 # html header image
 HTML_OUT_HEADER_IMG = "/static/favicon.ico"
 
 # for title line on format=html
 HTML_OUT_TITLE = """<p style="font-family:'Open Sans',sans-serif;font-weight:bold; font-size:16px;"><a href="http://mygene.info" target="_blank" style="text-decoration: none; color: black">MyGene.info - Gene Annotation as a Service</a></p>"""
-
 METADATA_DOCS_URL = "http://docs.mygene.info/en/latest/doc/data.html"
 QUERY_DOCS_URL = "http://docs.mygene.info/en/latest/doc/query_service.html"
 ANNOTATION_DOCS_URL = "http://docs.mygene.info/en/latest/doc/annotation_service.html"
 
-# kwargs for status check
-STATUS_CHECK = {
-    'id': '1017',
-    'index': 'genedoc_mygene_allspecies_current',
-    'doc_type': 'gene'
-}
-
-JSONLD_CONTEXT_PATH = 'web/context/context.json'
-
-# MYGENE THINGS
-
-# for error messages
-ID_REQUIRED_MESSAGE = 'Gene ID Required'
-ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
-
-# for docs
-INCLUDE_DOCS = False
-DOCS_STATIC_PATH = '../docs/_build/html'
-
-# for static server
-STATIC_PATH = 'static'
-
-# url template to redirect for 'include_tax_tree' parameter
-INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = 'http://t.biothings.io/v1/taxon'
-
-# This essentially bypasses the es.get fallback as in myvariant...
-# The first regex matched integers, in which case the query becomes against entrezgeneall annotation queries are now multimatch
-# against the following fields
-ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired']),
-                            (re.compile(r'.*'), ['ensembl.gene'])]
-
+# *****************************************************************************
+# User Input Control
+# *****************************************************************************
 DEFAULT_FIELDS = ['name', 'symbol', 'taxid', 'entrezgene']
 
 TAXONOMY = {
@@ -122,80 +58,129 @@ TAXONOMY = {
 }
 
 DATASOURCE_TRANSLATIONS = {
-    "refseq:":  r"refseq_agg:",
-    "accession:":   r"accession_agg:",
-    "reporter:":    r"reporter.\\\*:",
-    "interpro:":    r"interpro.id:",
+    "refseq:": r"refseq_agg:",
+    "accession:": r"accession_agg:",
+    "reporter:": r"reporter.\*:",
+    "interpro:": r"interpro.id:",
     # GO:xxxxx looks like a ES raw query, so just look for
     # the term as a string in GO's ID (note: searching every keys
     # will raise an error because pubmed key is a int and we're
     # searching with a string term.
-    "GO:":          r"go.\\\*.id:go\\\:",
-    # "GO:":          r"go.\\\*:go.",
-    "homologene:":  r"homologene.id:",
-    "reagent:":     r"reagent.\\\*.id:",
-    "uniprot:":     r"uniprot.\\\*:",
-    "wikipedia:":   r"wikipedia.\\\*:",
-    "ensemblgene:":         "ensembl.gene:",
-    "ensembltranscript:":   "ensembl.transcript:",
-    "ensemblprotein:":      "ensembl.protein:",
+    "GO:": r"go.\*.id:go\:",
+    # "GO:": r"go.\*:go.",
+    "homologene:": r"homologene.id:",
+    "reagent:": r"reagent.\*.id:",
+    "uniprot:": r"uniprot.\*:",
+    "wikipedia:": r"wikipedia.\*:",
+    "ensemblgene:": "ensembl.gene:",
+    "ensembltranscript:": "ensembl.transcript:",
+    "ensemblprotein:": "ensembl.protein:",
 
     # some specific datasources needs to be case-insentive
-    "hgnc:":        r"HGNC:",
-    "hprd:":        r"HPRD:",
-    "mim:":        r"MIM:",
-    "mgi:":        r"MGI:",
-    "ratmap:":      r"RATMAP:",
-    "rgd:":      r"RGD:",
-    "flybase:":      r"FLYBASE:",
-    "wormbase:":    r"WormBase:",
-    "tair:":      r"TAIR:",
-    "zfin:":      r"ZFIN:",
-    "xenbase:":      r"Xenbase:",
-    "mirbase:":     r"miRBase:",
+    "hgnc:": r"HGNC:",
+    "hprd:": r"HPRD:",
+    "mim:": r"MIM:",
+    "mgi:": r"MGI:",
+    "ratmap:": r"RATMAP:",
+    "rgd:": r"RGD:",
+    "flybase:": r"FLYBASE:",
+    "wormbase:": r"WormBase:",
+    "tair:": r"TAIR:",
+    "zfin:": r"ZFIN:",
+    "xenbase:": r"Xenbase:",
+    "mirbase:": r"miRBase:",
 }
 
-SPECIES_TYPEDEF = {'species': {'type': list, 'default': ['all'], 'max': 1000, 'translations': [
-    (re.compile(pattern, re.I), translation['tax_id']) for (pattern, translation) in TAXONOMY.items()]}}
+SPECIES_TYPEDEF = {
+    'species': {
+        'type': list,
+        'default': ['all'],
+        'max': 1000,
+        'group': 'esqb',
+        'translations': [
+            (re.compile(pattern, re.I), translation['tax_id'])
+            for (pattern, translation) in TAXONOMY.items()
+        ]
+    },
+    'species_facet_filter': {
+        'type': list,
+        'default': None,
+        'max': 1000,
+        'group': 'esqb',
+        'translations': [
+            (re.compile(pattern, re.I), translation['tax_id']) for
+            (pattern, translation) in TAXONOMY.items()
+        ]
+    }
+}
+FIELD_FILTERS = {
+    'entrezonly': {'type': bool, 'default': False, 'group':'esqb'},
+    'ensemblonly': {'type': bool, 'default': False, 'group':'esqb'},
+    'exists': {'type': list, 'default': None, 'max': 1000, 'group':'esqb'},
+    'missing': {'type': list, 'default': None, 'max': 1000, 'group':'esqb'},
+}
 
-# For datasource translations
-DATASOURCE_TRANSLATION_TYPEDEF = [(re.compile(pattern, re.I), translation) for
-                                  (pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
+DATASOURCE_TRANSLATION_TYPEDEF = [
+    (re.compile(pattern, re.I), translation) for
+    (pattern, translation) in DATASOURCE_TRANSLATIONS.items()
+]
 TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [
     (re.compile(re.sub(r':.*', '', pattern).replace('\\', '') + '(?!\\.)', re.I),
      re.sub(r':.*', '', translation).replace('\\', ''))
-    for(pattern, translation) in DATASOURCE_TRANSLATIONS.items()]
+    for(pattern, translation) in DATASOURCE_TRANSLATIONS.items()
+]
+ANNOTATION_KWARGS = copy.deepcopy(ANNOTATION_KWARGS)
+ANNOTATION_KWARGS['*'].update(SPECIES_TYPEDEF)
 
-# Kwarg control update for mygene specific kwargs
+QUERY_KWARGS = copy.deepcopy(QUERY_KWARGS)
+QUERY_KWARGS['*'].update(SPECIES_TYPEDEF)
+QUERY_KWARGS['*'].update(FIELD_FILTERS)
+QUERY_KWARGS['*']['_source']['default'] = DEFAULT_FIELDS
+QUERY_KWARGS['GET']['q']['translations'] = DATASOURCE_TRANSLATION_TYPEDEF
+QUERY_KWARGS['POST']['scopes']['translations'] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
+QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'group':'esqb'}
 
-# ES KWARGS (_source, scopes,
-# ANNOTATION_GET_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS,
-#    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-# ANNOTATION_POST_ES_KWARGS['_source'].update({#'default': DEFAULT_FIELDS,
-#    'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-# , 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-QUERY_GET_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})
-# , 'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
-QUERY_POST_ES_KWARGS['_source'].update({'default': DEFAULT_FIELDS})
 
-# Control KWARGS
-QUERY_GET_CONTROL_KWARGS['q'].update({'translations': DATASOURCE_TRANSLATION_TYPEDEF})
+# *****************************************************************************
+# Elasticsearch Query Pipeline
+# *****************************************************************************
+ES_QUERY_BUILDER = "web.pipeline.MygeneQueryBuilder"
 
-# query builder KWARGS
-ANNOTATION_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
-ANNOTATION_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
-QUERY_GET_ESQB_KWARGS.update(SPECIES_TYPEDEF)
-# ES query goes to these species by default?
-#QUERY_GET_ESQB_KWARGS['species']['default'] = [9606, 10090, 10116]
-QUERY_GET_ESQB_KWARGS.update({
-    'include_tax_tree': {'type': bool, 'default': False},
-    'entrezonly': {'type': bool, 'default': False},
-    'ensemblonly': {'type': bool, 'default': False},
-    'exists': {'type': list, 'default': None, 'max': 1000},
-    'missing': {'type': list, 'default': None, 'max': 1000},
-    'species_facet_filter': {'type': list, 'default': None, 'max': 1000,
-                             'translations': [(re.compile(pattern, re.I), translation['tax_id']) for
-                                              (pattern, translation) in TAXONOMY.items()]}
-})
-QUERY_POST_ESQB_KWARGS.update(SPECIES_TYPEDEF)
-QUERY_POST_ESQB_KWARGS['scopes'].update({'translations': TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF})
+AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
+
+# *****************************************************************************
+# Analytics Settings
+# *****************************************************************************
+GA_ACTION_QUERY_GET = 'query_get'
+GA_ACTION_QUERY_POST = 'query_post'
+GA_ACTION_ANNOTATION_GET = 'gene_get'
+GA_ACTION_ANNOTATION_POST = 'gene_post'
+GA_TRACKER_URL = 'MyGene.info'
+
+# *****************************************************************************
+# Endpoints Specifics & Others
+# *****************************************************************************
+
+# kwargs for status check
+STATUS_CHECK = {
+    'id': '1017',
+    'index': 'genedoc_mygene_allspecies_current',
+    'doc_type': 'gene'
+}
+
+# This essentially bypasses the es.get fallback as in myvariant...
+# The first regex matched integers, in which case the query becomes against
+# entrezgeneall annotation queries are now multimatch against the following fields
+ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired'])]
+ANNOTATION_DEFAULT_SCOPES = ['_id', 'ensembl.gene']
+
+# for error messages
+ID_REQUIRED_MESSAGE = 'Gene ID Required'
+ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
+
+# for docs
+INCLUDE_DOCS = False
+DOCS_STATIC_PATH = 'docs/_build/html'
+
+# url template to redirect for 'include_tax_tree' parameter
+INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = 'http://t.biothings.io/v1/taxon'

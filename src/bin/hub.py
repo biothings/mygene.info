@@ -34,6 +34,7 @@ class MyGeneHubServer(HubServer):
                 builder_class=partial(MyGeneDataBuilder,mappers=[ensembl2entrez]),
                 job_manager=self.managers["job_manager"])
         build_manager.configure()
+        build_manager.poll()
         self.managers["build_manager"] = build_manager
         self.logger.info("Using custom builder %s" % MyGeneDataBuilder)
 
@@ -68,18 +69,12 @@ class MyGeneHubServer(HubServer):
         #self.commands["publish_diff"] = partial(self.managers["diff_manager"].publish_diff,config.S3_APP_FOLDER)
         #self.commands["publish_snapshot"] = partial(self.managers["index_manager"].publish_snapshot,s3_folder=config.S3_APP_FOLDER)
 
-    def before_start(self):
-        self.logger.info("Scheduling builds")
-        allspecies = partial(server.shell.launch,partial(server.managers["build_manager"].merge,"mygene_allspecies"))
-        demo = partial(server.shell.launch,partial(server.managers["build_manager"].merge,"demo_allspecies"))
-        server.managers["job_manager"].submit(allspecies,"0 4 * * 7")
-        server.managers["job_manager"].submit(demo,"0 6 * * 7")
-
 import hub.dataload
 from hub.datatransform.keylookup import MyGeneKeyLookup
 # pass explicit list of datasources (no auto-discovery)
 server = MyGeneHubServer(config.ACTIVE_DATASOURCES,name="MyGene.info",
-        managers_custom_args={"dataplugin" : {"keylookup" : MyGeneKeyLookup}})
+        managers_custom_args={"dataplugin" : {"keylookup" : MyGeneKeyLookup}},
+        api_config=False)
 
 if __name__ == "__main__":
     server.start()

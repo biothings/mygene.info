@@ -51,9 +51,9 @@ class MainHandler(tornado.web.RequestHandler):
         query = self.get_argument('q', '')
         if query:
             if PY3:
-                out = call_service('/v2/query?' + urllib.parse.urlencode(dict(q=query, species='mouse', limit=1000)))
+                out = call_service('/v3/query?' + urllib.parse.urlencode(dict(q=query, species='mouse', limit=1000)))
             else:
-                out = call_service('/v2/query?' + urllib.urlencode(dict(q=query, species='mouse', limit=1000)))
+                out = call_service('/v3/query?' + urllib.urlencode(dict(q=query, species='mouse', limit=1000)))
             if 'total' in out:
                 gene_list = []
                 for gene in out['hits']:
@@ -67,7 +67,7 @@ class MainHandler(tornado.web.RequestHandler):
            geneid = self.get_argument('showgene', '')
            if geneid:
                #show gene page
-               gene = call_service('/v2/gene/%s?fields=reporter' % geneid)
+               gene = call_service('/v3/gene/%s?fields=reporter' % geneid)
                ps_list = []
                if gene and 'reporter' in gene:
                    ps_list = gene['reporter'].get('Mouse430_2',[])

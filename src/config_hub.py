@@ -201,6 +201,7 @@ SLACK_WEBHOOK = None
 # SSH port for hub console
 HUB_SSH_PORT = 7022
 HUB_API_PORT = 7080
+READONLY_HUB_API_PORT = 7081
 
 ################################################################################
 # HUB_PASSWD
@@ -223,6 +224,24 @@ STANDALONE_CONFIG = {
         "doc_type": "gene"
     },
     "mygene.info": {
+        "es_host": "prodserver:9200",
+        "index": "mygene_prod",
+        "doc_type": "gene"
+    },
+}
+# ... or using a dynamic indexer factory and ES host (index names are then
+# taken from VERSION_URLS and all are managed on one given ES host)
+#AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
+#AUTOHUB_ES_HOST = "localhost:9200"
+
+# Autohub configuration, either from a static definition...
+STANDALONE_CONFIG = {
+    "_default": {
+        "es_host": "localhost:9200",
+        "index": "mygene_test",
+        "doc_type": "gene"
+    },
+    "<data-release name for prod>": {
         "es_host": "prodserver:9200",
         "index": "mygene_prod",
         "doc_type": "gene"

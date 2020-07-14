@@ -8,7 +8,7 @@
 
 mygene={};
 
-mygene.url_root = 'http://mygene.info/widget/autocomplete/';
+mygene.url_root = '//docs.mygene.info/en/latest/_static/widget/autocomplete/';
 //any input tag with class "mygene_query_target" will be enabled for gene autocompletion feature.
 mygene.input_selector = "input.mygene_query_target";
 //this is the name of callback function should be defined by user.
@@ -62,7 +62,7 @@ mygene.genequery = function(select_callback){
         target_input.autocomplete({
             source: function( request, response ) {
                 $.ajax({
-                    url: "http://mygene.info/v2/query",
+                    url: "//mygene.info/v3/query",
                     dataType: "jsonp",
                     jsonp: 'callback',
                     data: {
