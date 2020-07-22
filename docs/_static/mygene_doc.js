@@ -9,8 +9,7 @@ jQuery(document).ready(function () {
     if (jQuery(' .indexed-field-table ').length) {
         jQuery.ajax({
             url: "//mygene.info/v3/metadata/fields",
-            dataType: "JSONP",
-            jsonpCallback: "callback",
+            dataType: "json",
             type: "GET",
             success: function (data) {
                 jQuery.each(data, function (field, d) {
