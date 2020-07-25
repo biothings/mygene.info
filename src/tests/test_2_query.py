@@ -172,6 +172,16 @@ class TestQueryGET(BiothingsTestCase):
         res2 = self.request("query?q=lytic%20enzyme&species=1386").json()
         assert res2['total'] == 0
 
+    def test_260_order(self):
+
+        url = 'gene/695?fields=homologene'
+        res = self.request(url).json()
+        genes = [tuple(list_) for list_ in res['homologene']['genes']]
+        assert (9606, 695) in genes # human
+        assert (10090, 12229) in genes # mouse
+        assert (10116, 367901) in genes # rat
+        assert (695, 9606) not in genes # this field should not be sorted
+
 
 class TestQueryPOST(BiothingsTestCase):
 
