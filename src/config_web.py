@@ -145,7 +145,7 @@ QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'grou
 # Elasticsearch Query Pipeline
 # *****************************************************************************
 ES_QUERY_BUILDER = "web.pipeline.MygeneQueryBuilder"
-
+ES_RESULT_TRANSFORM = "web.pipeline.MygeneTransform"
 AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
 
 # *****************************************************************************

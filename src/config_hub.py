@@ -214,7 +214,25 @@ HUB_PASSWD = {"guest":"9RKfd8gDuNf0Q"}
 CACHE_FOLDER = None
 
 # when publishing releases, specify the targetted (ie. required) standalone version
-STANDALONE_VERSION = "standalone_v3"
+STANDALONE_VERSION = {"branch": "standalone_v3"}
+
+# Autohub configuration, either from a static definition...
+STANDALONE_CONFIG = {
+    "_default": {
+        "es_host": "localhost:9200",
+        "index": "mygene_test",
+        "doc_type": "gene"
+    },
+    "mygene.info": {
+        "es_host": "prodserver:9200",
+        "index": "mygene_prod",
+        "doc_type": "gene"
+    },
+}
+# ... or using a dynamic indexer factory and ES host (index names are then
+# taken from VERSION_URLS and all are managed on one given ES host)
+#AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
+#AUTOHUB_ES_HOST = "localhost:9200"
 
 # Autohub configuration, either from a static definition...
 STANDALONE_CONFIG = {
