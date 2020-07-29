@@ -31,7 +31,7 @@ class CPDBUploader(uploader.BaseSourceUploader):
                     },
                     'name': {
                         "type": "text",
-                        "copy_to": ["all"],
+                        "copy_to": p_source,
                     }
                 }
             }
