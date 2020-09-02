@@ -241,3 +241,12 @@ class TestQueryPOST(BiothingsTestCase):
             if 'name' in item:
                 field_set.add('name')
         assert field_set == set(['entrezgene', 'name'])
+
+    def test_266_post(self):
+        """
+        https://github.com/biothings/mygene.info/issues/70
+        """
+        body = {
+            'q': 'ENSG00000034510',
+        }
+        self.query(method='POST', **body)
