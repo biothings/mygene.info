@@ -139,6 +139,7 @@ QUERY_KWARGS['*']['_source']['default'] = DEFAULT_FIELDS
 QUERY_KWARGS['GET']['q']['translations'] = DATASOURCE_TRANSLATION_TYPEDEF
 QUERY_KWARGS['POST']['scopes']['translations'] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
 QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'group':'esqb'}
+QUERY_KWARGS['POST']['scopes']['default'] =  ["_id", "entrezgene", "ensembl.gene", "retired"]
 
 
 # *****************************************************************************
@@ -172,7 +173,7 @@ STATUS_CHECK = {
 # The first regex matched integers, in which case the query becomes against
 # entrezgeneall annotation queries are now multimatch against the following fields
 ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired'])]
-ANNOTATION_DEFAULT_SCOPES = ['_id', 'ensembl.gene']
+ANNOTATION_DEFAULT_SCOPES = ["_id", "entrezgene", "ensembl.gene", "retired"]
 
 # for error messages
 ID_REQUIRED_MESSAGE = 'Gene ID Required'
