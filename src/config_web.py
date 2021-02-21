@@ -114,10 +114,10 @@ SPECIES_TYPEDEF = {
     }
 }
 FIELD_FILTERS = {
-    'entrezonly': {'type': bool, 'default': False, 'group':'esqb'},
-    'ensemblonly': {'type': bool, 'default': False, 'group':'esqb'},
-    'exists': {'type': list, 'default': None, 'max': 1000, 'group':'esqb'},
-    'missing': {'type': list, 'default': None, 'max': 1000, 'group':'esqb'},
+    'entrezonly': {'type': bool, 'default': False, 'group': 'esqb'},
+    'ensemblonly': {'type': bool, 'default': False, 'group': 'esqb'},
+    'exists': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb'},
+    'missing': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb'},
 }
 
 DATASOURCE_TRANSLATION_TYPEDEF = [
@@ -138,8 +138,9 @@ QUERY_KWARGS['*'].update(FIELD_FILTERS)
 QUERY_KWARGS['*']['_source']['default'] = DEFAULT_FIELDS
 QUERY_KWARGS['GET']['q']['translations'] = DATASOURCE_TRANSLATION_TYPEDEF
 QUERY_KWARGS['POST']['scopes']['translations'] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
-QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'group':'esqb'}
-QUERY_KWARGS['POST']['scopes']['default'] =  ["_id", "entrezgene", "ensembl.gene", "retired"]
+QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'group': 'esqb'}
+QUERY_KWARGS['POST']['scopes']['default'] = ["_id", "entrezgene", "ensembl.gene", "retired"]
+QUERY_KWARGS['POST']['q']['jsoninput'] = True
 
 
 # *****************************************************************************

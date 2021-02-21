@@ -11,10 +11,19 @@ class MygeneQueryBuilder(ESQueryBuilder):
 
     def default_string_query(self, q, options):
 
+        search = AsyncSearch()
+
         # genomic interval query
         pattern = r'chr(?P<chrom>\w+):(?P<gstart>[0-9,]+)-(?P<gend>[0-9,]+)'
         match = re.search(pattern, q)
-        if match:  # (chr, gstart, gend)
+
+        if q == '__all__':
+            search = search.query()
+
+        elif q == '__any__' and self.allow_random_query:
+            search = search.query('function_score', random_score={})
+
+        elif match:  # (chr, gstart, gend)
             d = match.groupdict()
             if q.startswith('hg19.'):
                 # support hg19 for human (default is hg38)
