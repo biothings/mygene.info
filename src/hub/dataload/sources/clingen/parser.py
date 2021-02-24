@@ -28,8 +28,7 @@ def parse_data(data_access):
     return: a list containing a nested dinctionary with ENTREZ ID as gene ID  
     """
 
-    current_time = date.today().strftime("-%Y-%m-%d")
-    file_name = "ClinGen-Gene-Disease-Summary{}.csv".format(str(current_time))
+    file_name = "Clingen-Gene-Disease-Summary-{}.csv".format(data_access[-10:])
     data_dir = os.path.join(data_access, file_name)
 
     # check if the file exist
@@ -42,6 +41,7 @@ def parse_data(data_access):
             next(input_file)
 
         header = next(input_file).strip().split(",")
+        header = [col.strip('"') for col in header]
         next(input_file)
         reader = csv.DictReader(set(list(input_file)), fieldnames = header, delimiter = ",")
         output = defaultdict(list)
