@@ -15,7 +15,7 @@ class ClingenDumper(biothings.hub.dataload.dumper.LastModifiedHTTPDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     SCHEDULE = None
     UNCOMPRESS = False
-    SRC_URLS = ['https://search.clinicalgenome.org/kb/gene-validity.csv']
+    SRC_URLS = ['https://search.clinicalgenome.org/kb/gene-validity/download']
     SCHEDULE = "0 6 * * *"
     __metadata__ = {
         "src_meta": {
