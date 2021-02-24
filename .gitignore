@@ -6,3 +6,5 @@ src/config_dev.py
 *.pyc
 src/bin/ssh*
 src/run
+
+docs/_build
