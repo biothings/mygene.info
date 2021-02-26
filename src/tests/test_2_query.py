@@ -51,15 +51,18 @@ class TestQueryGET(BiothingsTestCase):
     def test_209_query(self):
         # entrezonly for match query
         query_data = {
-            "q": "FAM86B3P",
+            "q": "U3",
             "scopes": "symbol, alias",
             "entrezonly": "True"
         }
-        res = self.query(method='POST', data=query_data)
-        assert len(res) == 1
+        res1 = self.query(method='GET', data=query_data)
+        #assert len(res) == 1
         del query_data["entrezonly"]
-        res = self.query(method='POST', data=query_data)
-        assert len(res) == 3
+        res2 = self.query(method='GET', data=query_data)
+        assert res1['total'] < res2['total']
+        query_data["ensemblonly"] = 1
+        res3 = self.query(method='GET', data=query_data)
+        assert res3['total'] < res2['total']
 
     def test_210_size(self):
         res = self.request('query?q=cdk?').json()

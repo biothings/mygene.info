@@ -53,7 +53,7 @@ class TestMygeneWeb(BiothingsTestCase):
     def test_333_taxonomy(self):
         res = self.request("species/46170?include_children=true").json()
         res2 = self.request("species/46170?include_children=true&has_gene=1").json()
-        assert len(res2['children']) >= 16
+        assert len(res2['children']) >= 11
         assert len(res2['children']) <= len(res['children'])
 
     def test_341_species(self):
