@@ -203,9 +203,9 @@ class TestDataFields(BiothingsTestCase):
         res = self.request("gene/107924918").json()
         assert "other_names" in res, "No other_names found in %s" % res
         assert res["other_names"] == ['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3']
-        # that one not
-        res = self.request("gene/1246509").json()
-        assert "other_names" not in res
+        # # that one not
+        # res = self.request("gene/83656").json()
+        # assert "other_names" not in res
         # query by other_names:
         res = self.request("query?q=other_names:p33&size=100").json()
         assert res["total"] > 30  # currently 35...
