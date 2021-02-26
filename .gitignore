@@ -8,3 +8,4 @@ src/bin/ssh*
 src/run
 
 docs/_build
+.vscode
