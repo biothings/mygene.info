@@ -136,6 +136,7 @@ QUERY_KWARGS = copy.deepcopy(QUERY_KWARGS)
 QUERY_KWARGS['*'].update(SPECIES_TYPEDEF)
 QUERY_KWARGS['*'].update(FIELD_FILTERS)
 QUERY_KWARGS['*']['_source']['default'] = DEFAULT_FIELDS
+QUERY_KWARGS['*']['_source']['strict'] = False
 QUERY_KWARGS['GET']['q']['translations'] = DATASOURCE_TRANSLATION_TYPEDEF
 QUERY_KWARGS['POST']['scopes']['translations'] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
 QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'group': 'esqb'}
