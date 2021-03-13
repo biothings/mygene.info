@@ -95,6 +95,7 @@ SPECIES_TYPEDEF = {
     'species': {
         'type': list,
         'default': ['all'],
+        'strict': False,
         'max': 1000,
         'group': 'esqb',
         'translations': [
@@ -105,6 +106,7 @@ SPECIES_TYPEDEF = {
     'species_facet_filter': {
         'type': list,
         'default': None,
+        'strict': False,
         'max': 1000,
         'group': 'esqb',
         'translations': [
@@ -116,8 +118,8 @@ SPECIES_TYPEDEF = {
 FIELD_FILTERS = {
     'entrezonly': {'type': bool, 'default': False, 'group': 'esqb'},
     'ensemblonly': {'type': bool, 'default': False, 'group': 'esqb'},
-    'exists': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb'},
-    'missing': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb'},
+    'exists': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb', 'strict': False},
+    'missing': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb', 'strict': False},
 }
 
 DATASOURCE_TRANSLATION_TYPEDEF = [
@@ -131,6 +133,7 @@ TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [
 ]
 ANNOTATION_KWARGS = copy.deepcopy(ANNOTATION_KWARGS)
 ANNOTATION_KWARGS['*'].update(SPECIES_TYPEDEF)
+ANNOTATION_KWARGS['*']['_source']['strict'] = False
 
 QUERY_KWARGS = copy.deepcopy(QUERY_KWARGS)
 QUERY_KWARGS['*'].update(SPECIES_TYPEDEF)
