@@ -22,7 +22,7 @@ class MygeneQueryHandler(QueryHandler):
                     "expand_species": 'True'
                 }
                 res = requests.post(
-                    self.web_settings.INCLUDE_TAX_TREE_REDIRECT_ENDPOINT, 
+                    self.web_settings.INCLUDE_TAX_TREE_REDIRECT_ENDPOINT,
                     data=body, headers=headers)
 
                 if res.status_code == requests.codes.ok:
@@ -66,10 +66,11 @@ class MygeneSourceHandler(MetadataSourceHandler):
         }
     }
     """
+
     def extras(self, _meta):
 
         appdir = self.web_settings.devinfo.get_git_repo_path()
-        commit = get_software_info(appdir).get('commit-hash', '')
+        commit = get_software_info(appdir)['codebase'].get('commit-hash', '')
 
         _meta['available_fields'] = 'http://mygene.info/metadata/fields'
         _meta['app_revision'] = commit
