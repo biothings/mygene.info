@@ -1,5 +1,4 @@
-'''
-    MyGene Data & Feature Tester
+# MyGene Data & Feature Tester
 
     Run:
     > pytest tests
@@ -12,4 +11,3 @@
     - 4** Cornercase handling
     - 5** Common control keywords
     - 6** Datasources
-'''

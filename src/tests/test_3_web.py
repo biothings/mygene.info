@@ -1,9 +1,9 @@
+from biothings.tests.web import BiothingsDataTest
 
 
-from biothings.tests.web import BiothingsTestCase
-
-
-class TestMygeneWeb(BiothingsTestCase):
+class TestMygeneWeb(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     def test_301_status(self):
         self.request('/status')

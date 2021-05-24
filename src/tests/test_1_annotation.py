@@ -1,7 +1,9 @@
-from biothings.tests.web import BiothingsTestCase
+from biothings.tests.web import BiothingsDataTest
 
 
-class TestAnnotationGET(BiothingsTestCase):
+class TestAnnotationGET(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     def test_101(self):
 
@@ -94,7 +96,9 @@ class TestAnnotationGET(BiothingsTestCase):
         self.request('gene/', expect=400)
 
 
-class TestAnnotationPOST(BiothingsTestCase):
+class TestAnnotationPOST(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     def test_151(self):
 
