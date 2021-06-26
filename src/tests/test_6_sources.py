@@ -1,13 +1,9 @@
+from biothings.tests.web import BiothingsDataTest
 
 
-import os
-import random
-
-
-from biothings.tests.web import BiothingsTestCase
-
-
-class TestDataFields(BiothingsTestCase):
+class TestDataFields(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     def test_601_hg19(self):
 

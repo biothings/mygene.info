@@ -1,9 +1,9 @@
+from biothings.tests.web import BiothingsDataTest
 
 
-from biothings.tests.web import BiothingsTestCase
-
-
-class TestSpecialInput(BiothingsTestCase):
+class TestSpecialInput(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     unicode_text = u'基因'
 

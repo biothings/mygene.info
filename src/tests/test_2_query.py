@@ -1,10 +1,9 @@
-import random
+from biothings.tests.web import BiothingsDataTest
 
 
-from biothings.tests.web import BiothingsTestCase
-
-
-class TestQueryGET(BiothingsTestCase):
+class TestQueryGET(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     def test_201_query(self):
         # data existance
@@ -186,7 +185,9 @@ class TestQueryGET(BiothingsTestCase):
         assert (695, 9606) not in genes # this field should not be sorted
 
 
-class TestQueryPOST(BiothingsTestCase):
+class TestQueryPOST(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     def test_261_post(self):
 

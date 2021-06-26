@@ -1,10 +1,11 @@
-
 import pytest
 
-from biothings.tests.web import BiothingsTestCase
+from biothings.tests.web import BiothingsDataTest
 
 
-class TestControlKeywords(BiothingsTestCase):
+class TestControlKeywords(BiothingsDataTest):
+    host = 'mygene.info'
+    prefix = 'v3'
 
     def test_501_format_msgpack(self):
 
