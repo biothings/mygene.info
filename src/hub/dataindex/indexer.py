@@ -1,29 +1,21 @@
-import os
-
-import config
-import biothings.hub.dataindex.indexer as indexer
+from biothings.hub.dataindex.indexer import Indexer
 
 
-class GeneIndexer(indexer.Indexer):
+class GeneIndexer(Indexer):
 
-    def get_index_creation_settings(self):
-        settings = super(GeneIndexer,self).get_index_creation_settings()
-        # mygene's specific
-        settings["codec"] = "best_compression"
-        #settings["auto_expand_replicas"] = "0-all"
-        settings["number_of_replicas"] = 1
-        settings["number_of_shards"] = 3
-        settings["analysis"]["tokenizer"] = {
-                "refseq_tokenizer": {
-                    "delimiter": ".",
-                    "type": "path_hierarchy"
-                    }
-                }
-        settings["analysis"]["analyzer"]["refseq_analyzer"] = {
-                "filter": "lowercase",
-                "tokenizer": "refseq_tokenizer",
-                "type": "custom"
-                }
-
-        return settings
-
+    def __init__(self, build_doc, indexer_env, target_name, index_name):
+        super().__init__(build_doc, indexer_env, target_name, index_name)
+        self.index_settings["codec"] = "best_compression"  # mygene's specific
+        self.index_settings["number_of_replicas"] = 0
+        self.index_settings["number_of_shards"] = 3
+        self.index_settings["analysis"]["tokenizer"] = {
+            "refseq_tokenizer": {
+                "delimiter": ".",
+                "type": "path_hierarchy"
+            }
+        }
+        self.index_settings["analysis"]["analyzer"]["refseq_analyzer"] = {
+            "filter": "lowercase",
+            "tokenizer": "refseq_tokenizer",
+            "type": "custom"
+        }
