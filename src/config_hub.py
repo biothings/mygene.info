@@ -250,7 +250,7 @@ STANDALONE_CONFIG = {
         "index": "mygene_test",
         "doc_type": "gene"
     },
-    "<data-release name for prod>": {
+    "mygene.info": {
         "es_host": "prodserver:9200",
         "index": "mygene_prod",
         "doc_type": "gene"
