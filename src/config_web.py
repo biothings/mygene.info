@@ -167,7 +167,7 @@ GA_TRACKER_URL = 'MyGene.info'
 # kwargs for status check
 STATUS_CHECK = {
     'id': '1017',
-    'index': 'genedoc_mygene_allspecies_current'
+    'index': 'mygene_current'
 }
 
 # This essentially bypasses the es.get fallback as in myvariant...
