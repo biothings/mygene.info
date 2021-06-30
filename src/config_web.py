@@ -14,7 +14,7 @@ from biothings.web.settings.default import APP_LIST, ANNOTATION_KWARGS, QUERY_KW
 # elasticsearch server transport url
 ES_HOST = 'localhost:9200'
 # elasticsearch index name
-ES_INDEX = 'genedoc_mygene_allspecies_current'
+ES_INDEX = 'mygene_current'
 # elasticsearch document type
 ES_DOC_TYPE = 'gene'
 
@@ -97,7 +97,6 @@ SPECIES_TYPEDEF = {
         'default': ['all'],
         'strict': False,
         'max': 1000,
-        'group': 'esqb',
         'translations': [
             (re.compile(pattern, re.I), translation['tax_id'])
             for (pattern, translation) in TAXONOMY.items()
@@ -108,7 +107,6 @@ SPECIES_TYPEDEF = {
         'default': None,
         'strict': False,
         'max': 1000,
-        'group': 'esqb',
         'translations': [
             (re.compile(pattern, re.I), translation['tax_id']) for
             (pattern, translation) in TAXONOMY.items()
@@ -116,10 +114,10 @@ SPECIES_TYPEDEF = {
     }
 }
 FIELD_FILTERS = {
-    'entrezonly': {'type': bool, 'default': False, 'group': 'esqb'},
-    'ensemblonly': {'type': bool, 'default': False, 'group': 'esqb'},
-    'exists': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb', 'strict': False},
-    'missing': {'type': list, 'default': None, 'max': 1000, 'group': 'esqb', 'strict': False},
+    'entrezonly': {'type': bool, 'default': False},
+    'ensemblonly': {'type': bool, 'default': False},
+    'exists': {'type': list, 'default': None, 'max': 1000, 'strict': False},
+    'missing': {'type': list, 'default': None, 'max': 1000, 'strict': False},
 }
 
 DATASOURCE_TRANSLATION_TYPEDEF = [
@@ -142,7 +140,7 @@ QUERY_KWARGS['*']['_source']['default'] = DEFAULT_FIELDS
 QUERY_KWARGS['*']['_source']['strict'] = False
 QUERY_KWARGS['GET']['q']['translations'] = DATASOURCE_TRANSLATION_TYPEDEF
 QUERY_KWARGS['POST']['scopes']['translations'] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
-QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False, 'group': 'esqb'}
+QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False}
 QUERY_KWARGS['POST']['scopes']['default'] = ["_id", "entrezgene", "ensembl.gene", "retired"]
 QUERY_KWARGS['POST']['q']['jsoninput'] = True
 
@@ -151,7 +149,6 @@ QUERY_KWARGS['POST']['q']['jsoninput'] = True
 # Elasticsearch Query Pipeline
 # *****************************************************************************
 ES_QUERY_BUILDER = "web.pipeline.MygeneQueryBuilder"
-ES_RESULT_TRANSFORM = "web.pipeline.MygeneTransform"
 AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
 
 # *****************************************************************************
@@ -170,8 +167,7 @@ GA_TRACKER_URL = 'MyGene.info'
 # kwargs for status check
 STATUS_CHECK = {
     'id': '1017',
-    'index': 'genedoc_mygene_allspecies_current',
-    'doc_type': 'gene'
+    'index': 'genedoc_mygene_allspecies_current'
 }
 
 # This essentially bypasses the es.get fallback as in myvariant...
@@ -179,10 +175,6 @@ STATUS_CHECK = {
 # entrezgeneall annotation queries are now multimatch against the following fields
 ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired'])]
 ANNOTATION_DEFAULT_SCOPES = ["_id", "entrezgene", "ensembl.gene", "retired"]
-
-# for error messages
-ID_REQUIRED_MESSAGE = 'Gene ID Required'
-ID_NOT_FOUND_TEMPLATE = "Gene ID '{bid}' not found"
 
 # for docs
 INCLUDE_DOCS = False
