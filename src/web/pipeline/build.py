@@ -28,9 +28,7 @@ class MygeneQueryBuilder(ESQueryBuilder):
         elif q.startswith('"') and q.endswith('"') or \
                 any(map(q.__contains__, (':', '~', ' AND ', ' OR ', 'NOT '))):
             search = Search().query(
-                "query_string", query=q,
-                default_operator="AND",
-                auto_generate_phrase_queries=True)
+                "query_string", query=q, default_operator="AND")
 
         # wildcard query
         elif '*' in q or '?' in q:
