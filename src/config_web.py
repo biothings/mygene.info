@@ -11,11 +11,8 @@ from biothings.web.settings.default import APP_LIST, ANNOTATION_KWARGS, QUERY_KW
 # *****************************************************************************
 # Elasticsearch Settings
 # *****************************************************************************
-# elasticsearch server transport url
 ES_HOST = 'localhost:9200'
-# elasticsearch index name
 ES_INDEX = 'mygene_current'
-# elasticsearch document type
 ES_DOC_TYPE = 'gene'
 
 # *****************************************************************************
@@ -150,15 +147,6 @@ QUERY_KWARGS['POST']['q']['jsoninput'] = True
 # *****************************************************************************
 ES_QUERY_BUILDER = "web.pipeline.MygeneQueryBuilder"
 AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
-
-# *****************************************************************************
-# Analytics Settings
-# *****************************************************************************
-GA_ACTION_QUERY_GET = 'query_get'
-GA_ACTION_QUERY_POST = 'query_post'
-GA_ACTION_ANNOTATION_GET = 'gene_get'
-GA_ACTION_ANNOTATION_POST = 'gene_post'
-GA_TRACKER_URL = 'MyGene.info'
 
 # *****************************************************************************
 # Endpoints Specifics & Others
