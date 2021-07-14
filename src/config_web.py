@@ -45,13 +45,13 @@ DEFAULT_FIELDS = ['name', 'symbol', 'taxid', 'entrezgene']
 TAXONOMY = {
     "human": {"tax_id": "9606", "assembly": "hg38"},
     "mouse": {"tax_id": "10090", "assembly": "mm10"},
-    "rat": {"tax_id": "10116", "assembly": "rn4"},
-    "fruitfly": {"tax_id": "7227", "assembly": "dm3"},
-    "nematode": {"tax_id": "6239", "assembly": "ce10"},
-    "zebrafish": {"tax_id": "7955", "assembly": "zv9"},
-    "thale-cress": {"tax_id": "3702"},
-    "frog": {"tax_id": "8364", "assembly": "xenTro3"},
-    "pig": {"tax_id": "9823", "assembly": "susScr2"}
+    "rat": {"tax_id": "10116", "assembly": "rn6"},
+    "fruitfly": {"tax_id": "7227", "assembly": "dm6"},
+    "nematode": {"tax_id": "6239", "assembly": "ce11"},
+    "zebrafish": {"tax_id": "7955", "assembly": "danRer11"},
+    "thale-cress": {"tax_id": "3702", "assembly": "araTha1"},
+    "frog": {"tax_id": "8364", "assembly": "xenTro9"},
+    "pig": {"tax_id": "9823", "assembly": "susScr11"}
 }
 
 DATASOURCE_TRANSLATIONS = {
