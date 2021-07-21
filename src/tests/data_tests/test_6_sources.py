@@ -65,7 +65,6 @@ class TestDataFields(BiothingsDataTest):
         assert hit["refseq"]["protein"] == "NP_001670.1"
         assert hit["refseq"]["rna"].startswith("NM_001679.")
 
-
     def test_615_accession(self):
         protein = filter_hits(self.request(
             "query?q=accession:AAH68303&fields=accession").json())
@@ -196,9 +195,11 @@ class TestDataFields(BiothingsDataTest):
 
     def test_650_others(self):
         # this one has some
-        res = self.request("gene/107924918").json()
+        res = self.request("gene/1017").json()
         assert "other_names" in res, "No other_names found in %s" % res
-        assert res["other_names"] == ['aquaporin NIP1-2-like', 'aquaporin NIP1;2', 'aquaporin NIP1;3']
+        assert "cdc2-related protein kinase" in res["other_names"]
+        assert "cell division protein kinase 2" in res["other_names"]
+        assert "p33 protein kinase" in res["other_names"]
         # # that one not
         # res = self.request("gene/83656").json()
         # assert "other_names" not in res
@@ -271,6 +272,7 @@ class TestDataFields(BiothingsDataTest):
         # https://pharos.nih.gov/idg/about
         res = self.request("gene/56141?fields=pharos").json()
         assert res["pharos"]["target_id"] == 4745
+
 
 def filter_hits(dic, field=None):
     ''' Filter hits by removing specified fields or by default meta fields '''
