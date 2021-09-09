@@ -1,8 +1,6 @@
 
-import os, csv, re
+import os, pandas, csv, re
 import math
-import pandas as pd
-
 from biothings.utils.dataload import dict_convert, dict_sweep
 from biothings import config
 logging = config.logger
@@ -19,7 +17,7 @@ def load_orthology(data_folder):
     infile = os.path.join(data_folder, "ORTHOLOGY-ALLIANCE_COMBINED.tsv")
     assert os.path.exists(infile)
 
-    data=pd.read_csv(infile, header=15, sep="\\t").to_dict(orient='records')
+    data=pandas.read_csv(infile, header=15, sep="\\t").to_dict(orient='records')
     results = {}
 
     for rec in data:
