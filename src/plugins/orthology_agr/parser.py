@@ -8,8 +8,10 @@ logging = config.logger
 process_key = lambda k: k.replace(" ","_").lower()
 
 def load_orthology(data_folder):
+
     infile = os.path.join(data_folder, "ORTHOLOGY-ALLIANCE_COMBINED.tsv")
     assert os.path.exists(infile)
+
     data=pd.read_csv(infile, header=15, sep="\\t").to_dict(orient='records')
     results = {}
 
@@ -24,3 +26,8 @@ def load_orthology(data_folder):
     for _id,docs in results.items():
         doc = {"_id": _id, "orthology_data" : docs}
         yield doc
+
+
+def setup_release(self):
+    release="2021-08"
+    return release
