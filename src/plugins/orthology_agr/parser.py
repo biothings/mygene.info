@@ -1,8 +1,8 @@
 
 import os, pandas, csv, re
 import math
-from biothings import config
 from biothings.utils.dataload import dict_convert, dict_sweep
+from biothings import config
 logging = config.logger
 
 process_key = lambda k: k.replace(" ","_").lower()
