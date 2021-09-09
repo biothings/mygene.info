@@ -6,7 +6,7 @@
         "uncompress" : true
     },
     "uploader" : {
-        "parser" : "parser:load_orthology",
+        "parser" : "parser:load_orthology"
         
     }
 }
