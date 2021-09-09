@@ -7,6 +7,6 @@
     },
     "uploader" : {
         "parser" : "parser:load_orthology",
-        "on_duplicates" : "error"
+        
     }
 }
