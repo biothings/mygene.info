@@ -2,7 +2,7 @@
     "version": "0.1",
     "requires" : ["pandas"],
     "dumper" : {
-        "data_url" : ["https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz"],
+        "data_url" : "https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz",
         "uncompress" : true
     },
     "uploader" : {
