@@ -1,11 +1,18 @@
 
-import os, pandas, csv, re
+import os, csv, re
 import math
+import pandas as pd
+
 from biothings.utils.dataload import dict_convert, dict_sweep
 from biothings import config
 logging = config.logger
 
 process_key = lambda k: k.replace(" ","_").lower()
+
+def setup_release(self):
+    release="2021-08"
+    return release
+
 
 def load_orthology(data_folder):
 
@@ -26,8 +33,3 @@ def load_orthology(data_folder):
     for _id,docs in results.items():
         doc = {"_id": _id, "orthology_data" : docs}
         yield doc
-
-
-def setup_release(self):
-    release="2021-08"
-    return release
