@@ -1,6 +1,5 @@
 
-import os, pandas, csv, re
-import math
+import os, pandas
 import numpy as np
 from biothings.utils.dataload import dict_convert, dict_sweep
 from biothings import config
@@ -9,7 +8,7 @@ logging = config.logger
 process_key = lambda k: k.replace(" ","_").lower()
 
 def setup_release(self):
-    release="2021-08"
+    release="2021-09"
     return release
 
 
