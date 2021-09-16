@@ -8,7 +8,7 @@ logging = config.logger
 process_key = lambda k: k.replace(" ","_").lower()
 
 def setup_release(self):
-    release="2021-09"
+    release="2021-08-10"
     return release
 
 
