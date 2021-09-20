@@ -8,7 +8,7 @@ logging = config.logger
 process_key = lambda k: k.replace(" ","_").lower()
 
 def setup_release(self):
-    release="2021-08-10"
+    release="2021-09-19"
     return release
 
 
@@ -28,7 +28,6 @@ def load_orthology(data_folder):
         # remove NaN values, not indexable
         rec = dict_sweep(rec,vals=[np.nan])
         results.setdefault(_id,[]).append(rec)
-        #print(rec)
 
     for _id,docs in results.items():
         doc = {"_id": _id, "ortholog_info" : docs}
