@@ -5,6 +5,7 @@
     Chemical and Drug Annotation as a Service.
 """
 import os as _os
+import sys as _sys
 import importlib.util as _imp_util
 
 CONFIG_FILE_NAME = "config_web.py"
@@ -32,6 +33,9 @@ _spec.loader.exec_module(_config)
 for _k, _v in _config.__dict__.items():
     if not _k.startswith('_'):
         globals()[_k] = _v
+
+# insert module import path
+_sys.path.insert(0, _os.path.dirname(_cfg_path))
 
 # cleanup
 del CONFIG_FILE_NAME
