@@ -1,12 +1,7 @@
-
-"""
-    Mychem.info
-    https://mychem.info/
-    Chemical and Drug Annotation as a Service.
-"""
 import os as _os
 import sys as _sys
 import importlib.util as _imp_util
+
 
 CONFIG_FILE_NAME = "config_web.py"
 

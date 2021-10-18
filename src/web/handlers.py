@@ -1,35 +1,33 @@
 
 import requests
 
-from biothings.utils.version import get_software_info
 from biothings.web.handlers import MetadataSourceHandler, QueryHandler
 
 
 class MygeneQueryHandler(QueryHandler):
 
-    def pre_query_builder_hook(self, options):
+    async def get(self, *args, **kwargs):
 
-        options = super().pre_query_builder_hook(options)
-        if self.request.method == 'GET':
-            if options.esqb.include_tax_tree and \
-                    'all' not in options.esqb.species:
-                headers = {
-                    'user-agent': 'Python-requests_mygene.info/{} (gzip)'.format(
-                        requests.__version__)}
+        if self.args.include_tax_tree and 'all' not in self.args.species:
 
-                body = {
-                    "ids": ','.join([str(sid) for sid in options.esqb.species]),
+            res = requests.post(
+                self.web_settings.INCLUDE_TAX_TREE_REDIRECT_ENDPOINT,
+                data={
+                    "ids": ','.join([str(sid) for sid in self.args.species]),
                     "expand_species": 'True'
-                }
-                res = requests.post(
-                    self.web_settings.INCLUDE_TAX_TREE_REDIRECT_ENDPOINT,
-                    data=body, headers=headers)
+                },
+                headers={
+                    'user-agent': (
+                        'Python-requests_'
+                        'mygene.info/'
+                        '{} (gzip)'
+                    ).format(requests.__version__)
+                })
 
-                if res.status_code == requests.codes.ok:
-                    options['esqb']['species'] = [str(x) for x in res.json()]
-                    # logging.debug('tax_tree species: {}'.format(options.esqb_kwargs.species))
+            if res.status_code == requests.codes.ok:
+                self.args.species = [str(x) for x in res.json()]
 
-        return options
+        await super().get(self, *args, **kwargs)
 
 
 class MygeneSourceHandler(MetadataSourceHandler):
@@ -38,8 +36,6 @@ class MygeneSourceHandler(MetadataSourceHandler):
     GET /v3/metadata
 
     {
-        "app_revision": " ... ", # gitcommit hash
-        "available_fields": "http://mygene.info/metadata/fields",
         "biothing_type": "gene",
         "build_date": "2020-03-29T04:00:00.012426",
         "build_version": "20200329",
@@ -48,7 +44,6 @@ class MygeneSourceHandler(MetadataSourceHandler):
             "mouse": "mm10",
             ...
         },
-        "source": null,
         "src": { ... }, // 28 items
         "stats": {
             "total": 36232158,
@@ -69,22 +64,13 @@ class MygeneSourceHandler(MetadataSourceHandler):
 
     def extras(self, _meta):
 
-        appdir = self.web_settings.devinfo.get_git_repo_path()
-        commit = get_software_info(appdir)['codebase'].get('commit-hash', '')
-
-        _meta['available_fields'] = 'http://mygene.info/metadata/fields'
-        _meta['app_revision'] = commit
-        _meta['genome_assembly'] = {}
         _meta['taxonomy'] = {}
+        _meta['genome_assembly'] = {}
 
-        for s, d in self.web_settings.TAXONOMY.items():
+        for s, d in self.biothings.config.TAXONOMY.items():
             if 'tax_id' in d:
                 _meta['taxonomy'][s] = int(d['tax_id'])
             if 'assembly' in d:
                 _meta['genome_assembly'][s] = d['assembly']
-
-        if "source" not in _meta:
-            # occurs when loaded from scratch, not from a change/diff file
-            _meta["source"] = None
 
         return _meta

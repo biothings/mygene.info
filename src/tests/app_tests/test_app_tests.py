@@ -3,7 +3,6 @@ import pytest
 from biothings.tests.web import BiothingsWebAppTest
 
 
-
 class TestAnnotationScopes(BiothingsWebAppTest):
     TEST_DATA_DIR_NAME = 'AnnotationTests'
 
@@ -27,7 +26,7 @@ class TestAnnotationScopes(BiothingsWebAppTest):
         res = res.json()
         assert len(res) == 1
         assert self.value_in_result(q, res, 'retired') or \
-               self.value_in_result(int(q), res, 'retired')
+            self.value_in_result(int(q), res, 'retired')
 
     # cannot test for entrez != _id (no such data)
     # not adding a mock data for this case because this seems unlikely
@@ -184,13 +183,12 @@ class TestQuery(BiothingsWebAppTest):
 
 
 class TestMetadata(BiothingsWebAppTest):
+    TEST_DATA_DIR_NAME = 'QueryTests'
+
     def test_metadata_extra(self):
         res = self.request('metadata')
         res = res.json()
-        assert 'available_fields' in res
-        assert 'app_revision' in res
         assert 'genome_assembly' in res
         assert isinstance(res['genome_assembly'], dict)
         assert 'taxonomy' in res
         assert isinstance(res['taxonomy'], dict)
-        assert 'source' in res

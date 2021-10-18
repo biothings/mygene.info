@@ -98,8 +98,7 @@ def dismax(q):
                     "query": {
                         "query_string": {
                             "query": q,
-                            "default_operator": "AND",
-                            "auto_generate_phrase_queries": True
+                            "default_operator": "AND"
                         },
                     },
                     "weight": 1
@@ -175,7 +174,8 @@ def wildcard(q):
             "dis_max": _query
         }
     }
-    
+
+
 def safe_genome_pos(s):
     '''
         safe_genome_pos(1000) = 1000
@@ -188,7 +188,6 @@ def safe_genome_pos(s):
         return int(s.replace(',', ''))
     else:
         raise ValueError('invalid type "%s" for "save_genome_pos"' % type(s))
-
 
 
 def interval(chrom, gstart, gend, assembly=None):
@@ -226,4 +225,3 @@ def interval(chrom, gstart, gend, assembly=None):
         }
     }
     return dict(query=_query)
-
