@@ -1,0 +1,14 @@
+{
+    "version": "0.2",
+    "requires" : ["pandas"],
+    "dumper" : {
+        "data_url" : "https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz",
+        "uncompress" : true,
+        "release": "parser:setup_release"
+    },
+    "uploader" : {
+        "parser" : "parser:load_orthology",
+        "on_duplicates" : "error"
+        
+    }
+}
