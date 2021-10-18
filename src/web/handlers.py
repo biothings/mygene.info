@@ -11,7 +11,7 @@ class MygeneQueryHandler(QueryHandler):
         if self.args.include_tax_tree and 'all' not in self.args.species:
 
             res = requests.post(
-                self.web_settings.INCLUDE_TAX_TREE_REDIRECT_ENDPOINT,
+                self.settings['biothings'].INCLUDE_TAX_TREE_REDIRECT_ENDPOINT,
                 data={
                     "ids": ','.join([str(sid) for sid in self.args.species]),
                     "expand_species": 'True'
