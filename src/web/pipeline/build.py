@@ -1,8 +1,7 @@
 import re
 
 from elasticsearch_dsl import Search
-from biothings.web.handlers.exceptions import BadRequest
-from biothings.web.query import ESQueryBuilder
+from biothings.web.query import ESQueryBuilder, QueryPipelineException
 
 from .legacy import dismax, interval, wildcard
 
@@ -66,9 +65,12 @@ class MygeneQueryBuilder(ESQueryBuilder):
             if 'all' in options.species:
                 pass  # do not apply any filters
             elif not all(isinstance(string, str) for string in options.species):
-                raise BadRequest(reason="species must be strings or integer strings.")
+                raise TypeError("species must be strings or integer strings.")
             elif not all(string.isnumeric() for string in options.species):
-                raise BadRequest(reason="cannot map some species to taxids.")
+                raise QueryPipelineException(
+                    code=400,
+                    summary="cannot map some species to taxids."
+                )
             else:  # filter by taxid numeric strings
                 search = search.filter('terms', taxid=options.species)
         if options.aggs and options.species_facet_filter:
