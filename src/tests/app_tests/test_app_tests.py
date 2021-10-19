@@ -75,13 +75,13 @@ class TestQuery(BiothingsWebAppTest):
     def test_010_taxtree_true(self):
         self.query(
             hits=True,
-            q='lytic enzyme', species='1386', include_tax_tree=True
+            q='lytic enzyme', species='1385', include_tax_tree=True
         )
 
     def test_011_taxtree_false(self):
         self.query(
             hits=False,
-            q='lytic enzyme', species='1386',
+            q='lytic enzyme', species='1385',
         )
 
     def test_012_species_translation(self):
