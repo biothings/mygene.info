@@ -93,6 +93,17 @@ class TestQuery(BiothingsWebAppTest):
             assert self.value_in_result(9606, hit, 'taxid') or \
                 self.value_in_result("9606", hit, 'taxid')
 
+    @pytest.mark.skip("this is also impossible to trigger. "
+                      "It gets casted before reaching the pipeline")
+    def test_013_species_type_error(self):
+        self.request('query', method='POST', expect=400,
+                     data={'q': '__all__', 'species': True})
+
+    def test_014_species_translation_fail(self):
+        self.request('query', params={
+            'q': '__all__', 'species': 'elf',  # I don't see this test case changing soon
+        }, expect=400)
+
     def test_020_interval_query_hg38(self):
         q = 'chr12:55,966,782-55,972,788'
         # should hit 1017
