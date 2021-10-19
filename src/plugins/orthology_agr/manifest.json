@@ -1,6 +1,6 @@
 {
     "version": "0.2",
-    "requires" : ["pandas"],
+    "requires" : ["numpy", "pandas"],
     "dumper" : {
         "data_url" : "https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz",
         "uncompress" : true,
