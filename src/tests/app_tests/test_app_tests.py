@@ -166,15 +166,15 @@ class TestQuery(BiothingsWebAppTest):
         taxid = 9606
         res1 = self.query(
             hits=True,
-            q=q, aggs='type_of_gene'
+            q=q, aggs='type_of_gene', size=10
         )
         res2 = self.query(
             hits=True,
-            q=q, aggs='type_of_gene', species=taxid
+            q=q, aggs='type_of_gene', species=taxid, size=10
         )
         res3 = self.query(
             hits=True,
-            q=q, aggs='type_of_gene', species_facet_filter=taxid
+            q=q, aggs='type_of_gene', species_facet_filter=taxid,size=10
         )
         assert res1['facets'] != res2['facets']
         assert res1['facets'] == res3['facets']
