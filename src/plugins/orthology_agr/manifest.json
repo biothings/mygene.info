@@ -1,6 +1,11 @@
 {
     "version": "0.2",
     "requires" : ["pandas"],
+    "__metadata__":{
+        "url": "https://www.alliancegenome.org/",
+        "license_url": "https://creativecommons.org/licenses/by/4.0/",
+        "license": "CC BY 4.0"
+    },
     "dumper" : {
         "data_url" : "https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz",
         "uncompress" : true,
