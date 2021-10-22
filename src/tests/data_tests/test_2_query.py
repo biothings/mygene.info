@@ -1,3 +1,4 @@
+import pytest
 from biothings.tests.web import BiothingsDataTest
 
 
@@ -22,6 +23,7 @@ class TestQueryGET(BiothingsDataTest):
         # interval query
         self.query(q='chr1:151,073,054-151,383,976&species=human')
 
+    @pytest.mark.skip("Feature Removed in BioThings 0.7.0")
     def test_204_query(self):
         pass # feature removed in biothings 0.7.0
         # con = self.request('query?q=cdk2&callback=mycallback').content
