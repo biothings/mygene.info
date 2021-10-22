@@ -1,4 +1,4 @@
 # biothings
-biothings[web_extra]==0.10.0
+git+https://github.com/biothings/biothings.api@master#egg=biothings[web_extra]
 #Optional
 raven
