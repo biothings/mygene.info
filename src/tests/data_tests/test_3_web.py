@@ -47,12 +47,12 @@ class TestMygeneWeb(BiothingsDataTest):
         assert "lineage" in res
 
     def test_332_taxonomy(self):
-        res = self.request("species/46170?include_children=true").json()
+        res = self.request("species/1280?include_children=true").json()
         assert len(res['children']) >= 305
 
     def test_333_taxonomy(self):
-        res = self.request("species/46170?include_children=true").json()
-        res2 = self.request("species/46170?include_children=true&has_gene=1").json()
+        res = self.request("species/1280?include_children=true").json()
+        res2 = self.request("species/1280?include_children=true&has_gene=1").json()
         assert len(res2['children']) >= 11
         assert len(res2['children']) <= len(res['children'])
 
