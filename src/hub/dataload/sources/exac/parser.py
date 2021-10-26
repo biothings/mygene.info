@@ -94,10 +94,10 @@ def load_broadinstitute_exac(data_folder):
     from ..ensembl.parser import EnsemblParser
     from biothings.utils.hub_db import get_src_dump
     ensembl_doc = get_src_dump().find_one({"_id":"ensembl"}) or {}
-    ensembl_dir = ensembl_doc.get("data_folder")
+    ensembl_dir = ensembl_doc.get('download', {}).get("data_folder")
     assert ensembl_dir, "Can't find Ensembl data directory (used for id conversion)"
-    ensembl_parser = EnsemblParser(ensembl_dir)
-    ensembl_parser._load_ensembl2entrez_li()
+    ensembl_parser = EnsemblParser('ensembl', ensembl_dir)
+    ensembl_parser._load_ensembl2entrez_li('ensembl')
     ensembl2entrez = list2dict(ensembl_parser.ensembl2entrez_li, 0, alwayslist=True)
     for line in tabfile_feeder(os.path.join(ensembl_dir,"gene_ensembl__translation__main.txt")):
         _,ensid,transid,_ = line

@@ -3,7 +3,6 @@ import pytest
 from biothings.tests.web import BiothingsWebAppTest
 
 
-
 class TestAnnotationScopes(BiothingsWebAppTest):
     TEST_DATA_DIR_NAME = 'AnnotationTests'
 
@@ -27,7 +26,7 @@ class TestAnnotationScopes(BiothingsWebAppTest):
         res = res.json()
         assert len(res) == 1
         assert self.value_in_result(q, res, 'retired') or \
-               self.value_in_result(int(q), res, 'retired')
+            self.value_in_result(int(q), res, 'retired')
 
     # cannot test for entrez != _id (no such data)
     # not adding a mock data for this case because this seems unlikely
@@ -76,13 +75,13 @@ class TestQuery(BiothingsWebAppTest):
     def test_010_taxtree_true(self):
         self.query(
             hits=True,
-            q='lytic enzyme', species='1386', include_tax_tree=True
+            q='lytic enzyme', species='1385', include_tax_tree=True
         )
 
     def test_011_taxtree_false(self):
         self.query(
             hits=False,
-            q='lytic enzyme', species='1386',
+            q='lytic enzyme', species='1385',
         )
 
     def test_012_species_translation(self):
@@ -93,6 +92,17 @@ class TestQuery(BiothingsWebAppTest):
         for hit in res['hits']:
             assert self.value_in_result(9606, hit, 'taxid') or \
                 self.value_in_result("9606", hit, 'taxid')
+
+    @pytest.mark.skip("this is also impossible to trigger. "
+                      "It gets casted before reaching the pipeline")
+    def test_013_species_type_error(self):
+        self.request('query', method='POST', expect=400,
+                     data={'q': '__all__', 'species': True})
+
+    def test_014_species_translation_fail(self):
+        self.request('query', params={
+            'q': '__all__', 'species': 'elf',  # I don't see this test case changing soon
+        }, expect=400)
 
     def test_020_interval_query_hg38(self):
         q = 'chr12:55,966,782-55,972,788'
@@ -167,15 +177,15 @@ class TestQuery(BiothingsWebAppTest):
         taxid = 9606
         res1 = self.query(
             hits=True,
-            q=q, aggs='type_of_gene'
+            q=q, aggs='type_of_gene', size=10
         )
         res2 = self.query(
             hits=True,
-            q=q, aggs='type_of_gene', species=taxid
+            q=q, aggs='type_of_gene', species=taxid, size=10
         )
         res3 = self.query(
             hits=True,
-            q=q, aggs='type_of_gene', species_facet_filter=taxid
+            q=q, aggs='type_of_gene', species_facet_filter=taxid,size=10
         )
         assert res1['facets'] != res2['facets']
         assert res1['facets'] == res3['facets']
@@ -184,13 +194,12 @@ class TestQuery(BiothingsWebAppTest):
 
 
 class TestMetadata(BiothingsWebAppTest):
+    TEST_DATA_DIR_NAME = 'QueryTests'
+
     def test_metadata_extra(self):
         res = self.request('metadata')
         res = res.json()
-        assert 'available_fields' in res
-        assert 'app_revision' in res
         assert 'genome_assembly' in res
         assert isinstance(res['genome_assembly'], dict)
         assert 'taxonomy' in res
         assert isinstance(res['taxonomy'], dict)
-        assert 'source' in res

@@ -1,6 +1,6 @@
 {
     "version": "0.2",
-    "requires" : ["pandas"],
+    "requires" : ["numpy", "pandas"],
     "__metadata__":{
         "url": "https://www.alliancegenome.org/",
         "license_url": "https://creativecommons.org/licenses/by/4.0/",

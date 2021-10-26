@@ -1,6 +1,4 @@
 # biothings
-biothings[web_extra]==0.9.1
-elasticsearch==6.3.1
-elasticsearch-dsl==6.3.1
+git+https://github.com/biothings/biothings.api@master#egg=biothings[web_extra]
 #Optional
 raven

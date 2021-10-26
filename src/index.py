@@ -10,10 +10,11 @@
 import os.path
 
 import config
-from biothings.web.index_base import main
+from biothings.web.launcher import main
 
 ADDON_HANDLERS = [
-    (r"/demo/?(.*)", "tornado.web.StaticFileHandler", {"path": "docs/demo", "default_filename": "index.html"}),
+    (r"/demo/?(.*)", "tornado.web.StaticFileHandler",
+     {"path": "docs/demo", "default_filename": "index.html"}),
 ]
 if config.INCLUDE_DOCS:
     if not os.path.exists(config.DOCS_STATIC_PATH):
