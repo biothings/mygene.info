@@ -47,8 +47,8 @@ def load_exons_for_human(data_folder):
            exons  -->   hg38
            exons_hg19  -->  hg19
     '''
-    gene2exons_hg19 = load_exons_for_species(data_folder, 'Homo_sapiens', exons_key='exons_hg19')
-    gene2exons = load_exons_for_species(data_folder, '../hg38')
+    gene2exons_hg19 = load_exons_for_species(data_folder, '../hg19', exons_key='exons_hg19')
+    gene2exons = load_exons_for_species(data_folder, '../hg38', exons_key='exons')
     for gid in gene2exons_hg19:
         if gid in gene2exons:
             gene2exons[gid].update(gene2exons_hg19[gid])

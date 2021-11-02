@@ -273,6 +273,10 @@ class TestDataFields(BiothingsDataTest):
         res = self.request("gene/56141?fields=pharos").json()
         assert res["pharos"]["target_id"] == 4745
 
+    def test_680_exons_hg19_hg38(self):
+        res = self.request('gene/9150?fields=exons,exons_hg19').json()
+        assert res['exons'] != res['exons_hg19']
+
 
 def filter_hits(dic, field=None):
     ''' Filter hits by removing specified fields or by default meta fields '''

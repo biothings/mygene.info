@@ -60,8 +60,12 @@ class UCSCDumper(FTPDumper):
         genome_li = [x for x in self.client.nlst() if not x.endswith('.')]
         fli = []
         fixed_files = ['../hg38/database/refFlat.txt.gz',
+                       '../hg19/database/refFlat.txt.gz',
                        '../mm9/database/refFlat.txt.gz',
                        '../hgFixed/database/refLink.txt.gz']
+        # hg38 is downloaded twice but having the directory 'Homo_sapiens'
+        # is essential for the parser/uploader to trigger the upload for hg19 and hg38
+        # and the tradeoff is only less than 10MB wasted disk space
         for file_path in [os.path.join(genome, "database/refFlat.txt.gz") for genome in genome_li] + fixed_files:
             lastmodified = self.get_ftpfile_lastmodified(file_path)
             if lastmodified:
