@@ -44,7 +44,7 @@ DEFAULT_FIELDS = ['name', 'symbol', 'taxid', 'entrezgene']
 
 TAXONOMY = {
     "human": {"tax_id": "9606", "assembly": "hg38"},
-    "mouse": {"tax_id": "10090", "assembly": "mm10"},
+    "mouse": {"tax_id": "10090", "assembly": "mm39"},
     "rat": {"tax_id": "10116", "assembly": "rn6"},
     "fruitfly": {"tax_id": "7227", "assembly": "dm6"},
     "nematode": {"tax_id": "6239", "assembly": "ce11"},
