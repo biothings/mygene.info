@@ -31,7 +31,7 @@ class ClingenUploader(biothings.hub.dataload.uploader.BaseSourceUploader):
 
     @classmethod
     def get_mapping(klass):
-        return         {
+        return {
             'clingen': {
                 'properties': {
                     'clinical_validity': {
@@ -40,13 +40,23 @@ class ClingenUploader(biothings.hub.dataload.uploader.BaseSourceUploader):
                                 'normalizer': 'keyword_lowercase_normalizer',
                                 'type': 'keyword'
                             },
+                            'classification_date': {
+                                "type": "date"
+                            },
                             'disease_label': {
                                 'type': 'text'
+                            },
+                            "gcep": {
+                                "type": "text"
                             },
                             'mondo': {
                                 'copy_to': ['all'],
                                 'normalizer': 'keyword_lowercase_normalizer',
                                 'type': 'keyword'
+                            },
+                            "moi": {
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "type": "keyword"
                             },
                             'online_report': {
                                 'index': False,
