@@ -180,14 +180,21 @@ class GeneInfoParser(EntrezParserBase):
         te (tab is used as a separator, pound sign - start of a comment)
 
         '''
-        gene_d = tab2dict_iter(self.datafile, (0, 1, 2, 3, 4, 5, 7, 8, 9, 13, 14), key=1,
-                          alwayslist=0, includefn=self.species_filter)
+        gene_d = tab2dict_iter(
+            self.datafile,
+            (0, 1, 2, 3, 4, 5, 7, 8, 9, 10, 13, 14),
+            key=1,
+            alwayslist=0,
+            includefn=self.species_filter
+        )
 
         def _ff(d):
             (
                 taxid, symbol, locus_tag, synonyms,
                 dbxrefs, map_location,
-                description, type_of_gene, other_designations,
+                description, type_of_gene,
+                symbol_from_nomenclature_authority,
+                other_designations,
                 modification_date
             ) = d
             out = dict(taxid=int(taxid),
@@ -201,9 +208,15 @@ class GeneInfoParser(EntrezParserBase):
                 out['alias'] = normalized_value(synonyms.split('|'))
             if locus_tag != '-':
                 out['locus_tag'] = locus_tag
+            other_names = []
             if other_designations != "-":
-                out['other_names'] = normalized_value(other_designations.split('|'))
-
+                out['other_names'] = other_names.extend(other_designations.split('|'))
+            if symbol_from_nomenclature_authority != "-" \
+                    and symbol_from_nomenclature_authority != symbol \
+                    and symbol_from_nomenclature_authority not in other_names:
+                other_names.append(symbol_from_nomenclature_authority)
+            if other_names:
+                out['other_names'] = normalized_value(other_names)
             ### when merged, this will become the default timestamp
             ### as of 2017/12/10, some timestamps can have different formats
             ##if len(modification_date) > 8:
