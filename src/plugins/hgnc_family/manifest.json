@@ -1,8 +1,8 @@
 {
     "version": "0.2",
     "dumper" : {
-        "data_url" : ["http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/csv/genefamily_db_tables/gene_has_family.csv",
-                      "http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/csv/genefamily_db_tables/family.csv"]
+        "data_url" : ["http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/csv/genefamily_db_tables/family.csv",
+                      "http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/csv/genefamily_db_tables/gene_has_family.csv"]
     },
     "uploader" : {
         "parser" : "parser:load_family",
