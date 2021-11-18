@@ -25,7 +25,7 @@ def parse_family(data_folder):
     """
 
     family = {}
-    infile = os.path.join(data_folder,"family.csv")
+    infile = os.path.join(data_folder, "family.csv")
     assert os.path.exists(infile)
     with open(infile, encoding='utf-8') as hgnc_family:
         family_reader = csv.DictReader(hgnc_family, delimiter=",")
@@ -49,7 +49,7 @@ def load_family(data_folder):
     # key hgnc_id
     hgnc = {}
     family = parse_family(data_folder)
-    infile = os.path.join(data_folder,"gene_has_family.csv")
+    infile = os.path.join(data_folder, "gene_has_family.csv")
     assert os.path.exists(infile)
     with open(infile, encoding='utf-8') as hgnc_id:
         hgnc_reader = csv.DictReader(hgnc_id, delimiter=",")
@@ -72,7 +72,3 @@ def load_family(data_folder):
     for key, value in query[0].items():
         hgnc[key]["_id"] = value[0]
         yield hgnc[key]
-
-
-
-
