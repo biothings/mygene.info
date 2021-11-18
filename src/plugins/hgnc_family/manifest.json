@@ -1,5 +1,9 @@
 {
     "version": "0.2",
+    "__metadata__": {
+        "url": "https://www.genenames.org/data/genegroup/#!/",
+        "license_url": "https://www.ebi.ac.uk/about/terms-of-use/"
+    },
     "dumper" : {
         "data_url" : ["http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/csv/genefamily_db_tables/family.csv",
                       "http://ftp.ebi.ac.uk/pub/databases/genenames/hgnc/csv/genefamily_db_tables/gene_has_family.csv"]
