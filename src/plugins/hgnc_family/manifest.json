@@ -10,6 +10,7 @@
     },
     "uploader" : {
         "parser" : "parser:load_family",
-        "on_duplicates" : "error"
+        "on_duplicates" : "error",
+        "mapping" : "mapping:get_customized_mapping"
     }
 }
