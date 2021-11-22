@@ -7,7 +7,7 @@ def get_customized_mapping(cls):
                     "type": "keyword"
                 },
                 "pubmed": {
-                    "type": "integer"
+                    "type": "long"
                 },
                 "typical_gene": {
                     "normalizer": "keyword_lowercase_normalizer",
