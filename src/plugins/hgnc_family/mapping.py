@@ -21,6 +21,7 @@ def get_customized_mapping(cls):
                 },
                 "comments": {
                     "type": "text"
+                    "index": False
                 }
             }
         }
