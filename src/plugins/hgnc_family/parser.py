@@ -73,8 +73,8 @@ def load_family(data_folder):
                 }
 
     query = query_hgnc(list(hgnc.keys()))
-    logger.info("This is the number of missing hgnc to gene id: %d", len(query[0]))
-    logger.debug("This is the list of missing hgnc to gene id: %s", query[0])
+    logger.info("This is the number of missing hgnc to gene id: %d", len(query[1]))
+    logger.debug("This is the list of missing hgnc to gene id: %s", query[1])
     for key in query[1]:
         hgnc.pop(key, None)
     print(len(hgnc.keys()))
