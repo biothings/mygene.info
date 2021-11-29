@@ -1,13 +1,17 @@
 import requests
-import logging
-
 from biothings_client import get_client
 from collections import defaultdict
 
+
+try:
+    from biothings import config
+    logger = config.logger
+except ImportError:
+    import logging
+    logger = logging.getLogger(__name__)
+
+
 GENE_CLIENT = get_client('gene')
-
-
-logger = logging.getLogger(__name__)
 
 
 def query_uniprot(uniprot: list):
@@ -24,17 +28,23 @@ def query_uniprot(uniprot: list):
 
 
 def get_uniprot():
+    """Requests the fda api to return uniprot: unii dictionary
+
+    """
+
+    # make a request to the fda api
     url = "https://api.fda.gov/other/substance.json?search=codes.code_system:%22UNIPROT%22&"
     request = requests.get(url).json()
     doc = {}
 
-    # TODO: raise runtimeerror
+    # error checking 26000
     if request["meta"]["results"]["total"] > 26000:
-        logging.error("Exceeds limit to paginate see this page for more details: https://open.fda.gov/apis/paging/")
-        return
+        logger.error("Exceeds limit to paginate see this page for more details: https://open.fda.gov/apis/paging/")
+        raise RuntimeError('Limit Exceeded')
     else:
         count = (request["meta"]["results"]["total"]-1)//1000
 
+    # paginate through the api and collect protein: unii
     for page in range(count+1):
         url = "https://api.fda.gov/other/substance.json?search=codes.code_system:%22UNIPROT%22&limit=1000&skip=" + str(page*1000)
         request = requests.get(url).json()
@@ -53,6 +63,8 @@ def get_uniprot():
 def load_uniprot():
     docs = get_uniprot()
     ids = query_uniprot(list(docs.keys()))
+    logger.info("This is the number of missing uniprot to gene_id: %d", len(ids[1]['missing']))
+    logger.debug("This is the list of missing uniprot to gene_id: %s", ids[1]['missing'])
     for prot, unii in docs.items():
         gene_ids = ids[0][prot]
         for gene_id in gene_ids:
@@ -61,6 +73,5 @@ def load_uniprot():
                 "unii": unii
             }
             yield rec
-
 
 
