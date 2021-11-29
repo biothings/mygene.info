@@ -57,9 +57,7 @@ class TestMygeneWeb(BiothingsDataTest):
 
     def test_341_species(self):
         dic = self.request("species/9606").json()
-        assert set(dic.keys()) == set([
-            'taxid', 'authority', 'lineage', '_id',
-            'common_name', 'genbank_common_name',
-            '_version', 'parent_taxid', 'scientific_name',
-            'has_gene', 'children', 'rank',
-            'uniprot_name'])
+        assert set(dic.keys()) == {'taxid', 'authority', 'lineage', '_id',
+                                   'genbank_common_name', '_version', 'parent_taxid',
+                                   'scientific_name', 'has_gene', 'children', 'rank',
+                                   'uniprot_name'}
