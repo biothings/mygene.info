@@ -60,7 +60,7 @@ def get_uniprot():
     return doc
 
 
-def load_uniprot():
+def load_unii():
     docs = get_uniprot()
     ids = query_uniprot(list(docs.keys()))
     logger.info("This is the number of missing uniprot to gene_id: %d", len(ids[1]['missing']))
