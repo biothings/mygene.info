@@ -84,6 +84,7 @@ DATASOURCE_TRANSLATIONS = {
     "wormbase:": r"WormBase:",
     "tair:": r"TAIR:",
     "zfin:": r"ZFIN:",
+    "sgd:": r"SGD:",
     "xenbase:": r"Xenbase:",
     "mirbase:": r"miRBase:",
 }
