@@ -21,9 +21,8 @@ class TestMygeneWeb(BiothingsDataTest):
         root_res = self.request('/metadata').json()
         api_res = self.request('metadata').json()
         assert root_res == api_res
-        available_fields = {'available_fields', 'build_version',
-                            'app_revision', 'build_date', 'taxonomy',
-                            'stats', 'genome_assembly', 'src', 'source', 'biothing_type'}
+        available_fields = {'build_version', 'build_date', 'taxonomy', 'stats',
+                            'genome_assembly', 'src', 'biothing_type'}
         assert root_res.keys() == available_fields
 
     def test_322_metadata(self):
@@ -58,9 +57,7 @@ class TestMygeneWeb(BiothingsDataTest):
 
     def test_341_species(self):
         dic = self.request("species/9606").json()
-        assert set(dic.keys()) == set([
-            'taxid', 'authority', 'lineage', '_id',
-            'common_name', 'genbank_common_name',
-            '_version', 'parent_taxid', 'scientific_name',
-            'has_gene', 'children', 'rank',
-            'uniprot_name'])
+        assert set(dic.keys()) == {'taxid', 'authority', 'lineage', '_id',
+                                   'genbank_common_name', '_version', 'parent_taxid',
+                                   'scientific_name', 'has_gene', 'children', 'rank',
+                                   'uniprot_name'}
