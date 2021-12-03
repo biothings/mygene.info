@@ -122,6 +122,10 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
                 "type": "keyword",             # ZDB-GENE-040426-2741
                 "normalizer" : "keyword_lowercase_normalizer",
             },
+            "SGD": {
+                "type": "keyword",             # S000003566
+                "normalizer" : "keyword_lowercase_normalizer",
+            },
             "Xenbase": {
                 "type": "keyword",
                 "normalizer" : "keyword_lowercase_normalizer",
