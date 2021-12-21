@@ -1,12 +1,11 @@
 import os
 import os.path
-import sys
-import time
 
-import biothings, config
+import biothings
+import config
 biothings.config_for_app(config)
 
-from config import DATA_ARCHIVE_ROOT, logger as logging
+from config import DATA_ARCHIVE_ROOT
 from biothings.hub.dataload.dumper import FTPDumper
 
 
@@ -21,14 +20,16 @@ class HomologeneDumper(FTPDumper):
 
     def get_newest_info(self):
         rel = None
+
         def setrel(line):
             nonlocal rel
             rel = line
-        self.client.retrlines("RETR RELEASE_NUMBER",setrel)
+
+        self.client.retrlines("RETR RELEASE_NUMBER", setrel)
         self.release = rel
 
     def new_release_available(self):
-        current_release = self.src_doc.get("download",{}).get("release")
+        current_release = self.src_doc.get("download", {}).get("release")
         if not current_release or self.release > current_release:
             self.logger.info("New release '%s' found" % self.release)
             return True
@@ -39,7 +40,6 @@ class HomologeneDumper(FTPDumper):
     def create_todump_list(self, force=False):
         self.get_newest_info()
         remote_file = "homologene.data"
-        local_file = os.path.join(self.new_data_folder,remote_file)
-        if force or not os.path.exists(local_file) or self.remote_is_better(remote_file,local_file) or self.new_release_available():
-            self.to_dump.append({"remote": remote_file, "local":local_file})
-
+        local_file = os.path.join(self.new_data_folder, remote_file)
+        if force or not os.path.exists(local_file) or self.remote_is_better(remote_file, local_file) or self.new_release_available():
+            self.to_dump.append({"remote": remote_file, "local": local_file})

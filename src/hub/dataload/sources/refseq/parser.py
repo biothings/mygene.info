@@ -1,9 +1,4 @@
-import os.path
-import datetime
-from biothings.utils.common import file_newer, loadobj, dump
-from biothings.utils.dataload import tab2dict, tab2list, value_convert, \
-                            normalized_value, dict_convert, dict_to_list, \
-                            tab2dict_iter
+from biothings.utils.dataload import dict_convert, tab2dict_iter
 
 try:
     from ..entrez.parser import EntrezParserBase
@@ -11,6 +6,7 @@ except (ValueError, ImportError):
     # capture "ValueError: Attempted relative import beyond top-level package"
     # or other ImportError
     from hub.dataload.sources.entrez.parser import EntrezParserBase
+
 
 class GeneSummaryParser(EntrezParserBase):
     '''Parser for gene2summary_all.txt, adding "summary" field in gene doc'''
@@ -81,10 +77,14 @@ class Gene2GeneRifParser(EntrezParserBase):
     def load(self):
         cnt = 0
         for datadict in tab2dict_iter(self.datafile, (1, 2, 4), 0, alwayslist=1, encoding="latin1"):
-            datadict = dict_convert(datadict, valuefn=lambda v: {
-                            'generif': [dict(pubmed=self._cvt_pubmed(x[0]), text=x[1]) for x in v]})
+            datadict = dict_convert(
+                datadict,
+                valuefn=lambda v: {
+                    'generif': [dict(pubmed=self._cvt_pubmed(x[0]), text=x[1]) for x in v]
+                }
+            )
 
-            for id,doc in datadict.items():
+            for id, doc in datadict.items():
                 cnt += 1
                 doc['_id'] = id
                 yield doc

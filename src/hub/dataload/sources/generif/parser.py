@@ -7,6 +7,7 @@ except (ValueError, ImportError):
     # or other ImportError
     from hub.dataload.sources.entrez.parser import EntrezParserBase
 
+
 class Gene2GeneRifParser(EntrezParserBase):
     '''
     '''
@@ -23,10 +24,14 @@ class Gene2GeneRifParser(EntrezParserBase):
     def load(self):
         cnt = 0
         for datadict in tab2dict_iter(self.datafile, (1, 2, 4), 0, alwayslist=1):
-            datadict = dict_convert(datadict, valuefn=lambda v: {
-                            'generif': [dict(pubmed=self._cvt_pubmed(x[0]), text=x[1]) for x in v]})
+            datadict = dict_convert(
+                datadict,
+                valuefn=lambda v: {
+                    'generif': [dict(pubmed=self._cvt_pubmed(x[0]), text=x[1]) for x in v]
+                }
+            )
 
-            for id,doc in datadict.items():
+            for id, doc in datadict.items():
                 cnt += 1
                 doc['_id'] = id
                 yield doc
