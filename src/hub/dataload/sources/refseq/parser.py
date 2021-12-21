@@ -5,8 +5,12 @@ from biothings.utils.dataload import tab2dict, tab2list, value_convert, \
                             normalized_value, dict_convert, dict_to_list, \
                             tab2dict_iter
 
-from ..entrez.parser import EntrezParserBase
-
+try:
+    from ..entrez.parser import EntrezParserBase
+except (ValueError, ImportError):
+    # capture "ValueError: Attempted relative import beyond top-level package"
+    # or other ImportError
+    from hub.dataload.sources.entrez.parser import EntrezParserBase
 
 class GeneSummaryParser(EntrezParserBase):
     '''Parser for gene2summary_all.txt, adding "summary" field in gene doc'''

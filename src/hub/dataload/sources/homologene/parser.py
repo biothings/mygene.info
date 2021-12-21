@@ -3,8 +3,12 @@ from config import TAXONOMY
 from biothings.utils.common import file_newer, loadobj, dump
 from biothings.utils.dataload import tab2dict
 
-from ..entrez.parser import EntrezParserBase, get_geneid_d
-
+try:
+    from ..entrez.parser import EntrezParserBase, get_geneid_d
+except (ValueError, ImportError):
+    # capture "ValueError: Attempted relative import beyond top-level package"
+    # or other ImportError
+    from hub.dataload.sources.entrez.parser import EntrezParserBase, get_geneid_d
 
 class HomologeneParser(EntrezParserBase):
     '''Parser for NCBI homologenes.data file.'''
