@@ -128,12 +128,19 @@ class TestDataFields(BiothingsDataTest):
             "query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat").json()
         assert res["total"] == 6
         # I do not understand why we check for IPR017385,
+        # discussion is at
+        # https://suwulab.slack.com/archives/C028H4133U1/p1639704700002100
+        # but no explanation is given.
         # but if not necessary, the following commented-out code works
         # for hit in res['hits']:
         #     assert self.value_in_result('IPR008389', hit, 'interpro.id',
         #                                 case_insensitive=True)
         assert set([pro["id"] for hit in res["hits"]
                     for pro in alwayslist(hit["interpro"])]) == {'IPR008389', 'IPR017385'}
+        # the above code checks that the set union on the fields interpro.id for
+        # all the results contains both IPR008389 and IPR017385
+        # i.e. a hit can have either or both, but all of them unioned must have both
+        # but nothing else.
 
     def test_630_go(self):
         res = self.request("query?q=GO:0016324&fields=go&sort=_id").json()
