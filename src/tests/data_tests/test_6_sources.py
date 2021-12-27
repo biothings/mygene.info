@@ -1,5 +1,5 @@
 from biothings.tests.web import BiothingsDataTest
-
+from biothings.utils.dataload import alwayslist
 
 class TestDataFields(BiothingsDataTest):
     host = 'mygene.info'
@@ -127,9 +127,13 @@ class TestDataFields(BiothingsDataTest):
         res = self.request(
             "query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat").json()
         assert res["total"] == 6
+        # I do not understand why we check for IPR017385,
+        # but if not necessary, the following commented-out code works
+        # for hit in res['hits']:
+        #     assert self.value_in_result('IPR008389', hit, 'interpro.id',
+        #                                 case_insensitive=True)
         assert set([pro["id"] for hit in res["hits"]
-                    for pro in hit["interpro"]]) == set(['IPR008389',
-                                                         'IPR017385'])
+                    for pro in alwayslist(hit["interpro"])]) == {'IPR008389', 'IPR017385'}
 
     def test_630_go(self):
         res = self.request("query?q=GO:0016324&fields=go&sort=_id").json()
