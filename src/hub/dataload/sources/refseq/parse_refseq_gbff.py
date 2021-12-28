@@ -18,6 +18,7 @@ import glob
 import time
 import logging
 from Bio import SeqIO
+from Bio.SeqFeature import FeatureLocation
 
 from biothings.utils.common import SubStr, anyfile
 
@@ -33,8 +34,12 @@ class GBFFParser():
             if geneid:
                 summary = self.get_summary(rec)
                 ec_list = self.get_ec_numbers(rec)
-                if summary or ec_list:
-                    out_li.append((geneid, summary, ec_list))
+                cds = self.get_cds(rec)
+                ccds = cds[0]
+                location = cds[1]
+                refseq = rec.id
+                if summary or ec_list or ccds:
+                    out_li.append((geneid, summary, ec_list, ccds, location, refseq))
         return out_li
 
     def get_geneid(self, rec):
@@ -88,4 +93,42 @@ class GBFFParser():
             assert isinstance(ec_list, list)
 #            ec_list = [SubStr(x, 'EC_number="', '"') for x in ec_qualifiers]
         return ec_list
+
+    def get_cds(self, rec):
+        ccds = None
+        location = None
+        cds_feature = [x for x in rec.features if x.type == 'CDS']
+        assert len(cds_feature) <= 1, '#: {}, id: {}'.format(len(cds_feature), rec.id)
+
+        # return if there is no cds
+        if len(cds_feature) == 0:
+            return ccds, location
+
+        cds_feature = cds_feature[0]
+        db_xref = cds_feature.qualifiers.get('db_xref', None)
+        if db_xref:
+            x = [x for x in db_xref if x.startswith('CCDS:')]
+            if len(x) == 1:
+                ccds = SubStr(x[0], 'CCDS:')
+
+        loc = ""
+        locations = cds_feature.location
+        if locations:
+            locations = locations.parts
+            for location in locations:
+                # add one because it shows python counting but we want genbank counting
+                # https://biopython.org/docs/1.75/api/Bio.SeqFeature.html#Bio.SeqFeature.FeatureLocation.__str__
+                location = FeatureLocation(type(location.start)(location.start + 1), location.end)
+                # has to convert to a string to display fuzzy location "42..>222" if converted to int fuzzy location will
+                # not display
+                if location.start == location.end:
+                    location = str(location.start)
+                else:
+                    location = str(location.start) + ".." + str(location.end)
+
+                if loc:
+                    loc = loc + "," + location
+                else:
+                    loc = location
+        return ccds, loc
 

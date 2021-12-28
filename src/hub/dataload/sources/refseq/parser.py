@@ -60,6 +60,47 @@ class Gene2ECParser(EntrezParserBase):
             gene_d = dict([(d['_id'], d) for d in doc_li])
             return gene_d
 
+class Gene2CDSParser(EntrezParserBase):
+    '''
+    loading cds data (add cds field)
+    cds: {
+        ccds:
+        location:
+        refseq:
+    }
+    Sample lines for input file
+        11287	CCDS39650.1	57..4544	NM_007376.4
+        11298	CCDS25671.1	150..767	NM_009591.3
+    '''
+    DATAFILE = 'gene2cds_all.txt'
+    def load(self, aslist=False):
+        with open(self.datafile) as df:
+            gene = {}
+            doc_li = []
+            for line in df:
+                gene_id, ccds, location, refseq = line.strip().split('\t')
+                doc = {
+                    'refseq': refseq,
+                    'location': location,
+                    'ccds': ccds
+                }
+                if gene_id in gene.keys():
+                    gene[gene_id].append(doc)
+                else:
+                    gene[gene_id] = [doc]
+
+            for key, value in gene.items():
+                doc = {
+                    '_id': key,
+                    'cds': value
+                }
+                doc_li.append(doc)
+        if aslist:
+            return doc_li
+        else:
+            gene_d = dict([(d['_id'], d) for d in doc_li])
+            return gene_d
+
 
 class Gene2GeneRifParser(EntrezParserBase):
     '''
