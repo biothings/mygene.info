@@ -1,7 +1,11 @@
-import requests
-from biothings_client import get_client
+import os
 from collections import defaultdict
 
+import requests
+from biothings_client import get_client
+
+from biothings.hub.dataload.dumper import APIDumper
+from config import DATA_ARCHIVE_ROOT
 
 try:
     from biothings import config
@@ -11,15 +15,37 @@ except ImportError:
     logger = logging.getLogger(__name__)
 
 
-GENE_CLIENT = get_client('gene')
+__all__ = [
+    'MyGeneUNIIDumper',
+]
 
 
-def query_uniprot(uniprot: list):
+class MyGeneUNIIDumper(APIDumper):
+    SRC_NAME = 'mygene_unii'
+    SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
+
+    @staticmethod
+    def get_release():
+        resp = requests.get(
+            'https://api.fda.gov/other/substance.json?limit=0',
+            timeout=15
+        ).json()
+        release = resp['meta']['last_updated']
+        return release
+
+    @staticmethod
+    def get_document():
+        for doc in _load_unii():
+            yield 'gene_unii.ndjson', doc
+
+
+def _query_uniprot(uniprot: list):
     """Use biothings_client.py to query uniprot codes and get back '_id' in mygene.info
 
     :param: uniprot: list of uniprot codes
     """
-    res = GENE_CLIENT.querymany(uniprot, scopes='uniprot', fields='_id', returnall=True)
+    gene_client = get_client('gene')
+    res = gene_client.querymany(uniprot, scopes='uniprot', fields='_id', returnall=True)
     new_res = defaultdict(list)
     for item in res['out']:
         if not "notfound" in item:
@@ -27,7 +53,7 @@ def query_uniprot(uniprot: list):
     return [new_res, res]
 
 
-def get_uniprot():
+def _get_uniprot():
     """Requests the fda api to return uniprot: unii dictionary
 
     """
@@ -60,9 +86,10 @@ def get_uniprot():
     return doc
 
 
-def load_unii():
-    docs = get_uniprot()
-    ids = query_uniprot(list(docs.keys()))
+def _load_unii():
+    # FIXME: correctly handle all timeouts
+    docs = _get_uniprot()
+    ids = _query_uniprot(list(docs.keys()))
     logger.info("This is the number of missing uniprot to gene_id: %d", len(ids[1]['missing']))
     logger.debug("This is the list of missing uniprot to gene_id: %s", ids[1]['missing'])
     for prot, unii in docs.items():
@@ -73,5 +100,3 @@ def load_unii():
                 "unii": unii
             }
             yield rec
-
-
