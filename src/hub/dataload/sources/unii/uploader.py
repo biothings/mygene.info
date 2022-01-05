@@ -1,5 +1,5 @@
 import os
-from ast import literal_eval
+import json
 import biothings, config
 biothings.config_for_app(config)
 
@@ -24,8 +24,7 @@ class UniiUploader(biothings.hub.dataload.uploader.BaseSourceUploader):
         assert os.path.exists(infile)
         with open(infile, 'r') as f:
             for line in f:
-                doc = literal_eval(line)
-                yield doc
+                yield json.loads(line)
 
 
     @classmethod
