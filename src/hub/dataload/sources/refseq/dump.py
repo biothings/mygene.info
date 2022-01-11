@@ -47,14 +47,17 @@ class RefseqDumper(FTPDumper):
     def create_todump_list(self, force=False):
         self.get_newest_info()
         for wild in ['H_sapiens/mRNA_Prot/human.1.rna.gbff.gz',
-                    'M_musculus/mRNA_Prot/mouse.*.rna.gbff.gz',
-                    'S_scrofa/mRNA_Prot/pig.*.rna.gbff.gz']:
+                   'M_musculus/mRNA_Prot/mouse.1.rna.gbff.gz',
+                   'R_norvegicus/mRNA_Prot/rat.1.rna.gbff.gz',
+                   'D_rerio/mRNA_Prot/zebrafish.1.rna.gbff.gz',
+                   'X_tropicalis/mRNA_Prot/frog.1.rna.gbff.gz',
+                   'B_taurus/mRNA_Prot/cow.1.rna.gbff.gz',
+                   'S_scrofa/mRNA_Prot/pig.1.rna.gbff.gz']:
             files = self.client.nlst(wild)
             for fn in files:
-                local_file = os.path.join(self.new_data_folder, os.path.basename(fn))
-                if force or not os.path.exists(local_file) or self.remote_is_better(fn,
-                                                                                    local_file) or self.new_release_available():
-                    self.to_dump.append({"remote": fn, "local": local_file})
+                local_file = os.path.join(self.new_data_folder,os.path.basename(fn))
+                if force or not os.path.exists(local_file) or self.remote_is_better(fn,local_file) or self.new_release_available():
+                    self.to_dump.append({"remote": fn, "local":local_file})
 
     def post_dump(self, job_manager=None, *args, **kwargs):
         # we're in a new thread, we need to "bring back" the loop to run jobs
