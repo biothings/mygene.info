@@ -227,16 +227,21 @@ class GeneInfoParser(EntrezParserBase):
             for x in dbxrefs.split('|'):
                 if x == '-':
                     continue
-                xd = x.split(':')
-                if len(xd) == 3 and xd[0] == xd[1] and \
-                        xd[0] in ['VGNC', 'HGNC', 'MGI']:
+                # xd = x.split(':')
+                # if len(xd) == 3 and xd[0] == xd[1] and \
+                #         xd[0] in ['VGNC', 'HGNC', 'MGI']:
                     # a fix for NCBI bug for dup xref prefix, 'HGNC:HGNC:36328'
-                    xd = xd[1:]
-                try:
-                    _db, _id = xd
-                except:
-                    print(repr(x))
-                    raise
+                #     xd = xd[1:]
+                # try:
+                #     _db, _id = xd
+                # except:
+                #     print(repr(x))
+                #     raise
+                _db, _id = x.split(':', maxsplit=1)
+                for prefix in ['VGNC', 'HGNC', 'MGI', 'WB']:
+                    prefix_len = len(prefix) + 1    # add ":" to the prefix
+                    if _id[:prefix_len] == prefix + ':':
+                        _id = _id[prefix_len:]
                 # we don't need ensembl xref from here, we will get it from
                 # Ensembl directly
                 if _db.lower() in ['ensembl', 'imgt/gene-db']:
