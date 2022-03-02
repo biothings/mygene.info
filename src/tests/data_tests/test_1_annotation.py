@@ -117,7 +117,7 @@ class TestAnnotationPOST(BiothingsDataTest):
 
         for field in default_fields:
             assert field in res[0]
-        assert len(default_fields) == len(res[0])
+        assert len(default_fields) <= len(res[0])
 
     def test_152(self):
 
