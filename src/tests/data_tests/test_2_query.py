@@ -79,8 +79,8 @@ class TestQueryGET(BiothingsDataTest):
         assert len(res['hits']) == 20
 
     def test_213_size(self):
-        res1 = self.request("query?q=cdk?&from=0&size=20").json()
-        res = self.request("query?q=cdk?&skip=10&size=20").json()
+        res1 = self.request("query?q=cdk?&from=0&size=20&sort=_score,symbol").json()
+        res = self.request("query?q=cdk?&skip=10&size=20&sort=_score,symbol").json()
         assert len(res['hits']) == 20
         assert res['hits'][0] in res1['hits']
 
