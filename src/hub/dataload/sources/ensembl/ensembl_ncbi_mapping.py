@@ -106,7 +106,7 @@ def find_ncbi_ids_from_gene2ensembl(ensembl_dict, gene2ensembl_file):
     return ensembl_dict, count
 
 
-def find_ncbi_symbols(gene_info_file,ensembl_dict):
+def find_ncbi_symbols(gene_info_file, ensembl_dict):
     print("step 4 start: read NCBI gene symbol")
     ncbi_list_to_find = {}
     for key in ensembl_dict:
@@ -221,7 +221,9 @@ def get_missing_mappings_from_gene2ensembl(gene_ensembl_entrezgene_dm_file, gene
             split_line = line.split("\t")
             ensembl_gene_id_from_gene2ensembl = split_line[2].strip()
             ncbi_gene_id_from_gene2ensembl = split_line[1].strip()
-            if ensembl_gene_id_from_gene2ensembl in ensembl_ids and ncbi_gene_id_from_gene2ensembl not in mapped_entrezgene_ids and ensembl_gene_id_from_gene2ensembl not in ensembl_dict_with_entrez:
+            if ensembl_gene_id_from_gene2ensembl in ensembl_ids and \
+               ncbi_gene_id_from_gene2ensembl not in mapped_entrezgene_ids and \
+               ensembl_gene_id_from_gene2ensembl not in ensembl_dict_with_entrez:
                 # only keep those ensembl_gene_ids are valid and have no mapping from Ensembl xrefs
                 # also remove only mapping contains entrezgene ids have been mapped to other Ensembl gene ids based on Ensembl xrefs
                 ensembl_dict_from_gene2ensembl[ensembl_gene_id_from_gene2ensembl].append(ncbi_gene_id_from_gene2ensembl)
@@ -241,7 +243,6 @@ def get_missing_mappings_from_gene2ensembl(gene_ensembl_entrezgene_dm_file, gene
     print("step 6 end")
 
 
-
 def write_mapping_file(mapping_generator, outfile, confirm=True):
     """OUTPUT is mapping file:
     -------------------------
@@ -256,7 +257,7 @@ def write_mapping_file(mapping_generator, outfile, confirm=True):
         NCBI ID if symbols match only once)
     """
     print("step 7 start: write file from mapping generator of tuples")
-    mapping_file, mapping_filename = safewfile(outfile, prompt=confirm,default='O')
+    mapping_file, mapping_filename = safewfile(outfile, prompt=confirm, default='O')
 
     count = 0
     for item in mapping_generator:
@@ -282,21 +283,20 @@ def run_stats(total_ensembl_IDs, ensembl_dict, ensembl_map_count, total_mapped):
     print("\tTotal Ensembl gene IDs successfully and uniquely mapped to 1 NCBI gene ID: ", cnt_resolved_multi_mappings)
     print("\tTotal mapped using gene2ensembl: ", ensembl_map_count)
     print("\tTotal mapped from symbol: ", cnt_resolved_multi_mappings - ensembl_map_count)
-    print("\tPercent of Ensembl IDs uniquely mapped out of Ensembl IDs with > 1 NCBI gene ID: ", round((cnt_resolved_multi_mappings * 1. / (len(ensembl_dict))) * 100, 1))
+    print("\tPercent of Ensembl IDs uniquely mapped out of Ensembl IDs with > 1 NCBI gene ID: ",
+          round((cnt_resolved_multi_mappings * 1. / (len(ensembl_dict))) * 100, 1))
 
     print("# Recovered missing mappings")
     print("\tTotal missing 1:1 mappings recovered from gene2ensembl: ", cnt_recovered_missing_mappings)
 
 
-
-# def main(gene_ensembl_1, gene_ensembl_2, gene2ensembl):
 def main(src_name, confirm=True):
     src_dump = get_src_dump()
-    ensembl_doc = src_dump.find_one({"_id":src_name}) or {}
-    ENSEMBL_DATA_FOLDER = ensembl_doc.get("download",{}).get("data_folder")
+    ensembl_doc = src_dump.find_one({"_id": src_name}) or {}
+    ENSEMBL_DATA_FOLDER = ensembl_doc.get("download", {}).get("data_folder")
     assert ENSEMBL_DATA_FOLDER, "Can't find Ensembl data folder"
-    entrez_doc = src_dump.find_one({"_id":"entrez"}) or {}
-    ENTREZ_DATA_FOLDER = entrez_doc.get("download",{}).get("data_folder")
+    entrez_doc = src_dump.find_one({"_id": "entrez"}) or {}
+    ENTREZ_DATA_FOLDER = entrez_doc.get("download", {}).get("data_folder")
     assert ENTREZ_DATA_FOLDER, "Can't find Entrez data folder"
 
     gene_ensembl_1_xref_dm_file = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__xref_entrezgene__dm.txt")
@@ -306,8 +306,6 @@ def main(src_name, confirm=True):
 
     outfile = os.path.join(ENSEMBL_DATA_FOLDER, "gene_ensembl__gene__extra.txt")
 
-
-
     multi_mapping_dict, total_ensembl_IDs = find_multiple_mappings_from_entrezgene_file(gene_ensembl_1_xref_dm_file)
     ensembl_dict = create_ensembl_gene_id_dict(gene_ensembl_2_main_file, multi_mapping_dict)
     ensembl_dict, ensembl_match_count = find_ncbi_ids_from_gene2ensembl(ensembl_dict, gene2ensembl_file)
@@ -316,7 +314,9 @@ def main(src_name, confirm=True):
     ##pickle.dump(ensembl_dict,open("/tmp/ensembl_dict","wb"))
     ##pickle.dump(ncbi_id_symbols,open("/tmp/ncbi_id_symbols","wb"))
     resolved_multi_mapping_generator = resolve_multi_mappings_with_gene2ensembl(ensembl_dict, ncbi_id_symbols, add_source=False)
-    missing_mapping_generator = get_missing_mappings_from_gene2ensembl(gene_ensembl_1_xref_dm_file, gene_ensembl_2_main_file, gene2ensembl_file, add_source=False)
+    missing_mapping_generator = get_missing_mappings_from_gene2ensembl(
+        gene_ensembl_1_xref_dm_file, gene_ensembl_2_main_file, gene2ensembl_file, add_source=False
+    )
     mapping_generator = chain(resolved_multi_mapping_generator, missing_mapping_generator)
     total_mapped = write_mapping_file(mapping_generator, outfile, confirm=confirm)
     run_stats(total_ensembl_IDs, ensembl_dict, ensembl_match_count, total_mapped)
