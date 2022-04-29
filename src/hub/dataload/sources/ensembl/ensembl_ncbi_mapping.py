@@ -8,6 +8,10 @@ from biothings.utils.common import safewfile, anyfile
 from biothings.utils.hub_db import get_src_dump
 
 
+cnt_resolved_multi_mappings = 0
+cnt_recovered_missing_mappings = 0
+
+
 def find_multiple_mappings_from_entrezgene_file(gene_ensembl_entrezgene_dm_file):
     """Input gene_ensembl_entrezgene_dm_file, and identify how many NCBI gene IDs there are for
     each ensembl gene ID. Lines in input file are:
@@ -139,6 +143,8 @@ def resolve_multi_mappings_with_gene2ensembl(ensembl_dict, mygene_website_dict, 
     ---------------------
     Tuple with ensembl gene ID and NCBI gene ID
     """
+    global cnt_resolved_multi_mappings
+    cnt_resolved_multi_mappings = 0
     print("step 5 start: Generator-decide whether to use gene2ensembl or symbol for mapping")
     for key in ensembl_dict:
         ncbi_list = ensembl_dict[key]['data']['ncbi_list']
@@ -146,6 +152,7 @@ def resolve_multi_mappings_with_gene2ensembl(ensembl_dict, mygene_website_dict, 
         gene2ensembl_ncbi_gene_id_match_list = ensembl_dict[key]['data']['gene2ensembl']
 
         if len(gene2ensembl_ncbi_gene_id_match_list) == 1:
+            cnt_resolved_multi_mappings += 1
             if add_source is False:
                 yield (key, int(gene2ensembl_ncbi_gene_id_match_list[0]))
             else:
@@ -163,6 +170,7 @@ def resolve_multi_mappings_with_gene2ensembl(ensembl_dict, mygene_website_dict, 
             if ensembl_symbol in ensembl_symbol_list_from_mygene:
                 if ensembl_symbol_list_from_mygene.count(ensembl_symbol) == 1:
                     ncbi_idx = ensembl_symbol_list_from_mygene.index(ensembl_symbol)
+                    cnt_resolved_multi_mappings += 1
                     if add_source is False:
                         yield (key, int(ncbi_list[ncbi_idx]))
                     else:
@@ -178,6 +186,8 @@ def get_missing_mappings_from_gene2ensembl(gene_ensembl_entrezgene_dm_file, gene
        (Basically, those 1:1 mappings from gene2ensembl with no any overlapping with Ensembl xref mappings)
        A generator of (ensemblgene_id, entrezgene_id) is returned
     """
+    global cnt_recovered_missing_mappings
+    cnt_recovered_missing_mappings = 0
 
     print("step 6 start: Find missing 1:1 mappings from gene2ensembl")
     # get the existing ensemblgene_to_entregene mappings from Ensembl xref
@@ -220,15 +230,14 @@ def get_missing_mappings_from_gene2ensembl(gene_ensembl_entrezgene_dm_file, gene
         del ensembl_dict_with_entrez, mapped_entrezgene_ids, ensembl_ids
 
     # only keep those 1:1 ensemblgene_to_entrezgene mappings, yield as a generator
-    cnt = 0
     for k, v in ensembl_dict_from_gene2ensembl.items():
         if len(v) == 1:
-            cnt += 1
+            cnt_recovered_missing_mappings += 1
             if add_source is False:
                 yield (k, int(v[0]))
             else:
                 yield (k, int(v[0]), '3')
-    print("Total missing 1:1 mappings recovered from gene2ensembl: ", cnt)
+    print("Total missing 1:1 mappings recovered from gene2ensembl: ", cnt_recovered_missing_mappings)
     print("step 6 end")
 
 
@@ -266,14 +275,17 @@ def write_mapping_file(mapping_generator, outfile, confirm=True):
 def run_stats(total_ensembl_IDs, ensembl_dict, ensembl_map_count, total_mapped):
     print("Final Summary:")
     print("--------------")
-    print("# Resolve multiple mapping")
+    print("# Resolved multiple mappings")
     print("\tTotal Ensembl gene IDs mapped to NCBI gene IDs", total_ensembl_IDs)
     print("\tTotal Ensembl gene IDs with multiple NCBI gene IDs: ", len(ensembl_dict))
     print("\tPercent of Ensembl gene IDs with multiple NCBI gene IDs: ", round((len(ensembl_dict) * 1. / (total_ensembl_IDs)) * 100, 1))
-    print("\tTotal Ensembl gene IDs successfully and uniquely mapped to 1 NCBI gene ID: ", total_mapped)
+    print("\tTotal Ensembl gene IDs successfully and uniquely mapped to 1 NCBI gene ID: ", cnt_resolved_multi_mappings)
     print("\tTotal mapped using gene2ensembl: ", ensembl_map_count)
-    print("\tTotal mapped from symbol: ", total_mapped - ensembl_map_count)
-    print("\tPercent of Ensembl IDs uniquely mapped out of Ensembl IDs with > 1 NCBI gene ID: ", round((total_mapped * 1. / (len(ensembl_dict))) * 100, 1))
+    print("\tTotal mapped from symbol: ", cnt_resolved_multi_mappings - ensembl_map_count)
+    print("\tPercent of Ensembl IDs uniquely mapped out of Ensembl IDs with > 1 NCBI gene ID: ", round((cnt_resolved_multi_mappings * 1. / (len(ensembl_dict))) * 100, 1))
+
+    print("# Recovered missing mappings")
+    print("\tTotal missing 1:1 mappings recovered from gene2ensembl: ", cnt_recovered_missing_mappings)
 
 
 
@@ -308,4 +320,3 @@ def main(src_name, confirm=True):
     mapping_generator = chain(resolved_multi_mapping_generator, missing_mapping_generator)
     total_mapped = write_mapping_file(mapping_generator, outfile, confirm=confirm)
     run_stats(total_ensembl_IDs, ensembl_dict, ensembl_match_count, total_mapped)
-
