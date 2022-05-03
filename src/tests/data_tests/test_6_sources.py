@@ -9,7 +9,7 @@ class TestDataFields(BiothingsDataTest):
 
         url = 'query?q=hg19.chr12:57,795,963-57,815,592&species=human'
         res = self.request(url).json()
-        assert len(res['hits']) == 2
+        assert len(res['hits']) == 1
         assert '_id' in res['hits'][0]
 
     def test_602_hg19(self):
