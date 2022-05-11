@@ -1,6 +1,7 @@
 from .parser import GeneSummaryParser
 import biothings.hub.dataload.uploader as uploader
 
+
 class EntrezGeneSummaryUploader(uploader.MergerSourceUploader):
 
     name = "entrez_genesummary"
@@ -15,8 +16,7 @@ class EntrezGeneSummaryUploader(uploader.MergerSourceUploader):
         mapping = {
             "summary": {
                 "type": "text",
-                "boost": 0.5,      # downgrade summary field.
-                'copy_to': ['all'],
+                "copy_to": "all"
             },
         }
         return mapping
