@@ -60,14 +60,14 @@ class MyGeneDataBuilder(builder.DataBuilder):
         self.stats = super(MyGeneDataBuilder,self).get_stats(sources,job_manager)
         # enrich with some specific mygene counts, specially regarding ensembl vs. entrez
         tgt = mongo.get_target_db()[self.target_name]
-        self.stats["total_genes"] = tgt.count()
+        self.stats["total_genes"] = tgt.estimated_document_count()
         # entrez genes are digits only (also, don't count entrez_gene collection,
         # because tgt can be a subset, we have to work with the merged collection)
         self.logger.debug("Counting 'total_entrez_genes'")
-        entrez_cnt = tgt.find({"entrezgene":{"$exists":1}},{"_id":1}).count()
+        entrez_cnt = tgt.count_documents({"entrezgene": {"$exists": 1}})
         self.stats["total_entrez_genes"] = entrez_cnt
         # ensembl genes aount are taken from :
-        # 1. "ensembl" field, but it can a list => use aggregation. 
+        # 1. "ensembl" field, but it can a list => use aggregation.
         #    Note: "ensembl.0" means first element of the list, so it implicitely
         #    select doc with a list. Finally, filtering with {$type:"array"} doesn't work because
         #    mongo filters this on the most inner field (that's weird, but it is what is it...)
@@ -85,8 +85,8 @@ class MyGeneDataBuilder(builder.DataBuilder):
             list_count = next(res)["sum"]
         except StopIteration:
             list_count = 0
-        object_count = tgt.find({"ensembl" : {"$type" : "object"}},{"_id":1}).count()
-        orphan_count = tgt.find({"_id":{"$regex":'''\\w'''},"ensembl":{"$exists":0}},{"_id":1}).count()
+        object_count = tgt.count_documents({"ensembl": {"$type": "object"}})
+        orphan_count = tgt.count_documents({"_id": {"$regex": '''\\w'''},"ensembl": {"$exists": 0}})
         total_ensembl_genes = list_count + object_count + orphan_count
         self.stats["total_ensembl_genes"] = total_ensembl_genes
         # this one can't be computed from merged collection, and is only valid when build
@@ -101,13 +101,13 @@ class MyGeneDataBuilder(builder.DataBuilder):
                 ]))["sum"]
         except StopIteration:
             list_count = 0
-        object_count = tgt.find({"$and": [{"ensembl" : {"$type" : "object"}},{"entrezgene":{"$exists":1}}]},{"_id":1}).count()
+        object_count = tgt.count_documents({"$and": [{"ensembl": {"$type": "object"}}, {"entrezgene": {"$exists": 1}}]})
         mapped = list_count + object_count
         self.stats["total_ensembl_genes_mapped_to_entrez"] = mapped
         # ensembl gene contains letters (if it wasn't, it means it would only contain digits
         # so it would be an entrez gene (\\D = non-digits, can't use \\w as a digit *is* a letter)
         self.logger.debug("Counting 'total_ensembl_only_genes'")
-        ensembl_unmapped = tgt.find({"_id":{"$regex":'''\\D'''}},{"_id":1}).count()
+        ensembl_unmapped = tgt.count_documents({"_id": {"$regex": '''\\D'''}})
         self.stats["total_ensembl_only_genes"] = ensembl_unmapped
         self.logger.debug("Counting 'total_species'")
         self.stats["total_species"] = len(tgt.distinct("taxid"))
