@@ -1,10 +1,7 @@
 import biothings.utils.mongo as mongo
 import biothings.hub.databuild.builder as builder
-from biothings.utils.common import loadobj
 from biothings.hub import BUILDER_CATEGORY
 
-from hub.dataload.sources.entrez.gene_upload import EntrezGeneUploader
-from hub.dataload.sources.ensembl.gene_upload import EnsemblGeneUploader
 
 class MyGeneDataBuilder(builder.DataBuilder):
     """
@@ -19,29 +16,26 @@ class MyGeneDataBuilder(builder.DataBuilder):
             which are not handled by mongo as upserts and produce duplicated
             errors. For this datasource in particular, we allow only one merge job
             """
-            return len([j for j in job_manager.jobs.values() if \
-                    j["category"] == BUILDER_CATEGORY \
-                    and j["step"] == "ensembl_gene"]) == 0
+            return len([j for j in job_manager.jobs.values() if j["category"] == BUILDER_CATEGORY and j["step"] == "ensembl_gene"]) == 0
         preds = super().get_predicates()
         preds.append(no_other_merge_job_for_ensembl_gene)
         return preds
-
 
     def generate_document_query(self, src_name):
         """Root documents are created according to species list"""
         _query = None
         if src_name in self.get_root_document_sources():
             if "species" in self.build_config:
-                _query = {'taxid': {'$in': list(map(int,self.build_config['species']))}}
+                _query = {'taxid': {'$in': list(map(int, self.build_config['species']))}}
             elif "species_to_exclude" in self.build_config:
-                _query = {'taxid': {'$nin': list(map(int,self.build_config['species_to_exclude']))}}
+                _query = {'taxid': {'$nin': list(map(int, self.build_config['species_to_exclude']))}}
             else:
                 _query = None
         if _query:
-            self.logger.debug("Source '%s' requires custom query: '%s'" % (src_name,_query))
+            self.logger.debug("Source '%s' requires custom query: '%s'" % (src_name, _query))
         return _query
 
-    def document_cleaner(self,src_name,*args,**kwargs):
+    def document_cleaner(self, src_name, *args, **kwargs):
         # only root sources document can keep their taxid
         if src_name in self.get_root_document_sources():
             return None
@@ -52,12 +46,12 @@ class MyGeneDataBuilder(builder.DataBuilder):
         tgt = mongo.get_target_db()[self.target_name]
         # background=true or it'll lock the whole database...
         self.logger.info("Indexing 'taxid'")
-        tgt.create_index("taxid",background=True)
+        tgt.create_index("taxid", background=True)
         self.logger.info("Indexing 'entrezgene'")
-        tgt.create_index("entrezgene",background=True)
+        tgt.create_index("entrezgene", background=True)
 
-    def get_stats(self,sources,job_manager):
-        self.stats = super(MyGeneDataBuilder,self).get_stats(sources,job_manager)
+    def get_stats(self, sources, job_manager):
+        self.stats = super(MyGeneDataBuilder, self).get_stats(sources, job_manager)
         # enrich with some specific mygene counts, specially regarding ensembl vs. entrez
         tgt = mongo.get_target_db()[self.target_name]
         self.stats["total_genes"] = tgt.estimated_document_count()
@@ -77,16 +71,16 @@ class MyGeneDataBuilder(builder.DataBuilder):
         # Queries are gonna use colscan strategy...
         self.logger.debug("Counting 'total_ensembl_genes'")
         res = tgt.aggregate([
-            {"$match" : {"ensembl.0" : {"$exists" : True}}},
-            {"$project" : {"num_gene" : {"$size" : "$ensembl"}}},
-            {"$group" : {"_id" : None, "sum" : {"$sum": "$num_gene"}}}
-            ])
+            {"$match": {"ensembl.0": {"$exists": True}}},
+            {"$project": {"num_gene": {"$size": "$ensembl"}}},
+            {"$group": {"_id": None, "sum": {"$sum": "$num_gene"}}}
+        ])
         try:
             list_count = next(res)["sum"]
         except StopIteration:
             list_count = 0
         object_count = tgt.count_documents({"ensembl": {"$type": "object"}})
-        orphan_count = tgt.count_documents({"_id": {"$regex": '''\\w'''},"ensembl": {"$exists": 0}})
+        orphan_count = tgt.count_documents({"_id": {"$regex": '''\\w'''}, "ensembl": {"$exists": 0}})
         total_ensembl_genes = list_count + object_count + orphan_count
         self.stats["total_ensembl_genes"] = total_ensembl_genes
         # this one can't be computed from merged collection, and is only valid when build
@@ -95,10 +89,10 @@ class MyGeneDataBuilder(builder.DataBuilder):
         # this one is similar to total_ensembl_genes except we cross with entrezgene (ie. so they're mapped)
         try:
             list_count = next(tgt.aggregate([
-                {"$match" : {"$and" : [{"ensembl.0" : {"$exists" : True}},{"entrezgene":{"$exists":1}}]}},
-                {"$project" : {"num_gene" : {"$size" : "$ensembl"}}},
-                {"$group" : {"_id" : None, "sum" : {"$sum": "$num_gene"}}}
-                ]))["sum"]
+                {"$match": {"$and": [{"ensembl.0": {"$exists": True}}, {"entrezgene": {"$exists": 1}}]}},
+                {"$project": {"num_gene": {"$size": "$ensembl"}}},
+                {"$group": {"_id": None, "sum": {"$sum": "$num_gene"}}}
+            ]))["sum"]
         except StopIteration:
             list_count = 0
         object_count = tgt.count_documents({"$and": [{"ensembl": {"$type": "object"}}, {"entrezgene": {"$exists": 1}}]})

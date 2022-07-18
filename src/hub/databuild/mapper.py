@@ -1,10 +1,11 @@
 from biothings.utils.common import loadobj
 import biothings.hub.databuild.mapper as mapper
 
+
 class EntrezRetired2Current(mapper.IDBaseMapper):
 
     def __init__(self, db_provider, *args, **kwargs):
-        super(EntrezRetired2Current,self).__init__(*args,**kwargs)
+        super(EntrezRetired2Current, self).__init__(*args, **kwargs)
         self.db_provider = db_provider
 
     def load(self):
@@ -14,7 +15,7 @@ class EntrezRetired2Current(mapper.IDBaseMapper):
             # but it's a way to know the entrez perimeter (what entrez _ids exist and should be considered
             self.map = loadobj(("entrez_gene__geneid_d.pyobj", self.db_provider()), mode='gridfs')
 
-    def process(self,*args,**kwargs):
+    def process(self, *args, **kwargs):
         raise UserWarning("Don't call me, please")
 
 
@@ -24,7 +25,7 @@ class Ensembl2Entrez(mapper.IDBaseMapper):
     """
 
     def __init__(self, db_provider, retired2current, *args, **kwargs):
-        super(Ensembl2Entrez,self).__init__("ensembl2entrez",*args,**kwargs)
+        super(Ensembl2Entrez, self).__init__("ensembl2entrez", *args, **kwargs)
         self.db_provider = db_provider
         self.retired2current = retired2current
 
@@ -34,7 +35,7 @@ class Ensembl2Entrez(mapper.IDBaseMapper):
             self.map = {}
             ensembl2entrez_li = loadobj(("ensembl_gene__2entrezgene_list.pyobj", self.db_provider()), mode='gridfs')
             #filter out those deprecated entrez gene ids
-            for ensembl_id,entrez_id in ensembl2entrez_li:
+            for ensembl_id, entrez_id in ensembl2entrez_li:
                 entrez_id = int(entrez_id)
                 if entrez_id in self.retired2current:
                     self.map[ensembl_id] = self.retired2current.translate(entrez_id)
@@ -47,7 +48,7 @@ class Ensembl2EntrezRoot(mapper.IDBaseMapper):
     """
 
     def __init__(self, ensembl2entrez, *args, **kwargs):
-        super(Ensembl2EntrezRoot,self).__init__("ensembl",*args,**kwargs)
+        super(Ensembl2EntrezRoot, self).__init__("ensembl", *args, **kwargs)
         self.ensembl2entrez = ensembl2entrez
 
     def load(self):
@@ -56,7 +57,7 @@ class Ensembl2EntrezRoot(mapper.IDBaseMapper):
             self.ensembl2entrez.load()
             self.map = self.ensembl2entrez.map
 
-    def process(self,docs,key_to_convert="_id",**kwargs):
+    def process(self, docs, key_to_convert="_id", **kwargs):
         """
         we want to force translation, not defaulting to ensembl if no match
         so, if there's a match, it means ensembl doc can be converted so it means
@@ -65,8 +66,8 @@ class Ensembl2EntrezRoot(mapper.IDBaseMapper):
         convertible docs to only keep ensembl docs
         """
         for doc in docs:
-            _new = self.translate(doc[key_to_convert],transparent=False)
+            _new = self.translate(doc[key_to_convert], transparent=False)
             if _new:
-                continue # already as entrez_gene
+                continue    # already as entrez_gene
             else:
-                yield doc # return original
+                yield doc   # return original
