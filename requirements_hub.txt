@@ -1,3 +1,3 @@
-git+https://github.com/biothings/biothings.api@master#egg=biothings[hub]
+git+https://github.com/biothings/biothings.api@0.11.x#egg=biothings[hub]
 biopython # refseq
 pandas # umls
