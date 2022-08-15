@@ -143,7 +143,7 @@ class TestDataFields(BiothingsDataTest):
         # but nothing else.
 
     def test_630_go(self):
-        res = self.request("query?q=GO:0016324&fields=go&sort=_id").json()
+        res = self.request("query?q=GO:0016324&fields=go&sort=_seq_no").json()
         assert res["total"] > 800
 
     def test_631_homologene(self):
