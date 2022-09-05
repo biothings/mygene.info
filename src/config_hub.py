@@ -23,6 +23,8 @@ DATA_HUB_DB_DATABASE = "mygene_hubdb"
 HUB_NAME = "MyGene Hub (prod)"
 HUB_ICON = "https://mygene.info/static/img/mygene-logo-shiny.svg"
 
+USE_RELOADER = False
+
 # Pre-prod/test ES definitions
 INDEX_CONFIG = {
     "indexer_select": {
@@ -155,9 +157,6 @@ RELEASE_CONFIG = {
     }
 }
 
-
-# cached data (it None, caches won't be used at all)
-CACHE_FOLDER = None
 
 # when publishing releases, specify the targetted (ie. required) standalone version
 STANDALONE_VERSION = {"branch": "standalone_v3"}
