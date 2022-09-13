@@ -1,4 +1,5 @@
 from biothings.utils.dataload import dict_convert, tab2dict_iter
+from biothings.utils.common import open_anyfile
 
 try:
     from ..entrez.parser import EntrezParserBase
@@ -13,9 +14,18 @@ class GeneSummaryParser(EntrezParserBase):
     DATAFILE = 'gene2summary_all.txt'
 
     def load(self, aslist=False):
+        geneid_set = set()
+        doc_li = []
+
         with open(self.datafile) as df:
-            geneid_set = set()
-            doc_li = []
+            for line in df:
+                geneid, summary = line.strip().split('\t')
+                if geneid not in geneid_set:
+                    doc_li.append(dict(_id=geneid, summary=str(summary)))
+                    geneid_set.add(geneid)
+
+        # temporary fix to add in missing human gene summaries
+        with open_anyfile('/opt/mygene-hub/datasources/ncbi_gene/gene2summary_human.txt.xz') as df:
             for line in df:
                 geneid, summary = line.strip().split('\t')
                 if geneid not in geneid_set:
