@@ -26,8 +26,6 @@ jobs:
         run: pip install -r requirements_web.txt
       - name: Install PyTest
         run: pip install pytest
-      - name: Install BioThings 0.10.x branch  # FIXME
-        run: pip install git+https://github.com/biothings/biothings.api.git@0.10.x#egg=biothings
       - name: Run App Tests
         run: pytest test_app_tests.py
         working-directory: src/tests/app_tests
