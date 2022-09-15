@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.6, 3.7, 3.8, 3.9 ]
+        python-version: [ '3.6', '3.7', '3.8', '3.9', '3.10' ]
     steps:
       - name: Checkout source
         uses: actions/checkout@v2
@@ -26,16 +26,17 @@ jobs:
         run: pip install -r requirements_web.txt
       - name: Install PyTest
         run: pip install pytest
-      - name: Install BioThings 0.10.x branch  # FIXME
-        run: pip install git+https://github.com/biothings/biothings.api.git@0.10.x#egg=biothings
       - name: Run App Tests
         run: pytest test_app_tests.py
         working-directory: src/tests/app_tests
     services:
       Elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.13.3
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.4.1
         env:
           "discovery.type" : single-node
+          "xpack.security.enabled": false
+          "xpack.security.http.ssl.enabled": false
+          "xpack.security.transport.ssl.enabled": false
         ports:
           - 9200:9200
 
