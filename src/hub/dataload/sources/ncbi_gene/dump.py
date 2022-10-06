@@ -18,7 +18,7 @@ class NcbiGeneDumper(FTPDumper):
     FTP_HOST = 'ftp.ncbi.nih.gov'
     CWD_DIR = '/gene/DATA/ASN_BINARY/Mammalia'
 
-    SCHEDULE = "0 22  * * 6"
+    #SCHEDULE = "0 22  * * 6"
 
     def get_newest_info(self):
         res = self.client.sendcmd("MDTM All_Mammalia.ags.gz")

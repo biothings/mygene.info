@@ -2,7 +2,7 @@ from .parser import GeneSummaryParser
 import biothings.hub.dataload.uploader as uploader
 
 
-class NCBIGeneSummaryUploader(uploader.MergerSourceUploader):
+class NcbiGeneSummaryUploader(uploader.MergerSourceUploader):
 
     name = "ncbi_gene"
 

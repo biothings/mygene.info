@@ -1,2 +1,2 @@
 from .dump import NcbiGeneDumper
-from .upload import NCBIGeneSummaryUploader
+from .upload import NcbiGeneSummaryUploader
