@@ -18,7 +18,6 @@ class GeneSummaryParser(EntrezParserBase):
 
     def load(self, aslist=False):
 
-        geneid_set = set()
         doc_li = []
         with open_anyfile(self.datafile) as df:
             for line in df:

@@ -34,7 +34,7 @@ class NcbiGeneDumper(FTPDumper):
             self.logger.debug("No new release found")
             return False
 
-    def create_todump_list(self, force=False):
+    def create_todump_list(self, force=False, **kwargs):
         self.get_newest_info()
         for fn in ['Sus_scrofa.ags.gz']:  #TODO change to all, using sus_scrofa for testing
             local_file = os.path.join(self.new_data_folder,fn)
