@@ -14,7 +14,7 @@ class GeneSummaryParser(EntrezParserBase):
     '''Parser for gene2summary_all.txt.xz, adding "summary" field in gene doc'''
 
     # TODO testing only need to change file name
-    DATAFILE = 'gene2summary_sus.txt.xz'
+    DATAFILE = 'gene2summary_all.txt.xz'
 
     def load(self, aslist=False):
 

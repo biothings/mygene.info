@@ -18,7 +18,7 @@ class NcbiGeneDumper(FTPDumper):
     FTP_HOST = 'ftp.ncbi.nih.gov'
     CWD_DIR = '/gene/DATA/ASN_BINARY/Mammalia'
 
-    #SCHEDULE = "0 22  * * 6"
+    SCHEDULE = "0 6 * * 6"
 
     def get_newest_info(self):
         res = self.client.sendcmd("MDTM All_Mammalia.ags.gz")
@@ -36,7 +36,7 @@ class NcbiGeneDumper(FTPDumper):
 
     def create_todump_list(self, force=False, **kwargs):
         self.get_newest_info()
-        for fn in ['Sus_scrofa.ags.gz']:  #TODO change to all, using sus_scrofa for testing
+        for fn in ['All_Mammalia.ags.gz']:
             local_file = os.path.join(self.new_data_folder,fn)
             if force or not os.path.exists(local_file) or self.remote_is_better(fn,local_file) or self.new_release_available():
                 self.to_dump.append({"remote": fn, "local":local_file})
@@ -44,5 +44,5 @@ class NcbiGeneDumper(FTPDumper):
     def post_dump(self, *args, **kwargs):
         self.logger.info("Extracting Gene Summary Data in %s", self.new_data_folder)
         os.chdir(self.new_data_folder)
-        os.system('time gunzip -c Sus_scrofa.ags.gz |../gene2xml -i stdin -b T | ../xtract -pattern Entrezgene -element Gene-track_geneid,Entrezgene_summary | awk -F "\t" \'length($2)\' | xz -9 --stdout > gene2summary_sus.txt.xz')
+        os.system('time gunzip -c All_Mammalia.ags.gz |../gene2xml -i stdin -b T | ../xtract -pattern Entrezgene -element Gene-track_geneid,Entrezgene_summary | awk -F "\t" \'length($2)\' | xz -9 --stdout > gene2summary_all.txt.xz')
 
