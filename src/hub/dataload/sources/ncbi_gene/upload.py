@@ -18,3 +18,4 @@ class NcbiGeneSummaryUploader(uploader.MergerSourceUploader):
                 "copy_to": "all"
             },
         }
+        return mapping
