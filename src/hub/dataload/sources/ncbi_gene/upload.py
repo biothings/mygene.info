@@ -1,5 +1,6 @@
-from .parser import GeneSummaryParser
 import biothings.hub.dataload.uploader as uploader
+from .parser import GeneSummaryParser
+
 
 
 class NcbiGeneSummaryUploader(uploader.MergerSourceUploader):
