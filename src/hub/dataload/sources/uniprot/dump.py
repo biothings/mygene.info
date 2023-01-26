@@ -4,7 +4,6 @@ import sys
 import time
 import socket
 from datetime import datetime
-from ftplib import FTP
 
 import biothings, config
 biothings.config_for_app(config)
