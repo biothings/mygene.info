@@ -2,7 +2,9 @@ import os
 import os.path
 import sys
 import time
+import socket
 from datetime import datetime
+from ftplib import FTP
 
 import biothings, config
 biothings.config_for_app(config)
@@ -18,8 +20,20 @@ class UniprotDumper(FTPDumper):
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     FTP_HOST = 'ftp.uniprot.org'
     CWD_DIR = '/pub/databases/uniprot/current_release/knowledgebase/idmapping'
+    BLOCK_SIZE: 33554432
 
     SCHEDULE = "30 7 * * *"
+
+  
+    def prepare_client(self):
+        # FTP side
+        self.client = FTP(self.FTP_HOST, timeout=self.FTP_TIMEOUT)
+        self.client.login(self.FTP_USER, self.FTP_PASSWD)
+        if self.CWD_DIR:
+            self.client.cwd(self.CWD_DIR)
+        self.client.sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
+        self.client.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 75)
+        self.client.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPIDLE, 60)   
 
     def get_newest_info(self):
         res = self.client.sendcmd("MDTM idmapping_selected.tab.gz") # pick one, assuming all other on the same data
