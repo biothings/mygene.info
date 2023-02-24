@@ -39,7 +39,7 @@ class TestSpecialInput(BiothingsDataTest):
         self.query(q='mirbase:MI0017267')
 
     def test_412_case_sensitivity(self):
-        self.query(q='wormbase:WBGene00057218', species=31234)
+        self.query(q='wormbase:WBGene00019362', species=6239)
 
     def test_413_case_sensitivity(self):
         self.query(q='xenbase:XB-GENE-1001990', species='frog')
