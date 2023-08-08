@@ -403,8 +403,7 @@ class EnsemblBioMart(GenericBioMart):
 
     # used to get latest release number & list of available species
     ENSEMBL_FTP_HOST = "ftp.ensembl.org"
-    MART_URL = "http://uswest.ensembl.org/biomart/martservice"
-
+    MART_URL = "http://useast.ensembl.org/biomart/martservice"
     RELEASE_FOLDER = '/pub'
     RELEASE_PREFIX = '/pub/release-'
 
