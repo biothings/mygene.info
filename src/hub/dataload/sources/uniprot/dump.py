@@ -25,7 +25,7 @@ class UniprotDumper(FTPDumper):
 
   
     def prepare_client(self):
-        super().prepare_client(self)
+        super().prepare_client()
         # adding keepalive so the client socket does not disconnect while the data socket is downloading
         self.client.sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         self.client.sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_KEEPINTVL, 75)
