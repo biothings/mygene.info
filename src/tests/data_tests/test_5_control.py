@@ -1,39 +1,37 @@
 import pytest
-
 from biothings.tests.web import BiothingsDataTest
 
 
 class TestControlKeywords(BiothingsDataTest):
-    host = 'mygene.info'
-    prefix = 'v3'
+    host = "mygene.info"
+    prefix = "v3"
 
     def test_501_format_msgpack(self):
-
         # format and out_format are an aliases
         # effective for both annotation and query
         # effective for both GET and POST requests
 
         # former request syntax is msgpack=true
 
-        res = self.request('gene/1017').json()
+        res = self.request("gene/1017").json()
         res2 = msgpack_ok(self.request("gene/1017?format=msgpack").content)
         assert res, res2
 
     def test_502_format_msgpack(self):
-        res = self.request('query/?q=cdk').json()
+        res = self.request("query/?q=cdk").json()
         res2 = msgpack_ok(self.request("query/?q=cdk&format=msgpack").content)
         assert res, res2
 
-    def test_503_format_msgpack(self):	
-        res = self.request('metadata').json()	
-        res2 = msgpack_ok(self.request("metadata?format=msgpack").content)	
+    def test_503_format_msgpack(self):
+        res = self.request("metadata").json()
+        res2 = msgpack_ok(self.request("metadata?format=msgpack").content)
         assert res, res2
-        
+
     def test_511_raw(self):
-        raw1 = self.request('gene/1017?raw=1').json()
-        rawtrue = self.request('gene/1017?raw=true').json()
-        raw0 = self.request('gene/1017?raw=0').json()
-        rawfalse = self.request('gene/1017?raw=false').json()
+        raw1 = self.request("gene/1017?raw=1").json()
+        rawtrue = self.request("gene/1017?raw=true").json()
+        raw0 = self.request("gene/1017?raw=0").json()
+        rawfalse = self.request("gene/1017?raw=false").json()
         assert sorted(raw1) == sorted(rawtrue)
         raw0.pop("_score", None)
         rawfalse.pop("_score", None)
@@ -71,22 +69,28 @@ class TestControlKeywords(BiothingsDataTest):
         # Endpoints: annotation, query
         # Methods: GET, POST
 
-        res = self.request('gene/1017?fields=symbol,name,entrezgene').json()
-        assert set(res) == set(['_id', '_version', 'symbol', 'name', 'entrezgene'])
+        res = self.request("gene/1017?fields=symbol,name,entrezgene").json()
+        assert set(res) == set(["_id", "_version", "symbol", "name", "entrezgene"])
 
     def test_522_fields(self):
-        res = self.request('gene/1017?filter=symbol,go.MF').json()
-        assert set(res) == set(['_id', '_version', 'symbol', 'go'])
+        res = self.request("gene/1017?filter=symbol,go.MF").json()
+        assert set(res) == set(["_id", "_version", "symbol", "go"])
         assert "MF" in res["go"]
 
     def test_531_dotfield(self):
         # query service
         # default dotfield=0
-        rdefault = self.request("query?q=ccnk&fields=refseq.rna&size=3").json()
+        rdefault = self.request(
+            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&size=3"
+        ).json()
         # force no dotfield
-        rfalse = self.request("query?q=ccnk&fields=refseq.rna&dotfield=false&size=3").json()
+        rfalse = self.request(
+            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&dotfield=false&size=3"
+        ).json()
         # force dotfield
-        rtrue = self.request("query?q=ccnk&fields=refseq.rna&dotfield=true&size=3").json()
+        rtrue = self.request(
+            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&dotfield=true&size=3"
+        ).json()
         # check defaults and bool params
         # TODO: put this in json_ok as post-process filter ?
         for res in [rdefault, rfalse, rtrue]:
@@ -114,30 +118,31 @@ class TestControlKeywords(BiothingsDataTest):
         assert "MF" in rdefault["go"].keys()
 
     def test_541_list_null(self):
-        res = self.request('gene/1017?always_list=entrezgene&allow_null=accession.test').json()
-        assert 'entrezgene' in res
-        assert isinstance(res['entrezgene'], list)
-        assert res['accession']['test'] is None
+        res = self.request(
+            "gene/1017?always_list=entrezgene&allow_null=accession.test"
+        ).json()
+        assert "entrezgene" in res
+        assert isinstance(res["entrezgene"], list)
+        assert res["accession"]["test"] is None
 
 
 def msgpack_ok(packed_bytes, checkerror=True):
-    ''' Load msgpack into a dict '''
+    """Load msgpack into a dict"""
     try:
         import msgpack
     except ImportError:
-        pytest.skip('Msgpack is not installed.')
+        pytest.skip("Msgpack is not installed.")
     try:
         dic = msgpack.unpackb(packed_bytes)
     except BaseException:  # pylint: disable=bare-except
-        assert False, 'Not a valid Msgpack binary.'
+        assert False, "Not a valid Msgpack binary."
     if checkerror:
-        assert not (isinstance(dic, dict)
-                    and 'error' in dic), truncate(str(dic), 100)
+        assert not (isinstance(dic, dict) and "error" in dic), truncate(str(dic), 100)
     return dic
 
 
 def truncate(string, limit):
-    ''' Truncate a long string with a trailing ellipsis '''
+    """Truncate a long string with a trailing ellipsis"""
     if len(string) <= limit:
         return string
-    return string[:limit] + '...'
+    return string[:limit] + "..."
