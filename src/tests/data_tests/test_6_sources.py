@@ -6,8 +6,7 @@ class TestDataFields(BiothingsDataTest):
     prefix = 'v3'
 
     def test_601_hg19(self):
-
-        url = 'query?q=hg19.chr12:57,795,963-57,815,592&species=human'
+        url = 'query?q=hg19.chr12:57,810,963-57,815,592'
         res = self.request(url).json()
         assert len(res['hits']) == 1
         assert '_id' in res['hits'][0]
