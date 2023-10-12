@@ -1,55 +1,60 @@
 from biothings.tests.web import BiothingsDataTest
 from biothings.utils.dataload import alwayslist
 
+
 class TestDataFields(BiothingsDataTest):
-    host = 'mygene.info'
-    prefix = 'v3'
+    host = "mygene.info"
+    prefix = "v3"
 
     def test_601_hg19(self):
-        url = 'query?q=hg19.chr12:57,810,963-57,815,592'
+        url = "query?q=hg19.chr12:57,810,963-57,815,592"
         res = self.request(url).json()
-        assert len(res['hits']) == 1
-        assert '_id' in res['hits'][0]
+        assert len(res["hits"]) == 1
+        assert "_id" in res["hits"][0]
 
     def test_602_hg19(self):
-        url = 'query?q=hg19.chr12:57,795,963-57,815,592&species=human'
+        url = "query?q=hg19.chr12:57,795,963-57,815,592&species=human"
         res = self.request(url).json()
-        url = 'query?q=chr12:57,795,963-57,815,592&species=human'
+        url = "query?q=chr12:57,795,963-57,815,592&species=human"
         res2 = self.request(url).json()
-        assert res['total'] != res2['total']
+        assert res["total"] != res2["total"]
 
     def test_603_hg19(self):
-        url = 'query?q=hg19.chr12:57,795,963-57,815,592&species=human'
+        url = "query?q=hg19.chr12:57,795,963-57,815,592&species=human"
         res = self.request(url).json()
-        url = 'gene/10017?fields=genomic_pos_hg19,exons_hg19'
+        url = "gene/10017?fields=genomic_pos_hg19,exons_hg19"
         res = self.request(url).json()
-        assert 'genomic_pos_hg19' in res
-        assert 'exons_hg19' in res
+        assert "genomic_pos_hg19" in res
+        assert "exons_hg19" in res
 
     def test_604_mm9(self):
-        url = 'query?q=mm9.chr12:57,795,963-57,815,592&species=mouse'
+        url = "query?q=mm9.chr12:57,795,963-57,815,592&species=mouse"
         res = self.request(url).json()
-        assert len(res['hits']) == 2
-        assert '_id' in res['hits'][0]
+        assert len(res["hits"]) == 2
+        assert "_id" in res["hits"][0]
 
     def test_605_mm9(self):
-        url = 'query?q=mm9.chr12:57,795,963-57,815,592&species=mouse'
+        url = "query?q=mm9.chr12:57,795,963-57,815,592&species=mouse"
         res = self.request(url).json()
-        url = 'query?q=chr12:57,795,963-57,815,592&species=mouse'
+        url = "query?q=chr12:57,795,963-57,815,592&species=mouse"
         res2 = self.request(url).json()
-        assert res['total'] != res2['total']
+        assert res["total"] != res2["total"]
 
     def test_606_mm9(self):
-        url = 'gene/12049?fields=genomic_pos_mm9,exons_mm9'
+        url = "gene/12049?fields=genomic_pos_mm9,exons_mm9"
         res = self.request(url).json()
-        assert 'genomic_pos_mm9' in res
-        assert 'exons_mm9' in res
+        assert "genomic_pos_mm9" in res
+        assert "exons_mm9" in res
 
     def test_611_refseq(self):
-        protein = filter_hits(self.request("query?q=refseq:NP_001670&fields=refseq").json())
+        protein = filter_hits(
+            self.request("query?q=refseq:NP_001670&fields=refseq").json()
+        )
         url = "query?q=refseq:NM_001679&fields=refseq"
         rna = filter_hits(self.request(url).json())
-        genomic = filter_hits(self.request("query?q=refseq:NT_005612&fields=refseq").json())
+        genomic = filter_hits(
+            self.request("query?q=refseq:NT_005612&fields=refseq").json()
+        )
         url = "query?q=refseq.protein:NP_001670&fields=refseq"
         explicit_protein = filter_hits(self.request(url).json())
         filter_hits(explicit_protein)
@@ -65,11 +70,15 @@ class TestDataFields(BiothingsDataTest):
         assert hit["refseq"]["rna"].startswith("NM_001679.")
 
     def test_615_accession(self):
-        protein = filter_hits(self.request(
-            "query?q=accession:AAH68303&fields=accession").json())
-        rna = filter_hits(self.request("query?q=accession:BC068303&fields=accession").json())
-        genomic = filter_hits(self.request(
-            "query?q=accession:FJ497232&fields=accession").json())
+        protein = filter_hits(
+            self.request("query?q=accession:AAH68303&fields=accession").json()
+        )
+        rna = filter_hits(
+            self.request("query?q=accession:BC068303&fields=accession").json()
+        )
+        genomic = filter_hits(
+            self.request("query?q=accession:FJ497232&fields=accession").json()
+        )
         url = "query?q=accession.protein:AAH68303&fields=accession"
         explicit_protein = filter_hits(self.request(url).json())
         url = "query?q=accession.rna:BC068303&fields=accession"
@@ -102,7 +111,9 @@ class TestDataFields(BiothingsDataTest):
 
     def test_621_reporter(self):
         # rat
-        rat = filter_hits(self.request("query?q=reporter:1387540_at&fields=reporter").json())
+        rat = filter_hits(
+            self.request("query?q=reporter:1387540_at&fields=reporter").json()
+        )
         assert rat["total"] == 1
         assert rat["hits"][0]["reporter"]["RaEx-1_0"] == "7082865"
         assert rat["hits"][0]["reporter"]["Rat230_2"] == "1387540_at"
@@ -111,8 +122,9 @@ class TestDataFields(BiothingsDataTest):
         assert "AF036760_at" in rat["hits"][0]["reporter"]["RG-U34A"]
 
     def test_622_reporter(self):
-        mouse = filter_hits(self.request(
-            "query?q=reporter:1452128_a_at&fields=reporter").json())
+        mouse = filter_hits(
+            self.request("query?q=reporter:1452128_a_at&fields=reporter").json()
+        )
         assert mouse["total"] == 1
         assert "1456141_x_at" in mouse["hits"][0]["reporter"]["Mouse430_2"]
         assert mouse["hits"][0]["reporter"]["MTA-1_0"] == "TC0X00000742.mm.1"
@@ -124,7 +136,8 @@ class TestDataFields(BiothingsDataTest):
 
     def test_625_interpro(self):
         res = self.request(
-            "query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat").json()
+            "query?q=interpro:IPR008389&fields=interpro&species=human,mouse,rat"
+        ).json()
         assert res["total"] == 6
         # I do not understand why we check for IPR017385,
         # discussion is at
@@ -134,8 +147,9 @@ class TestDataFields(BiothingsDataTest):
         # for hit in res['hits']:
         #     assert self.value_in_result('IPR008389', hit, 'interpro.id',
         #                                 case_insensitive=True)
-        assert set([pro["id"] for hit in res["hits"]
-                    for pro in alwayslist(hit["interpro"])]) == {'IPR008389', 'IPR017385'}
+        assert set(
+            [pro["id"] for hit in res["hits"] for pro in alwayslist(hit["interpro"])]
+        ) == {"IPR008389", "IPR017385"}
         # the above code checks that the set union on the fields interpro.id for
         # all the results contains both IPR008389 and IPR017385
         # i.e. a hit can have either or both, but all of them unioned must have both
@@ -147,22 +161,27 @@ class TestDataFields(BiothingsDataTest):
 
     def test_631_homologene(self):
         res = self.request(
-            "query?q=homologene:44221&fields=homologene&species=human,mouse,rat").json()
+            "query?q=homologene:44221&fields=homologene&species=human,mouse,rat"
+        ).json()
         assert res["total"] == 3
         hit = res["hits"][0]
-        assert set([i[0] for i in hit["homologene"]["genes"]]) == \
-            set([7955, 8364, 9031, 9598, 9606, 9615, 9913, 10090, 10116])
+        assert set([i[0] for i in hit["homologene"]["genes"]]) == set(
+            [7955, 8364, 9031, 9598, 9606, 9615, 9913, 10090, 10116]
+        )
 
     def test_635_reagent(self):
         res = self.request("query?q=reagent:GNF190467&fields=reagent").json()
         assert res["total"] == 1
         hit = res["hits"][0]
-        assert {"relationship": "is", "id": "GNF168655"} in \
-            hit["reagent"]["GNF_Qia_hs-genome_v1_siRNA"]
-        assert {"relationship": "is", "id": "GNF277345"} in \
-            hit["reagent"]["GNF_mm+hs-MGC"]
-        assert {"relationship": "is", "id": "GNF110093"} in \
-            hit["reagent"]["NOVART_hs-genome_siRNA"]
+        assert {"relationship": "is", "id": "GNF168655"} in hit["reagent"][
+            "GNF_Qia_hs-genome_v1_siRNA"
+        ]
+        assert {"relationship": "is", "id": "GNF277345"} in hit["reagent"][
+            "GNF_mm+hs-MGC"
+        ]
+        assert {"relationship": "is", "id": "GNF110093"} in hit["reagent"][
+            "NOVART_hs-genome_siRNA"
+        ]
 
     def test_640_refseq(self):
         # no version, _all
@@ -182,15 +201,19 @@ class TestDataFields(BiothingsDataTest):
         sameres = filter_hits(self.request("query?q=XP_011536034&fields=refseq").json())
         assert sameres["hits"] == res["hits"]
         # using explicit field
-        sameres = filter_hits(self.request("query?q=refseq:XP_011536034&fields=refseq").json())
+        sameres = filter_hits(
+            self.request("query?q=refseq:XP_011536034&fields=refseq").json()
+        )
         assert sameres["hits"] == res["hits"]
 
     def test_645_exac(self):
         # (Exome Aggregation Consortium)
-        res = filter_hits(self.request(
-            "query?q=exac.transcript:ENST00000266970.4&fields=exac").json())
-        resnover = filter_hits(self.request(
-            "query?q=exac.transcript:ENST00000266970&fields=exac").json())
+        res = filter_hits(
+            self.request("query?q=exac.transcript:ENST00000266970.4&fields=exac").json()
+        )
+        resnover = filter_hits(
+            self.request("query?q=exac.transcript:ENST00000266970&fields=exac").json()
+        )
         assert res["hits"] == resnover["hits"]
         assert len(res["hits"]) == 1
         hit = res["hits"][0]
@@ -221,13 +244,18 @@ class TestDataFields(BiothingsDataTest):
         assert "1017" in ids, "Should have 1017 in results"
 
     def test_655_uniprot(self):
-        swissid = filter_hits(self.request("query?q=uniprot:Q8NEB7&fields=uniprot").json())
-        trembid = filter_hits(self.request("query?q=uniprot:F5H2C2&fields=uniprot").json())
+        swissid = filter_hits(
+            self.request("query?q=uniprot:Q8NEB7&fields=uniprot").json()
+        )
+        trembid = filter_hits(
+            self.request("query?q=uniprot:F5H2C2&fields=uniprot").json()
+        )
         assert swissid["hits"] == trembid["hits"]
         assert trembid["total"] == 1
         assert trembid["hits"][0]["uniprot"]["Swiss-Prot"] == "Q8NEB7"
-        assert set(trembid["hits"][0]["uniprot"]["TrEMBL"]), \
-            set(["E7EP66", "F5H2C2", "F5H3P4", "F5H5S8"])
+        assert set(trembid["hits"][0]["uniprot"]["TrEMBL"]), set(
+            ["E7EP66", "F5H2C2", "F5H3P4", "F5H5S8"]
+        )
 
     def test_660_ensembl(self):
         # Vertebrate
@@ -248,15 +276,17 @@ class TestDataFields(BiothingsDataTest):
         assert "ENSP00000216211" in hit["ensembl"]["protein"]
         assert "ENST00000216211" in hit["ensembl"]["transcript"]
         # POST /gene batch
-        resl = self.request("gene", method='POST', data={'ids': 'ENSG00000148795'}).json()
+        resl = self.request(
+            "gene", method="POST", data={"ids": "ENSG00000148795"}
+        ).json()
         assert len(resl) == 1
         res = resl[0]
         assert res["_id"] == "1586"
 
     def test_661_ensembl_additional(self):
-        ''' DATAFIELD Ensembl Others
+        """DATAFIELD Ensembl Others
         Asserts the existance of the 4 other ensembl sources,
-        by querying unique genes in each individual databases '''
+        by querying unique genes in each individual databases"""
 
         # Added in March 2019
 
@@ -274,7 +304,8 @@ class TestDataFields(BiothingsDataTest):
         assert "pantherdb" in res
         assert isinstance(res["pantherdb"]["ortholog"], list)
         res = self.request(
-            "query?q=pantherdb.ortholog.taxid:10090%20AND%20pantherdb.uniprot_kb:O95867").json()
+            "query?q=pantherdb.ortholog.taxid:10090%20AND%20pantherdb.uniprot_kb:O95867"
+        ).json()
         assert len(res["hits"]) == 1
         assert res["hits"][0]["_id"] == "80740"
 
@@ -284,12 +315,12 @@ class TestDataFields(BiothingsDataTest):
         assert res["pharos"]["target_id"] == 4745
 
     def test_680_exons_hg19_hg38(self):
-        res = self.request('gene/9150?fields=exons,exons_hg19').json()
-        assert res['exons'] != res['exons_hg19']
+        res = self.request("gene/9150?fields=exons,exons_hg19").json()
+        assert res["exons"] != res["exons_hg19"]
 
 
 def filter_hits(dic, field=None):
-    ''' Filter hits by removing specified fields or by default meta fields '''
+    """Filter hits by removing specified fields or by default meta fields"""
     res = dict(dic)
     for hit in res.get("hits"):
         if field:
