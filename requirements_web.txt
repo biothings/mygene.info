@@ -1,4 +1,4 @@
 # Use this instead to test the latest fixes on 0.12.x branch before official release
 # git+https://github.com/biothings/biothings.api@0.12.x#egg=biothings[web_extra]
 
-biothings[web_extra]==0.12.2
+biothings[web_extra]==0.12.3
