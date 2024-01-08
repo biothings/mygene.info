@@ -73,7 +73,7 @@ class TestControlKeywords(BiothingsDataTest):
         assert set(res) == set(["_id", "_version", "symbol", "name", "entrezgene"])
 
     def test_522_fields(self):
-        res = self.request("gene/1017?filter=symbol,go.MF").json()
+        res = self.request("gene/1017?fields=symbol,go.MF").json()
         assert set(res) == set(["_id", "_version", "symbol", "go"])
         assert "MF" in res["go"]
 

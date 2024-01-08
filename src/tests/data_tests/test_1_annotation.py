@@ -253,7 +253,7 @@ class TestAnnotationPOST(BiothingsDataTest):
             )
 
     def test_154(self):
-        data = {"ids": "1017,1018", "filter": "symbol,go.MF"}
+        data = {"ids": "1017,1018", "fields": "symbol,go.MF"}
         res = self.request("gene", method="POST", data=data).json()
         assert len(res) == 2
         for _g in res:
