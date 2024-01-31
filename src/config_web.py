@@ -11,8 +11,7 @@ from biothings.web.settings.default import APP_LIST, ANNOTATION_KWARGS, QUERY_KW
 # *****************************************************************************
 # Elasticsearch Settings
 # *****************************************************************************
-# ES_HOST = 'localhost:9200'
-ES_HOST = "es8.biothings.io:9200"
+ES_HOST = "localhost:9200"
 ES_INDEX = "mygene_current"
 ES_DOC_TYPE = "gene"
 
@@ -166,31 +165,28 @@ STATUS_CHECK = {"id": "1017", "index": "mygene_current"}
 # This essentially bypasses the es.get fallback as in myvariant ...
 # The first regex matched integers, in which case the query becomes against
 # entrezgeneall annotation queries are now multimatch against the following fields
-base_regex_pattern = re.compile(r"^\d+$")
-base_field_scope = ["entrezgene", "retired"]
 
-# CURIE ID support
+# CURIE ID support based on BioLink Model
 BIOLINK_MODEL_PREFIX_BIOTHINGS_GENE_MAPPING = {
-    "NCBIGene": {"type": "gene", "field": "entrezgene"},
+    "NCBIGene": {"type": "gene", "field": ["entrezgene", "retired"]},
     "ENSEMBL": {"type": "gene", "field": "ensembl.gene"},
     "UniProtKB": {"type": "gene", "field": "uniprot.Swiss-Prot"},
 }
-gene_pattern_field_mapping = []
+biolink_curie_regex_list = []
 for (
-    biolink_model,
-    biothings_parameters,
+    biolink_prefix,
+    mapping,
 ) in BIOLINK_MODEL_PREFIX_BIOTHINGS_GENE_MAPPING.items():
-    expression = re.compile(rf"({biolink_model}):(?P<term>[^:]+)", re.I)
-    field_match = biothings_parameters["field"]
+    expression = re.compile(rf"({biolink_prefix}):(?P<term>[^:]+)", re.I)
+    field_match = mapping["field"]
     pattern = (expression, field_match)
-    gene_pattern_field_mapping.append(pattern)
+    biolink_curie_regex_list.append(pattern)
 
 ANNOTATION_ID_REGEX_LIST = [
-    *gene_pattern_field_mapping,
-    (base_regex_pattern, base_field_scope),
+    *biolink_curie_regex_list,
+    (re.compile(r"^\d+$"), ["entrezgene", "retired"]),  # default regex pattern matching
 ]
 
-# ANNOTATION_ID_REGEX_LIST = []  # [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid')]
 ANNOTATION_DEFAULT_SCOPES = ["_id", "entrezgene", "ensembl.gene", "retired"]
 
 # for docs
