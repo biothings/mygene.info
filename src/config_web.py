@@ -11,14 +11,15 @@ from biothings.web.settings.default import APP_LIST, ANNOTATION_KWARGS, QUERY_KW
 # *****************************************************************************
 # Elasticsearch Settings
 # *****************************************************************************
-ES_HOST = 'localhost:9200'
-ES_INDEX = 'mygene_current'
-ES_DOC_TYPE = 'gene'
+# ES_HOST = 'localhost:9200'
+ES_HOST = "es8.biothings.io:9200"
+ES_INDEX = "mygene_current"
+ES_DOC_TYPE = "gene"
 
 # *****************************************************************************
 # Web Application
 # *****************************************************************************
-API_VERSION = 'v3'
+API_VERSION = "v3"
 TAX_REDIRECT = "http://t.biothings.io/v1/taxon/{0}?include_children=1"
 APP_LIST += [
     (r"/{ver}/species/(\d+)/?", "tornado.web.RedirectHandler", {"url": TAX_REDIRECT}),
@@ -40,7 +41,7 @@ ANNOTATION_DOCS_URL = "http://docs.mygene.info/en/latest/doc/annotation_service.
 # *****************************************************************************
 # User Input Control
 # *****************************************************************************
-DEFAULT_FIELDS = ['name', 'symbol', 'taxid', 'entrezgene']
+DEFAULT_FIELDS = ["name", "symbol", "taxid", "entrezgene"]
 
 TAXONOMY = {
     "human": {"tax_id": "9606", "assembly": "hg38"},
@@ -51,7 +52,7 @@ TAXONOMY = {
     "zebrafish": {"tax_id": "7955", "assembly": "danRer11"},
     "thale-cress": {"tax_id": "3702", "assembly": "araTha1"},
     "frog": {"tax_id": "8364", "assembly": "xenTro9"},
-    "pig": {"tax_id": "9823", "assembly": "susScr11"}
+    "pig": {"tax_id": "9823", "assembly": "susScr11"},
 }
 
 DATASOURCE_TRANSLATIONS = {
@@ -72,7 +73,6 @@ DATASOURCE_TRANSLATIONS = {
     "ensemblgene:": "ensembl.gene:",
     "ensembltranscript:": "ensembl.transcript:",
     "ensemblprotein:": "ensembl.protein:",
-
     # some specific datasources needs to be case-insentive
     "hgnc:": r"HGNC:",
     "hprd:": r"HPRD:",
@@ -90,84 +90,112 @@ DATASOURCE_TRANSLATIONS = {
 }
 
 SPECIES_TYPEDEF = {
-    'species': {
-        'type': list,
-        'default': ['all'],
-        'strict': False,
-        'max': 1000,
-        'translations': [
-            (re.compile(pattern, re.I), translation['tax_id'])
+    "species": {
+        "type": list,
+        "default": ["all"],
+        "strict": False,
+        "max": 1000,
+        "translations": [
+            (re.compile(pattern, re.I), translation["tax_id"])
             for (pattern, translation) in TAXONOMY.items()
-        ]
+        ],
     },
-    'species_facet_filter': {
-        'type': list,
-        'default': None,
-        'strict': False,
-        'max': 1000,
-        'translations': [
-            (re.compile(pattern, re.I), translation['tax_id']) for
-            (pattern, translation) in TAXONOMY.items()
-        ]
-    }
+    "species_facet_filter": {
+        "type": list,
+        "default": None,
+        "strict": False,
+        "max": 1000,
+        "translations": [
+            (re.compile(pattern, re.I), translation["tax_id"])
+            for (pattern, translation) in TAXONOMY.items()
+        ],
+    },
 }
 FIELD_FILTERS = {
-    'entrezonly': {'type': bool, 'default': False},
-    'ensemblonly': {'type': bool, 'default': False},
-    'exists': {'type': list, 'default': None, 'max': 1000, 'strict': False},
-    'missing': {'type': list, 'default': None, 'max': 1000, 'strict': False},
+    "entrezonly": {"type": bool, "default": False},
+    "ensemblonly": {"type": bool, "default": False},
+    "exists": {"type": list, "default": None, "max": 1000, "strict": False},
+    "missing": {"type": list, "default": None, "max": 1000, "strict": False},
 }
 
 DATASOURCE_TRANSLATION_TYPEDEF = [
-    (re.compile(pattern, re.I), translation) for
-    (pattern, translation) in DATASOURCE_TRANSLATIONS.items()
+    (re.compile(pattern, re.I), translation)
+    for (pattern, translation) in DATASOURCE_TRANSLATIONS.items()
 ]
 TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF = [
-    (re.compile(re.sub(r':.*', '', pattern).replace('\\', '') + '(?!\\.)', re.I),
-     re.sub(r':.*', '', translation).replace('\\', ''))
-    for(pattern, translation) in DATASOURCE_TRANSLATIONS.items()
+    (
+        re.compile(re.sub(r":.*", "", pattern).replace("\\", "") + "(?!\\.)", re.I),
+        re.sub(r":.*", "", translation).replace("\\", ""),
+    )
+    for (pattern, translation) in DATASOURCE_TRANSLATIONS.items()
 ]
 ANNOTATION_KWARGS = copy.deepcopy(ANNOTATION_KWARGS)
-ANNOTATION_KWARGS['*'].update(SPECIES_TYPEDEF)
-ANNOTATION_KWARGS['*']['_source']['strict'] = False
+ANNOTATION_KWARGS["*"].update(SPECIES_TYPEDEF)
+ANNOTATION_KWARGS["*"]["_source"]["strict"] = False
 
 QUERY_KWARGS = copy.deepcopy(QUERY_KWARGS)
-QUERY_KWARGS['*'].update(SPECIES_TYPEDEF)
-QUERY_KWARGS['*'].update(FIELD_FILTERS)
-QUERY_KWARGS['*']['_source']['default'] = DEFAULT_FIELDS
-QUERY_KWARGS['*']['_source']['strict'] = False
-QUERY_KWARGS['GET']['q']['translations'] = DATASOURCE_TRANSLATION_TYPEDEF
-QUERY_KWARGS['POST']['scopes']['translations'] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
-QUERY_KWARGS['GET']['include_tax_tree'] = {'type': bool, 'default': False}
-QUERY_KWARGS['POST']['scopes']['default'] = ["_id", "entrezgene", "ensembl.gene", "retired"]
-QUERY_KWARGS['POST']['q']['jsoninput'] = True
+QUERY_KWARGS["*"].update(SPECIES_TYPEDEF)
+QUERY_KWARGS["*"].update(FIELD_FILTERS)
+QUERY_KWARGS["*"]["_source"]["default"] = DEFAULT_FIELDS
+QUERY_KWARGS["*"]["_source"]["strict"] = False
+QUERY_KWARGS["GET"]["q"]["translations"] = DATASOURCE_TRANSLATION_TYPEDEF
+QUERY_KWARGS["POST"]["scopes"]["translations"] = TRIMMED_DATASOURCE_TRANSLATION_TYPEDEF
+QUERY_KWARGS["GET"]["include_tax_tree"] = {"type": bool, "default": False}
+QUERY_KWARGS["POST"]["scopes"]["default"] = [
+    "_id",
+    "entrezgene",
+    "ensembl.gene",
+    "retired",
+]
+QUERY_KWARGS["POST"]["q"]["jsoninput"] = True
 
 
 # *****************************************************************************
 # Elasticsearch Query Pipeline
 # *****************************************************************************
 ES_QUERY_BUILDER = "web.pipeline.MygeneQueryBuilder"
-AVAILABLE_FIELDS_EXCLUDED = ['all', 'accession_agg', 'refseq_agg']
+AVAILABLE_FIELDS_EXCLUDED = ["all", "accession_agg", "refseq_agg"]
 
 # *****************************************************************************
 # Endpoints Specifics & Others
 # *****************************************************************************
 
 # kwargs for status check
-STATUS_CHECK = {
-    'id': '1017',
-    'index': 'mygene_current'
-}
+STATUS_CHECK = {"id": "1017", "index": "mygene_current"}
 
-# This essentially bypasses the es.get fallback as in myvariant...
+# This essentially bypasses the es.get fallback as in myvariant ...
 # The first regex matched integers, in which case the query becomes against
 # entrezgeneall annotation queries are now multimatch against the following fields
-ANNOTATION_ID_REGEX_LIST = [(re.compile(r'^\d+$'), ['entrezgene', 'retired'])]
+base_regex_pattern = re.compile(r"^\d+$")
+base_field_scope = ["entrezgene", "retired"]
+
+# CURIE ID support
+BIOLINK_MODEL_PREFIX_BIOTHINGS_GENE_MAPPING = {
+    "NCBIGene": {"type": "gene", "field": "entrezgene"},
+    "ENSEMBL": {"type": "gene", "field": "ensembl.gene"},
+    "UniProtKB": {"type": "gene", "field": "uniprot.Swiss-Prot"},
+}
+gene_pattern_field_mapping = []
+for (
+    biolink_model,
+    biothings_parameters,
+) in BIOLINK_MODEL_PREFIX_BIOTHINGS_GENE_MAPPING.items():
+    expression = re.compile(rf"({biolink_model}):(?P<term>[^:]+)", re.I)
+    field_match = biothings_parameters["field"]
+    pattern = (expression, field_match)
+    gene_pattern_field_mapping.append(pattern)
+
+ANNOTATION_ID_REGEX_LIST = [
+    *gene_pattern_field_mapping,
+    (base_regex_pattern, base_field_scope),
+]
+
+# ANNOTATION_ID_REGEX_LIST = []  # [(re.compile(r'rs[0-9]+', re.I), 'dbsnp.rsid')]
 ANNOTATION_DEFAULT_SCOPES = ["_id", "entrezgene", "ensembl.gene", "retired"]
 
 # for docs
 INCLUDE_DOCS = False
-DOCS_STATIC_PATH = 'docs/_build/html'
+DOCS_STATIC_PATH = "docs/_build/html"
 
 # url template to redirect for 'include_tax_tree' parameter
-INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = 'http://t.biothings.io/v1/taxon'
+INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = "http://t.biothings.io/v1/taxon"
