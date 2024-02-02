@@ -184,7 +184,11 @@ for (
 
 ANNOTATION_ID_REGEX_LIST = [
     *biolink_curie_regex_list,
-    (re.compile(r"^\d+$"), ["entrezgene", "retired"]),  # default regex pattern matching
+    (re.compile(r"^\d+$"), ["entrezgene", "retired"]),
+    (
+        re.compile(r"(?P<scope>\w+):(?P<term>[^:]+)"),
+        [],
+    ),  # default regex pattern matching
 ]
 
 ANNOTATION_DEFAULT_SCOPES = ["_id", "entrezgene", "ensembl.gene", "retired"]
