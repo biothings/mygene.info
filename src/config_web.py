@@ -188,7 +188,7 @@ fallback_pattern = (re.compile(r"^\d+$"), ["entrezgene", "retired"])
 # CURIE ID prefixes match the pattern. This pattern matches the default
 # presented in the ESQueryBuilder in the biothings.api library.
 # Infers based off empty scopes
-default_pattern = (re.compile(r"(?P<scope>\w+):(?P<term>[^:]+)"), [])
+default_pattern = (re.compile(r"(?P<scope>[\W\w]+):(?P<term>[^:]+)"), [])
 
 ANNOTATION_ID_REGEX_LIST = [
     *biolink_curie_regex_list,
