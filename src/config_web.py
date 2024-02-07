@@ -162,10 +162,6 @@ AVAILABLE_FIELDS_EXCLUDED = ["all", "accession_agg", "refseq_agg"]
 # kwargs for status check
 STATUS_CHECK = {"id": "1017", "index": "mygene_current"}
 
-# This essentially bypasses the es.get fallback as in myvariant ...
-# The first regex matched integers, in which case the query becomes against
-# entrezgeneall annotation queries are now multimatch against the following fields
-
 # CURIE ID support based on BioLink Model
 BIOLINK_MODEL_PREFIX_BIOTHINGS_GENE_MAPPING = {
     "NCBIGene": {"type": "gene", "field": ["entrezgene", "retired"]},
@@ -182,13 +178,22 @@ for (
     pattern = (expression, field_match)
     biolink_curie_regex_list.append(pattern)
 
+# This essentially bypasses the es.get fallback as in myvariant ...
+# The first regex matched integers, in which case the query becomes against
+# entrezgeneall annotation queries are now multimatch against the following
+# fields
+fallback_pattern = (re.compile(r"^\d+$"), ["entrezgene", "retired"])
+
+# The default pattern is neither the fallback pattern of the biolink
+# CURIE ID prefixes match the pattern. This pattern matches the default
+# presented in the ESQueryBuilder in the biothings.api library.
+# Infers based off empty scopes
+default_pattern = (re.compile(r"(?P<scope>\w+):(?P<term>[^:]+)"), [])
+
 ANNOTATION_ID_REGEX_LIST = [
     *biolink_curie_regex_list,
-    (re.compile(r"^\d+$"), ["entrezgene", "retired"]),
-    (
-        re.compile(r"(?P<scope>\w+):(?P<term>[^:]+)"),
-        [],
-    ),  # default regex pattern matching
+    fallback_pattern,
+    default_pattern,
 ]
 
 ANNOTATION_DEFAULT_SCOPES = ["_id", "entrezgene", "ensembl.gene", "retired"]
