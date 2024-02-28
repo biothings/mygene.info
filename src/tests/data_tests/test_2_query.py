@@ -127,11 +127,13 @@ class TestQueryGET(BiothingsDataTest):
         assert hits[1]["entrezgene"] == "69606"
         assert hits[2]["entrezgene"] == "315763"
 
+    @pytest.mark.userquery
     def test_241_userquery(self):
         res1 = self.request("query?q=cdk").json()
         res2 = self.request("query?q=cdk&userquery=bgood_cure_griffith").json()
         assert res1["total"] > res2["total"]
 
+    @pytest.mark.userquery
     def test_242_userquery(self):
         # nonexisting user filter gets ignored
         res1 = self.request("query?q=cdk").json()
