@@ -183,7 +183,7 @@ class TestAnnotationGET(BiothingsDataTest):
     @pytest.mark.xfail(
         reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
         run=True,
-        strict=True
+        strict=True,
     )
     def test_114(self):
         """
@@ -341,7 +341,7 @@ class TestAnnotationPOST(BiothingsDataTest):
     @pytest.mark.xfail(
         reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
         run=True,
-        strict=True
+        strict=True,
     )
     def test_156(self):
         """
@@ -377,11 +377,8 @@ class TestAnnotationPOST(BiothingsDataTest):
             data_mapping = {
                 "ids": delimiter.join([f'"{query}"' for query in query_collection])
             }
-            header_mapping = {
-                "user-agent": "biothings_client.py/0.3.1 (python:3.11.2 requests:2.31.0)"
-            }
             query_results = self.request(
-                endpoint, method="POST", data=data_mapping, headers=header_mapping
+                endpoint, method="POST", data=data_mapping
             ).json()
             assert len(query_results) == len(query_collection)
 
