@@ -5,7 +5,7 @@ from biothings.tests.web import BiothingsDataTest
 
 
 class TestAnnotationGET(BiothingsDataTest):
-    host = "mygene.info"
+    host = "localhost:8000"
     prefix = "v3"
 
     def test_101(self):
@@ -180,11 +180,11 @@ class TestAnnotationGET(BiothingsDataTest):
     def test_113(self):
         self.request("gene/", expect=400)
 
-    @pytest.mark.xfail(
-        reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
-        run=True,
-        strict=True,
-    )
+    # @pytest.mark.xfail(
+    #     reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
+    #     run=True,
+    #     strict=True,
+    # )
     def test_114(self):
         """
         Tests the annotation endpoint support for the biolink CURIE ID.
@@ -201,6 +201,16 @@ class TestAnnotationGET(BiothingsDataTest):
             ("1017", "entrezgene:1017", "NCBIGENE:1017"),
             ("1018", "ensembl.gene:ENSG00000250506", "ENSEMBL:ENSG00000250506"),
             (1018, "ensembl.gene:ENSG00000250506", "ensembl:ENSG00000250506"),
+            (
+                "ENSG00000250506",
+                "ensembl.gene:ENSG00000250506",
+                "ENSEMBL:ENSG00000250506",
+            ),
+            (
+                "ensg00000250506",
+                "ensembl.gene:ENSG00000250506",
+                "ENSEMBL:ENSG00000250506",
+            ),
             ("5995", "uniprot.Swiss-Prot:P47804", "UniProtKB:P47804"),
             (5995, "uniprot.Swiss-Prot:P47804", "UNIPROTKB:P47804"),
             ("5995", "uniprot.Swiss-Prot:P47804", "uniprotkb:P47804"),
@@ -250,9 +260,29 @@ class TestAnnotationGET(BiothingsDataTest):
 
         assert all(results_validation), "\n".join(failure_messages)
 
+    def test_115(self):
+        """
+        Tests the annotation endpoint support for the biolink CURIE ID.
+
+        Invalid query evaluating we still return properly return a missing document result
+        """
+        invalid_query = "tree:293484"
+        expected_invalid_status_code = 404
+        endpoint = "gene"
+        invalid_query_result = self.request(
+            f"{endpoint}/{invalid_query}", expect=expected_invalid_status_code
+        )
+        assert isinstance(invalid_query_result, requests.models.Response)
+        assert invalid_query_result.url == self.get_url(
+            path=f"{endpoint}/{invalid_query}"
+        )
+
+        expected_json_response = {"code": 404, "success": False, "error": "Not Found."}
+        assert invalid_query_result.json() == expected_json_response
+
 
 class TestAnnotationPOST(BiothingsDataTest):
-    host = "mygene.info"
+    host = "localhost:8000"
     prefix = "v3"
 
     def test_151(self):
