@@ -5,7 +5,7 @@ from biothings.tests.web import BiothingsDataTest
 
 
 class TestAnnotationGET(BiothingsDataTest):
-    host = "localhost:8000"
+    host = "mygene.info"
     prefix = "v3"
 
     def test_101(self):
@@ -282,7 +282,7 @@ class TestAnnotationGET(BiothingsDataTest):
 
 
 class TestAnnotationPOST(BiothingsDataTest):
-    host = "localhost:8000"
+    host = "mygene.info"
     prefix = "v3"
 
     def test_151(self):
@@ -392,6 +392,16 @@ class TestAnnotationPOST(BiothingsDataTest):
             ("1017", "entrezgene:1017", "NCBIGENE:1017"),
             ("1018", "ensembl.gene:ENSG00000250506", "ENSEMBL:ENSG00000250506"),
             (1018, "ensembl.gene:ENSG00000250506", "ensembl:ENSG00000250506"),
+            (
+                "ENSG00000250506",
+                "ensembl.gene:ENSG00000250506",
+                "ENSEMBL:ENSG00000250506",
+            ),
+            (
+                "ensg00000250506",
+                "ensembl.gene:ENSG00000250506",
+                "ENSEMBL:ENSG00000250506",
+            ),
             ("5995", "uniprot.Swiss-Prot:P47804", "UniProtKB:P47804"),
             (5995, "uniprot.Swiss-Prot:P47804", "UNIPROTKB:P47804"),
             ("5995", "uniprot.Swiss-Prot:P47804", "uniprotkb:P47804"),
@@ -444,3 +454,30 @@ class TestAnnotationPOST(BiothingsDataTest):
 
         assert all(results_validation), "\n".join(failure_messages)
         assert all(results_validation), "\n".join(failure_messages)
+
+    def test_157(self):
+        """
+        Tests the annotation endpoint support for the biolink CURIE ID.
+
+        Invalid query evaluating we still return properly return a missing document result
+        via the POST batch
+        """
+        invalid_queries = ["tree:293484", "branch:844"]
+        expected_invalid_status_code = 400
+        endpoint = "gene"
+
+        delimiter = ","
+        data_mapping = {
+            "ids": delimiter.join([f'"{query}"' for query in invalid_queries])
+        }
+
+        invalid_query_results = self.request(
+            endpoint, expect=expected_invalid_status_code, data=data_mapping
+        ).json()
+        expected_batch_json_response = {
+            "code": 400,
+            "success": False,
+            "error": "Bad Request",
+            "missing": "id",
+        }
+        assert invalid_query_results == expected_batch_json_response
