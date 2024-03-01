@@ -180,11 +180,11 @@ class TestAnnotationGET(BiothingsDataTest):
     def test_113(self):
         self.request("gene/", expect=400)
 
-    # @pytest.mark.xfail(
-    #     reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
-    #     run=True,
-    #     strict=True,
-    # )
+    @pytest.mark.xfail(
+        reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
+        run=True,
+        strict=True,
+    )
     def test_114(self):
         """
         Tests the annotation endpoint support for the biolink CURIE ID.
