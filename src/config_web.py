@@ -3,10 +3,10 @@
     https://mygene.info/v3/
 """
 
-import re
 import copy
+import re
 
-from biothings.web.settings.default import APP_LIST, ANNOTATION_KWARGS, QUERY_KWARGS
+from biothings.web.settings.default import ANNOTATION_KWARGS, APP_LIST, QUERY_KWARGS
 
 # *****************************************************************************
 # Elasticsearch Settings
@@ -180,8 +180,7 @@ for (
 
 # This essentially bypasses the es.get fallback as in myvariant ...
 # The first regex matched integers, in which case the query becomes against
-# entrezgeneall annotation queries are now multimatch against the following
-# fields
+# entrezgeneall annotation queries multimatch against the following fields
 fallback_pattern = (re.compile(r"^\d+$"), ["entrezgene", "retired"])
 
 ANNOTATION_ID_REGEX_LIST = [
@@ -197,3 +196,6 @@ DOCS_STATIC_PATH = "docs/_build/html"
 
 # url template to redirect for 'include_tax_tree' parameter
 INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = "http://t.biothings.io/v1/taxon"
+
+# for running tests locally in our biothings client
+PYTEST_PATH = "tests/data_tests"
