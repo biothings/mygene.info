@@ -176,4 +176,4 @@ DOCS_STATIC_PATH = "docs/_build/html"
 INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = "http://t.biothings.io/v1/taxon"
 
 # for running tests locally in our biothings client
-PYTEST_PATH = "tests/data_tests"
+PYTEST_PATH = "/opt/home/mygene/mygene.info/src/tests/data_tests"
