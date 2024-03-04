@@ -286,7 +286,7 @@ class TestAnnotationGET(BiothingsDataTest):
 
         Evaluates the multimatch capabilities:
         [Results validated as of 03/04/2024]
-        - (homologene.id:74409) which should return 20 documents
+        - (homologene.id:74409) which should return 21 documents
         - (interpro.id:IPR000719) which should return over 1000 documents yielding a 500 error
         """
         valid_multimatch_query = "homologene.id:74409"
