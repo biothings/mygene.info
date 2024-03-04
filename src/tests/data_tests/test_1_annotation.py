@@ -280,6 +280,50 @@ class TestAnnotationGET(BiothingsDataTest):
         expected_json_response = {"code": 404, "success": False, "error": "Not Found."}
         assert invalid_query_result.json() == expected_json_response
 
+    def test_116(self):
+        """
+        Tests the annotation endpoint support for the biolink CURIE ID.
+
+        Evaluates the multimatch capabilities:
+        [Results validated as of 03/04/2024]
+        - (homologene.id:74409) which should return 20 documents
+        - (interpro.id:IPR000719) which should return over 1000 documents yielding a 500 error
+        """
+        valid_multimatch_query = "homologene.id:74409"
+        expected_multimatch_status_code = 200
+        endpoint = "gene"
+        multimatch_query_result = self.request(
+            f"{endpoint}/{valid_multimatch_query}",
+            expect=expected_multimatch_status_code,
+        )
+        assert isinstance(multimatch_query_result, requests.models.Response)
+        assert multimatch_query_result.url == self.get_url(
+            path=f"{endpoint}/{valid_multimatch_query}"
+        )
+
+        assert len(multimatch_query_result.json()) == 21
+
+        invalid_multimatch_query = "interpro.id:IPR000719"
+        expected_multimatch_status_code = 500
+        endpoint = "gene"
+        invalid_multimatch_query_result = self.request(
+            f"{endpoint}/{invalid_multimatch_query}",
+            expect=expected_multimatch_status_code,
+        )
+        assert isinstance(invalid_multimatch_query_result, requests.models.Response)
+        assert invalid_multimatch_query_result.url == self.get_url(
+            path=f"{endpoint}/{invalid_multimatch_query}"
+        )
+
+        expected_massive_multimatch_result = {
+            "code": 500,
+            "success": False,
+            "error": "Too Many Matches.",
+        }
+        assert (
+            invalid_multimatch_query_result.json() == expected_massive_multimatch_result
+        )
+
 
 class TestAnnotationPOST(BiothingsDataTest):
     host = "mygene.info"
