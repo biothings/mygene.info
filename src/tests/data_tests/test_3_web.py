@@ -1,3 +1,4 @@
+import pytest
 from biothings.tests.web import BiothingsDataTest
 
 
@@ -5,15 +6,19 @@ class TestMygeneWeb(BiothingsDataTest):
     host = "mygene.info"
     prefix = "v3"
 
+    @pytest.mark.production
     def test_301_status(self):
         self.request("/status")
 
+    @pytest.mark.production
     def test_302_status(self):
         self.request("/status", method="HEAD")
 
+    @pytest.mark.production
     def test_311_static(self):
         self.request("/favicon.ico")
 
+    @pytest.mark.production
     def test_312_static(self):
         self.request("/robots.txt")
 
