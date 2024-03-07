@@ -223,3 +223,8 @@ TAXONOMY = {
     "frog": {"tax_id": "8364", "assembly": "xenTro3"},
     "pig": {"tax_id": "9823", "assembly": "susScr2"}
 }
+
+# for running tests locally in our biothings hub with testing api
+APITEST_PATH = "/opt/home/mygene/mygene.info/src/tests/data_tests"
+
+APITEST_CONFIG = "config_web_local"
