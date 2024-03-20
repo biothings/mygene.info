@@ -11,7 +11,7 @@ from biothings.web.settings.default import ANNOTATION_KWARGS, APP_LIST, QUERY_KW
 # *****************************************************************************
 # Elasticsearch Settings
 # *****************************************************************************
-ES_HOST = "localhost:9200"
+ES_HOST = "http://localhost:9200"
 ES_INDEX = "mygene_current"
 ES_DOC_TYPE = "gene"
 
