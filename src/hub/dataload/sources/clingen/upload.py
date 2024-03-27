@@ -23,7 +23,7 @@ class ClingenUploader(biothings.hub.dataload.uploader.BaseSourceUploader):
         }
     }
     idconverter = None
-    storage_class = biothings.hub.dataload.storage.IgnoreDuplicatedStorage
+    storage_class = biothings.utils.storage.IgnoreDuplicatedStorage
 
     def load_data(self, data_folder):
         self.logger.info("Load data from directory: '%s'" % data_folder)
