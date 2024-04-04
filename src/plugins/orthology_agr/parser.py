@@ -21,16 +21,23 @@ def setup_release(self):
 
 def convert_score(score):
     """
-        Converts the isbestscore and isbestrevscore 
-        from a string to boolean. 
-        score: "Yes" or "No" string 
+    Converts the isbestscore and isbestrevscore 
+    from a string to boolean. 
+    score: "Yes" or "No" string 
     """
-    if score=="Yes":
-        return True;
-    else:
-        return False;
+    return score == "Yes"
+
 
 def adjust_gene_ids(gene_id_list):
+    """
+    Adjusts gene IDs in the given list by replacing specified prefixes with their corresponding replacements.
+
+    Args:
+        gene_id_list (list): List of gene IDs to be adjusted.
+
+    Returns:
+        list: Adjusted list of gene IDs.
+    """
     # Adjust prefixes directly in the list
     adjustments = {
         "WB:": "WormBase:",
@@ -43,11 +50,22 @@ def adjust_gene_ids(gene_id_list):
             if gene_id.startswith(prefix):
                 gene_id_list[i] = gene_id.replace(prefix, replacement)
                 break
-    
+
     return gene_id_list
 
 
 def get_gene_cache(unique_gene_ids, gene_client, batch_size=1000):
+    """
+    Builds a cache of gene IDs using gene client queries.
+
+    Args:
+        unique_gene_ids (set): Set of unique gene IDs.
+        gene_client: Client for querying gene information.
+        batch_size (int): Batch size for querying gene IDs.
+
+    Returns:
+        dict: A dictionary containing gene IDs as keys and their corresponding Entrez IDs as values.
+    """
     gene_id_cache = {}
     first_pass_fail_ct = 0
     error_ids = []
@@ -94,9 +112,7 @@ def get_gene_cache(unique_gene_ids, gene_client, batch_size=1000):
                         logging.error(f"Error in second pass query for {query_id}: {e}")
                 else:
                     # Process found queries
-                    # original_gene_id = result.get('_id')
                     entrez_id = result.get('entrezgene')
-                    # if original_gene_id and entrez_id:
                     if entrez_id:
                         gene_id_cache[query_id] = entrez_id
                     else:
@@ -110,8 +126,17 @@ def get_gene_cache(unique_gene_ids, gene_client, batch_size=1000):
 
     return gene_id_cache
 
-def load_orthology(data_folder):
-    """Main method for parsing ortholog data from AGR."""
+def load_orthology(data_folder): #, sample_limit=100):
+    """
+    Main method for parsing ortholog data from AGR.
+
+    Args:
+        data_folder (str): Path to the folder containing the ortholog data file.
+        sample_limit (int): Maximum number of samples to process (default is 100). **only used for testing**
+
+    Returns:
+        list: List of ortholog records.
+    """
     start_time = time.time()
 
     infile = os.path.join(data_folder, "ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz")
@@ -123,12 +148,11 @@ def load_orthology(data_folder):
 
     # Collect unique gene IDs
     line_count = 0
-    for line in dl.tabfile_feeder(infile, header=1, sep="\t"):
+    for line in dl.tabfile_feeder(infile, header=16, sep="\t"):
         # if sample_limit and line_count >= sample_limit:
         #     break
-        if len(line) >= 5:
-            unique_gene_ids.update([line[0], line[4]])
-            line_count += 1
+        unique_gene_ids.update([line[0], line[4]])
+        line_count += 1
 
     # Fetch gene IDs in parallel -- use batch with querymany
     gene_id_cache = get_gene_cache(unique_gene_ids, gene_client)
@@ -136,11 +160,9 @@ def load_orthology(data_folder):
     # Construct records using fetched gene IDs
     records = {}
     line_count = 0
-    for line in dl.tabfile_feeder(infile, header=1, sep="\t"):
+    for line in dl.tabfile_feeder(infile, header=16, sep="\t"):
         # if sample_limit and line_count >= sample_limit:
         #     break
-        if len(line) < 5:
-            continue
         gene_id, ortholog_id = gene_id_cache.get(line[0]), gene_id_cache.get(line[4])
         if gene_id and ortholog_id:
             # Create a record if gene_id not in records, or append ortholog if gene_id already exists
