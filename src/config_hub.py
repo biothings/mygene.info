@@ -32,19 +32,19 @@ INDEX_CONFIG = {
         None: "hub.dataindex.indexer.GeneIndexer",
     },
     "env": {
-        "prod": {
-            "host": "http://<PRODSERVER>:9200",
-            "indexer": {
-                "args": {
-                    "timeout": 300,
-                    "retry_on_timeout": True,
-                    "max_retries": 10,
-                },
-            },
-            "index": [
-                {"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}
-            ],
-        },
+        # "prod": {
+        #     "host": "http://<PRODSERVER>:9200",
+        #     "indexer": {
+        #         "args": {
+        #             "timeout": 300,
+        #             "retry_on_timeout": True,
+        #             "max_retries": 10,
+        #         },
+        #     },
+        #     "index": [
+        #         {"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}
+        #     ],
+        # },
         "local": {
             "host": "http://localhost:9200",
             "indexer": {
