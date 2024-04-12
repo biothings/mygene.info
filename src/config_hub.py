@@ -33,7 +33,7 @@ INDEX_CONFIG = {
     },
     "env": {
         "prod": {
-            "host": "<PRODSERVER>:9200",
+            "host": "http://<PRODSERVER>:9200",
             "indexer": {
                 "args": {
                     "timeout": 300,
