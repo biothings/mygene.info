@@ -119,15 +119,18 @@ def get_download_url():
     res.raise_for_status()
     html = bs4.BeautifulSoup(res.text, "lxml")
     # Get the table of metathesaurus release files
-    table = html.find("table", attrs={"class": "mb-4"})
+    table = html.find(
+        "table", attrs={"class": "usa-table border-base-lighter margin-bottom-4"}
+    )
     rows = table.find_all("tr")
     # The header of the first column should be 'Release'
     assert (
-        rows[0].find_all("th")[0].text == "Release"
+        rows[0].find_all("th")[0].text.strip() == "Release"
     ), "Could not parse url from html table."
     try:
         # Get the url from the link
-        url = rows[1].find_all("td")[0].a["href"]
+        url = rows[2].find_all("td")[0].a["href"]
+        logger.info(f"Found UMLS download url: {url}")
         # Create the url using the api aky
         url = f"https://uts-ws.nlm.nih.gov/download?url={url}&apiKey={UMLS_API_KEY}"
         return url
@@ -165,6 +168,9 @@ def load_data(data_folder):
             os.path.join(data_folder, "*metathesaurus-release.zip")
         )[0]
     file_list = zipfile.ZipFile(metathesaurus_file, mode="r").namelist()
+    logger.info(
+        "Found the following files in the metathesaurus file: {}".format(file_list)
+    )
     try:
         mrsty_path = [f for f in file_list if f.endswith("MRSTY.RRF")][0]
     except IndexError:
