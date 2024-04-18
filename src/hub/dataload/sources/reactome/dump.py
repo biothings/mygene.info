@@ -1,13 +1,19 @@
+import datetime
+import os
+import sys
+import time
 
+import biothings
+import requests
 
-import os, sys, time, datetime
+import config
 
-import biothings, config
 biothings.config_for_app(config)
 
-from config import DATA_ARCHIVE_ROOT
 from biothings.hub.dataload.dumper import LastModifiedHTTPDumper
 from biothings.utils.common import unzipall
+
+from config import DATA_ARCHIVE_ROOT
 
 
 class ReactomeDumper(LastModifiedHTTPDumper):
@@ -18,3 +24,8 @@ class ReactomeDumper(LastModifiedHTTPDumper):
     SRC_URLS = ["https://reactome.org/download/current/NCBI2Reactome_All_Levels.txt"]
     SCHEDULE = "0 6 * * *"
 
+
+def set_release(self):
+    self.release = requests.get(
+        "https://reactome.org/ContentService/data/database/version"
+    ).json()
