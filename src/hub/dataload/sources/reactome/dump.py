@@ -24,8 +24,9 @@ class ReactomeDumper(LastModifiedHTTPDumper):
     SRC_URLS = ["https://reactome.org/download/current/NCBI2Reactome_All_Levels.txt"]
     SCHEDULE = "0 6 * * *"
 
-
-def set_release(self):
-    self.release = requests.get(
-        "https://reactome.org/ContentService/data/database/version"
-    ).json()
+    def set_release(self):
+        self.release = str(
+            requests.get(
+                "https://reactome.org/ContentService/data/database/version"
+            ).json()
+        )
