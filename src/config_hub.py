@@ -4,13 +4,13 @@
 
 # Refer to biothings.hub.default_config for all configurable settings
 
-DATA_SRC_SERVER = 'localhost'
+DATA_SRC_SERVER = "localhost"
 DATA_SRC_PORT = 27017
-DATA_SRC_DATABASE = 'mygene_src'
+DATA_SRC_DATABASE = "mygene_src"
 
-DATA_TARGET_SERVER = 'localhost'
+DATA_TARGET_SERVER = "localhost"
 DATA_TARGET_PORT = 27017
-DATA_TARGET_DATABASE = 'mygene'
+DATA_TARGET_DATABASE = "mygene"
 
 HUB_DB_BACKEND = {
     "module": "biothings.utils.mongo",
@@ -33,7 +33,7 @@ INDEX_CONFIG = {
     },
     "env": {
         "prod": {
-            "host": "<PRODSERVER>:9200",
+            "host": "http://<PRODSERVER>:9200",
             "indexer": {
                 "args": {
                     "timeout": 300,
@@ -41,10 +41,12 @@ INDEX_CONFIG = {
                     "max_retries": 10,
                 },
             },
-            "index": [{"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}]
+            "index": [
+                {"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}
+            ],
         },
         "local": {
-            "host": "localhost:9200",
+            "host": "http://localhost:9200",
             "indexer": {
                 "args": {
                     "timeout": 300,
@@ -52,7 +54,7 @@ INDEX_CONFIG = {
                     "max_retries": 10,
                 },
             },
-            "index": [{"index": "mygene_gene_allspecies_current", "doc_type": "gene"}]
+            "index": [{"index": "mygene_gene_allspecies_current", "doc_type": "gene"}],
         },
     },
 }
@@ -71,9 +73,9 @@ SNAPSHOT_CONFIG = {
                 "name": "gene_repository-$(Y)",
                 "type": "s3",
                 "settings": {
-                        "bucket": "<SNAPSHOT_BUCKET_NAME>",
-                        "base_path": "mygene.info/$(Y)",  # per year
-                        "region": "us-west-2",
+                    "bucket": "<SNAPSHOT_BUCKET_NAME>",
+                    "base_path": "mygene.info/$(Y)",  # per year
+                    "region": "us-west-2",
                 },
                 "acl": "private",
             },
@@ -95,9 +97,9 @@ SNAPSHOT_CONFIG = {
                 "name": "gene_repository-demo-$(Y)",
                 "type": "s3",
                 "settings": {
-                        "bucket": "<SNAPSHOT_DEMO_BUCKET_NAME>",
-                        "base_path": "mygene.info/$(Y)",  # per year
-                        "region": "us-west-2",
+                    "bucket": "<SNAPSHOT_DEMO_BUCKET_NAME>",
+                    "base_path": "mygene.info/$(Y)",  # per year
+                    "region": "us-west-2",
                 },
                 "acl": "public",
             },
@@ -108,7 +110,7 @@ SNAPSHOT_CONFIG = {
             # when creating a snapshot, how long should we wait before querying ES
             # to check snapshot status/completion ? (in seconds)
             "monitor_delay": 10,
-        }
+        },
     }
 }
 
@@ -153,7 +155,7 @@ RELEASE_CONFIG = {
                 "region": "us-west-2",
                 "auto": True,  # automatically generate diff ? Careful if lots of changes
             },
-        }
+        },
     }
 }
 
@@ -164,38 +166,38 @@ STANDALONE_VERSION = {"branch": "standalone_v3"}
 # Autohub configuration, either from a static definition...
 STANDALONE_CONFIG = {
     "_default": {
-        "es_host": "localhost:9200",
+        "es_host": "http://localhost:9200",
         "index": "mygene_test",
-        "doc_type": "gene"
+        "doc_type": "gene",
     },
     "mygene.info": {
         "es_host": "prodserver:9200",
         "index": "mygene_prod",
-        "doc_type": "gene"
+        "doc_type": "gene",
     },
 }
 # ... or using a dynamic indexer factory and ES host (index names are then
 # taken from VERSION_URLS and all are managed on one given ES host)
-#AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
-#AUTOHUB_ES_HOST = "localhost:9200"
+# AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
+# AUTOHUB_ES_HOST = "localhost:9200"
 
 # Autohub configuration, either from a static definition...
 STANDALONE_CONFIG = {
     "_default": {
-        "es_host": "localhost:9200",
+        "es_host": "http:/localhost:9200",
         "index": "mygene_test",
-        "doc_type": "gene"
+        "doc_type": "gene",
     },
     "mygene.info": {
         "es_host": "prodserver:9200",
         "index": "mygene_prod",
-        "doc_type": "gene"
+        "doc_type": "gene",
     },
 }
 # ... or using a dynamic indexer factory and ES host (index names are then
 # taken from VERSION_URLS and all are managed on one given ES host)
-#AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
-#AUTOHUB_ES_HOST = "localhost:9200"
+# AUTOHUB_INDEXER_FACTORY = "biothings.hub.dataindex.indexer.DynamicIndexerFactory"
+# AUTOHUB_ES_HOST = "localhost:9200"
 
 
 ########################################
@@ -221,5 +223,10 @@ TAXONOMY = {
     "zebrafish": {"tax_id": "7955", "assembly": "zv9"},
     "thale-cress": {"tax_id": "3702"},
     "frog": {"tax_id": "8364", "assembly": "xenTro3"},
-    "pig": {"tax_id": "9823", "assembly": "susScr2"}
+    "pig": {"tax_id": "9823", "assembly": "susScr2"},
 }
+
+# for running tests locally in our biothings hub with testing api
+APITEST_PATH = "data_tests"
+
+APITEST_CONFIG = "config_web_local"

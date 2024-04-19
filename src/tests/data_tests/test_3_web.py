@@ -1,3 +1,4 @@
+import pytest
 from biothings.tests.web import BiothingsDataTest
 
 
@@ -5,15 +6,19 @@ class TestMygeneWeb(BiothingsDataTest):
     host = "mygene.info"
     prefix = "v3"
 
+    @pytest.mark.production
     def test_301_status(self):
         self.request("/status")
 
+    @pytest.mark.production
     def test_302_status(self):
         self.request("/status", method="HEAD")
 
+    @pytest.mark.production
     def test_311_static(self):
         self.request("/favicon.ico")
 
+    @pytest.mark.production
     def test_312_static(self):
         self.request("/robots.txt")
 
@@ -47,6 +52,43 @@ class TestMygeneWeb(BiothingsDataTest):
         assert "software" in debug.keys()
         nodebug = self.request("metadata?dev=0").json()
         assert "software" not in nodebug.keys()
+
+    def test_324_metadata(self):
+        sources = [
+            "entrez",
+            "cpdb",
+            "pharos",
+            "homologene",
+            "clingen",
+            "pharmgkb",
+            "ensembl",
+            "entrez_unigene",
+            "ensembl_protists",
+            "uniprot_ipi",
+            "reagent",
+            "uniprot_pir",
+            "ensembl_genomic_pos_mm9",
+            "ensembl_fungi",
+            "wikipedia",
+            "reactome",
+            "generif",
+            "ensembl_genomic_pos_hg19",
+            "ensembl_plant",
+            "ensembl_metazoa",
+            "ucsc",
+            "umls",
+            "reporter",
+            "refseq",
+            "uniprot_pdb",
+            "pantherdb",
+            "exac",
+            "uniprot",
+        ]
+        res = self.request("metadata").json()
+        for source in sources:
+            assert source in res["src"].keys(), (
+                "source %s not found in metadata" % source
+            )
 
     def test_331_taxonomy(self):
         res = self.request("species/1239").json()

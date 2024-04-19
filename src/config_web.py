@@ -11,7 +11,7 @@ from biothings.web.settings.default import ANNOTATION_KWARGS, APP_LIST, QUERY_KW
 # *****************************************************************************
 # Elasticsearch Settings
 # *****************************************************************************
-ES_HOST = "localhost:9200"
+ES_HOST = "http://localhost:9200"
 ES_INDEX = "mygene_current"
 ES_DOC_TYPE = "gene"
 
@@ -196,6 +196,3 @@ DOCS_STATIC_PATH = "docs/_build/html"
 
 # url template to redirect for 'include_tax_tree' parameter
 INCLUDE_TAX_TREE_REDIRECT_ENDPOINT = "http://t.biothings.io/v1/taxon"
-
-# for running tests locally in our biothings client
-PYTEST_PATH = "tests/data_tests"

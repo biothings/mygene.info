@@ -81,15 +81,15 @@ class TestControlKeywords(BiothingsDataTest):
         # query service
         # default dotfield=0
         rdefault = self.request(
-            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&size=3"
+            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&size=3&sort=_seq_no"
         ).json()
         # force no dotfield
         rfalse = self.request(
-            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&dotfield=false&size=3"
+            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&dotfield=false&size=3&sort=_seq_no"
         ).json()
         # force dotfield
         rtrue = self.request(
-            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&dotfield=true&size=3"
+            "query?q=ccnk%20AND%20_exists_:refseq.rna&fields=refseq.rna&dotfield=true&size=3&sort=_seq_no"
         ).json()
         # check defaults and bool params
         # TODO: put this in json_ok as post-process filter ?
@@ -106,9 +106,13 @@ class TestControlKeywords(BiothingsDataTest):
 
     def test_532_dotfield(self):
         # /gene service
-        rdefault = self.request("gene/1017?filter=symbol,go.MF").json()
-        rtrue = self.request("gene/1017?filter=symbol,go.MF&dotfield=true").json()
-        rfalse = self.request("gene/1017?filter=symbol,go.MF&dotfield=false").json()
+        rdefault = self.request("gene/1017?filter=symbol,go.MF&sort=_seq_no").json()
+        rtrue = self.request(
+            "gene/1017?filter=symbol,go.MF&dotfield=true&sort=_seq_no"
+        ).json()
+        rfalse = self.request(
+            "gene/1017?filter=symbol,go.MF&dotfield=false&sort=_seq_no"
+        ).json()
         # sharding makes scoring slightly variable
         rdefault.pop("_version")
         rfalse.pop("_version")
