@@ -162,10 +162,32 @@ AVAILABLE_FIELDS_EXCLUDED = ["all", "accession_agg", "refseq_agg"]
 # kwargs for status check
 STATUS_CHECK = {"id": "1017", "index": "mygene_current"}
 
-# This essentially bypasses the es.get fallback as in myvariant...
+# CURIE ID support based on BioLink Model
+BIOLINK_MODEL_PREFIX_BIOTHINGS_GENE_MAPPING = {
+    "NCBIGene": {"type": "gene", "field": ["entrezgene", "retired"]},
+    "ENSEMBL": {"type": "gene", "field": "ensembl.gene"},
+    "UniProtKB": {"type": "gene", "field": "uniprot.Swiss-Prot"},
+}
+biolink_curie_regex_list = []
+for (
+    biolink_prefix,
+    mapping,
+) in BIOLINK_MODEL_PREFIX_BIOTHINGS_GENE_MAPPING.items():
+    expression = re.compile(rf"({biolink_prefix}):(?P<term>[^:]+)", re.I)
+    field_match = mapping["field"]
+    pattern = (expression, field_match)
+    biolink_curie_regex_list.append(pattern)
+
+# This essentially bypasses the es.get fallback as in myvariant ...
 # The first regex matched integers, in which case the query becomes against
-# entrezgeneall annotation queries are now multimatch against the following fields
-ANNOTATION_ID_REGEX_LIST = [(re.compile(r"^\d+$"), ["entrezgene", "retired"])]
+# entrezgeneall annotation queries multimatch against the following fields
+fallback_pattern = (re.compile(r"^\d+$"), ["entrezgene", "retired"])
+
+ANNOTATION_ID_REGEX_LIST = [
+    *biolink_curie_regex_list,
+    fallback_pattern,
+]
+
 ANNOTATION_DEFAULT_SCOPES = ["_id", "entrezgene", "ensembl.gene", "retired"]
 
 # for docs
