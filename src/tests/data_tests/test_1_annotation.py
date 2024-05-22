@@ -1,6 +1,5 @@
 import pytest
 import requests
-
 from biothings.tests.web import BiothingsDataTest
 
 
@@ -180,11 +179,6 @@ class TestAnnotationGET(BiothingsDataTest):
     def test_113(self):
         self.request("gene/", expect=400)
 
-    @pytest.mark.xfail(
-        reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
-        run=True,
-        strict=True,
-    )
     def test_114(self):
         """
         Tests the annotation endpoint support for the biolink CURIE ID.
@@ -412,11 +406,6 @@ class TestAnnotationPOST(BiothingsDataTest):
         res = self.request("gene", method="POST", data={"ids": "791256"}).json()
         assert res[0]["_id"] == "50846"  # this is the corresponding _id field
 
-    @pytest.mark.xfail(
-        reason="CURIE ID SUPPORT NOT CURRENTLY ENABLED ON MYGENE.INFO HOST",
-        run=True,
-        strict=True,
-    )
     def test_156(self):
         """
         Tests the annotations endpoint support for the biolink CURIE ID.
