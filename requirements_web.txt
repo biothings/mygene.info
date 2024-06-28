@@ -3,4 +3,4 @@
 
 # biothings[web_extra]==0.12.4
 # Fixes from 0.12.x up to 2024-06-14 (include notifiers fix)
-git+https://github.com/biothings/biothings.api@f33525e0c5b90c41db82c799e2a923ea5e976049#egg=biothings[web_extra]
+git+https://github.com/biothings/biothings.api@c1f8438a325647fb0f20db1e01589315a5379e1f#egg=biothings[web_extra]
