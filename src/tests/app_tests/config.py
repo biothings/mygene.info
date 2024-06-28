@@ -36,5 +36,5 @@ _sys.path.insert(0, _os.path.dirname(_cfg_path))
 del CONFIG_FILE_NAME
 
 # override default
-ES_HOST = 'localhost:9200'
+ES_HOST = 'http://localhost:9200'
 ES_INDEX = 'mygene_test'
