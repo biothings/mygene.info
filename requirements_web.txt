@@ -1,4 +1,6 @@
 # Use this instead to test the latest fixes on 0.12.x branch before official release
 # git+https://github.com/biothings/biothings.api@0.12.x#egg=biothings[web_extra]
 
-biothings[web_extra]==0.12.4
+# biothings[web_extra]==0.12.4
+# Fixes from 0.12.x up to 2024-06-14 (include notifiers fix)
+git+https://github.com/biothings/biothings.api@639302ace2f9dd90c8a9de57aa16c5a0d4beac27#egg=biothings[web_extra]
