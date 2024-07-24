@@ -11,6 +11,7 @@ for field in [
     "hgnc",
     "rgd",
     "tair",
+    "wormbase",
     "zfin",
     "sgd",
     "flybase",
@@ -45,7 +46,7 @@ graph_mygene.add_edge(
     "entrez", "entrez", object=MongoDBEdge("entrez_gene", lookup="_id", field="_id")
 )
 
-for field in ["MGI", "HGNC", "RGD", "TAIR", "ZFIN", "SGD", "FLYBASE"]:
+for field in ["MGI", "HGNC", "RGD", "TAIR", "WormBase", "ZFIN", "SGD", "FLYBASE"]:
     graph_mygene.add_edge(
         field.lower(),
         "entrez",
