@@ -1,3 +1,4 @@
+import pytest
 from biothings.tests.web import BiothingsDataTest
 
 
@@ -44,6 +45,7 @@ class TestSpecialInput(BiothingsDataTest):
         # case-insensitive sources
         self.query(q="mirbase:MI0017267")
 
+    @pytest.mark.skip("Deprecated now integrated into AllianceGenome")
     def test_412_case_sensitivity(self):
         self.query(q="wormbase:WBGene00019362", species=6239)
 

@@ -80,7 +80,7 @@ DATASOURCE_TRANSLATIONS = {
     "ratmap:": r"RATMAP:",
     "rgd:": r"RGD:",
     "flybase:": r"FLYBASE:",
-    "wormbase:": r"WormBase:",
+    # "wormbase:": r"WormBase:", # deprecated for alliancegenome
     "tair:": r"TAIR:",
     "zfin:": r"ZFIN:",
     "sgd:": r"SGD:",

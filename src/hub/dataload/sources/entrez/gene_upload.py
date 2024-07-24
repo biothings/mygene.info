@@ -1,7 +1,7 @@
-from .parser import GeneInfoParser
-from .parser import get_geneid_d
 import biothings.hub.dataload.uploader as uploader
 from biothings.utils.common import dump2gridfs
+
+from .parser import GeneInfoParser, get_geneid_d
 
 
 class EntrezGeneUploader(uploader.MergerSourceUploader):
@@ -22,8 +22,16 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
     def post_update_data(self, *args, **kwargs):
         self.logger.info('Uploading "geneid_d" to GridFS...')
         geneid_d = self.get_geneid_d(load_cache=False, save_cache=False)
-        dump2gridfs(geneid_d, self.name + '__geneid_d.pyobj', self.db)
-        for field in ["MGI", "HGNC", "RGD", "TAIR", "WormBase", "ZFIN", "SGD", "FLYBASE"]:
+        dump2gridfs(geneid_d, self.name + "__geneid_d.pyobj", self.db)
+        for field in [
+            "MGI",
+            "HGNC",
+            "RGD",
+            "TAIR",
+            "ZFIN",
+            "SGD",
+            "FLYBASE",
+        ]:
             self.logger.info("Indexing '%s'" % field)
             self.collection.create_index(field, background=True)
 
@@ -33,105 +41,87 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
             "entrezgene": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer",
-                "copy_to": "all"
+                "copy_to": "all",
             },
-            "taxid": {
-                "type": "integer"
-            },
+            "taxid": {"type": "integer"},
             "alias": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer",
-                "copy_to": "all"
+                "copy_to": "all",
             },
-            "name": {
-                "type": "text",
-                "copy_to": "all"
-            },
-            "other_names": {
-                "type": "text",
-                "copy_to": "all"
-            },
+            "name": {"type": "text", "copy_to": "all"},
+            "other_names": {"type": "text", "copy_to": "all"},
             "symbol": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer",
-                "copy_to": "all"
+                "copy_to": "all",
             },
             "locus_tag": {
                 "type": "keyword",
                 "normalizer": "keyword_lowercase_normalizer",
-                "copy_to": "all"
+                "copy_to": "all",
             },
-
             # do not index map_location and type_of_gene
-            "map_location": {
-                "index": False,
-                "type": "text"
-            },
+            "map_location": {"index": False, "type": "text"},
             "type_of_gene": {
                 "normalizer": "keyword_lowercase_normalizer",
-                "type": "keyword"
+                "type": "keyword",
             },
-            "AnimalQTLdb": {
-                "index": False,
-                "type": "text"
-            },
-            "Vega": {
-                "index": False,
-                "type": "text"
-            },
-
+            "AnimalQTLdb": {"index": False, "type": "text"},
+            "Vega": {"index": False, "type": "text"},
             # convert index_name to lower-case, and excluded from "_all"
             "HGNC": {
-                "type": "keyword",              # 1771
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # 1771
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "HPRD": {
-                "type": "keyword",              # 00310
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # 00310
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "MIM": {
-                "type": "keyword",              # 116953
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # 116953
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "MGI": {
-                "type": "keyword",              # MGI:104772
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # MGI:104772
+                "normalizer": "keyword_lowercase_normalizer",
             },
-            "RATMAP": {
-                "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
-            },
+            "RATMAP": {"type": "keyword", "normalizer": "keyword_lowercase_normalizer"},
             "RGD": {
-                "type": "keyword",             # 70486
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # 70486
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "FLYBASE": {
-                "type": "keyword",            # FBgn0004107
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # FBgn0004107
+                "normalizer": "keyword_lowercase_normalizer",
             },
-            "WormBase": {
-                "type": "keyword",         # WBGene00000871
-                "normalizer": "keyword_lowercase_normalizer"
+            # "WormBase": {
+            #     "type": "keyword",         # WBGene00000871
+            #     "normalizer": "keyword_lowercase_normalizer"
+            # },
+            "AllianceGenome": {
+                "type": "keyword",  # WBGene00019362
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "TAIR": {
-                "type": "keyword",             # AT3G48750
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # AT3G48750
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "ZFIN": {
-                "type": "keyword",             # ZDB-GENE-040426-2741
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # ZDB-GENE-040426-2741
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "SGD": {
-                "type": "keyword",             # S000003566
-                "normalizer": "keyword_lowercase_normalizer"
+                "type": "keyword",  # S000003566
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "Xenbase": {
                 "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
+                "normalizer": "keyword_lowercase_normalizer",
             },
             "miRBase": {
                 "type": "keyword",
-                "normalizer": "keyword_lowercase_normalizer"
+                "normalizer": "keyword_lowercase_normalizer",
             },
         }
         return mapping
