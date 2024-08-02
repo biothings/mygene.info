@@ -181,6 +181,11 @@ class TestQueryGET(BiothingsDataTest):
         assert (10116, 367901) in genes  # rat
         assert (695, 9606) not in genes  # this field should not be sorted
 
+    def test_261_order(self):
+        res = self.request("query?q=CTNNA2&species=human").json()
+        assert res["hits"][0]["_id"] == "1496"
+        assert res["hits"][0]["symbol"] == "CTNNA2"
+
 
 class TestQueryPOST(BiothingsDataTest):
     host = "mygene.info"
