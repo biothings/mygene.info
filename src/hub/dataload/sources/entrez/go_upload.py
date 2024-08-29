@@ -1,5 +1,7 @@
-from .parser import Gene2GOParser
 import biothings.hub.dataload.uploader as uploader
+
+from .parser import Gene2GOParser
+
 
 class EntrezGOUploader(uploader.MergerSourceUploader):
 
@@ -26,22 +28,19 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                             },
                             "id": {
                                 "type": "keyword",
-                                "normalizer" : "keyword_lowercase_normalizer",
-                                'copy_to': ['all'],
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "copy_to": ["all"],
                             },
                             "evidence": {
-                                "type": "text",
-                                "index": False
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer",
                             },
-                            "pubmed": {
-                                "type": "long",
-                                "index": False
-                            },
+                            "pubmed": {"type": "long", "index": False},
                             "category": {
-                                "type": "text",
-                                "index": False
-                            }
-                        }
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer",
+                            },
+                        },
                     },
                     "CC": {
                         "dynamic": False,
@@ -51,22 +50,19 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                             },
                             "id": {
                                 "type": "keyword",
-                                "normalizer" : "keyword_lowercase_normalizer",
-                                'copy_to': ['all'],
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "copy_to": ["all"],
                             },
                             "evidence": {
-                                "type": "text",
-                                "index": False
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer",
                             },
-                            "pubmed": {
-                                "type": "long",
-                                "index": False
-                            },
+                            "pubmed": {"type": "long", "index": False},
                             "category": {
-                                "type": "text",
-                                "index": False
-                            }
-                        }
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer",
+                            },
+                        },
                     },
                     "BP": {
                         "dynamic": False,
@@ -76,24 +72,21 @@ class EntrezGOUploader(uploader.MergerSourceUploader):
                             },
                             "id": {
                                 "type": "keyword",
-                                "normalizer" : "keyword_lowercase_normalizer",
-                                'copy_to': ['all'],
+                                "normalizer": "keyword_lowercase_normalizer",
+                                "copy_to": ["all"],
                             },
                             "evidence": {
-                                "type": "text",
-                                "index": False
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer",
                             },
-                            "pubmed": {
-                                "type": "long",
-                                "index": False
-                            },
+                            "pubmed": {"type": "long", "index": False},
                             "category": {
-                                "type": "text",
-                                "index": False
-                            }
-                        }
-                    }
-                }
+                                "type": "keyword",
+                                "normalizer": "keyword_lowercase_normalizer",
+                            },
+                        },
+                    },
+                },
             }
         }
 
