@@ -1,4 +1,5 @@
 # Use this instead to test the latest fixes on 0.12.x branch before official release
-# git+https://github.com/biothings/biothings.api@0.12.x#egg=biothings[web_extra]
+# biothings@git+https://github.com/biothings/biothings.api@0.12.x#egg=biothings[web_extra]
+biothings@git+https://github.com/biothings/biothings.api@slack-messages-in-pytest
 
-biothings[web_extra]==0.12.5
+# biothings[web_extra]==0.12.5
