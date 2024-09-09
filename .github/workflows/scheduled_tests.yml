@@ -17,10 +17,10 @@ jobs:
       AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }} # AWS Default Region.
       AWS_S3_BUCKET: "biothings-codebuild" # The S3 bucket name for storing application metadata.
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # The Slack webhook URL for sending notifications.
-      SLACK_CHANNEL: "#observability-test" # The Slack channel where notifications will be posted.
+      SLACK_CHANNEL: "#logger---web" # The Slack channel where notifications will be posted.
       APPLICATION_NAME: "mygene.info" # The name of the application being tested. It will be displayed in the Slack message.
-      APPLICATION_METADATA_URL: "https://mygene.info/metadata" # Path to the application metadata, typically a URL.
-      APPLICATION_METADATA_FIELD: "build_date" # Notation to the build version field. Ex.: "metadata.build_version"
+      APPLICATION_METADATA_URL: "https://mygene.info/v3/metadata" # Path to the application metadata, typically a URL.
+      APPLICATION_METADATA_FIELD: "build_version" # Notation to the build version field. Ex.: "metadata.build_version"
 
     strategy:
       fail-fast: false
@@ -58,9 +58,3 @@ jobs:
         run: |
           source .venv/bin/activate
           python -m pytest src/tests/data_tests biothings_client.py/tests/gene.py -s -vv
-
-      # ### For debugging purposes in case of github action failure
-      # ### Reference:https://github.com/mxschmitt/action-tmate
-      # - name: Setup tmate debug session on failure
-      #   if: ${{ failure() }}
-      #   uses: mxschmitt/action-tmate@v3
