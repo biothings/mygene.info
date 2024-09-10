@@ -31,6 +31,7 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
             "ZFIN",
             "SGD",
             "FLYBASE",
+            "WormBase",
         ]:
             self.logger.info("Indexing '%s'" % field)
             self.collection.create_index(field, background=True)
@@ -95,10 +96,10 @@ class EntrezGeneUploader(uploader.MergerSourceUploader):
                 "type": "keyword",  # FBgn0004107
                 "normalizer": "keyword_lowercase_normalizer",
             },
-            # "WormBase": {
-            #     "type": "keyword",         # WBGene00000871
-            #     "normalizer": "keyword_lowercase_normalizer"
-            # },
+            "WormBase": {
+                "type": "keyword",  # WBGene00000871
+                "normalizer": "keyword_lowercase_normalizer",
+            },
             "AllianceGenome": {
                 "type": "keyword",  # WBGene00019362
                 "normalizer": "keyword_lowercase_normalizer",

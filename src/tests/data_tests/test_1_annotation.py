@@ -136,7 +136,7 @@ class TestAnnotationGET(BiothingsDataTest):
     def test_105(self):
         # this is not nematode, "taxid": 31234
         res = self.request("gene/171911").json()
-        assert "AllianceGenome" in res
+        assert "WormBase" in res
 
     def test_106(self):
         # fission yeast
