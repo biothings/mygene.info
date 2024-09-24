@@ -29,5 +29,5 @@ def load_data(input_file, tdl_file):
                 result[str(_id)].append(int(pharos_id))
         for k, v in result.items():
             if tdl := entrez_tdls.get(k):
-                json_doc = {"_id": str(k), "pharos": {"target_id": v}, "tdl": tdl}
+                json_doc = {"_id": str(k), "pharos": {"target_id": v, "tdl": tdl}}
                 yield unlist(json_doc)
