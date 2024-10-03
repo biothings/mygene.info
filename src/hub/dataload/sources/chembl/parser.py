@@ -33,5 +33,5 @@ def load_data(target_filepaths):
         with open(file) as f:
             content = f.read()
             json_data = json.loads(content)
-            parsed_data = parse_data(json_data)
-            return parsed_data
+            for data in parse_data(json_data):
+                yield data
