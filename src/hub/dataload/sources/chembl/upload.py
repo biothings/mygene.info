@@ -44,8 +44,8 @@ class ChemblUploader(uploader.BaseSourceUploader):
 
     keylookup = MyGeneKeyLookup(
         input_types=[
-            ("swissprot", "xrefs.accession"),
-            ("trembl", "xrefs.accession"),
+            ("swissprot", "chembl.uniprot_accession"),
+            ("trembl", "chembl.uniprot_accession"),
         ],
         skip_on_failure=True,
     )
