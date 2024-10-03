@@ -20,10 +20,10 @@ def parse_data(data):
                 uniprot_accessions.append(accession)
         if uniprot_accessions:
             output = {
-                "_id": item["target_chembl_id"],
+                "_id": uniprot_accessions[0],
                 "chembl_target": item["target_chembl_id"],
                 "xrefs": {
-                    "accession": uniprot_accessions,
+                    "accession": uniprot_accessions[0],
                 },
             }
             yield output
