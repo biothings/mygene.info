@@ -45,6 +45,7 @@ class ChemblUploader(uploader.BaseSourceUploader):
     keylookup = MyGeneKeyLookup(
         input_types=[
             ("swissprot", "chembl.xrefs.accession"),
+            ("trembl", "chembl.xrefs.accession"),
         ],
         skip_on_failure=True,
     )
@@ -54,7 +55,7 @@ class ChemblUploader(uploader.BaseSourceUploader):
             os.path.join(data_folder, self.TARGET_FILENAME_PATTERN)
         )
         # for doc in load_data(target_filepaths):
-        #     yield doc
+        #    yield doc
         return self.keylookup(load_data)(target_filepaths)
 
     @classmethod
