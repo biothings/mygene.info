@@ -26,9 +26,9 @@ class ChemblUploader(uploader.BaseSourceUploader):
         target_filepaths = glob.iglob(
             os.path.join(data_folder, self.TARGET_FILENAME_PATTERN)
         )
-        for doc in load_data(target_filepaths):
-            yield doc
-        # return self.keylookup(load_data(target_filepaths))
+        # for doc in load_data(target_filepaths):
+        #     yield doc
+        return self.keylookup(load_data(target_filepaths))
 
     @classmethod
     def get_mapping(klass):
