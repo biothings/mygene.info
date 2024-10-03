@@ -27,14 +27,6 @@ def parse_data(data):
                     },
                 }
                 yield output
-        # if uniprot_accessions:
-        #     output = {
-        #         "chembl": {
-        #             "chembl_target": item["target_chembl_id"],
-        #             "uniprot_accession": uniprot_accessions,
-        #         },
-        #     }
-        #     yield output
 
 
 def load_data(target_filepaths):
