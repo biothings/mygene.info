@@ -44,8 +44,8 @@ class ChemblUploader(uploader.BaseSourceUploader):
 
     keylookup = MyGeneKeyLookup(
         input_types=[
-            ("swissprot", "chembl.uniprot_accession"),
-            ("trembl", "chembl.uniprot_accession"),
+            ("swissprot", "chembl.uniprot_accessions"),
+            ("trembl", "chembl.uniprot_accessions"),
         ],
         skip_on_failure=True,
     )
@@ -65,7 +65,7 @@ class ChemblUploader(uploader.BaseSourceUploader):
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer",
                     },
-                    "uniprot_accession": {
+                    "uniprot_accessions": {
                         "type": "keyword",
                         "normalizer": "keyword_lowercase_normalizer",
                     },
