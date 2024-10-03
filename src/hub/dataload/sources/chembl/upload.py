@@ -16,7 +16,7 @@ class ChemblUploader(uploader.BaseSourceUploader):
     TARGET_FILENAME_PATTERN = "target.*.json"
 
     keylookup = MyGeneKeyLookup(
-        [
+        input_types=[
             ("swissprot", "chembl.xrefs.accession"),
         ],
         skip_on_failure=True,
