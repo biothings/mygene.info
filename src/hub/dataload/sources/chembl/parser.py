@@ -22,9 +22,9 @@ def parse_data(data):
             for uniprot_accession in uniprot_accessions:
                 output = {
                     "_id": uniprot_accession,
-                    "chembl_target": item["target_chembl_id"],
-                    "xrefs": {
-                        "accession": uniprot_accession,
+                    "chembl": {
+                        "chembl_target": item["target_chembl_id"],
+                        "uniprot_accession": uniprot_accession,
                     },
                 }
                 yield output
