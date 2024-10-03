@@ -28,7 +28,7 @@ class ChemblUploader(uploader.BaseSourceUploader):
         )
         # for doc in load_data(target_filepaths):
         #     yield doc
-        return self.keylookup(load_data(target_filepaths))
+        return self.keylookup(load_data)(target_filepaths)
 
     @classmethod
     def get_mapping(klass):
