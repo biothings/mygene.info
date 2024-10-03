@@ -26,7 +26,7 @@ class ChemblUploader(uploader.BaseSourceUploader):
         target_filepaths = glob.iglob(
             os.path.join(data_folder, self.TARGET_FILENAME_PATTERN)
         )
-        return self.keylookup(load_data(target_filepaths), skip_on_failure=True)
+        return self.keylookup(load_data(target_filepaths))
 
     @classmethod
     def get_mapping(klass):
