@@ -19,14 +19,15 @@ def parse_data(data):
             if UNIPROT_ACCESSION_PATTERN.fullmatch(accession):
                 uniprot_accessions.append(accession)
         if uniprot_accessions:
-            output = {
-                "_id": uniprot_accessions[0],
-                "chembl_target": item["target_chembl_id"],
-                "xrefs": {
-                    "accession": uniprot_accessions[0],
-                },
-            }
-            yield output
+            for uniprot_accession in uniprot_accessions:
+                output = {
+                    "_id": uniprot_accession,
+                    "chembl_target": item["target_chembl_id"],
+                    "xrefs": {
+                        "accession": uniprot_accession,
+                    },
+                }
+                yield output
 
 
 def load_data(target_filepaths):
