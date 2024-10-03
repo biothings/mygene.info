@@ -1,21 +1,29 @@
 import json
+import re
 
 
 def parse_data(data):
+    UNIPROT_ACCESSION_PATTERN = re.compile(
+        r"[OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}"
+    )
+
     for item in data["targets"]:
-        output = {
-            "chembl_target": item["target_chembl_id"],
-            "xrefs": {
-                "accession": (
-                    [
-                        target_component.get("accession")
-                        for target_component in item["target_components"]
-                        if "accession" in target_component
-                    ]
-                ),
-            },
-        }
-        if output["xrefs"]["accession"]:
+        uniprot_accessions = []
+        accessions = (
+            component["accession"].rstrip()
+            for component in item.get("target_components")
+            if component["accession"]
+        )
+        for accession in accessions:
+            if UNIPROT_ACCESSION_PATTERN.fullmatch(accession):
+                uniprot_accessions.append(accession)
+        if uniprot_accessions:
+            output = {
+                "chembl_target": item["target_chembl_id"],
+                "xrefs": {
+                    "accession": uniprot_accessions,
+                },
+            }
             yield output
 
 
