@@ -12,7 +12,8 @@ from .parser import load_data
 class ChemblUploader(uploader.BaseSourceUploader):
     name = "chembl"
 
-    storage_class = storage.RootKeyMergerStorage
+    # storage_class = storage.RootKeyMergerStorage
+    storage_class = storage.MergerStorage
     TARGET_FILENAME_PATTERN = "target.*.json"
 
     keylookup = MyGeneKeyLookup(
