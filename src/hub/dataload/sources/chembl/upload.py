@@ -13,9 +13,8 @@ from .parser import load_data
 class ChemblMergerStorage(storage.MergerStorage):
     @classmethod
     def merge_func(klass, doc1, doc2, **kwargs):
+        klass.logger.info("Merging %s with %s" % (doc1, doc2))
         doc2 = copy.copy(doc2)
-        # we need to take it from doc2 because doc1 _id was popped by the caller
-        merged_doc = {"_id": doc2["_id"], "chembl": []}
         chembl_dict = {}
 
         for doc in [doc1, doc2]:
@@ -41,6 +40,7 @@ class ChemblMergerStorage(storage.MergerStorage):
                         "uniprot": uniprot,
                     }
 
+        merged_doc = {"_id": doc2["_id"]}
         merged_doc["chembl"] = list(chembl_dict.values())
         return merged_doc
 
