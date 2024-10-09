@@ -11,10 +11,9 @@ from .parser import load_data
 
 
 class ChemblMergerStorage(storage.MergerStorage):
-    @classmethod
-    def merge_func(klass, doc1, doc2, **kwargs):
-        klass.logger.info("Merging %s with %s" % (doc1, doc2))
-        doc2 = copy.copy(doc2)
+
+    def merge_chembl(self, doc1, doc2):
+        self.logger.info("Merging %s and %s", doc1, doc2)
         chembl_dict = {}
 
         for doc in [doc1, doc2]:
@@ -42,7 +41,13 @@ class ChemblMergerStorage(storage.MergerStorage):
 
         merged_doc = {"_id": doc2["_id"]}
         merged_doc["chembl"] = list(chembl_dict.values())
+        self.logger.info("Merged doc: %s", merged_doc)
         return merged_doc
+
+    @classmethod
+    def merge_func(klass, doc1, doc2, **kwargs):
+        doc = klass.merge_chembl(doc1, copy.copy(doc2))
+        return doc
 
 
 class ChemblUploader(uploader.BaseSourceUploader):
