@@ -12,7 +12,8 @@ from .parser import load_data
 class ChemblMergerStorage(storage.MergerStorage):
     @classmethod
     def merge_func(klass, doc1, doc2, **kwargs):
-        merged_doc = {"_id": doc1["_id"], "chembl": []}
+        # we need to take it from doc2 because doc1 _id was popped by the caller
+        merged_doc = {"_id": doc2["_id"], "chembl": []}
         chembl_dict = {}
 
         for doc in [doc1, doc2]:
