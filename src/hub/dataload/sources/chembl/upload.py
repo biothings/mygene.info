@@ -1,5 +1,6 @@
 import glob
 import os
+import copy
 
 import biothings.hub.dataload.storage as storage
 import biothings.hub.dataload.uploader as uploader
@@ -12,6 +13,7 @@ from .parser import load_data
 class ChemblMergerStorage(storage.MergerStorage):
     @classmethod
     def merge_func(klass, doc1, doc2, **kwargs):
+        doc2 = copy.copy(doc2)
         # we need to take it from doc2 because doc1 _id was popped by the caller
         merged_doc = {"_id": doc2["_id"], "chembl": []}
         chembl_dict = {}
@@ -42,6 +44,7 @@ class ChemblMergerStorage(storage.MergerStorage):
         merged_doc["chembl"] = list(chembl_dict.values())
         return merged_doc
 
+    def merge_chembl(doc1, doc2):
 
 class ChemblUploader(uploader.BaseSourceUploader):
     name = "chembl"
