@@ -46,7 +46,8 @@ class ChemblMergerStorage(storage.MergerStorage):
 
     @classmethod
     def merge_func(klass, doc1, doc2, **kwargs):
-        doc = klass.merge_chembl(doc1, copy.copy(doc2))
+        instance = klass()
+        doc = instance.merge_chembl(doc1, copy.copy(doc2))
         return doc
 
 
