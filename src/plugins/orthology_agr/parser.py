@@ -1,29 +1,32 @@
 """
-# Orthology AGR Data Parser  
-# Organization: Su and Wu labs @ Scripps Research  
-# Data parser for the Alliance of Genome Resources database for ortholog relationships. 
+# Orthology AGR Data Parser
+# Organization: Su and Wu labs @ Scripps Research
+# Data parser for the Alliance of Genome Resources database for ortholog relationships.
 """
+
+import json
+import logging
+
 # load packages
 import os
-from biothings_client import get_client
-import biothings.utils.dataload as dl
 import time
-import logging
-import json
 
+import biothings.utils.dataload as dl
+from biothings_client import get_client
 
 logging = logging.getLogger("orthology_agr")
 
+
 def setup_release(self):
-    release="2019-06-23"
+    release = "2019-06-23"
     return release
 
 
 def convert_score(score):
     """
-    Converts the isbestscore and isbestrevscore 
-    from a string to boolean. 
-    score: "Yes" or "No" string 
+    Converts the isbestscore and isbestrevscore
+    from a string to boolean.
+    score: "Yes" or "No" string
     """
     return score == "Yes"
 
@@ -71,7 +74,7 @@ def get_gene_cache(unique_gene_ids, gene_client, batch_size=1000):
     error_ids = []
 
     # Convert set to list for manipulation
-    unique_gene_ids=adjust_gene_ids(list(unique_gene_ids))
+    unique_gene_ids = adjust_gene_ids(list(unique_gene_ids))
     # Convert back to set if you need to remove duplicates after adjustment
     unique_gene_ids = set(unique_gene_ids)
 
@@ -80,43 +83,47 @@ def get_gene_cache(unique_gene_ids, gene_client, batch_size=1000):
         # Convert set to list if iterable is a set
         if isinstance(iterable, set):
             iterable = list(iterable)
-        
+
         l = len(iterable)
         for ndx in range(0, l, n):
-            yield iterable[ndx:min(ndx + n, l)]
+            yield iterable[ndx : min(ndx + n, l)]
 
     # Iterate through batches and perform query
     for batch_ids in batch(unique_gene_ids, batch_size):
-        try: 
+        try:
             results = gene_client.querymany(
                 batch_ids,
                 scopes=["WormBase", "MGI", "FLYBASE", "Xenbase", "WB"],
-                fields='symbol,name,entrezgene',
-                verbose=False
+                fields="symbol,name,entrezgene",
+                verbose=False,
             )
             for result in results:
-                query_id = result['query']
-                if 'notfound' in result:
+                query_id = result["query"]
+                if "notfound" in result:
                     first_pass_fail_ct += 1
                     # Second pass query -- attempt to get Entrez ID directly
                     try:
-                        query_res = gene_client.query(query_id, fields='entrezgene')
-                        if query_res.get('hits'):
-                            for hit in query_res['hits']:
-                                if 'entrezgene' in hit:
-                                    gene_id_cache[query_id] = hit['entrezgene']
+                        query_res = gene_client.query(query_id, fields="entrezgene")
+                        if query_res.get("hits"):
+                            for hit in query_res["hits"]:
+                                if "entrezgene" in hit:
+                                    gene_id_cache[query_id] = hit["entrezgene"]
                         else:
-                            logging.info(f"query ID not found in second individual query: {query_id}")
+                            logging.info(
+                                f"query ID not found in second individual query: {query_id}"
+                            )
                             error_ids.append(query_id)
                     except Exception as e:
                         logging.error(f"Error in second pass query for {query_id}: {e}")
                 else:
                     # Process found queries
-                    entrez_id = result.get('entrezgene')
+                    entrez_id = result.get("entrezgene")
                     if entrez_id:
                         gene_id_cache[query_id] = entrez_id
                     else:
-                        logging.info(f"Missing data for found query: {result.get('query', 'Unknown ID')}")
+                        logging.info(
+                            f"Missing data for found query: {result.get('query', 'Unknown ID')}"
+                        )
         except Exception as e:
             logging.error(f"Error in batch query: {e}")
 
@@ -126,7 +133,8 @@ def get_gene_cache(unique_gene_ids, gene_client, batch_size=1000):
 
     return gene_id_cache
 
-def load_orthology(data_folder): #, sample_limit=100):
+
+def load_orthology(data_folder):  # , sample_limit=100):
     """
     Main method for parsing ortholog data from AGR.
 
@@ -143,8 +151,8 @@ def load_orthology(data_folder): #, sample_limit=100):
     logging.info(f"Starting upload for orthology AGR from {infile}")
     assert os.path.exists(infile), "Input file does not exist."
 
-    gene_client = get_client('gene')
-    unique_gene_ids = set() 
+    gene_client = get_client("gene")
+    unique_gene_ids = set()
 
     # Collect unique gene IDs
     line_count = 0
@@ -167,10 +175,7 @@ def load_orthology(data_folder): #, sample_limit=100):
         if gene_id and ortholog_id:
             # Create a record if gene_id not in records, or append ortholog if gene_id already exists
             if gene_id not in records:
-                records[gene_id] = {
-                    "_id": gene_id,
-                    "orthologs": []
-                }
+                records[gene_id] = {"_id": gene_id, "agr": {"orthologs": []}}
             ortholog_record = {
                 "gene_id": gene_id,
                 "ortholog_id": ortholog_id,
@@ -179,14 +184,18 @@ def load_orthology(data_folder): #, sample_limit=100):
                 "algorithmsmatch": line[9],
                 "outofalgorithms": line[10],
                 "isbestscore": convert_score(line[11]),
-                "isbestrevscore": convert_score(line[12])
+                "isbestrevscore": convert_score(line[12]),
             }
-            records[gene_id]["orthologs"].append(ortholog_record)
+            records[gene_id]["agr"]["orthologs"].append(ortholog_record)
             line_count += 1  # Increment the line counter
 
     elapsed_time = time.time() - start_time
-    logging.info(f"Completed processing {sum(len(rec['orthologs']) for rec in records.values())} ortholog records for {len(records)} genes in {elapsed_time:.2f} seconds.")
+    logging.info(
+        f"Completed processing {sum(len(rec['orthologs']) for rec in records.values())} ortholog records for {len(records)} genes in {elapsed_time:.2f} seconds."
+    )
     if records:
-        logging.info(f"Sample record: {json.dumps(records[next(iter(records))], indent=2)}")
+        logging.info(
+            f"Sample record: {json.dumps(records[next(iter(records))], indent=2)}"
+        )
 
     return list(records.values())
