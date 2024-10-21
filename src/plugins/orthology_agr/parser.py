@@ -191,7 +191,7 @@ def load_orthology(data_folder):  # , sample_limit=100):
 
     elapsed_time = time.time() - start_time
     logging.info(
-        f"Completed processing {sum(len(rec['orthologs']) for rec in records.values())} ortholog records for {len(records)} genes in {elapsed_time:.2f} seconds."
+        f"Completed processing {sum(len(rec["agr"]["orthologs"]) for rec in records.values())} ortholog records for {len(records)} genes in {elapsed_time:.2f} seconds."
     )
     if records:
         logging.info(
