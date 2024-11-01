@@ -1,9 +1,6 @@
 name: Scheduled Tests
 
 on:
-  push:
-    branches:
-      - add-pyproject-toml
   workflow_dispatch: # Manual trigger
   schedule: # Scheduled trigger
     - cron: "15,45 14-23,0-1 * * 1-5"  # At minutes 15 and 45 past every hour from 14:00 through 01:00 on every day-of-week from Monday through Friday.
