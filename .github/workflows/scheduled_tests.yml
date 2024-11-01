@@ -57,4 +57,4 @@ jobs:
       - name: Run pytest
         run: |
           source .venv/bin/activate
-          python -m pytest src/tests/data_tests biothings_client.py/tests/gene.py -s -vv
+          python -m pytest src/tests/data_tests biothings_client.py/tests/test_gene.py -s -vv
