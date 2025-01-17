@@ -3,13 +3,11 @@
     "requires" : [],
     "dumper" : {
         "data_url" : ["http://xteam.xbio.top/CellMarker/download/all_cell_markers.txt",
-                      "http://xteam.xbio.top/CellMarker/download/Human_cell_markers.txt",
-                      "http://xteam.xbio.top/CellMarker/download/Mouse_cell_markers.txt",
                       "http://xteam.xbio.top/CellMarker/download/Single_cell_markers.txt"],
         "uncompress" : false
     },
     "uploader" : {
-        "parser" : "data_parser:load_annotations",
+        "parser" : "data_parser:load_cellMarkers",
         "on_duplicates" : "error"
     }
 }

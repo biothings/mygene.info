@@ -5,7 +5,6 @@ import json
 import os
 import re
 
-import numpy as np
 import requests
 from biothings import config
 from biothings.utils.dataload import dict_convert, dict_sweep
@@ -95,18 +94,11 @@ def pairUp_seq_info(value_dict: dict) -> list:
 
     if not all(len(v) == len(next(iter(values))) for v in values):
         gene_ids = ", ".join(
-            [
-                gene_id
-                for gene_id in str_to_list(value_dict["geneid"])
-                if gene_id.casefold() != "na" and gene_id != ""
-            ]
+            [gene_id for gene_id in str_to_list(value_dict["geneid"]) if gene_id.casefold() != "na" and gene_id != ""]
         )
         symbols = get_gene_symbol(gene_ids)
 
-        return [
-            {"geneid": gene_info["_id"], "genesymbol": gene_info["symbol"]}
-            for gene_info in symbols
-        ]
+        return [{"geneid": gene_info["_id"], "genesymbol": gene_info["symbol"]} for gene_info in symbols]
 
     return [dict(zip(keys, combination)) for combination in zip(*values)]
 
@@ -161,7 +153,7 @@ def load_data_files(data_folder: str, files: list) -> list:
     return data
 
 
-def load_annotations(data_folder):
+def load_cellMarkers(data_folder):
     """Converting data into expected JSON format
 
     Args:
@@ -190,37 +182,27 @@ def load_annotations(data_folder):
             gene_expression_dict = results[_id]
             gene_expression_dict["symbol"] = gene_expression["genesymbol"]
             if record["markerresource"].casefold() != "company":
-                gene_expression_dict.setdefault("geneRelatedCells", []).append(
-                    dict_sweep(
-                        {
-                            "CellOntologyID": record["cellontologyid"],
-                            "cellName": record["cellname"],
-                            "cellType": record["celltype"],
-                            "cancerType": record["cancertype"],
-                            "tissueType": record["tissuetype"],
-                            "UberonOntologyID": record["uberonontologyid"],
-                            "speciesType": record["speciestype"],
-                            "markerResource": record["markerresource"],
-                            "PMID": record["pmid"],
-                        }
-                    )
-                )
+                resource_key = "PMID"
+                record_resource_key = "pmid"
             else:
-                gene_expression_dict.setdefault("geneRelatedCells", []).append(
-                    dict_sweep(
-                        {
-                            "CellOntologyID": record["cellontologyid"],
-                            "cellName": record["cellname"],
-                            "cellType": record["celltype"],
-                            "cancerType": record["cancertype"],
-                            "tissueType": record["tissuetype"],
-                            "UberonOntologyID": record["uberonontologyid"],
-                            "speciesType": record["speciestype"],
-                            "markerResource": record["markerresource"],
-                            "Company": record["company"],
-                        }
-                    )
+                resource_key = "Company"
+                record_resource_key = "company"
+            gene_expression_dict.setdefault("geneRelatedCells", []).append(
+                dict_sweep(
+                    {
+                        "CellOntologyID": record["cellontologyid"],
+                        "cellName": record["cellname"],
+                        "cellType": record["celltype"],
+                        "cancerType": record["cancertype"],
+                        "tissueType": record["tissuetype"],
+                        "UberonOntologyID": record["uberonontologyid"],
+                        "speciesType": record["speciestype"],
+                        "markerResource": record["markerresource"],
+                        f"{resource_key}": record[f"{record_resource_key}"],
+                    }
                 )
+            )
+
     # return each gene_id with yield and remove duplicate from the dictionary
     for _id, related_info in results.items():
         yield {
@@ -230,10 +212,10 @@ def load_annotations(data_folder):
         }
 
 
-if __name__ == "__main__":
-    import doctest
+# if __name__ == "__main__":
+#     import doctest
 
-    doctest.testmod()
-    x = load_annotations("data")
-    y = [i for i in x]
-    breakpoint()
+#     doctest.testmod()
+#     x = load_annotations("data")
+#     y = [i for i in x]
+#     breakpoint()
