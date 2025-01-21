@@ -128,7 +128,8 @@ some of the CellMarker records contain mismatch values in its list-like strs. Mi
 ![Mismatch pie chart](img/mt_MakerDistribution.png)
 
 #### resolution
-The relationship between protein and gene in nature is 1 to N. Therefore, there can never be guarantee that the dataset is 1 to 1 match. Thus, **we will drop column `proteinName` and `proteinID`**
+We care about the relationships betweens Gene ID and Cell information in each cellMarker. Thus, we will drop 
+**columns `proteinName`, `proteinID`, `CellMarker`**.
 
 ### Missingness of company value
 91% of the value in the `company` column is missing, but it is missing by design. There are in total 4 different kinds of values in `markerResource` column which are "Experiment", "Review", "Single-cell sequencing", and "Company". The `company` column is not missing when the value in `markerResource` column is "company" 
@@ -165,7 +166,6 @@ This is the template for the output data field. The structure within the cellMar
     "markerResource": "Company"
     "Company": Company_Name
     }
-  }
 }
 ```
 ## Example
@@ -211,13 +211,12 @@ Notice, we are using the first template since the markerResource is either Exper
 ## Data Processing Workflow
 
 - concatenating **all_cell_markers** dataframe and **all_singleCell_markers** dataframe
-- drop `proteinName` and `proteinID` columns
+- drop `proteinName` and `proteinID`, `cellMarker` columns
 - remove all rows with missing "geneID"
 - replacing all the "undefined" in `tissueType` column with NaN value
 - converting all the listLikeStrings into the list for column [cellMarker, geneSymbol, geneID] 
 
-- sometimes, there are duplicate rows within the dataset
-
+- remove duplicate cell in each geneID
 
 <!-- CONTACT -->
 ## Contact
