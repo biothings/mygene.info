@@ -92,6 +92,7 @@ def pairUp_seq_info(value_dict: dict) -> list:
     keys = list(value_dict.keys())
     values = [str_to_list(value) for value in value_dict.values()]
 
+    # when there is mismatch gene and its symbol, we will get gene symbol form my.gene API
     if not all(len(v) == len(next(iter(values))) for v in values):
         gene_ids = ", ".join(
             [gene_id for gene_id in str_to_list(value_dict["geneid"]) if gene_id.casefold() != "na" and gene_id != ""]
@@ -181,12 +182,15 @@ def load_cellMarkers(data_folder):
             results.setdefault(_id, {})
             gene_expression_dict = results[_id]
             gene_expression_dict["symbol"] = gene_expression["genesymbol"]
+
+            # identify source key
             if record["markerresource"].casefold() != "company":
                 resource_key = "PMID"
                 record_resource_key = "pmid"
             else:
                 resource_key = "Company"
                 record_resource_key = "company"
+
             gene_expression_dict.setdefault("geneRelatedCells", []).append(
                 dict_sweep(
                     {
