@@ -13,19 +13,6 @@ logging = config.logger
 GENE_ID = "geneid"
 GENE_SYMBOL = "genesymbol"
 MARKER_RESOURCE = "markerresource"
-CELL_INFO_KEYS = [
-    "cellontologyid",
-    "cellname",
-    "celltype",
-    "cancertype",
-    "tissuetype",
-    "uberonontologyid",
-    "speciestype",
-    "markerresource",
-    "pmid",
-    "company",
-]
-ZIP_COLUMNS = [GENE_ID, GENE_SYMBOL]
 FILES = ["all_cell_markers.txt", "Single_cell_markers.txt"]
 
 
@@ -174,34 +161,34 @@ def load_cellMarkers(data_folder):
         # ignore geneID that is missing
         if record[GENE_ID].casefold() == "na" or record[GENE_ID].casefold() == "":
             continue
+
         # zip these elements together to get multiple copies
-        for gene_expression in pairUp_seq_info(select_items(record, ZIP_COLUMNS)):
-            _id = gene_expression["geneid"]
+        for gene_id in str_to_list(record[GENE_ID]):
+            _id = gene_id
             if _id.casefold() == "na" or _id.casefold() == "":
                 continue
             results.setdefault(_id, {})
-            gene_expression_dict = results[_id]
-            gene_expression_dict["symbol"] = gene_expression["genesymbol"]
+            gene_id_dict = results[_id]
 
             # identify source key
             if record["markerresource"].casefold() != "company":
-                resource_key = "PMID"
+                resource_key = "pmid"
                 record_resource_key = "pmid"
             else:
-                resource_key = "Company"
+                resource_key = "company"
                 record_resource_key = "company"
 
-            gene_expression_dict.setdefault("geneRelatedCells", []).append(
+            gene_id_dict.setdefault("cellmarker", []).append(
                 dict_sweep(
                     {
-                        "CellOntologyID": record["cellontologyid"],
-                        "cellName": record["cellname"],
-                        "cellType": record["celltype"],
-                        "cancerType": record["cancertype"],
-                        "tissueType": record["tissuetype"],
-                        "UberonOntologyID": record["uberonontologyid"],
-                        "speciesType": record["speciestype"],
-                        "markerResource": record["markerresource"],
+                        "cellontology": record["cellontologyid"],
+                        "cellname": record["cellname"],
+                        "celltype": record["celltype"],
+                        "cancertype": record["cancertype"],
+                        "tissue": record["tissuetype"],
+                        "uberon": record["uberonontologyid"],
+                        "species": record["speciestype"],
+                        "marker_resource": record["markerresource"],
                         f"{resource_key}": record[f"{record_resource_key}"],
                     }
                 )
@@ -211,8 +198,7 @@ def load_cellMarkers(data_folder):
     for _id, related_info in results.items():
         yield {
             "_id": _id,
-            "symbol": related_info["symbol"],
-            "geneRelatedCells": make_uniqueMarker(related_info["geneRelatedCells"]),
+            "cellmarker": make_uniqueMarker(related_info["cellmarker"]),
         }
 
 
@@ -220,6 +206,6 @@ def load_cellMarkers(data_folder):
 #     import doctest
 
 #     doctest.testmod()
-#     x = load_annotations("data")
+#     x = load_cellMarkers("data")
 #     y = [i for i in x]
 #     breakpoint()

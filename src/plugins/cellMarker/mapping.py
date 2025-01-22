@@ -1,29 +1,32 @@
 def get_customized_mapping(cls):
     mapping = {
-        "agr": {
+        "cellmarker": {
             "properties": {
-                "orthologs": {
-                    "properties": {
-                        "geneid": {
-                            "normalizer": "keyword_lowercase_normalizer",
-                            "type": "keyword",
-                        },
-                        "symbol": {
-                            "normalizer": "keyword_lowercase_normalizer",
-                            "type": "keyword",
-                        },
-                        "CellOntologyID": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
-                        "PMID": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
-                        "speciesType": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
-                        "UberonOntologyID": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
-                        "Company": {"normalizer": "keyword_lowercase_normalizer", "type": "keyword"},
-                        "cancerType": {"type": "text"},
-                        "markerResource": {"type": "text"},
-                        "tissueType": {"type": "text"},
-                        "cellName": {"type": "text"},
-                        "cellType": {"type": "text"},
-                    }
-                }
+                "cellontology": {
+                    "normalizer": "keyword_lowercase_normalizer",
+                    "type": "keyword",
+                },
+                "pmid": {
+                    "normalizer": "keyword_lowercase_normalizer",
+                    "type": "keyword",
+                },
+                "species": {
+                    "normalizer": "keyword_lowercase_normalizer",
+                    "type": "keyword",
+                },
+                "uberon": {
+                    "normalizer": "keyword_lowercase_normalizer",
+                    "type": "keyword",
+                },
+                "company": {
+                    "normalizer": "keyword_lowercase_normalizer",
+                    "type": "keyword",
+                },
+                "cancertype": {"type": "text"},
+                "marker_resource": {"type": "text"},
+                "tissue": {"type": "text"},
+                "cellname": {"type": "text"},
+                "celltype": {"type": "text"},
             }
         }
     }
