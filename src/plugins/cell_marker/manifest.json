@@ -8,6 +8,7 @@
     },
     "uploader" : {
         "parser" : "data_parser:load_cellMarkers",
-        "on_duplicates" : "error"
+        "on_duplicates" : "error",
+        "mapping": "mapping:get_customized_mapping"
     }
 }
