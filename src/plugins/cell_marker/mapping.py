@@ -23,10 +23,10 @@ def get_customized_mapping(cls):
                     "type": "keyword",
                 },
                 "cancertype": {"type": "text"},
-                "marker_resource": {"type": "text"},
+                "marker_resource": {"type": "keyword"},
                 "tissue": {"type": "text"},
                 "cellname": {"type": "text"},
-                "celltype": {"type": "text"},
+                "celltype": {"type": "keyword"},
             }
         }
     }
