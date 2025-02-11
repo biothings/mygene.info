@@ -6,10 +6,8 @@ import os
 import re
 
 import requests
-from biothings import config
 from biothings.utils.dataload import dict_convert, dict_sweep
 
-logging = config.logger
 GENE_ID = "geneid"
 GENE_SYMBOL = "genesymbol"
 MARKER_RESOURCE = "markerresource"
@@ -158,8 +156,8 @@ def load_cellMarkers(data_folder):
         # converting all the key to standard format
         record = dict_convert(record, keyfn=lambda k: k.replace(" ", "_").lower())
 
-        # ignore geneID that is missing
-        if record[GENE_ID].casefold() == "na" or record[GENE_ID].casefold() == "":
+        # ignore geneID that is missing or contains non-numeric value
+        if record[GENE_ID].casefold() == "na" or not record[GENE_ID].isnumeric() or record[GENE_ID].casefold() == "":
             continue
 
         # zip these elements together to get multiple copies
@@ -178,18 +176,22 @@ def load_cellMarkers(data_folder):
                 resource_key = "company"
                 record_resource_key = "company"
 
+            # if tissuetype is undefined, we will make it empty
+            if record["tissuetype"].casefold() == "undefined":
+                record["tissuetype"] = ""
+
             gene_id_dict.setdefault("cellmarker", []).append(
                 dict_sweep(
                     {
-                        "cellontology": record["cellontologyid"],
-                        "cellname": record["cellname"],
-                        "celltype": record["celltype"],
-                        "cancertype": record["cancertype"],
-                        "tissue": record["tissuetype"],
-                        "uberon": record["uberonontologyid"],
-                        "species": record["speciestype"],
-                        "marker_resource": record["markerresource"],
-                        f"{resource_key}": record[f"{record_resource_key}"],
+                        "cellontology": record["cellontologyid"].replace(" ", "_").lower(),
+                        "cellname": record["cellname"].replace(" ", "_").lower(),
+                        "celltype": record["celltype"].replace(" ", "_").lower(),
+                        "cancertype": record["cancertype"].replace(" ", "_").lower(),
+                        "tissue": record["tissuetype"].replace(" ", "_").lower(),
+                        "uberon": record["uberonontologyid"].replace(" ", "_").lower(),
+                        "species": record["speciestype"].replace(" ", "_").lower(),
+                        "marker_resource": record["markerresource"].replace(" ", "_").lower(),
+                        f"{resource_key}": record[f"{record_resource_key}"].replace(" ", "_").lower(),
                     }
                 )
             )
@@ -208,4 +210,11 @@ def load_cellMarkers(data_folder):
 #     doctest.testmod()
 #     x = load_cellMarkers("data")
 #     y = [i for i in x]
+
+#     remember = []
+#     # check if all the geneid is number
+#     for i in y:
+#         if not i["_id"].isnumeric():
+#             remember.append(i["_id"])
+
 #     breakpoint()
