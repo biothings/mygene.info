@@ -14,27 +14,6 @@ MARKER_RESOURCE = "markerresource"
 FILES = ["all_cell_markers.txt", "Single_cell_markers.txt"]
 
 
-def get_gene_symbol(gene_ids: str) -> str:
-    """The function that make an API request to my mygene.info, requesting for symbol using gene ID
-
-    Args:
-        gene_id (str): the id of the gene
-
-    Returns:
-        (str) the symbol of the gene
-    """
-    headers = {"content-type": "application/x-www-form-urlencoded"}
-    params = f"ids={gene_ids}&fields=symbol"
-
-    try:
-        res = requests.post("http://mygene.info/v3/gene", data=params, headers=headers)
-        res.raise_for_status()
-    except requests.RequestException as e:
-        return {}
-
-    return json.loads(res.content.decode("utf-8"))
-
-
 def str_to_list(listLikeStr: str) -> list:
     """Case str-like-list into actual list, nested list will be expand
 
@@ -58,35 +37,6 @@ def str_to_list(listLikeStr: str) -> list:
     parsed_str = re.sub(r"[\[\]]", "", listLikeStr)
     parsed_str_list = parsed_str.split(",")
     return [val.strip() for val in parsed_str_list]
-
-
-def pairUp_seq_info(value_dict: dict) -> list:
-    """Pair up all the elements in each value of the dictionary
-
-    Args:
-        value_dict (dict): values that need to be paired up
-
-    Returns:
-        list[dict]: A list of dictionaries where each dict contains a pairing
-        of keys with corresponding elements from the value lists.
-    >>> pairUp_seq_info({"a": "1, 2", "b": "3, 4"})
-    [{'a': '1', 'b': '3'}, {'a': '2', 'b': '4'}]
-    >>> pairUp_seq_info({"a": '1'})
-    [{'a': '1'}]
-    """
-    keys = list(value_dict.keys())
-    values = [str_to_list(value) for value in value_dict.values()]
-
-    # when there is mismatch gene and its symbol, we will get gene symbol form my.gene API
-    if not all(len(v) == len(next(iter(values))) for v in values):
-        gene_ids = ", ".join(
-            [gene_id for gene_id in str_to_list(value_dict["geneid"]) if gene_id.casefold() != "na" and gene_id != ""]
-        )
-        symbols = get_gene_symbol(gene_ids)
-
-        return [{"geneid": gene_info["_id"], "genesymbol": gene_info["symbol"]} for gene_info in symbols]
-
-    return [dict(zip(keys, combination)) for combination in zip(*values)]
 
 
 def make_uniqueMarker(cellMarkers: list) -> list:
@@ -176,22 +126,34 @@ def load_cellMarkers(data_folder):
                 resource_key = "company"
                 record_resource_key = "company"
 
+            # handle edge case
             # if tissuetype is undefined, we will make it empty
             if record["tissuetype"].casefold() == "undefined":
                 record["tissuetype"] = ""
 
+            # check if any value in the dict is na, if so, make it empty
+            for key, value in record.items():
+                # handle missing values
+                if value.casefold() == "na":
+                    record[key] = ""
+
+                if key == "cellontologyid" or key == "uberonontologyid":
+                    record[key] = record[key].replace("_", ":")
+                else:
+                    record[key] = record[key].lower()
+
             gene_id_dict.setdefault("cellmarker", []).append(
                 dict_sweep(
                     {
-                        "cellontology": record["cellontologyid"].replace(" ", "_").lower(),
-                        "cellname": record["cellname"].replace(" ", "_").lower(),
-                        "celltype": record["celltype"].replace(" ", "_").lower(),
-                        "cancertype": record["cancertype"].replace(" ", "_").lower(),
-                        "tissue": record["tissuetype"].replace(" ", "_").lower(),
-                        "uberon": record["uberonontologyid"].replace(" ", "_").lower(),
-                        "species": record["speciestype"].replace(" ", "_").lower(),
-                        "marker_resource": record["markerresource"].replace(" ", "_").lower(),
-                        f"{resource_key}": record[f"{record_resource_key}"].replace(" ", "_").lower(),
+                        "cellontology": record["cellontologyid"],
+                        "cellname": record["cellname"],
+                        "celltype": record["celltype"],
+                        "cancertype": record["cancertype"],
+                        "tissue": record["tissuetype"],
+                        "uberon": record["uberonontologyid"],
+                        "species": record["speciestype"],
+                        "marker_resource": record["markerresource"],
+                        f"{resource_key}": record[f"{record_resource_key}"],
                     }
                 )
             )
@@ -210,11 +172,5 @@ def load_cellMarkers(data_folder):
 #     doctest.testmod()
 #     x = load_cellMarkers("data")
 #     y = [i for i in x]
-
-#     remember = []
-#     # check if all the geneid is number
-#     for i in y:
-#         if not i["_id"].isnumeric():
-#             remember.append(i["_id"])
 
 #     breakpoint()
