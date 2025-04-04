@@ -52,14 +52,20 @@ class RefseqDumper(FTPDumper):
 
     def create_todump_list(self, force=False):
         self.get_newest_info()
+
+        # for wild in [
+        #     "H_sapiens/mRNA_Prot/human.*.rna.gbff.gz",
+        #     "M_musculus/mRNA_Prot/mouse.*.rna.gbff.gz",
+        #     "R_norvegicus/mRNA_Prot/rat.*.rna.gbff.gz",
+        #     "D_rerio/mRNA_Prot/zebrafish.*.rna.gbff.gz",
+        #     "X_tropicalis/mRNA_Prot/frog.*.rna.gbff.gz",
+        #     "B_taurus/mRNA_Prot/cow.*.rna.gbff.gz",
+        #     "S_scrofa/mRNA_Prot/pig.*.rna.gbff.gz",
+        # ]:
+
+        
         for wild in [
-            "H_sapiens/mRNA_Prot/human.*.rna.gbff.gz",
-            "M_musculus/mRNA_Prot/mouse.*.rna.gbff.gz",
-            "R_norvegicus/mRNA_Prot/rat.*.rna.gbff.gz",
-            "D_rerio/mRNA_Prot/zebrafish.*.rna.gbff.gz",
-            "X_tropicalis/mRNA_Prot/frog.*.rna.gbff.gz",
-            "B_taurus/mRNA_Prot/cow.*.rna.gbff.gz",
-            "S_scrofa/mRNA_Prot/pig.*.rna.gbff.gz",
+            "H_sapiens/mRNA_Prot/human.*.protein.gbff.gz",
         ]:
             files = self.client.nlst(wild)
             for fn in files:
