@@ -16,7 +16,7 @@ class MyGeneDataBuilder(builder.DataBuilder):
             which are not handled by mongo as upserts and produce duplicated
             errors. For this datasource in particular, we allow only one merge job
             """
-            return len([j for j in job_manager.jobs.values() if j["category"] == BUILDER_CATEGORY and j["step"] == "ensembl_gene"]) == 0
+            return len([j for j in job_manager.jobs.values() if j["category"] == BUILDER_CATEGORY and (j["step"] == "ensembl_gene" or j["step"] == "ensembl_metazoa_gene"]) == 0
         preds = super().get_predicates()
         preds.append(no_other_merge_job_for_ensembl_gene)
         return preds

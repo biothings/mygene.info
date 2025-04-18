@@ -5,13 +5,15 @@ from hub.dataload.sources.ensembl.interpro_upload import EnsemblInterproUploader
 from hub.dataload.sources.ensembl.pfam_upload import EnsemblPfamUploader
 from hub.dataload.sources.ensembl.prosite_upload import EnsemblPrositeUploader
 
+
 class EnsemblMetazoaAccUploader(EnsemblAccUploader):
 
     name = "ensembl_metazoa_acc"
     main_source = "ensembl_metazoa"
 
-class EnsemblMetazoaGeneUploader(EnsemblGeneUploader):
 
+class EnsemblMetazoaGeneUploader(EnsemblGeneUploader):
+    __metadata__ = {"mapper": "ensemblmetazoa2entrez"}
     name = "ensembl_metazoa_gene"
     main_source = "ensembl_metazoa"
 
