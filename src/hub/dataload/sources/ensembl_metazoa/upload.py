@@ -13,7 +13,6 @@ class EnsemblMetazoaAccUploader(EnsemblAccUploader):
 
 
 class EnsemblMetazoaGeneUploader(EnsemblGeneUploader):
-    __metadata__ = {"mapper": "ensemblmetazoa2entrez"}
     name = "ensembl_metazoa_gene"
     main_source = "ensembl_metazoa"
 

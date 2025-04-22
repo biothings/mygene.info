@@ -34,35 +34,39 @@ class Ensembl2Entrez(mapper.IDBaseMapper):
             self.retired2current.load()
             self.map = {}
             ensembl2entrez_li = loadobj(("ensembl_gene__2entrezgene_list.pyobj", self.db_provider()), mode="gridfs")
-            # filter out those deprecated entrez gene ids
-            for ensembl_id, entrez_id in ensembl2entrez_li:
-                entrez_id = int(entrez_id)
-                if entrez_id in self.retired2current:
-                    self.map[ensembl_id] = self.retired2current.translate(entrez_id)
-
-
-class EnsemblMetazoa2Entrez(mapper.IDBaseMapper):
-    """
-    Mapper to convert ensembl _id to entrez type id.
-    """
-
-    def __init__(self, db_provider, retired2current, *args, **kwargs):
-        super(EnsemblMetazoa2Entrez, self).__init__("ensemblmetazoa2entrez", *args, **kwargs)
-        self.db_provider = db_provider
-        self.retired2current = retired2current
-
-    def load(self):
-        if self.map is None:
-            self.retired2current.load()
-            self.map = {}
-            ensembl2entrez_li = loadobj(
+            ensemblmetazoa2entrez_li = loadobj(
                 ("ensembl_metazoa_gene__2entrezgene_list.pyobj", self.db_provider()), mode="gridfs"
             )
-            # filter out those deprecated entrez gene ids
-            for ensembl_id, entrez_id in ensembl2entrez_li:
-                entrez_id = int(entrez_id)
-                if entrez_id in self.retired2current:
-                    self.map[ensembl_id] = self.retired2current.translate(entrez_id)
+            for li in [ensembl2entrez_li, ensemblmetazoa2entrez_li]:
+                # filter out those deprecated entrez gene ids
+                for ensembl_id, entrez_id in li:
+                    entrez_id = int(entrez_id)
+                    if entrez_id in self.retired2current:
+                        self.map[ensembl_id] = self.retired2current.translate(entrez_id)
+
+
+# class EnsemblMetazoa2Entrez(mapper.IDBaseMapper):
+#     """
+#     Mapper to convert ensembl _id to entrez type id.
+#     """
+
+#     def __init__(self, db_provider, retired2current, *args, **kwargs):
+#         super(EnsemblMetazoa2Entrez, self).__init__("ensemblmetazoa2entrez", *args, **kwargs)
+#         self.db_provider = db_provider
+#         self.retired2current = retired2current
+
+#     def load(self):
+#         if self.map is None:
+#             self.retired2current.load()
+#             self.map = {}
+#             ensembl2entrez_li = loadobj(
+#                 ("ensembl_metazoa_gene__2entrezgene_list.pyobj", self.db_provider()), mode="gridfs"
+#             )
+#             # filter out those deprecated entrez gene ids
+#             for ensembl_id, entrez_id in ensembl2entrez_li:
+#                 entrez_id = int(entrez_id)
+#                 if entrez_id in self.retired2current:
+#                     self.map[ensembl_id] = self.retired2current.translate(entrez_id)
 
 
 class Ensembl2EntrezRoot(mapper.IDBaseMapper):

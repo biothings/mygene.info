@@ -28,7 +28,7 @@ from biothings.hub.databuild.syncer import (
     ThrottledESJsonDiffSyncer,
 )
 from hub.databuild.builder import MyGeneDataBuilder
-from hub.databuild.mapper import Ensembl2Entrez, EnsemblMetazoa2Entrez, EntrezRetired2Current
+from hub.databuild.mapper import Ensembl2Entrez, EntrezRetired2Current
 
 
 class MyGeneHubServer(HubServer):
@@ -36,9 +36,8 @@ class MyGeneHubServer(HubServer):
     def configure_build_manager(self):
         retired2current = EntrezRetired2Current(convert_func=int, db_provider=mongo.get_src_db)
         ensembl2entrez = Ensembl2Entrez(db_provider=mongo.get_src_db, retired2current=retired2current)
-        ensemblmetazoa2entrez = EnsemblMetazoa2Entrez(db_provider=mongo.get_src_db, retired2current=retired2current)
         build_manager = builder.BuilderManager(
-            builder_class=partial(MyGeneDataBuilder, mappers=[ensembl2entrez, ensemblmetazoa2entrez]),
+            builder_class=partial(MyGeneDataBuilder, mappers=[ensembl2entrez]),
             job_manager=self.managers["job_manager"],
         )
         build_manager.configure()
