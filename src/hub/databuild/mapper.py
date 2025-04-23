@@ -35,11 +35,11 @@ class Ensembl2Entrez(mapper.IDBaseMapper):
             self.map = {}
 
             for li in [
-                "ensembl_gene__2entrezgene_list.pyobj",
                 "ensembl_metazoa_gene__2entrezgene_list.pyobj",
                 "ensembl_protists_gene__2entrezgene_list.pyobj",
                 "ensembl_fungi_gene__2entrezgene_list.pyobj",
                 "ensembl_plant_gene__2entrezgene_list.pyobj",
+                "ensembl_gene__2entrezgene_list.pyobj",
             ]:
                 # filter out those deprecated entrez gene ids
                 for ensembl_id, entrez_id in loadobj((li, self.db_provider()), mode="gridfs"):
