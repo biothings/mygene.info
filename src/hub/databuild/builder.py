@@ -22,7 +22,13 @@ class MyGeneDataBuilder(builder.DataBuilder):
                         j
                         for j in job_manager.jobs.values()
                         if j["category"] == BUILDER_CATEGORY
-                        and (j["step"] == "ensembl_gene" or j["step"] == "ensembl_metazoa_gene")
+                        and (
+                            j["step"] == "ensembl_gene"
+                            or j["step"] == "ensembl_metazoa_gene"
+                            or j["step"] == "ensembl_protists_gene"
+                            or j["step"] == "ensembl_fungi_gene"
+                            or j["step"] == "ensembl_plant_gene"
+                        )
                     ]
                 )
                 == 0
