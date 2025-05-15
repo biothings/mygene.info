@@ -6,12 +6,13 @@
         "license": "CC BY 4.0"
     },
     "dumper" : {
-        "data_url" : "https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz", 
-        "release": "parser:setup_release"
+        "data_url" : "https://fms.alliancegenome.org/download/ORTHOLOGY-ALLIANCE_COMBINED.tsv.gz",
+        "release": "parser:setup_release",
+        "uncompress" : false
     },
     "uploader" : {
         "parser" : "parser:load_orthology",
         "on_duplicates" : "error",
-        "mapping": "mapping:get_customized_mapping"       
+        "mapping": "mapping:get_customized_mapping"
     }
 }
