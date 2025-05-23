@@ -19,6 +19,9 @@ class EntrezGeneDumper(FTPDumper):
     CWD_DIR = '/gene/DATA'
 
     SCHEDULE = "0 22  * * 6"
+    to_check = [("gene_info.gz", 60000000)]
+
+
 
     def get_newest_info(self):
         res = self.client.sendcmd("MDTM gene_info.gz") # pick one, assuming all other on the same data
