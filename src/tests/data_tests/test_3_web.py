@@ -86,9 +86,7 @@ class TestMygeneWeb(BiothingsDataTest):
         ]
         res = self.request("metadata").json()
         for source in sources:
-            assert source in res["src"].keys(), (
-                "source %s not found in metadata" % source
-            )
+            assert source in res["src"].keys(), "source %s not found in metadata" % source
 
     def test_331_taxonomy(self):
         res = self.request("species/1239").json()
@@ -119,4 +117,5 @@ class TestMygeneWeb(BiothingsDataTest):
             "children",
             "rank",
             "uniprot_name",
+            "other_names",
         }
