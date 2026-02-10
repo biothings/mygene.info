@@ -4,17 +4,18 @@
 
 # Refer to biothings.hub.default_config for all configurable settings
 
-DATA_SRC_SERVER = "localhost"
+DATA_SRC_SERVER = "su11"
 DATA_SRC_PORT = 27017
 DATA_SRC_DATABASE = "mygene_src"
 
-DATA_TARGET_SERVER = "localhost"
+DATA_TARGET_SERVER = "su11"
 DATA_TARGET_PORT = 27017
 DATA_TARGET_DATABASE = "mygene"
 
 HUB_DB_BACKEND = {
     "module": "biothings.utils.mongo",
-    "uri": "mongodb://localhost:27017",
+    #"uri": "mongodb://localhost:27017",
+    "uri": "mongodb://su11:27017,su09:27017/?replicaSet=rs0biothings&readPreference=nearest",
 }
 DATA_HUB_DB_DATABASE = "mygene_hubdb"
 
