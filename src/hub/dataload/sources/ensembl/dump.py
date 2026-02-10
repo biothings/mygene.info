@@ -2,9 +2,8 @@
 import os
 from ftplib import FTP
 
-import requests
-
 import config
+import requests
 from biothings import config_for_app
 from biothings.hub.dataload.dumper import DumperException, HTTPDumper
 from biothings.utils.common import is_int, safewfile
@@ -109,6 +108,21 @@ class GenericBioMart(HTTPDumper):
                 self.to_dump.append(
                     {"remote": method_name, "local": local_path})
 
+    def _ftp_path_exists(self, ftp_conn, path):
+        # Prefer SIZE (fast); fall back to NLST if SIZE isn't supported.
+        try:
+            ftp_conn.size(path)
+            return True
+        except Exception:
+            try:
+                dirpath, fname = os.path.split(path)
+                listing = ftp_conn.nlst(dirpath or ".")
+                return True if fname in listing else False
+            except Exception:
+                return False
+        finally:
+            ftp_conn.close()
+
     # helper for self.create_todump_list()
     def _get_latest_mart_version(self):
         ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
@@ -121,7 +135,10 @@ class GenericBioMart(HTTPDumper):
     # helper for self.create_todump_list()
     def _new_release_available(self):
         current_release = self.src_doc.get("download", {}).get("release")
-        if not current_release or self.release > current_release:
+        species_li = f"/pub/release-{self.release}/mysql/ensembl_mart_{self.release}/dataset_names.txt.gz"
+        ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
+        ftp.login()
+        if (not current_release or self.release > current_release) and self._ftp_path_exists(ftp, species_li):
             self.logger.info("New release '%s' found", self.release)
             return True
         self.logger.debug("No new release found")
