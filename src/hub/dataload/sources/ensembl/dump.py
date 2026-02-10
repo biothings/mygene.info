@@ -111,6 +111,8 @@ class GenericBioMart(HTTPDumper):
     def _ftp_path_exists(self, ftp_conn, path):
         # Prefer SIZE (fast); fall back to NLST if SIZE isn't supported.
         try:
+            if path is None:
+                return True
             ftp_conn.size(path)
             return True
         except Exception:
@@ -135,10 +137,10 @@ class GenericBioMart(HTTPDumper):
     # helper for self.create_todump_list()
     def _new_release_available(self):
         current_release = self.src_doc.get("download", {}).get("release")
-        species_li = f"/pub/release-{self.release}/mysql/ensembl_mart_{self.release}/dataset_names.txt.gz"
+        path = self.check_file()
         ftp = FTP(self.__class__.ENSEMBL_FTP_HOST)
         ftp.login()
-        if (not current_release or self.release > current_release) and self._ftp_path_exists(ftp, species_li):
+        if (not current_release or self.release > current_release) and self._ftp_path_exists(ftp, path):
             self.logger.info("New release '%s' found", self.release)
             return True
         self.logger.debug("No new release found")
@@ -411,6 +413,13 @@ class GenericBioMart(HTTPDumper):
         """
         raise NotImplementedError("Implement me in sub-class")
 
+    def check_file(self):
+        '''
+        Return the file to be checked for sanity after download, or None if no check is needed.
+        Override in sub-class if needed.
+        '''
+        return None
+
 
 class EnsemblBioMart(GenericBioMart):
     ''' Ensembl (Vertebrate) BioMart HTTP Dumper '''
@@ -433,3 +442,7 @@ class EnsemblBioMart(GenericBioMart):
 
     def get_dataset_name(self, species):
         return '%s_gene_ensembl' % species[0]
+
+    def check_file(self):
+        return f"/pub/release-{self.release}/mysql/ensembl_mart_{self.release}/dataset_names.txt.gz"
+
