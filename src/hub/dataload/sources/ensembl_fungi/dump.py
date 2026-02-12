@@ -1,9 +1,11 @@
 import os
 from ftplib import FTP
-from config import DATA_ARCHIVE_ROOT, logger as logging
-from biothings.utils.dataload import tab2list
+
 from biothings.utils.common import is_int
-from hub.dataload.sources.ensembl.dump import GenericBioMart, XML_QUERY_TEMPLATE
+from biothings.utils.dataload import tab2list
+from config import DATA_ARCHIVE_ROOT, logger as logging
+from hub.dataload.sources.ensembl.dump import XML_QUERY_TEMPLATE, GenericBioMart
+
 
 class EnsemblFungiBioMart(GenericBioMart):
 
@@ -16,10 +18,12 @@ class EnsemblFungiBioMart(GenericBioMart):
 
     RELEASE_FOLDER = '/pub/fungi'
     RELEASE_PREFIX = '/pub/fungi/release-'
-    
+
     def get_species_file(self):
         return '/pub/fungi/release-%s/mysql/fungi_mart_%s/dataset_names.txt.gz' % (self.release, self.release)
 
     def get_virtual_schema(self):
         return 'fungi_mart'
 
+    def get_check_file_path(self):
+        return self.get_species_file()
