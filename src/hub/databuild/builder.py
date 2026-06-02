@@ -9,6 +9,19 @@ class MyGeneDataBuilder(builder.DataBuilder):
     about Ensembl-to-Entrez mapping.
     """
 
+    def merge_order(self, other_sources):
+        self.logger.info("Other sources: %s", other_sources)
+        # Priority list of sources to merge from highest to lowest
+        # we need ensembl_acc to be merged last since other ensembl sources can upsert wrong data if they are merged after ensembl_acc
+        priority = [
+            "ensembl_acc"
+        ]
+        # Reverse list b/c sources are upserted so highest priority needs to be merged last
+        for source in reversed(priority):
+            other_sources.append(other_sources.pop(other_sources.index(source)))
+        self.logger.info("This is the merge order: %s", other_sources)
+        return other_sources
+
     def get_predicates(self):
         def no_other_merge_job_for_ensembl_gene(job_manager):
             """
