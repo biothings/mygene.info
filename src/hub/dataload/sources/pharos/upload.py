@@ -1,3 +1,4 @@
+import glob
 import os
 
 import biothings.hub.dataload.storage as storage
@@ -20,7 +21,11 @@ class PharosUploader(uploader.BaseSourceUploader):
     )
 
     def load_data(self, data_folder):
-        pharos_path = os.path.join(data_folder, "current_tdls.csv")
+        # the TDL file is versioned (e.g. pharos400_tdls_full.csv), so glob for it
+        matches = glob.glob(os.path.join(data_folder, "*tdls_full.csv"))
+        if not matches:
+            raise FileNotFoundError("No '*tdls_full.csv' file found in %s" % data_folder)
+        pharos_path = matches[0]
         return self.keylookup(load_data)(pharos_path)
 
     @classmethod
