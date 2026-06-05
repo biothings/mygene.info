@@ -1,33 +1,32 @@
-from collections import defaultdict
+import csv
 
 from biothings.utils.dataload import open_anyfile, unlist
 
 
-def parse_tdl(input_file):
-    with open_anyfile(input_file) as f:
-        result = {}
-        for line in f:
-            (
-                _,
-                _,
-                _id,
-                tdl,
-            ) = line.strip().split(",")
-            if _id and _id != "NCBI_id" and _id != "0":
-                result[str(_id)] = tdl
-        return result
-
-
-def load_data(input_file, tdl_file):
-    entrez_tdls = parse_tdl(tdl_file)
-
+def load_data(input_file):
     with open_anyfile(input_file) as in_f:
-        result = defaultdict(list)
-        for line in in_f:
-            pharos_id, _id = line.strip().split(",")
-            if _id != "entrez_gene_id" and _id != "0":
-                result[str(_id)].append(int(pharos_id))
-        for k, v in result.items():
-            if tdl := entrez_tdls.get(k):
-                json_doc = {"_id": str(k), "pharos": {"target_id": v, "tdl": tdl}}
-                yield unlist(json_doc)
+        reader = csv.DictReader(in_f)
+        result = {}
+        for row in reader:
+            uniprot = row.get("uniprot_id")
+            if not uniprot:
+                continue
+            tdl = row.get("tdl")
+            ncbi_id = row.get("ncbi_id")
+            entry = result.setdefault(uniprot, {"tdl": set(), "ncbi_id": set()})
+            if tdl:
+                entry["tdl"].add(tdl)
+            if ncbi_id:
+                entry["ncbi_id"].add(ncbi_id)
+        for uniprot, entry in result.items():
+            pharos = {
+                "tdl": sorted(entry["tdl"]),
+                "uniprot": uniprot,
+            }
+            if entry["ncbi_id"]:
+                # yield one doc per ncbi_id so _id is always a scalar
+                for ncbi_id in sorted(entry["ncbi_id"]):
+                    yield unlist({"_id": str(ncbi_id), "pharos": pharos})
+            else:
+                # no ncbi_id: keylookup resolves the gene id from pharos.uniprot
+                yield unlist({"pharos": pharos})
