@@ -1,23 +1,32 @@
 import csv
 
-from biothings.utils.dataload import open_anyfile
+from biothings.utils.dataload import open_anyfile, unlist
 
 
 def load_data(input_file):
     with open_anyfile(input_file) as in_f:
         reader = csv.DictReader(in_f)
+        result = {}
         for row in reader:
-            tdl = row.get("tdl")
             uniprot = row.get("uniprot_id")
+            if not uniprot:
+                continue
+            tdl = row.get("tdl")
             ncbi_id = row.get("ncbi_id")
-            pharos = {}
+            entry = result.setdefault(uniprot, {"tdl": set(), "ncbi_id": set()})
             if tdl:
-                pharos["tdl"] = tdl
-            if uniprot:
-                pharos["uniprot"] = uniprot
-            json_doc = {"pharos": pharos}
-            # ncbi_id isn't always present; when missing, the keylookup
-            # resolves the gene id from pharos.uniprot instead
+                entry["tdl"].add(tdl)
             if ncbi_id:
-                json_doc["_id"] = str(ncbi_id)
-            yield json_doc
+                entry["ncbi_id"].add(ncbi_id)
+        for uniprot, entry in result.items():
+            pharos = {
+                "tdl": sorted(entry["tdl"]),
+                "uniprot": uniprot,
+            }
+            if entry["ncbi_id"]:
+                # yield one doc per ncbi_id so _id is always a scalar
+                for ncbi_id in sorted(entry["ncbi_id"]):
+                    yield unlist({"_id": str(ncbi_id), "pharos": pharos})
+            else:
+                # no ncbi_id: keylookup resolves the gene id from pharos.uniprot
+                yield unlist({"pharos": pharos})
