@@ -46,7 +46,9 @@ class MygeneQueryBuilder(ESQueryBuilder):
                 {"filter": {"term": {"name": "pseudogene"}}, "weight": "0.5"},  # downgrade
                 {"filter": {"term": {"taxid": 9606}}, "weight": "1.55"},
                 {"filter": {"term": {"taxid": 10090}}, "weight": "1.3"},
-                {"filter": {"term": {"taxid": 10116}}, "weight": "1.1"},
+                {"filter": {"term": {"taxid": 10116}}, "weight": "1.2"},
+                # other common species (config_web.TAXONOMY) rank above the long tail on ties
+                {"filter": {"terms": {"taxid": [7227, 6239, 7955, 3702, 8364, 9823]}}, "weight": "1.1"},
             ], score_mode="first")
 
         if options.entrezonly:
