@@ -10,6 +10,27 @@ class EnsemblPlantAccUploader(EnsemblAccUploader):
     name = "ensembl_plant_acc"
     main_source = "ensembl_plant"
 
+    # NCBI gene ids that map to an unusually large number of Ensembl genes.
+    # When the merged "ensembl" array exceeds this size, drop the id to avoid
+    # bloated documents.
+    EDGE_CASE_IDS = {"25016676", "25016709"}
+    MAX_ENSEMBL = 10000
+
+    def load_data(self, data_folder):
+        ensembl2acc = super().load_data(data_folder)
+        for _id in self.EDGE_CASE_IDS:
+            doc = ensembl2acc.get(_id)
+            if not doc:
+                continue
+            ensembl = doc.get("ensembl")
+            if isinstance(ensembl, list) and len(ensembl) > self.MAX_ENSEMBL:
+                self.logger.info(
+                    "Dropping NCBI gene %s: ensembl array has %d entries (> %d)",
+                    _id, len(ensembl), self.MAX_ENSEMBL,
+                )
+                del ensembl2acc[_id]
+        return ensembl2acc
+
 class EnsemblPlantGeneUploader(EnsemblGeneUploader):
 
     name = "ensembl_plant_gene"
