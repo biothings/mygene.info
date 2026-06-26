@@ -1,7 +1,7 @@
 import re
 
-from elasticsearch_dsl import Search
 from biothings.web.query import ESQueryBuilder, QueryPipelineException
+from elasticsearch.dsl import Search
 
 from .legacy import dismax, interval, wildcard
 
