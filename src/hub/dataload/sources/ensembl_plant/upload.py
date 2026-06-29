@@ -42,6 +42,25 @@ class EnsemblPlantGenomicPosUploader(EnsemblGenomicPosUploader):
     name = "ensembl_plant_genomic_pos"
     main_source = "ensembl_plant"
 
+    # NCBI gene ids that map to an unusually large number of Ensembl genes.
+    # When the genomic_pos array exceeds this size, drop the id to avoid
+    # bloated documents.
+    EDGE_CASE_IDS = {"25016676", "25016709"}
+    MAX_GENOMIC_POS = 10000
+
+    def load_data(self, data_folder):
+        for doc in super().load_data(data_folder):
+            genomic_pos = doc.get("genomic_pos")
+            if doc.get("_id") in self.EDGE_CASE_IDS \
+                    and isinstance(genomic_pos, list) \
+                    and len(genomic_pos) > self.MAX_GENOMIC_POS:
+                self.logger.info(
+                    "Dropping NCBI gene %s: genomic_pos has %d entries (> %d)",
+                    doc["_id"], len(genomic_pos), self.MAX_GENOMIC_POS,
+                )
+                continue
+            yield doc
+
 
 class EnsemblPlantInterproUploader(EnsemblInterproUploader):
 
