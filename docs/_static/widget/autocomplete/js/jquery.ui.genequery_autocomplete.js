@@ -46,8 +46,7 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
         this.source = function( request, response ) {
                 $.ajax({
                     url: _options.mygene_url,
-                    dataType: "jsonp",
-                    jsonp: 'callback',
+                    dataType: "json",
                     data: {
                         q: _options.q.format({term:request.term}),
                         sort:_options.sort,
@@ -98,7 +97,7 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
 
 	},
 
-    _url_root : '//mygene.info/widget/autocomplete/',
+    _url_root : '//docs.mygene.info/en/latest/_static/widget/autocomplete/',
 
     //helper function for adding custom css style.
     _add_css : function(cssCode) {

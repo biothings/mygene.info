@@ -46,8 +46,7 @@ $.widget("my.genequery_autocomplete", $.ui.autocomplete, {
         this.source = function( request, response ) {
                 $.ajax({
                     url: _options.mygene_url,
-                    dataType: "jsonp",
-                    jsonp: 'callback',
+                    dataType: "json",
                     data: {
                         q: _options.q.format({term:request.term}),
                         sort:_options.sort,
