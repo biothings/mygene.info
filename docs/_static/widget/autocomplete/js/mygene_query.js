@@ -57,14 +57,13 @@ mygene.add_css = function(cssCode) {
 
 mygene.genequery = function(select_callback){
         //TODO: select_only option
-        var $ = window.$ || window.JQuery;
+        var $ = window.$ || window.jQuery;
         var target_input = $(mygene.input_selector);
         target_input.autocomplete({
             source: function( request, response ) {
                 $.ajax({
-                    url: "//mygene.info/v3/query",
-                    dataType: "jsonp",
-                    jsonp: 'callback',
+                    url: "https://mygene.info/v3/query",
+                    dataType: "json",
                     data: {
                         q: request.term,
                         species: "human",
@@ -113,7 +112,7 @@ mygene_init = function() {
 
     function check_jquery_ui(){
         //console.log('jquery_ui');
-        var jquery = window.$ || window.JQuery;
+        var jquery = window.$ || window.jQuery;
         //console.log('jqueryui: '+(jquery.ui?jquery.ui.version:'null'));
         if (jquery.ui === undefined || jquery.ui.version !== '1.8.21') {
             mygene.loadfile(mygene.url_root+'js/jquery-ui-1.8.21.custom.min.js', 'js', main);
@@ -126,7 +125,7 @@ mygene_init = function() {
 
     function check_jquery(){
         //console.log('jquery');
-        var jquery = window.$ || window.JQuery;
+        var jquery = window.$ || window.jQuery;
         //console.log('jquery: '+(jquery?(jquery.fn?jquery.fn.jquery:'null'):'null'));
         if (jquery === undefined || jquery.fn.jquery !== '1.7.2')  {
             mygene.loadfile(mygene.url_root+'js/jquery-1.7.2.min.js', 'js', check_jquery_ui);
