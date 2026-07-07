@@ -312,7 +312,7 @@ class TestDataFields(BiothingsDataTest):
     def test_670_pharos(self):
         # https://pharos.nih.gov/idg/about
         res = self.request("gene/56141?fields=pharos").json()
-        assert res["pharos"]["target_id"] == 4745
+        assert res["pharos"]["uniprot"] == "Q9UN72"
 
     def test_680_exons_hg19_hg38(self):
         res = self.request("gene/9150?fields=exons,exons_hg19").json()
