@@ -2,4 +2,3 @@
 biothings[hub] @ git+https://github.com/biothings/biothings.api.git@1.2.x
 biopython # refseq
 pandas # umls
-lxml              # bs4 parsing

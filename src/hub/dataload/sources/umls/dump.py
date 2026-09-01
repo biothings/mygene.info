@@ -21,7 +21,7 @@ class UMLSDumper(HTTPDumper):
         res = self.client.get(self.__class__.HOMEPAGE_URL)
         # Raise error if status is not 200
         res.raise_for_status()
-        html = bs4.BeautifulSoup(res.text, "lxml")
+        html = bs4.BeautifulSoup(res.text, "html.parser")
         # Get the table of metathesaurus release files
         table = html.find(
             "table", attrs={"class": "usa-table border-base-lighter margin-bottom-4"}
