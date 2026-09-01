@@ -14,11 +14,12 @@ DATA_TARGET_DATABASE = "mygene"
 
 HUB_DB_BACKEND = {
     "module": "biothings.utils.mongo",
-    #"uri": "mongodb://localhost:27017",
+    # "uri": "mongodb://localhost:27017",
     "uri": "mongodb://su11:27017,su09:27017/?replicaSet=rs0biothings&readPreference=nearest",
 }
 DATA_HUB_DB_DATABASE = "mygene_hubdb"
 
+HUB_FREE_THREADED_WORKERS = True
 
 # Hub name/icon url/version, for display purpose
 HUB_NAME = "MyGene Hub (prod)"
@@ -42,9 +43,7 @@ INDEX_CONFIG = {
                     "max_retries": 10,
                 },
             },
-            "index": [
-                {"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}
-            ],
+            "index": [{"index": "genedoc_mygene_allspecies_current", "doc_type": "gene"}],
         },
         "local": {
             "host": "http://localhost:9200",
