@@ -3,6 +3,9 @@ function numberWithCommas(x) {
 }
 
 var Releases = {};
+var ReleaseYears = [];
+var ReleaseDatesByYear = {};
+var ALL_YEARS = "all";
 var DATA_FORMAT_VERSION = "1.0";
 
 jQuery(document).ready(function () {
@@ -69,56 +72,49 @@ function displayReleases() {
         return new Date(b) - new Date(a);
     });
 
-    // render releases
+    // bucket the sorted dates into years, newest first, so the page can render one
+    // year at a time rather than every release ever built
+    ReleaseYears = [];
+    ReleaseDatesByYear = {};
+    jQuery.each(releaseDates, function (index, dateKey) {
+        var year = anchorFor(dateKey).slice(0, 4);
+        if (!ReleaseDatesByYear[year]) {
+            ReleaseDatesByYear[year] = [];
+            ReleaseYears.push(year);
+        }
+        ReleaseDatesByYear[year].push(dateKey);
+    });
+
+    if (!ReleaseYears.length) {
+        jQuery('#all-releases').html('<p class="loading">No release data available.</p>');
+        return;
+    }
+
     jQuery('#all-releases').html(`
         <p class="release-control-line">
             <a href="javascript:;" class="release-expand">Expand All</a>|
             <a href="javascript:;" class="release-collapse">Collapse All</a>
-        </p>`)
+        </p>
+        <p class="release-years"></p>
+        <div id="release-list"></div>`)
 
-    jQuery.each(releaseDates, function (index, val) {
+    // year strip, newest first, with an "All" escape hatch at the end
+    jQuery.each(ReleaseYears.concat([ALL_YEARS]), function (index, year) {
+        jQuery('.release-years').append($('<a>', {
+            "href": "javascript:;",
+            "class": "release-year",
+            "data-year": year,
+            "text": year === ALL_YEARS ? "All" : year
+        }));
+    });
 
-        var rDate = new Date(val)
-        var tDate = rDate.toDateString().slice(4)
-        var hDate = rDate.toISOString().substr(0, 10).replace(/-/g, '')
-
-        $release = $('<div>', {
-            class: "release-pane",
-            id: hDate,
-        })
-            .append($('<h4>', {
-                class: "release-date",
-                text: tDate
-            })
-                .append($('<a>', {
-                    class: "headerlink",
-                    href: "#" + hDate,
-                    title: "Permalink to this release",
-                    text: '¶'
-                })))
-
-        jQuery.each(Releases[val], function (rIndex, rVal) {
-            $release.append($('<div>')
-                .append($('<a>', {
-                    "href": "javascript:;",
-                    "class": "release-link",
-                    "data-url": rVal.url,
-                    "text": 'Build version '
-                })
-                    .append($('<span>', {
-                        class: "release-version",
-                        html: rVal['target_version']
-                    }))
-                ).append($('<div>', {
-                    class: "release-info"
-                })))
-        })
-
-        jQuery('#all-releases').append($release)
+    // handlers are delegated from #all-releases so they survive re-rendering a year
+    jQuery('#all-releases').on('click', '.release-year', function () {
+        renderYear(jQuery(this).attr('data-year'));
     });
 
     // attach click handlers for each pop down link
-    jQuery('.release-link').click(function () {
+    jQuery('#all-releases').on('click', '.release-link', function () {
         if (!(jQuery(this).siblings('.release-info').hasClass('loaded'))) {
             var that = this;
             jQuery.ajax({
@@ -145,14 +141,96 @@ function displayReleases() {
         }
     });
     // add expand collapse click handlers
-    jQuery('.release-collapse').click(function () { jQuery('.release-info').slideUp(); });
-    jQuery('.release-expand').click(function () {
+    jQuery('#all-releases').on('click', '.release-collapse', function () { jQuery('.release-info').slideUp(); });
+    jQuery('#all-releases').on('click', '.release-expand', function () {
         jQuery('.release-info.loaded').slideDown();
         jQuery('.release-info:not(.loaded)').siblings('.release-link').click();
     });
 
-    if (window.location.hash) {
-        location.href = window.location.hash
-        jQuery(window.location.hash).children("div").children("a").click()
+    // a permalink pasted in later still has to be able to switch years
+    jQuery(window).on('hashchange', goToHash);
+
+    renderYear(yearForHash(window.location.hash) || ReleaseYears[0]);
+    goToHash();
+}
+
+// The YYYYMMDD anchor for a release date. Year grouping keys off this same string
+// so a #20240115 permalink always resolves to the bucket that actually holds it.
+function anchorFor(dateKey) {
+    return new Date(dateKey).toISOString().substr(0, 10).replace(/-/g, '');
+}
+
+// Year a #YYYYMMDD permalink belongs to, or null if the hash isn't one of ours.
+function yearForHash(hash) {
+    var match = /^#?(\d{4})\d{4}$/.exec(hash || '');
+    return (match && ReleaseDatesByYear[match[1]]) ? match[1] : null;
+}
+
+function renderYear(year) {
+    jQuery('.release-year').removeClass('active');
+    jQuery('.release-year[data-year="' + year + '"]').addClass('active');
+
+    var shown = (year === ALL_YEARS) ? ReleaseYears : [year];
+    var $list = jQuery('#release-list').empty();
+    jQuery.each(shown, function (index, val) {
+        jQuery.each(ReleaseDatesByYear[val] || [], function (dIndex, dateKey) {
+            $list.append(buildReleasePane(dateKey));
+        });
+    });
+}
+
+function buildReleasePane(dateKey) {
+    var rDate = new Date(dateKey)
+    var tDate = rDate.toDateString().slice(4)
+    var hDate = anchorFor(dateKey)
+
+    var $release = $('<div>', {
+        class: "release-pane",
+        id: hDate,
+    })
+        .append($('<h4>', {
+            class: "release-date",
+            text: tDate
+        })
+            .append($('<a>', {
+                class: "headerlink",
+                href: "#" + hDate,
+                title: "Permalink to this release",
+                text: '\u00b6'
+            })))
+
+    jQuery.each(Releases[dateKey], function (rIndex, rVal) {
+        $release.append($('<div>')
+            .append($('<a>', {
+                "href": "javascript:;",
+                "class": "release-link",
+                "data-url": rVal.url,
+                "text": 'Build version '
+            })
+                .append($('<span>', {
+                    class: "release-version",
+                    html: rVal['target_version']
+                }))
+            ).append($('<div>', {
+                class: "release-info"
+            })))
+    })
+
+    return $release;
+}
+
+// Jump to a permalink, switching to its year first if that release isn't rendered.
+function goToHash() {
+    var id = (window.location.hash || '').slice(1);
+    if (!id) { return; }
+    if (!document.getElementById(id)) {
+        var year = yearForHash(window.location.hash);
+        if (!year) { return; }
+        renderYear(year);
+    }
+    var target = document.getElementById(id);
+    if (target) {
+        target.scrollIntoView();
+        jQuery(target).children("div").children("a.release-link").click();
     }
 }

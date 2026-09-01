@@ -16,3 +16,7 @@
 .release-collapse {margin-left:10px;}
 .release-expand {margin-right:10px;}
 .release-control-line {margin-bottom: 5px;}
+.release-years {margin-bottom:8px !important;}
+.release-year {display:inline-block;padding:1px 8px;margin:0 4px 4px 0;border:1px solid #e1e4e5;border-radius:3px;font-size:13px;}
+.release-year.active {background-color:#2980b9;border-color:#2980b9;color:#fff;}
+.release-year.active:visited {color:#fff;}
