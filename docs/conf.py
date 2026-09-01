@@ -26,7 +26,9 @@ import sys
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = []
+# sphinxcontrib.jquery re-adds jQuery, which Sphinx stopped bundling in 6.0.
+# docs/_static/mygene_doc.js depends on it (release notes + indexed-field tables).
+extensions = ["sphinxcontrib.jquery"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -248,34 +250,10 @@ texinfo_documents = [
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
 
-try:
-    import sphinx_bootstrap_theme
-
-    html_theme = "bootstrap"
-    html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
-    html_theme_options = {
-        "bootstrap_version": "3",
-        "bootswatch_theme": "simplex",
-        "navbar_site_name": "Documentation",
-        "navbar_links": [
-            ("Home", "/", True),
-            ("Try API live!", "http://mygene.info/v3/api", 1),
-        ],
-        "source_link_position": "footer",
-    }
-except ImportError:
-    print('Warning: "sphinx_bootstrap_theme" is not installed, fall back to default theme.')
-    pass
-
-try:
-    import sphinx_rtd_theme
-
-    html_theme = "sphinx_rtd_theme"
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-    html_theme_options = {}
-except ImportError:
-    print('Warning: "sphinx_rtd_theme" is not installed, fall back to default theme.')
-    pass
+# Pinned in docs/requirements_sphinx.txt -- import it rather than falling back
+# silently, so a missing theme fails the build instead of shipping a broken one.
+html_theme = "sphinx_rtd_theme"
+html_theme_options = {}
 
 
 def setup(app):

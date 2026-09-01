@@ -1,2 +1,5 @@
 # Requirements for virtualenv when building sphinx documentation
-sphinx_rtd_theme
+# Sphinx 6.0 stopped bundling jQuery, so we need to add it as a dependency
+sphinx>=9.1
+sphinx_rtd_theme>=3.1
+sphinxcontrib-jquery>=4.1

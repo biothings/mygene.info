@@ -9,3 +9,5 @@ src/run
 
 docs/_build
 .vscode
+# python virtualenvs (e.g. docs builds, see docs/README.md)
+.venv*
