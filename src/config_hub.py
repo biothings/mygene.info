@@ -230,4 +230,4 @@ TAXONOMY = {
 # for running tests locally in our biothings hub with testing api
 APITEST_PATH = "data_tests"
 
-APITEST_CONFIG = "config_web_local"
+APITEST_CONFIG = "config_web"
