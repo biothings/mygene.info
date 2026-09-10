@@ -442,7 +442,8 @@ Query parameters
 
 q
 """
-    Required, multiple query terms seperated by comma (also support "+" or white space), but no wildcard, e.g., 'q=1017,1018' or 'q=CDK2+BTK'
+    Required, multiple query terms seperated by comma (also support "+" or white space), but no wildcard, e.g., 'q=1017,1018' or 'q=CDK2+BTK'.
+    Note that currently we only take the input query terms up to **5000** maximum. Passing more than 5000 terms returns an HTTP 400 error.
 
 scopes
 """"""

@@ -106,7 +106,7 @@
                             "Name": "q",
                             "Type": "string",
                             "Required": "Y",
-                            "Description": "multiple query terms seperated by comma (also support \"+\" or white space), but no wildcard, e.g., \"q=1017,1018\" or \"q=CDK2+BTK\" "
+                            "Description": "multiple query terms seperated by comma (also support \"+\" or white space), but no wildcard, e.g., \"q=1017,1018\" or \"q=CDK2+BTK\". Note that currently we only take the input query terms up to 5000 maximum. Passing more than 5000 terms returns an HTTP 400 error."
                         },
                         {
                             "Name": "scopes",
@@ -274,7 +274,7 @@
                             "Name": "ids",
                             "Type": "string",
                             "Required": "Y",
-                            "Description": "multiple geneids seperated by comma, e.g., \"ids=1017,1018\" or \"ids=695,ENSG00000123374\". Note that currently we only take the input ids up to 1000 maximum, the rest will be omitted."
+                            "Description": "multiple geneids seperated by comma, e.g., \"ids=1017,1018\" or \"ids=695,ENSG00000123374\". Note that currently we only take the input ids up to 1000 maximum. Passing more than 1000 ids returns an HTTP 400 error."
                         },
                         {
                             "Name": "fields",
