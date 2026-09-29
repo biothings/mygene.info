@@ -1,14 +1,12 @@
 '''
-Populates MICROBE gene entries with genomic position data
-Currently updates the 120 microbial taxids that are NCBI Reference Sequences
-
-run get_ref_microbe_taxids function to get an updated file for TAXIDS_FILE
-when it's necessary.
+Populates MICROBE gene entries with genomic position data from NCBI's gene2refseq,
+limited to the bacterial reference genome taxids built by the ref_microbe_taxids
+(refmicrobe) source.
 '''
 
 import os.path
-from biothings.utils.common import (dump, loadobj, get_timestamp)
-from biothings.utils.dataload import tab2list
+from biothings.utils.common import loadobj
+from biothings.utils.dataload import tabfile_feeder
 import biothings.hub.dataload.uploader as uploader
 from biothings.utils.hub_db import get_src_dump
 
@@ -19,9 +17,9 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
 
     def load_data(self, data_folder):
         """
-        Loads gene data from NCBI's refseq2gene.gz file.
-        Parses it based on genomic position data and refseq status provided by the
-        list of taxids from get_ref_microbe_taxids() as lookup table
+        Loads gene data from NCBI's gene2refseq.gz file.
+        Keeps genomic position data for genes whose taxid is in the list built by
+        the ref_microbe_taxids (refmicrobe) source.
         :return:
         """
 
@@ -34,11 +32,13 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
         taxid_set = set(taxids)
 
         def _includefn(ld):
-            return ld[0] in taxid_set  # match taxid from taxid_set
+            # match taxid from taxid_set, skip rows without a genomic position
+            return ld[0] in taxid_set and ld[9] != '-' and ld[10] != '-'
 
         cols_included = [0, 1, 7, 9, 10, 11]  # 0-based col idx
-        gene2genomic_pos_li = tab2list(datafile, cols_included, header=1,
-                                       includefn=_includefn)
+        # stream rows rather than loading every matching row into memory (tab2list)
+        gene2genomic_pos_li = ([ld[i] for i in cols_included]
+                               for ld in tabfile_feeder(datafile, header=1, includefn=_includefn))
         count = 0
         last_id = None
         for gene in gene2genomic_pos_li:
@@ -83,27 +83,3 @@ class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
         }
 
         return mapping
-
-    def get_ref_microbe_taxids():
-        """
-        Downloads the latest bacterial genome assembly summary from the NCBI genome
-        ftp site and generate a list of taxids of the bacterial reference genomes.
-        :return:
-        """
-        import urllib
-        import csv
-
-        urlbase = 'ftp://ftp.ncbi.nlm.nih.gov'
-        urlextension = '/genomes/refseq/bacteria/assembly_summary.txt'
-        assembly = urllib.urlopen(urlbase + urlextension)
-        datareader = csv.reader(assembly.read().splitlines(), delimiter="\t")
-        taxid = []
-
-        for row in datareader:
-            if row[4] == 'reference genome':
-                taxid.append(row[5])
-
-        ts = get_timestamp()
-        dump(taxid, "ref_microbe_taxids_{}.pyobj".format(ts))
-
-        return taxid
