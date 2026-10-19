@@ -1,5 +1,5 @@
 # -e git+https://github.com/biothings/biothings.api.git@0.12.x#egg=biothings[hub]
-biothings[hub]==1.2.0
+biothings[hub]==1.2.1
 # biothings[hub] @ git+https://github.com/biothings/biothings.api.git@1.2.x
 biopython # refseq
 pandas # umls
