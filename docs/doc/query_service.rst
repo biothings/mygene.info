@@ -149,6 +149,7 @@ Field                        Description                                     Exa
 **symbol**                    official gene symbol                              `q=symbol:cdk2 <http://mygene.info/v3/query?q=symbol:cdk2>`_
 **name**                      gene name                                         `q=name:cyclin-dependent <http://mygene.info/v3/query?q=name:cyclin-dependent>`_
 **alias**                     gene alias                                        `q=alias:p33 <http://mygene.info/v3/query?q=alias:p33>`_
+**prev_symbol**               former official gene symbol (human, HGNC)         `q=prev_symbol:PARK2 <http://mygene.info/v3/query?q=prev_symbol:PARK2>`_
 **summary**                   gene summary text                                 `q=summary:insulin <http://mygene.info/v3/query?q=summary:insulin>`_
 **refseq**                    NCBI RefSeq id  (both rna and proteins)           `q=refseq:NM_001798 <http://mygene.info/v3/query?q=refseq:NM_001798>`_ :raw-html:`<br />`
                                                                                 `q=refseq:NP_439892 <http://mygene.info/v3/query?q=refseq:NP_439892>`_
@@ -450,7 +451,8 @@ scopes
     Optional, specify one or more fields (separated by comma) as the search "scopes", e.g., "scopes=entrezgene",
     "scopes=entrezgene,ensemblgene". The available "fields" can be passed to "**scopes**" parameter are
     :ref:`listed above <available_fields>`. Default: "scopes=entrezgene,ensemblgene,retired" (either Entrez
-    or Ensembl gene ids).
+    or Ensembl gene ids). To look up gene symbols, including former official symbols such as "PARK2" for
+    "PRKN", use "scopes=symbol,alias,prev_symbol".
 
 species
 """""""
