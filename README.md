@@ -15,7 +15,7 @@ For more information see this reference:
 
 #### 1. Prerequisites
 
-    python (>=3.4)
+    python (>=3.11)
     git 
 
    In Ubuntu/Debian system, you can install all prerequisites by
