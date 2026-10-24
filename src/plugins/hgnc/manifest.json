@@ -1,0 +1,18 @@
+{
+    "version": "0.2",
+    "__metadata__": {
+        "url": "https://www.genenames.org/",
+        "license_url": "https://www.genenames.org/about/license/",
+        "license": "CC0 1.0",
+        "description": "Former official symbols (prev_symbol) of human genes from the HGNC complete set"
+    },
+    "dumper" : {
+        "data_url" : "https://storage.googleapis.com/public-download-files/hgnc/tsv/tsv/hgnc_complete_set.txt",
+        "uncompress" : false
+    },
+    "uploader" : {
+        "parser" : "parser:load_data",
+        "on_duplicates" : "error",
+        "mapping": "mapping:get_customized_mapping"
+    }
+}

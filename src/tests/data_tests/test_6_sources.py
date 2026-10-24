@@ -314,6 +314,10 @@ class TestDataFields(BiothingsDataTest):
         res = self.request("gene/56141?fields=pharos").json()
         assert res["pharos"]["uniprot"] == "Q9UN72"
 
+    def test_675_hgnc_prev_symbol(self):
+        res = self.request("gene/5071?fields=prev_symbol").json()
+        assert "PARK2" in alwayslist(res["prev_symbol"])
+
     def test_680_exons_hg19_hg38(self):
         res = self.request("gene/9150?fields=exons,exons_hg19").json()
         assert res["exons"] != res["exons_hg19"]
