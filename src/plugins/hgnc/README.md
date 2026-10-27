@@ -8,7 +8,8 @@ Data is uploaded from the **HUGO Gene Nomenclature Committee ([HGNC](https://www
   NCBI gene_info merges these into Synonyms (our `alias` field), so they could not be told apart
   from casual synonyms or ranked above them. See [mygene.info#172](https://github.com/biothings/mygene.info/issues/172).
 - Keyed by the `entrez_id` column, so no ID translation is needed. Rows without an Entrez gene id are skipped.
-- Values equal to the gene's current symbol are dropped. Like `alias`, a single value is stored as a string and several as a sorted list.
+- Values equal to the gene's current symbol are dropped. Like `alias`, a single value is stored as a string and several as a list.
+- HGNC occasionally lists the same Entrez gene id on two approved records for a few weeks, so the uploader uses `on_duplicates: merge` to keep both records' former symbols instead of failing the upload.
 - The default query scores `prev_symbol` just below `symbol` for single-term queries (see `symbol_queries()` in `src/web/pipeline/legacy.py`).
 
 ## <u> Document Structure </u>

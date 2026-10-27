@@ -12,7 +12,7 @@
     },
     "uploader" : {
         "parser" : "parser:load_data",
-        "on_duplicates" : "error",
+        "on_duplicates" : "merge",
         "mapping": "mapping:get_customized_mapping"
     }
 }
