@@ -90,13 +90,13 @@ class TestQuery(BiothingsWebAppTest):
         assert res['hits'][0]['symbol'] == 'PRKN'
 
     def test_006_symbol_above_prev_symbol(self):
-        # AK3 is AK4's former symbol, but the gene now named AK3 comes first
+        # AK3 is human AK4's former symbol, but the genes now named AK3 in
+        # human and mouse come first
         res = self.query(
             hits=True,
             q='AK3'
         )
-        assert res['hits'][0]['_id'] == '50808'
-        assert res['hits'][1]['_id'] == '205'
+        assert [hit['_id'] for hit in res['hits'][:3]] == ['50808', '56248', '205']
 
     def test_010_taxtree_true(self):
         self.query(
