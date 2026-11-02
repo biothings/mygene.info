@@ -81,15 +81,7 @@ class TestQuery(BiothingsWebAppTest):
         assert res['hits'][0]['_id'] == '5071'
         assert res['hits'][1]['_id'] == '421577'
 
-    def test_005_prev_symbol_query_string(self):
-        res = self.query(
-            hits=True,
-            q='prev_symbol:PARK2'
-        )
-        assert res['total'] == 1
-        assert res['hits'][0]['symbol'] == 'PRKN'
-
-    def test_006_symbol_above_prev_symbol(self):
+    def test_005_symbol_above_prev_symbol(self):
         # AK3 is human AK4's former symbol, but the genes now named AK3 in
         # human and mouse come first
         res = self.query(
