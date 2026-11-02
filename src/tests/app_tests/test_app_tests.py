@@ -72,6 +72,24 @@ class TestQuery(BiothingsWebAppTest):
             assert self.value_in_result(int(q), hit, 'entrezgene') or \
                 self.value_in_result(q, hit, 'entrezgene')
 
+    def test_004_prev_symbol(self):
+        # human PRKN (formerly PARK2) outranks a chicken gene still named PARK2
+        res = self.query(
+            hits=True,
+            q='PARK2'
+        )
+        assert res['hits'][0]['_id'] == '5071'
+        assert res['hits'][1]['_id'] == '421577'
+
+    def test_005_symbol_above_prev_symbol(self):
+        # AK3 is human AK4's former symbol, but the genes now named AK3 in
+        # human and mouse come first
+        res = self.query(
+            hits=True,
+            q='AK3'
+        )
+        assert [hit['_id'] for hit in res['hits'][:3]] == ['50808', '56248', '205']
+
     def test_010_taxtree_true(self):
         self.query(
             hits=True,

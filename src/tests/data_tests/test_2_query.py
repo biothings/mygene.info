@@ -186,6 +186,21 @@ class TestQueryGET(BiothingsDataTest):
         assert res["hits"][0]["_id"] == "1496"
         assert res["hits"][0]["symbol"] == "CTNNA2"
 
+    def test_262_prev_symbol_order(self):
+        """
+        https://github.com/biothings/mygene.info/issues/172
+        """
+        # renamed human genes come first for their former official symbol
+        res = self.request("query?q=PARK2").json()
+        assert res["hits"][0]["_id"] == "5071"  # PRKN
+        res = self.request("query?q=N6AMT1").json()
+        assert res["hits"][0]["_id"] == "29104"  # HEMK2
+
+    def test_263_symbol_above_prev_symbol(self):
+        # AK3 is AK4's former symbol, but the gene now named AK3 comes first
+        res = self.request("query?q=AK3&species=human").json()
+        assert res["hits"][0]["_id"] == "50808"
+
 
 class TestQueryPOST(BiothingsDataTest):
     host = "mygene.info"

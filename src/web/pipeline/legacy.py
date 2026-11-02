@@ -5,12 +5,11 @@
 from biothings.utils.common import is_int
 
 
-def dismax(q):
+def symbol_queries(q):
 
-    _query = {
-        "tie_breaker": 0,
-        "boost": 1,
-        "queries": [
+    if len(q.split()) > 1:
+        # a hit on one of several terms is not an exact match, keep BM25
+        return [
             {
                 "function_score": {
                     "query": {
@@ -21,6 +20,53 @@ def dismax(q):
                     "weight": 8,
                 }
             },
+        ]
+
+    # exact symbol and former symbol hits score as fixed tiers, not BM25:
+    # IDF differs per field, so BM25 scores of the two aren't comparable.
+    # With the species weights in build.py, a human prev_symbol hit
+    # (96 * 1.55) outranks other species' exact symbol hits (<= 120 * 1.2)
+    # but stays below the current symbol owner in human or mouse.
+    return [
+        {
+            "function_score": {
+                "query": {
+                    "constant_score": {
+                        "filter": {
+                            "match": {
+                                "symbol": {"query": q, "analyzer": "whitespace_lowercase"}
+                            }
+                        }
+                    }
+                },
+                "weight": 120,
+            }
+        },
+        {
+            "function_score": {
+                "query": {
+                    # former official symbols, e.g. PARK2 for PRKN
+                    "constant_score": {
+                        "filter": {
+                            "match": {
+                                "prev_symbol": {"query": q, "analyzer": "whitespace_lowercase"}
+                            }
+                        }
+                    }
+                },
+                "weight": 96,
+            }
+        },
+    ]
+
+
+def dismax(q):
+
+    _query = {
+        "tie_breaker": 0,
+        "boost": 1,
+        "queries": [
+            *symbol_queries(q),
             {
                 "function_score": {
                     "query": {
