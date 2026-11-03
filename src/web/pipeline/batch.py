@@ -6,9 +6,12 @@ msearch, a multi_match over the term's scopes weighted by species. When every
 scope is one of the ID fields below, one terms query per field finds the same
 genes for the whole batch with much less Elasticsearch CPU, and the hits are
 split back by query term, in the order a search for each term returns them.
+(On an index with more than one shard, the per-term searches' BM25 differs by
+shard, so hits with equal weights could come in a different order. mygene's
+index has one shard.)
 
-A hit's _score is then its species weight times the boost of the field that
-matched its query term, instead of BM25.
+A hit's _score is then its species weight times the highest boost of the
+fields that matched its query term, instead of BM25.
 """
 
 import copy
@@ -19,25 +22,29 @@ from biothings.web.query import ES_DEFAULT_SIZE, MAX_RESULT_WINDOW, AsyncESQuery
 
 # Scope fields looked up with terms queries, and the boost of a match on each.
 # The per-term multi_match scores an entrezgene or ensembl.gene match with BM25,
-# about 10 to 21 for an ID, and an _id or retired match with 1, so a gene whose
+# about 10 to 21 for an ID, and an _id or retired match with 1. Species weights
+# run from 0.5 to 1.55, so any boost above 3.1 keeps that order: a gene whose
 # current ID is the query term ranks above a gene that retired it.
 ID_FIELD_BOOSTS = {"_id": 1, "entrezgene": 10, "ensembl.gene": 10, "retired": 1}
 
-# options that apply to each query term's search separately
+# Options one search can't reproduce for each term, and raw and rawquery, whose
+# output shows the msearch. aggs, explain, fetch_all, scroll_id and search_after
+# are GET options today, kept in case POST gains them.
 MSEARCH_OPTIONS = (
     "from",
     "sort",
+    "analyzer",
+    "raw",
+    "rawquery",
     "aggs",
     "explain",
-    "analyzer",
     "fetch_all",
     "scroll_id",
     "search_after",
-    "raw",
-    "rawquery",
 )
 
-# numbers Elasticsearch turns into a long to search retired, like 1017.0
+# numbers with a sign, a decimal point or an exponent: Elasticsearch turns some
+# into a long to search retired, like 1017.0 into 1017
 NUMBER = re.compile(r"[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?")
 LONG_MAX = 2**63 - 1
 
@@ -49,9 +56,11 @@ def lookup_keys(term, scopes):
     lowercase, retired as a long. None if a terms query can't match the term
     the way the per-term multi_match does.
     """
+    if not term:
+        return None  # the msearch rejects empty terms, and 0
     if isinstance(term, int) and not isinstance(term, bool):
         term = str(term)
-    if not isinstance(term, str) or not term or not term.isascii():
+    if not isinstance(term, str) or not term.isascii():
         return None  # Python and Lucene lowercase some non-ASCII letters differently
     if not isinstance(scopes, (list, tuple)) or not scopes:
         return None
@@ -62,11 +71,12 @@ def lookup_keys(term, scopes):
     for field in scopes:
         if field == "_id":
             keys.append((field, term))
-        elif field != "retired":
+        elif field != "retired":  # entrezgene and ensembl.gene, keywords with a lowercase normalizer
             keys.append((field, term.lower()))
         elif term.isdigit():
-            if int(term) <= LONG_MAX:
-                keys.append((field, int(term)))
+            digits = term.lstrip("0") or "0"
+            if len(digits) <= 19 and int(digits) <= LONG_MAX:  # int() refuses more than 4,300 digits
+                keys.append((field, int(digits)))
         elif NUMBER.fullmatch(term):
             return None
     return keys
@@ -115,10 +125,12 @@ class MygeneQueryPipeline(AsyncESQueryPipeline):
                 return None
             positions.append(lookups.setdefault(tuple(keys), len(lookups)))
 
-        values = {}
-        for keys in lookups:
+        values = {}  # field -> values to look up
+        owners = {}  # (field, value) -> indexes of the lookups with it
+        for index, keys in enumerate(lookups):
             for field, value in keys:
                 values.setdefault(field, set()).add(value)
+                owners.setdefault((field, value), []).append(index)
         size = ES_DEFAULT_SIZE if options.size is None else options.size
         window = min(MAX_RESULT_WINDOW, len(lookups) * size)
         if not values or not window:
@@ -130,22 +142,20 @@ class MygeneQueryPipeline(AsyncESQueryPipeline):
         if docvalue_fields:  # indexed values, to find the terms each hit matches
             search = search.extra(docvalue_fields=docvalue_fields)
         response = await self.backend.execute(search, **options)
-        hits = getattr(response, "body", response)["hits"]["hits"]
+        hits = response["hits"]["hits"]
         if len(hits) >= window:
-            return None  # hits may be cut off, a search for each term returns them all
+            return None  # hits may be cut off, so fall back to a search for each term
 
-        owners = {}  # (field, value) -> indexes of the lookups it matches
-        for index, keys in enumerate(lookups):
-            for key in keys:
-                owners.setdefault(key, []).append(index)
         matches = [[] for _ in lookups]  # (score, hit) of each lookup
         for hit in hits:
             keys = [("_id", hit["_id"])]
             keys += [(field, value) for field, indexed in hit.pop("fields", {}).items() for value in indexed]
-            boosts = {}  # lookup index -> boost of the best field it matched
+            boosts = {}  # lookup index -> highest boost of the fields it matched
             for key in keys:
                 for index in owners.get(key, ()):
                     boosts[index] = max(boosts.get(index, 0), ID_FIELD_BOOSTS[key[0]])
+            if not boosts:
+                return None  # no term claims this hit, e.g. after a normalizer change
             for index, boost in boosts.items():
                 matches[index].append((hit["_score"] * boost, hit))
         # sorted() is stable, so equal scores keep the order of the hits
@@ -157,11 +167,10 @@ class MygeneQueryPipeline(AsyncESQueryPipeline):
             term_hits = []
             for score, hit in ranked[index][:size]:
                 if id(hit) in used:
-                    hit = copy.deepcopy(hit)  # the formatter changes hits in place
+                    # each term sets its own _score, and the formatter changes hits in place
+                    hit = copy.deepcopy(hit)
                 used.add(id(hit))
                 hit["_score"] = score
                 term_hits.append(hit)
-            total = {"value": len(ranked[index]), "relation": "eq"}
-            max_score = term_hits[0]["_score"] if term_hits else None
-            responses.append({"hits": {"total": total, "max_score": max_score, "hits": term_hits}})
+            responses.append({"hits": {"total": {"value": len(ranked[index])}, "hits": term_hits}})
         return responses
