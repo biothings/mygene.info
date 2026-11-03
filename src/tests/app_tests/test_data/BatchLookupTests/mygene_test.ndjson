@@ -1,0 +1,22 @@
+{"index": {"_id": "100000001"}}
+{"taxid": 9606, "symbol": "RETIRED1", "name": "test gene that retired 1017 and 999999", "entrezgene": "100000001", "retired": [1017, 999999]}
+{"index": {"_id": "1017"}}
+{"taxid": 9606, "symbol": "CDK2", "name": "cyclin dependent kinase 2", "entrezgene": "1017", "ensembl": {"gene": "ENSG00000123374"}}
+{"index": {"_id": "12566"}}
+{"taxid": 10090, "symbol": "Cdk2", "name": "cyclin dependent kinase 2", "entrezgene": "12566", "ensembl": [{"gene": "ENSMUSG00000025358"}, {"gene": "ENSMUSG00000100000"}]}
+{"index": {"_id": "2001"}}
+{"taxid": 9606, "symbol": "SHARED1", "name": "shared ensembl test gene", "entrezgene": "2001", "ensembl": {"gene": "ENSG00000999999"}}
+{"index": {"_id": "2002"}}
+{"taxid": 10116, "symbol": "SHARED2", "name": "shared ensembl test gene", "entrezgene": "2002", "ensembl": {"gene": "ENSG00000999999"}}
+{"index": {"_id": "2003"}}
+{"taxid": 9606, "symbol": "SHARED3", "name": "shared ensembl test pseudogene", "entrezgene": "2003", "ensembl": {"gene": "ENSG00000999999"}}
+{"index": {"_id": "2004"}}
+{"taxid": 7955, "symbol": "SHARED4", "name": "shared ensembl test gene", "entrezgene": "2004", "ensembl": {"gene": "ENSG00000999999"}}
+{"index": {"_id": "2005"}}
+{"taxid": 9598, "symbol": "SHARED5", "name": "shared ensembl test gene", "entrezgene": "2005", "ensembl": {"gene": "ENSG00000999999"}}
+{"index": {"_id": "2006"}}
+{"taxid": 9598, "symbol": "SHARED6", "name": "shared ensembl test gene", "entrezgene": "2006", "ensembl": {"gene": "ENSG00000999999"}}
+{"index": {"_id": "ENSDARG00000000001"}}
+{"taxid": 7955, "name": "ensembl only test gene", "ensembl": {"gene": "ENSDARG00000000001"}}
+{"index": {"_id": "3001"}}
+{"taxid": 9606, "symbol": "PSEUDO1", "name": "test pseudogene", "entrezgene": "3001"}
