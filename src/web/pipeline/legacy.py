@@ -22,15 +22,10 @@ def symbol_queries(q):
             },
         ]
 
-    # exact symbol and former symbol hits score as fixed tiers, not BM25:
-    # IDF differs per field, so BM25 scores of the two aren't comparable.
-    # constant_score scores every hit 1 * boost, with no IDF. The BM25 clause
-    # above scores 8 * IDF (about 86-142 for a symbol), so a boost of 12 keeps
-    # exact symbol hits on that scale; of the values tested, 12 changed the
-    # fewest rankings from the BM25 version.
-    # prev_symbol's weight is 0.68 * symbol's: with the species weights in
-    # build.py, a human prev_symbol hit (1.55 * 0.68 = 1.05) ranks below exact
-    # symbol hits in the common species (>= 1.1) and above all others (1.0).
+    # fixed scores instead of BM25, whose IDF differs per field, so symbol and
+    # prev_symbol hits compare the same way for every query. 8 * 12 = 96 keeps
+    # symbol hits in the old BM25 range; at 0.68 of that, a human former symbol
+    # ranks below current symbols in build.py's common species, above all others.
     return [
         {
             "function_score": {
