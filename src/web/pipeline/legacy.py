@@ -22,10 +22,11 @@ def symbol_queries(q):
             },
         ]
 
-    # fixed scores instead of BM25, whose IDF differs per field, so symbol and
-    # prev_symbol hits compare the same way for every query. 8 * 12 = 96 keeps
-    # symbol hits in the old BM25 range; at 0.68 of that, a human former symbol
-    # ranks below current symbols in build.py's common species, above all others.
+    # Fixed scores instead of BM25: BM25's IDF is computed per field, so symbol
+    # and prev_symbol scores wouldn't be comparable. Symbol hits score
+    # 8 * 12 = 96, within the range BM25 used to give them. prev_symbol hits
+    # score 0.68 of that, so a human former symbol ranks below current symbols
+    # in build.py's common species and above those in all other species.
     return [
         {
             "function_score": {
