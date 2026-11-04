@@ -197,9 +197,16 @@ class TestQueryGET(BiothingsDataTest):
         assert res["hits"][0]["_id"] == "29104"  # HEMK2
 
     def test_263_symbol_above_prev_symbol(self):
-        # AK3 is AK4's former symbol, but the gene now named AK3 comes first
-        res = self.request("query?q=AK3&species=human").json()
-        assert res["hits"][0]["_id"] == "50808"
+        # AK3 is human AK4's former symbol: genes now named AK3 in the common
+        # species weighted in web/pipeline/build.py rank above AK4
+        common = {9606, 10090, 10116, 7227, 6239, 7955, 3702, 8364, 9823}
+        hits = self.request("query?q=AK3&size=20&fields=symbol,taxid").json()["hits"]
+        ids = [hit["_id"] for hit in hits]
+        assert ids[0] == "50808"
+        assert "205" in ids
+        for hit in hits:
+            if hit.get("taxid") in common and hit.get("symbol", "").lower() == "ak3":
+                assert ids.index(hit["_id"]) < ids.index("205")
 
 
 class TestQueryPOST(BiothingsDataTest):
