@@ -91,6 +91,15 @@ class TestQuery(BiothingsWebAppTest):
         )
         assert [hit['_id'] for hit in res['hits'][:6]] == ['50808', '56248', '26956', '406404', '205', '426534']
 
+    def test_006_post_symbol_scope(self):
+        # POST lookups rank like test_004 and test_005: the symbol scope also
+        # searches prev_symbol, and adding alias doesn't change the order
+        for scopes in ('symbol', 'symbol,alias'):
+            res = self.request('query', method='POST', data={'q': 'PARK2,AK3', 'scopes': scopes}).json()
+            ids = {term: [hit['_id'] for hit in res if hit['query'] == term] for term in ('PARK2', 'AK3')}
+            assert ids['PARK2'] == ['5071', '421577'], scopes
+            assert ids['AK3'] == ['50808', '56248', '26956', '406404', '205', '426534'], scopes
+
     def test_010_taxtree_true(self):
         self.query(
             hits=True,

@@ -4,6 +4,24 @@
 
 from biothings.utils.common import is_int
 
+# Fixed scores instead of BM25: BM25's IDF is computed per field, so symbol
+# and prev_symbol scores wouldn't be comparable. Symbol hits score
+# 8 * 12 = 96, within the range BM25 used to give them. prev_symbol hits
+# score 0.68 of that, so a human former symbol ranks below current symbols
+# in build.py's common species and above those in all other species.
+# Used by the default query below and by POST lookups in build.py.
+SYMBOL_WEIGHTS = {"symbol": 8, "prev_symbol": 5.44}
+
+
+def symbol_tier(field, match):
+    """Wrap a match query on field so that a hit scores 12 * SYMBOL_WEIGHTS[field]."""
+    return {
+        "function_score": {
+            "query": {"constant_score": {"filter": match, "boost": 12}},
+            "weight": SYMBOL_WEIGHTS[field],
+        }
+    }
+
 
 def symbol_queries(q):
 
@@ -22,43 +40,10 @@ def symbol_queries(q):
             },
         ]
 
-    # Fixed scores instead of BM25: BM25's IDF is computed per field, so symbol
-    # and prev_symbol scores wouldn't be comparable. Symbol hits score
-    # 8 * 12 = 96, within the range BM25 used to give them. prev_symbol hits
-    # score 0.68 of that, so a human former symbol ranks below current symbols
-    # in build.py's common species and above those in all other species.
+    # prev_symbol holds former official symbols, e.g. PARK2 for PRKN
     return [
-        {
-            "function_score": {
-                "query": {
-                    "constant_score": {
-                        "filter": {
-                            "match": {
-                                "symbol": {"query": q, "analyzer": "whitespace_lowercase"}
-                            }
-                        },
-                        "boost": 12,
-                    }
-                },
-                "weight": 8,
-            }
-        },
-        {
-            "function_score": {
-                "query": {
-                    # former official symbols, e.g. PARK2 for PRKN
-                    "constant_score": {
-                        "filter": {
-                            "match": {
-                                "prev_symbol": {"query": q, "analyzer": "whitespace_lowercase"}
-                            }
-                        },
-                        "boost": 12,
-                    }
-                },
-                "weight": 5.44,
-            }
-        },
+        symbol_tier(field, {"match": {field: {"query": q, "analyzer": "whitespace_lowercase"}}})
+        for field in SYMBOL_WEIGHTS
     ]
 
 

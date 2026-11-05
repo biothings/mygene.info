@@ -10,7 +10,8 @@ Data is uploaded from the **HUGO Gene Nomenclature Committee ([HGNC](https://www
 - Keyed by the `entrez_id` column, so no ID translation is needed. Rows without an Entrez gene id are skipped.
 - Values equal to the gene's current symbol are dropped. Like `alias`, a single value is stored as a string and several as a list.
 - HGNC occasionally lists the same Entrez gene id on two approved records for a few weeks, so the uploader uses `on_duplicates: merge` to keep both records' former symbols instead of failing the upload.
-- For single-term queries, the default query ranks a human `prev_symbol` hit below exact `symbol` hits in the common species weighted in `src/web/pipeline/build.py`, and above other species' exact `symbol` hits (see `symbol_queries()` in `src/web/pipeline/legacy.py`).
+- For single-term queries, the default query ranks a human `prev_symbol` hit below exact `symbol` hits in the common species weighted in `src/web/pipeline/build.py`, and above other species' exact `symbol` hits (see `SYMBOL_WEIGHTS` in `src/web/pipeline/legacy.py`).
+  POST lookups with the `symbol` scope also search `prev_symbol` and rank hits the same way (see `default_match_query()` in `src/web/pipeline/build.py`).
 
 ## <u> Document Structure </u>
 
