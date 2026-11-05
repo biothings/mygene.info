@@ -3,7 +3,7 @@ import re
 from biothings.web.query import ESQueryBuilder, QueryPipelineException
 from elasticsearch.dsl import Search
 
-from .legacy import dismax, interval, wildcard
+from .legacy import SYMBOL_WEIGHTS, dismax, interval, symbol_tier, wildcard
 
 
 class MygeneQueryBuilder(ESQueryBuilder):
@@ -36,6 +36,26 @@ class MygeneQueryBuilder(ESQueryBuilder):
             search = Search().from_dict(dismax(q))
 
         return search
+
+    def default_match_query(self, q, scopes, options):
+        # Lookups with scopes (POST /query) match q the way biothings does, but
+        # rank symbol hits like the default query: the symbol scope also
+        # searches prev_symbol, and both get the fixed scores in legacy.py.
+        fields = [scopes] if isinstance(scopes, str) else list(scopes)
+        if "symbol" in fields and "prev_symbol" not in fields:
+            fields.append("prev_symbol")
+        if not any(field in SYMBOL_WEIGHTS for field in fields):
+            return super().default_match_query(q, scopes, options)
+
+        match = super().default_match_query
+        queries = [
+            symbol_tier(field, match(q, [field], options).query.to_dict())
+            for field in fields if field in SYMBOL_WEIGHTS
+        ]
+        others = [field for field in fields if field not in SYMBOL_WEIGHTS]
+        if others:
+            queries.append(match(q, others, options).query.to_dict())
+        return Search().from_dict({"query": {"dis_max": {"queries": queries}}})
 
     def apply_extras(self, search, options):
 

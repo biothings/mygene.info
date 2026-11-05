@@ -82,13 +82,23 @@ class TestQuery(BiothingsWebAppTest):
         assert res['hits'][1]['_id'] == '421577'
 
     def test_005_symbol_above_prev_symbol(self):
-        # AK3 is human AK4's former symbol, but the genes now named AK3 in
-        # human and mouse come first
+        # AK3 is human AK4's former symbol: the genes now named AK3 in the
+        # common species (human, mouse, rat, zebrafish) come first, then
+        # human AK4, then the chicken AK3
         res = self.query(
             hits=True,
             q='AK3'
         )
-        assert [hit['_id'] for hit in res['hits'][:3]] == ['50808', '56248', '205']
+        assert [hit['_id'] for hit in res['hits'][:6]] == ['50808', '56248', '26956', '406404', '205', '426534']
+
+    def test_006_post_symbol_scope(self):
+        # POST lookups rank like test_004 and test_005: the symbol scope also
+        # searches prev_symbol, and adding alias doesn't change the order
+        for scopes in ('symbol', 'symbol,alias'):
+            res = self.request('query', method='POST', data={'q': 'PARK2,AK3', 'scopes': scopes}).json()
+            ids = {term: [hit['_id'] for hit in res if hit['query'] == term] for term in ('PARK2', 'AK3')}
+            assert ids['PARK2'] == ['5071', '421577'], scopes
+            assert ids['AK3'] == ['50808', '56248', '26956', '406404', '205', '426534'], scopes
 
     def test_010_taxtree_true(self):
         self.query(

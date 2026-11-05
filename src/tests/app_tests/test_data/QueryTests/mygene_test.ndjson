@@ -14,5 +14,11 @@
 {"HGNC": "17376", "alias": ["AK3L1", "AK6", "AKL3L", "AKL3L1", "FIX"], "entrezgene": "50808", "name": "adenylate kinase 3", "symbol": "AK3", "taxid": 9606, "type_of_gene": "protein-coding"}
 {"index": {"_id": "56248"}}
 {"MGI": "MGI:1860835", "alias": ["AK-3", "Ak3l", "Ak3l1", "Akl3l"], "entrezgene": "56248", "name": "adenylate kinase 3", "symbol": "Ak3", "taxid": 10090, "type_of_gene": "protein-coding"}
+{"index": {"_id": "26956"}}
+{"RGD": "619885", "entrezgene": "26956", "name": "adenylate kinase 3", "symbol": "Ak3", "taxid": 10116, "type_of_gene": "protein-coding"}
+{"index": {"_id": "406404"}}
+{"ZFIN": "ZDB-GENE-040426-2142", "alias": ["ak3l1", "id:ibd3034", "sb:cb845", "wu:fa02c11", "wu:fc20h08", "zgc:64135"], "entrezgene": "406404", "name": "adenylate kinase 3", "symbol": "ak3", "taxid": 7955, "type_of_gene": "protein-coding"}
+{"index": {"_id": "426534"}}
+{"entrezgene": "426534", "name": "adenylate kinase 3", "symbol": "AK3", "taxid": 9031, "type_of_gene": "protein-coding"}
 {"index": {"_id": "205"}}
 {"HGNC": "363", "alias": ["AK 4", "AK3", "AK3L1", "AK3L2"], "entrezgene": "205", "name": "adenylate kinase 4", "prev_symbol": ["AK3", "AK3L1"], "symbol": "AK4", "taxid": 9606, "type_of_gene": "protein-coding"}

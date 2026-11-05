@@ -197,9 +197,16 @@ class TestQueryGET(BiothingsDataTest):
         assert res["hits"][0]["_id"] == "29104"  # HEMK2
 
     def test_263_symbol_above_prev_symbol(self):
-        # AK3 is AK4's former symbol, but the gene now named AK3 comes first
-        res = self.request("query?q=AK3&species=human").json()
-        assert res["hits"][0]["_id"] == "50808"
+        # AK3 is human AK4's former symbol: genes now named AK3 in the common
+        # species weighted in web/pipeline/build.py rank above AK4
+        common = {9606, 10090, 10116, 7227, 6239, 7955, 3702, 8364, 9823}
+        hits = self.request("query?q=AK3&size=20&fields=symbol,taxid").json()["hits"]
+        ids = [hit["_id"] for hit in hits]
+        assert ids[0] == "50808"
+        assert "205" in ids
+        for hit in hits:
+            if hit.get("taxid") in common and hit.get("symbol", "").lower() == "ak3":
+                assert ids.index(hit["_id"]) < ids.index("205")
 
 
 class TestQueryPOST(BiothingsDataTest):
@@ -269,3 +276,12 @@ class TestQueryPOST(BiothingsDataTest):
             "q": "ENSG00000034510",
         }
         self.query(method="POST", **body)
+
+    def test_267_post_symbol_scope(self):
+        # the symbol scope also finds former symbols, ranked like a GET query:
+        # PARK2 finds PRKN, and AK3 finds human AK3 before AK4 (formerly AK3)
+        data = {"q": "PARK2,AK3", "scopes": "symbol", "species": "human"}
+        res = self.request("query", method="POST", data=data).json()
+        ids = {term: [hit.get("_id") for hit in res if hit["query"] == term] for term in ("PARK2", "AK3")}
+        assert ids["PARK2"][0] == "5071"
+        assert ids["AK3"][:2] == ["50808", "205"]
