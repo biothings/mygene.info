@@ -1,6 +1,9 @@
+from unittest import mock
+
 import pytest
 
 from biothings.tests.web import BiothingsWebAppTest
+from biothings.web.query import AsyncESQueryPipeline, QueryPipelineException
 
 
 class TestAnnotationScopes(BiothingsWebAppTest):
@@ -219,6 +222,156 @@ class TestQuery(BiothingsWebAppTest):
         assert res1['facets'] == res3['facets']
         for hit in res3['hits']:
             assert hit['taxid'] == taxid
+
+
+class TestBatchLookup(BiothingsWebAppTest):
+    """
+    MygeneQueryPipeline (web.pipeline.batch) looks up a batch of IDs with one search.
+    run_batch runs each batch through it and through AsyncESQueryPipeline, which searches
+    each ID separately, and asserts that both return the same hits.
+
+    The fixture has the real CDK2 (1017) and mouse Cdk2 (12566), plus made-up genes for
+    the cases one search could get wrong:
+    - 100000001 lists CDK2's ID 1017 as retired, so the term 1017 matches CDK2 by entrezgene
+      and 100000001 by retired. Both are human and 100000001 is indexed first, so only the
+      field boosts in batch.py rank CDK2 first, as BM25 does in the search per ID.
+    - 2001-2006 share ENSG00000999999, in species with different weights. 2003's name has
+      "pseudogene", which gets the lowest weight.
+    - 3001 is another pseudogene, the hit test_query_full_window cuts off.
+    """
+
+    TEST_DATA_DIR_NAME = 'BatchLookupTests'
+    SCOPES = ['_id', 'entrezgene', 'ensembl.gene', 'retired']
+    IDS = [
+        '1017', '1017', 100000001,  # Entrez IDs: CDK2 twice, and 100000001 as a JSON int
+        'ENSG00000123374', 'ensg00000123374', 'ENSG00000123374.5',  # CDK2's Ensembl ID, lowercase, versioned
+        '12566', 'ENSMUSG00000100000',  # mouse Cdk2, by Entrez ID and by its second Ensembl ID
+        'ENSG00000999999',  # genes 2001-2006
+        '999999',  # 100000001, by retired only
+        'ENSDARG00000000001',  # a gene with only an Ensembl ID, which is its _id
+        'nope', 'Cdk2',  # not found: junk, and a symbol
+    ]
+
+    def run_batch(self, method, ids, **options):
+        """
+        Run a batch through MygeneQueryPipeline and through AsyncESQueryPipeline, check that
+        both return the same hits, and return the result and the searches the batch sent:
+        ['Search'] for one search, ['MultiSearch'] for a search per ID, or ['Search',
+        'MultiSearch'] when the hits didn't fit in one search.
+        """
+        pipeline = self._app.biothings.pipeline
+        assert type(pipeline).__name__ == 'MygeneQueryPipeline'
+        per_term = AsyncESQueryPipeline(pipeline.builder, pipeline.backend, pipeline.formatter, **pipeline.settings)
+        with mock.patch.object(pipeline.backend, 'execute', wraps=pipeline.backend.execute) as execute:
+            result = self.io_loop.run_sync(lambda: getattr(pipeline, method)(ids, **options))
+        expected = self.io_loop.run_sync(lambda: getattr(per_term, method)(ids, **options))
+
+        def without_scores(res):
+            if isinstance(res, dict):  # with_total
+                return {**res, 'hits': without_scores(res['hits'])}
+            return [{key: value for key, value in hit.items() if key != '_score'} for hit in res]
+
+        assert without_scores(result) == without_scores(expected)
+        return result, [type(call.args[0]).__name__ for call in execute.call_args_list]
+
+    @staticmethod
+    def hits_of(result, q):
+        return [hit['_id'] for hit in result if hit['query'] == q and not hit.get('notfound')]
+
+    def test_query(self):
+        result, searches = self.run_batch('search', self.IDS, scopes=self.SCOPES, species=['all'])
+        assert searches == ['Search']
+        # CDK2, whose current ID is 1017, ranks above 100000001, which retired it (1017 is in IDS twice)
+        assert self.hits_of(result, '1017') == ['1017', '100000001'] * 2
+        # _score is per term, so terms that share a hit get their own copy: 100000001
+        # is a retired match for 1017 and an entrezgene match for 100000001
+        score = {(hit['query'], hit['_id']): hit['_score'] for hit in result if '_id' in hit}
+        assert score['1017', '1017'] > score['1017', '100000001']
+        assert score['1017', '100000001'] < score[100000001, '100000001']
+        # human, rat, zebrafish, then chimpanzee (a tie, kept in index order), and the pseudogene last
+        assert self.hits_of(result, 'ENSG00000999999') == ['2001', '2002', '2004', '2005', '2006', '2003']
+        assert self.hits_of(result, 'ensg00000123374') == ['1017']
+        assert self.hits_of(result, 100000001) == ['100000001']
+        assert self.hits_of(result, 'ENSG00000123374.5') == []
+
+    def test_query_species_size_with_total(self):
+        result, searches = self.run_batch(
+            'search', self.IDS, scopes=self.SCOPES, species=['9606', '10090'], size=2, with_total=True
+        )
+        assert searches == ['Search']
+        assert self.hits_of(result['hits'], 'ENSG00000999999') == ['2001', '2003']
+        result, searches = self.run_batch(
+            'search', self.IDS, scopes=self.SCOPES, species=['all'], size=2, with_total=True
+        )
+        assert searches == ['Search']
+        assert self.hits_of(result['hits'], 'ENSG00000999999') == ['2001', '2002']
+        assert result['max_total'] == 6
+
+    def test_query_full_window(self):
+        # one search fetches at most 2 terms x size 2 = 4 hits. The 6 genes with ENSG00000999999
+        # fill them and cut off 3001, so the batch runs again with a search per ID.
+        result, searches = self.run_batch(
+            'search', ['ENSG00000999999', '3001'], scopes=self.SCOPES, species=['all'], size=2
+        )
+        assert searches == ['Search', 'MultiSearch']
+        assert self.hits_of(result, 'ENSG00000999999') == ['2001', '2002']
+        assert self.hits_of(result, '3001') == ['3001']
+
+    def test_gene(self):
+        ids = [
+            '1017', 'NCBIGene:1017', 'ENSEMBL:ENSG00000999999', 'ENSG00000123374', '999999', '12566', 'nope',
+            'ENSDARG00000000001',
+        ]
+        result, searches = self.run_batch('fetch', ids, species=['all'])
+        assert searches == ['Search']
+        assert self.hits_of(result, 'NCBIGene:1017') == ['1017', '100000001']
+        assert len(self.hits_of(result, 'ENSEMBL:ENSG00000999999')) == 6
+
+    def test_msearch_fallback(self):
+        # batches one search can't answer the same way run with a search per ID, like
+        # the symbol scope, which gets the fixed scores in legacy.py even next to ID fields
+        result, searches = self.run_batch(
+            'search', ['CDK2', 'Cdk2', '1017'], scopes=['entrezgene', 'symbol'], species=['all']
+        )
+        assert searches == ['MultiSearch']
+        assert self.hits_of(result, 'CDK2') == ['1017', '12566']
+        for ids, options in [
+            (self.IDS, {'from': 1}),
+            (self.IDS, {'size': 0}),
+            (['1017', 'Ünï'], {}),  # Python and Lucene lowercase some non-ASCII letters differently
+        ]:
+            _, searches = self.run_batch('search', ids, scopes=self.SCOPES, species=['all'], **options)
+            assert searches == ['MultiSearch']
+        # retired is a long, Elasticsearch searches it for 1017 when the term is 1017.0
+        result, searches = self.run_batch('search', ['1017.0', '1017'], scopes=self.SCOPES, species=['all'])
+        assert searches == ['MultiSearch']
+        assert self.hits_of(result, '1017.0') == ['100000001']
+
+    def test_unusual_terms(self):
+        # more digits than int() accepts, or a number past the largest long:
+        # not found, as with a search per ID
+        result, searches = self.run_batch(
+            'search', ['1' * 5000, '9' * 19, '1017'], scopes=self.SCOPES, species=['all']
+        )
+        assert searches == ['Search']
+        assert self.hits_of(result, '1' * 5000) == self.hits_of(result, '9' * 19) == []
+        # a search per ID rejects the term 0 as empty, and so does the batch
+        with pytest.raises(QueryPipelineException) as raised:
+            self.io_loop.run_sync(lambda: self._app.biothings.pipeline.search([0], scopes=self.SCOPES))
+        assert raised.value.code == 400
+
+    def test_post_endpoints(self):
+        res = self.request('query', method='POST', data={
+            'q': '1017,ENSG00000999999', 'scopes': 'entrezgene,ensembl.gene,retired', 'species': 'human',
+        }).json()
+        assert [(hit['query'], hit['_id']) for hit in res] == [
+            ('1017', '1017'), ('1017', '100000001'), ('ENSG00000999999', '2001'), ('ENSG00000999999', '2003'),
+        ]
+        res = self.request('gene', method='POST', data={'ids': '1017,ENSDARG00000000001,nope'}).json()
+        assert [(hit['query'], hit.get('_id'), hit.get('notfound')) for hit in res] == [
+            ('1017', '1017', None), ('1017', '100000001', None),
+            ('ENSDARG00000000001', 'ENSDARG00000000001', None), ('nope', None, True),
+        ]
 
 
 class TestMetadata(BiothingsWebAppTest):

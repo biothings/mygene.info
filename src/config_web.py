@@ -153,6 +153,8 @@ QUERY_KWARGS["POST"]["q"]["jsoninput"] = True
 # Elasticsearch Query Pipeline
 # *****************************************************************************
 ES_QUERY_BUILDER = "web.pipeline.MygeneQueryBuilder"
+# one search for a batch of IDs instead of one per ID, see web/pipeline/batch.py
+ES_QUERY_PIPELINE = "web.pipeline.MygeneQueryPipeline"
 AVAILABLE_FIELDS_EXCLUDED = ["all", "accession_agg", "refseq_agg"]
 
 # *****************************************************************************

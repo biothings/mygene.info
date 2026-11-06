@@ -1,7 +1,7 @@
 import re
 
 from biothings.web.query import ESQueryBuilder, QueryPipelineException
-from elasticsearch.dsl import Search
+from elasticsearch.dsl import Q, Search
 
 from .legacy import SYMBOL_WEIGHTS, dismax, interval, symbol_tier, wildcard
 
@@ -56,6 +56,17 @@ class MygeneQueryBuilder(ESQueryBuilder):
         if others:
             queries.append(match(q, others, options).query.to_dict())
         return Search().from_dict({"query": {"dis_max": {"queries": queries}}})
+
+    def build_id_lookup(self, values, options):
+        """
+        One query for a batch of IDs, instead of a default_match_query search
+        for each: a terms query for each field in values, a dict of field ->
+        values. A hit scores 1 before the weights in apply_extras, see
+        web.pipeline.batch.
+        """
+        lookup = Q("bool", should=[Q("terms", **{field: terms}) for field, terms in values.items()])
+        search = Search().query("constant_score", filter=lookup)
+        return self.apply_extras(search, options)
 
     def apply_extras(self, search, options):
 
