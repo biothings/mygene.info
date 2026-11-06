@@ -451,8 +451,9 @@ scopes
     Optional, specify one or more fields (separated by comma) as the search "scopes", e.g., "scopes=entrezgene",
     "scopes=entrezgene,ensemblgene". The available "fields" can be passed to "**scopes**" parameter are
     :ref:`listed above <available_fields>`. Default: "scopes=entrezgene,ensemblgene,retired" (either Entrez
-    or Ensembl gene ids). To look up gene symbols, including former official symbols such as "PARK2" for
-    "PRKN", use "scopes=symbol,alias,prev_symbol".
+    or Ensembl gene ids). To look up gene symbols, use "scopes=symbol". It also matches former official
+    symbols, such as "PARK2" for "PRKN", ranked the same way as in a GET query. Add "alias" to match other
+    synonyms too.
 
 species
 """""""

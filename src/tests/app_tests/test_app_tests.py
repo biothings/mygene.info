@@ -85,13 +85,23 @@ class TestQuery(BiothingsWebAppTest):
         assert res['hits'][1]['_id'] == '421577'
 
     def test_005_symbol_above_prev_symbol(self):
-        # AK3 is human AK4's former symbol, but the genes now named AK3 in
-        # human and mouse come first
+        # AK3 is human AK4's former symbol: the genes now named AK3 in the
+        # common species (human, mouse, rat, zebrafish) come first, then
+        # human AK4, then the chicken AK3
         res = self.query(
             hits=True,
             q='AK3'
         )
-        assert [hit['_id'] for hit in res['hits'][:3]] == ['50808', '56248', '205']
+        assert [hit['_id'] for hit in res['hits'][:6]] == ['50808', '56248', '26956', '406404', '205', '426534']
+
+    def test_006_post_symbol_scope(self):
+        # POST lookups rank like test_004 and test_005: the symbol scope also
+        # searches prev_symbol, and adding alias doesn't change the order
+        for scopes in ('symbol', 'symbol,alias'):
+            res = self.request('query', method='POST', data={'q': 'PARK2,AK3', 'scopes': scopes}).json()
+            ids = {term: [hit['_id'] for hit in res if hit['query'] == term] for term in ('PARK2', 'AK3')}
+            assert ids['PARK2'] == ['5071', '421577'], scopes
+            assert ids['AK3'] == ['50808', '56248', '26956', '406404', '205', '426534'], scopes
 
     def test_010_taxtree_true(self):
         self.query(
@@ -318,9 +328,13 @@ class TestBatchLookup(BiothingsWebAppTest):
         assert len(self.hits_of(result, 'ENSEMBL:ENSG00000999999')) == 6
 
     def test_msearch_fallback(self):
-        # batches one search can't answer the same way run with a search per ID
-        _, searches = self.run_batch('search', ['CDK2', 'Cdk2'], scopes=['symbol'], species=['all'])
+        # batches one search can't answer the same way run with a search per ID, like
+        # the symbol scope, which gets the fixed scores in legacy.py even next to ID fields
+        result, searches = self.run_batch(
+            'search', ['CDK2', 'Cdk2', '1017'], scopes=['entrezgene', 'symbol'], species=['all']
+        )
         assert searches == ['MultiSearch']
+        assert self.hits_of(result, 'CDK2') == ['1017', '12566']
         _, searches = self.run_batch('search', self.IDS, scopes=self.SCOPES, species=['all'], **{'from': 1})
         assert searches == ['MultiSearch']
         # retired is a long, Elasticsearch searches it for 1017 when the term is 1017.0

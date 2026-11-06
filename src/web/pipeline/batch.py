@@ -2,8 +2,10 @@
 One search for a batch of IDs.
 
 POST /v3/query and POST /v3/gene search each query term separately in an
-msearch, a multi_match over the term's scopes weighted by species. When every
-scope is one of the ID fields below, one terms query per field finds the same
+msearch, with MygeneQueryBuilder.default_match_query weighted by species. For
+the ID fields below, that query is biothings' multi_match. The symbol scope
+gets the fixed scores from legacy.py instead, and keeps a search per term.
+When every scope is an ID field, one terms query per field finds the same
 genes for the whole batch with much less Elasticsearch CPU, and the hits are
 split back by query term, in the order a search for each term returns them.
 (On an index with more than one shard, the per-term searches' BM25 differs by
