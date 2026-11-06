@@ -335,18 +335,26 @@ class TestBatchLookup(BiothingsWebAppTest):
         )
         assert searches == ['MultiSearch']
         assert self.hits_of(result, 'CDK2') == ['1017', '12566']
-        _, searches = self.run_batch('search', self.IDS, scopes=self.SCOPES, species=['all'], **{'from': 1})
-        assert searches == ['MultiSearch']
+        for ids, options in [
+            (self.IDS, {'from': 1}),
+            (self.IDS, {'size': 0}),
+            (['1017', 'Ünï'], {}),  # Python and Lucene lowercase some non-ASCII letters differently
+        ]:
+            _, searches = self.run_batch('search', ids, scopes=self.SCOPES, species=['all'], **options)
+            assert searches == ['MultiSearch']
         # retired is a long, Elasticsearch searches it for 1017 when the term is 1017.0
         result, searches = self.run_batch('search', ['1017.0', '1017'], scopes=self.SCOPES, species=['all'])
         assert searches == ['MultiSearch']
         assert self.hits_of(result, '1017.0') == ['100000001']
 
     def test_unusual_terms(self):
-        # more digits than int() accepts: not found, as with a search per ID
-        result, searches = self.run_batch('search', ['1' * 5000, '1017'], scopes=self.SCOPES, species=['all'])
+        # more digits than int() accepts, or a number past the largest long:
+        # not found, as with a search per ID
+        result, searches = self.run_batch(
+            'search', ['1' * 5000, '9' * 19, '1017'], scopes=self.SCOPES, species=['all']
+        )
         assert searches == ['Search']
-        assert self.hits_of(result, '1' * 5000) == []
+        assert self.hits_of(result, '1' * 5000) == self.hits_of(result, '9' * 19) == []
         # a search per ID rejects the term 0 as empty, and so does the batch
         with pytest.raises(QueryPipelineException) as raised:
             self.io_loop.run_sync(lambda: self._app.biothings.pipeline.search([0], scopes=self.SCOPES))
