@@ -295,7 +295,7 @@ def main(src_name, confirm=True):
     ensembl_doc = src_dump.find_one({"_id": src_name}) or {}
     ENSEMBL_DATA_FOLDER = ensembl_doc.get("download", {}).get("data_folder")
     assert ENSEMBL_DATA_FOLDER, "Can't find Ensembl data folder"
-    entrez_doc = src_dump.find_one({"_id": "entrez"}) or {}
+    entrez_doc = src_dump.find_one({"_id": "ncbi_gene"}) or {}
     ENTREZ_DATA_FOLDER = entrez_doc.get("download", {}).get("data_folder")
     assert ENTREZ_DATA_FOLDER, "Can't find Entrez data folder"
 

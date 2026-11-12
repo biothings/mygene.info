@@ -2,11 +2,11 @@ from biothings.utils.dataload import dict_convert, tab2dict_iter
 from biothings.utils.common import open_anyfile
 
 try:
-    from ..entrez.parser import EntrezParserBase
+    from ..ncbi_gene.parser import EntrezParserBase
 except (ValueError, ImportError):
     # capture "ValueError: Attempted relative import beyond top-level package"
     # or other ImportError
-    from hub.dataload.sources.entrez.parser import EntrezParserBase
+    from hub.dataload.sources.ncbi_gene.parser import EntrezParserBase
 
 
 class GeneSummaryParser(EntrezParserBase):

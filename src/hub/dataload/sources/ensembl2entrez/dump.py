@@ -17,7 +17,7 @@ class Ensembl2EntrezDumper(FilesystemDumper):
             "files" : ["gene_ensembl__xref_entrezgene__dm.txt","gene_ensembl__gene__main.txt"]
             }
     TO_SOURCE = {
-            "name" : "entrez",
+            "name" : "ncbi_gene",
             "files" : ["gene2ensembl.gz","gene_info.gz"]
             }
     SCHEDULE = "0 6 * * *"

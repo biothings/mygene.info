@@ -85,7 +85,7 @@ class MyGeneDataBuilder(builder.DataBuilder):
         # enrich with some specific mygene counts, specially regarding ensembl vs. entrez
         tgt = mongo.get_target_db()[self.target_name]
         self.stats["total_genes"] = tgt.estimated_document_count()
-        # entrez genes are digits only (also, don't count entrez_gene collection,
+        # entrez genes are digits only (also, don't count ncbi_gene_info collection,
         # because tgt can be a subset, we have to work with the merged collection)
         self.logger.debug("Counting 'total_entrez_genes'")
         entrez_cnt = tgt.count_documents({"entrezgene": {"$exists": 1}})

@@ -11,9 +11,9 @@ from config import DATA_ARCHIVE_ROOT, logger as logging
 from biothings.hub.dataload.dumper import FTPDumper
 
 
-class EntrezGeneDumper(FTPDumper):
+class NcbiGeneDumper(FTPDumper):
 
-    SRC_NAME = "entrez"
+    SRC_NAME = "ncbi_gene"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     FTP_HOST = 'ftp.ncbi.nih.gov'
     CWD_DIR = '/gene/DATA'

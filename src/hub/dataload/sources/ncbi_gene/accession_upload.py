@@ -1,10 +1,10 @@
 from .parser import Gene2AccessionParser
 import biothings.hub.dataload.uploader as uploader
 
-class EntrezAccessionUploader(uploader.MergerSourceUploader):
+class NcbiGeneAccessionUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_accession"
-    main_source = "entrez"
+    name = "ncbi_gene_accession"
+    main_source = "ncbi_gene"
 
     def load_data(self, data_folder):
         self.parser = Gene2AccessionParser(data_folder)
