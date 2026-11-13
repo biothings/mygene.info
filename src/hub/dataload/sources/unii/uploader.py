@@ -6,7 +6,7 @@ biothings.config_for_app(config)
 import biothings.hub.dataload.uploader
 
 class UniiUploader(biothings.hub.dataload.uploader.BaseSourceUploader):
-    name = "mygene_unii"
+    name = "unii"
     __metadata__ = {
         "src_meta": {
             "url": "https://open.fda.gov/apis/other/substance/",

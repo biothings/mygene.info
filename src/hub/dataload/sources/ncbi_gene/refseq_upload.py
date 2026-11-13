@@ -1,10 +1,10 @@
 from .parser import Gene2RefseqParser
 import biothings.hub.dataload.uploader as uploader
 
-class EntrezRefseqUploader(uploader.MergerSourceUploader):
+class NcbiGeneRefseqUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_refseq"
-    main_source = "entrez"
+    name = "ncbi_gene_refseq"
+    main_source = "ncbi_gene"
 
     def load_data(self, data_folder):
         parser = Gene2RefseqParser(data_folder)

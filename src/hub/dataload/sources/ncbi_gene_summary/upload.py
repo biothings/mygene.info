@@ -5,7 +5,7 @@ from .parser import GeneSummaryParser
 
 class NcbiGeneSummaryUploader(uploader.MergerSourceUploader):
 
-    name = "ncbi_gene"
+    name = "ncbi_gene_summary"
 
     def load_data(self, data_folder):
         gene2summary = GeneSummaryParser(data_folder).load()

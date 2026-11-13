@@ -13,7 +13,7 @@ class EntrezRetired2Current(mapper.IDBaseMapper):
             # this is a whole dict containing all entrez _id, wether it's a current or retired one.
             # it means most of the data has assoction with same _id as key and as value. It consumes memory
             # but it's a way to know the entrez perimeter (what entrez _ids exist and should be considered
-            self.map = loadobj(("entrez_gene__geneid_d.pyobj", self.db_provider()), mode="gridfs")
+            self.map = loadobj(("ncbi_gene_info__geneid_d.pyobj", self.db_provider()), mode="gridfs")
 
     def process(self, *args, **kwargs):
         raise UserWarning("Don't call me, please")
@@ -68,13 +68,13 @@ class Ensembl2EntrezRoot(mapper.IDBaseMapper):
         """
         we want to force translation, not defaulting to ensembl if no match
         so, if there's a match, it means ensembl doc can be converted so it means
-        we're not interested in keeping this doc since it's already there as a entrez_gene
+        we're not interested in keeping this doc since it's already there as a ncbi_gene_info
         Note: it's not really a conversion is this case, it's a filter, we're filtering out
         convertible docs to only keep ensembl docs
         """
         for doc in docs:
             _new = self.translate(doc[key_to_convert], transparent=False)
             if _new:
-                continue  # already as entrez_gene
+                continue  # already as ncbi_gene_info
             else:
                 yield doc  # return original

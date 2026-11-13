@@ -1,9 +1,9 @@
 import biothings.hub.dataload.uploader as uploader
 
 
-class EntrezUnigeneUploader(uploader.DummySourceUploader):
+class UnigeneUploader(uploader.DummySourceUploader):
 
-    name = "entrez_unigene"
+    name = "unigene"
 
     @classmethod
     def get_mapping(klass):
