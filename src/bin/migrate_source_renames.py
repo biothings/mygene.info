@@ -6,6 +6,7 @@ One-off migration of the hub's data for the source renames:
     entrez         -> ncbi_gene           (uploaders entrez_* -> ncbi_gene_*)
     entrez_unigene -> unigene
     mygene_unii    -> unii
+    refseq's uploaders: entrez_genesummary -> refseq_summary, entrez_ec -> refseq_ec
 
 Stop the hub and move the data folders first. Then, from src/ with the hub's venv:
 
@@ -21,6 +22,9 @@ Stop the hub and move the data folders first. Then, from src/ with the hub's ven
     renamed. The old entrez, entrez_unigene and mygene_unii documents stay, marked with
     "renamed_to" and without pending flags: the release note looks up the previous build's
     sources there. The ncbi_gene document moves to ncbi_gene_summary, since entrez takes its _id.
+  * src_dump: renames the entrez_genesummary and entrez_ec jobs inside the refseq document, which
+    keeps its _id and data folder. The old job names aren't kept there: with sub-sources under both
+    names, the release note fails as soon as refseq's release changes.
   * src_master: adds each uploader's document under its new name
   * src_build_config: renames the sources in every build configuration
   * hub_config: renames class settings changed in the hub ("<class>.<ATTR>", e.g. a dumper's
@@ -79,8 +83,11 @@ SOURCES = [
     ("entrez_unigene", "unigene", {"entrez_unigene": "unigene"}),
     ("mygene_unii", "unii", {"mygene_unii": "unii"}),
 ]
+# uploaders renamed inside a source that keeps its name: {src_dump _id: {old uploader name: new uploader name}}
+RENAMED_IN_PLACE = {"refseq": {"entrez_genesummary": "refseq_summary", "entrez_ec": "refseq_ec"}}
 # old -> new uploader names, which are also the collection names
 UPLOADERS = {old: new for _, _, uploaders in SOURCES for old, new in uploaders.items()}
+UPLOADERS.update((old, new) for uploaders in RENAMED_IN_PLACE.values() for old, new in uploaders.items())
 GRIDFS_FILES = {"entrez_gene__geneid_d.pyobj": "ncbi_gene_info__geneid_d.pyobj"}
 # the source whose old src_dump document is replaced rather than kept
 REPLACED = "ncbi_gene"
@@ -97,6 +104,8 @@ CLASSES = [
     ("EntrezUnigeneDumper", "UnigeneDumper"),
     ("EntrezUnigeneUploader", "UnigeneUploader"),
     ("MyGeneUNIIDumper", "UniiDumper"),
+    ("EntrezGeneSummaryUploader", "RefseqSummaryUploader"),
+    ("EntrezECUploader", "RefseqECUploader"),
 ]
 
 
@@ -146,6 +155,35 @@ def renamed_doc(doc, new_id, old_src, new_src, uploaders):
         if isinstance(section, dict) and "data_folder" in section:
             section["data_folder"] = moved(section["data_folder"], old_src, new_src)
     return doc, sorted(dropped)
+
+
+def job_sections(doc):
+    """[(key, jobs)] for the sections of a src_dump document that hold jobs (upload, inspect, ...)."""
+    return [
+        (key, section["jobs"])
+        for key, section in (doc or {}).items()
+        if isinstance(section, dict) and isinstance(section.get("jobs"), dict)
+    ]
+
+
+def renamed_jobs(doc, names):
+    """
+    Jobs renamed in place, for a source that keeps its name: ({"<section>.jobs": renamed jobs} for
+    the sections with jobs to rename, [(old name, new name)] renamed).
+    """
+    update, done = {}, set()
+    for key, jobs in job_sections(doc):
+        if not set(jobs) & set(names):
+            continue
+        renamed = {}
+        for name, job in jobs.items():
+            if name in names:
+                done.add((name, names[name]))
+                if isinstance(job, dict) and job.get("step") == name:
+                    job = dict(job, step=names[name])
+            renamed[names.get(name, name)] = job
+        update[key + ".jobs"] = renamed
+    return update, sorted(done)
 
 
 def data_folders(doc):
@@ -220,6 +258,17 @@ class Migration:
                     "neither %s nor %s exists (fine if that release's files were deleted)" % (old_path, new_path)
                 )
 
+    def check_jobs_in_place(self, _id, names):
+        doc = self.find(_id)
+        self.check_status(doc)
+        for key, jobs in job_sections(doc):
+            for old, new in names.items():
+                if old in jobs and new in jobs:
+                    self.problems.append(
+                        "src_dump %s has %s jobs named both %s and %s; was the hub started with only half of "
+                        "the change? Delete the stale one first" % (_id, key, old, new)
+                    )
+
     # ------------------------------------------------------------------ apply
 
     def check_apply(self):
@@ -242,6 +291,8 @@ class Migration:
                     "was the hub started with the new code before the migration?" % new
                 )
             self.check_folders(renamed_doc(old_doc, new, old, new, uploaders)[0], old, new)
+        for _id, names in RENAMED_IN_PLACE.items():
+            self.check_jobs_in_place(_id, names)
         moving = self.class_settings_to_rename()
         for doc, new_id in moving:
             if self.hub_config.find_one({"_id": new_id}) and new_id not in {d["_id"] for d, _ in moving}:
@@ -330,6 +381,23 @@ class Migration:
                     self.dump.delete_one({"_id": old})
                 else:
                     self.dump.update_one({"_id": old}, {"$set": {"renamed_to": new}, "$unset": {"pending": ""}})
+        for _id, names in RENAMED_IN_PLACE.items():
+            self.rename_jobs(_id, names)
+
+    def rename_jobs(self, _id, names):
+        """Rename jobs inside a src_dump document, for a source that keeps its name."""
+        doc = self.find(_id)
+        if not doc:
+            self.warnings.append("no src_dump document for %s" % _id)
+            return
+        update, done = renamed_jobs(doc, names)
+        if not update:
+            print("  %s: no jobs to rename" % _id)
+            return
+        renames = ", ".join("%s -> %s" % pair for pair in done)
+        self.say("rename jobs in %s (%s): %s" % (_id, ", ".join(sorted(update)), renames))
+        if self.write:
+            self.dump.update_one({"_id": _id}, {"$set": update})
 
     def apply_src_master(self):
         print("src_master:")
@@ -422,6 +490,8 @@ class Migration:
                     "%s has been dumped since --apply; rolling back would lose that: "
                     "restore the hub DB from a backup instead" % new
                 )
+        for _id, names in RENAMED_IN_PLACE.items():
+            self.check_jobs_in_place(_id, {new: old for old, new in names.items()})
 
     def rollback(self):
         self.check_rollback()
@@ -465,6 +535,8 @@ class Migration:
                         update["$set"] = {"pending": new_doc["pending"]}
                     self.dump.update_one({"_id": old}, update)
                     self.dump.delete_one({"_id": new})
+        for _id, names in RENAMED_IN_PLACE.items():
+            self.rename_jobs(_id, {new: old for old, new in names.items()})
         print("GridFS files in %s:" % self.src_db.name)
         for old, new in GRIDFS_FILES.items():
             if self.fs.exists(new):
@@ -490,6 +562,9 @@ class Migration:
             new_doc = self.find(new)
             if not (new_doc and new_doc.get("renamed_from") == old):
                 self.problems.append("src_dump %s isn't migrated yet: run --apply first" % new)
+        for _id, names in RENAMED_IN_PLACE.items():
+            if renamed_jobs(self.find(_id), names)[0]:
+                self.problems.append("src_dump %s still has jobs under the old names: run --apply first" % _id)
         self.stop_on_problems()
         print("src_dump:")
         for old, new, _ in SOURCES:

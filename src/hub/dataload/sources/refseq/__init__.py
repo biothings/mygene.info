@@ -1,3 +1,3 @@
 from .dump import RefseqDumper
-from .ec_upload import EntrezECUploader
-from .genesummary_upload import EntrezGeneSummaryUploader
+from .ec_upload import RefseqECUploader
+from .genesummary_upload import RefseqSummaryUploader

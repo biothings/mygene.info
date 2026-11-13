@@ -1,9 +1,9 @@
 from .parser import Gene2ECParser
 import biothings.hub.dataload.uploader as uploader
 
-class EntrezECUploader(uploader.MergerSourceUploader):
+class RefseqECUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_ec"
+    name = "refseq_ec"
     main_source = "refseq"
 
     def load_data(self, data_folder):
