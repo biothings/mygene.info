@@ -1,9 +1,25 @@
 import os.path
+import re
 from biothings.utils.common import dump, loadobj
 from biothings.utils.dataload import dupline_seperator, tabfile_feeder, list2dict, value_convert
 
 # REF: ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/idmapping/README
 VALID_COLUMN_NO = 22
+
+# a versioned Ensembl stable ID, e.g. ENSG00000111644.9 or ENSMUST00000000001.5
+ENSEMBL_VERSIONED_ID = re.compile(r"^(ENS[A-Z]+\d+)\.\d+$")
+
+
+def ensembl_key(ensembl_id):
+    """
+    Return an Ensembl ID without its version, to match Ensembl IDs to Entrez GeneIDs.
+
+    UniProt entries of the same gene don't always carry the same Ensembl version. In UniProt 2026_04,
+    ACRBP's TrEMBL entries (F5H2C2...) say ENSG00000111644.9 while Q8NEB7, the entry with GeneID 84519,
+    still says ENSG00000111644.8, so matching on versioned IDs left those TrEMBL entries without a gene.
+    Other IDs (e.g. "Sobic.001G000100", where the dot isn't a version) are returned as they are.
+    """
+    return ENSEMBL_VERSIONED_ID.sub(r"\1", ensembl_id)
 
 
 def get_uniprot_section(uniprotkb_id):
@@ -57,7 +73,7 @@ def load_all(data_folder):
             if not transcode:
                 raise KeyError(ensembl_id)
             try:
-                entrez_id = ensembl2geneid[ensembl_id]
+                entrez_id = ensembl2geneid[ensembl_key(ensembl_id)]
                 # if ensembl_id can be mapped to entrez_id
                 for _eid in entrez_id:
                     xli2.append((uniprot_acc, section, _eid))
@@ -92,7 +108,7 @@ def load_all(data_folder):
             if not transcode:
                 raise KeyError(ensembl_id)
             try:
-                entrez_id = x_ensembl2geneid[ensembl_id]
+                entrez_id = x_ensembl2geneid[ensembl_key(ensembl_id)]
                 # if ensembl_id can be mapped to entrez_id
                 for _eid in entrez_id:
                     xli2.append((_eid, x_value))
@@ -146,7 +162,7 @@ def load_all(data_folder):
         for xli in xlis:
             # feed mapping
             if xli[2] != '' and xli[3] != '':
-                ensembl2geneid.setdefault(xli[3], []).append(xli[2])
+                ensembl2geneid.setdefault(ensembl_key(xli[3]), []).append(xli[2])
             try:
                 # postpone ensemblid->entrezid resolution while parsing uniprot as the
                 # full transcodification dict is only correct at the end.
@@ -168,7 +184,7 @@ def load_all(data_folder):
 
         for xli in pdbxlis:
             if xli[0] != '' and xli[1] != '':
-                x_ensembl2geneid.setdefault(xli[1], []).append(xli[0])
+                x_ensembl2geneid.setdefault(ensembl_key(xli[1]), []).append(xli[0])
             try:
                 merge_x(xli, gene2pdb, transcode=False, cvt_fn=cvt_fn, k="pdb")
             except KeyError:
@@ -176,7 +192,7 @@ def load_all(data_folder):
 
         for xli in pirxlis:
             if xli[0] != '' and xli[1] != '':
-                x_ensembl2geneid.setdefault(xli[1], []).append(xli[0])
+                x_ensembl2geneid.setdefault(ensembl_key(xli[1]), []).append(xli[0])
             try:
                 merge_x(xli, gene2pir, transcode=False)
             except KeyError:
