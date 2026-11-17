@@ -13,11 +13,6 @@ ENSEMBL_VERSIONED_ID = re.compile(r"^(ENS[A-Z]+\d+)\.\d+$")
 def ensembl_key(ensembl_id):
     """
     Return an Ensembl ID without its version, to match Ensembl IDs to Entrez GeneIDs.
-
-    UniProt entries of the same gene don't always carry the same Ensembl version. In UniProt 2026_04,
-    ACRBP's TrEMBL entries (F5H2C2...) say ENSG00000111644.9 while Q8NEB7, the entry with GeneID 84519,
-    still says ENSG00000111644.8, so matching on versioned IDs left those TrEMBL entries without a gene.
-    Other IDs (e.g. "Sobic.001G000100", where the dot isn't a version) are returned as they are.
     """
     return ENSEMBL_VERSIONED_ID.sub(r"\1", ensembl_id)
 
