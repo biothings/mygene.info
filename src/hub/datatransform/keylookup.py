@@ -43,14 +43,14 @@ graph_mygene.add_edge(
 # the interface until keylookup is able to take from values
 # from docs
 graph_mygene.add_edge(
-    "entrez", "entrez", object=MongoDBEdge("entrez_gene", lookup="_id", field="_id")
+    "entrez", "entrez", object=MongoDBEdge("ncbi_gene_info", lookup="_id", field="_id")
 )
 
 for field in ["MGI", "HGNC", "RGD", "TAIR", "WormBase", "ZFIN", "SGD", "FLYBASE"]:
     graph_mygene.add_edge(
         field.lower(),
         "entrez",
-        object=MongoDBEdge("entrez_gene", lookup=field, field="_id"),
+        object=MongoDBEdge("ncbi_gene_info", lookup=field, field="_id"),
     )
 
 

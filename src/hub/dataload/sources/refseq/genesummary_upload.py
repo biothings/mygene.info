@@ -2,9 +2,9 @@ from .parser import GeneSummaryParser
 import biothings.hub.dataload.uploader as uploader
 
 
-class EntrezGeneSummaryUploader(uploader.MergerSourceUploader):
+class RefseqSummaryUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_genesummary"
+    name = "refseq_summary"
     main_source = "refseq"
 
     def load_data(self, data_folder):

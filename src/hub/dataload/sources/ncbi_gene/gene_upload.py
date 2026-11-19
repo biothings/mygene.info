@@ -4,10 +4,10 @@ from biothings.utils.common import dump2gridfs
 from .parser import GeneInfoParser, get_geneid_d
 
 
-class EntrezGeneUploader(uploader.MergerSourceUploader):
+class NcbiGeneInfoUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_gene"
-    main_source = "entrez"
+    name = "ncbi_gene_info"
+    main_source = "ncbi_gene"
     ENTREZ_GENEDOC_ROOT = True
 
     def load_data(self, data_folder):

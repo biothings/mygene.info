@@ -118,8 +118,8 @@ domready(function () {
       }
       d['total_genes'] = meta['stats']['total_genes'];
       //var status_text = 'Status: NCBI snapshot: %NCBI_SNAPSHOT%, ensembl release: %ENSEMBL_MART_VERSION%, NetAffy: %NETAFFY_RELEASE%, <a href="/metadata">view complete</a>.'
-      //var status_text = 'Stats: total genes: %total_genes% Status: NCBI snapshot: %entrez%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  NetAffy: %netaffy%,  <a href="/v2/metadata">view complete</a>.'
-      var status_text = 'Status: NCBI snapshot: %entrez%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  UCSC: %ucsc%, NetAffx: %reporter%,  <a href="https://mygene.info/v3/metadata">view complete</a>.'
+      //var status_text = 'Stats: total genes: %total_genes% Status: NCBI snapshot: %ncbi_gene%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  NetAffy: %netaffy%,  <a href="/v2/metadata">view complete</a>.'
+      var status_text = 'Status: NCBI snapshot: %ncbi_gene%,  Ensembl release: %ensembl%,  UniProt: %uniprot%,  UCSC: %ucsc%, NetAffx: %reporter%,  <a href="https://mygene.info/v3/metadata">view complete</a>.'
       var status_text = template(status_text, d)
       var el = document.getElementById('status_text')
       if (el) el.innerHTML = status_text;

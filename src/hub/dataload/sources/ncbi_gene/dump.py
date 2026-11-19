@@ -16,12 +16,15 @@ class NcbiGeneDumper(FTPDumper):
     SRC_NAME = "ncbi_gene"
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
     FTP_HOST = 'ftp.ncbi.nih.gov'
-    CWD_DIR = '/gene/DATA/ASN_BINARY/Mammalia'
+    CWD_DIR = '/gene/DATA'
 
-    SCHEDULE = "0 6 * * 6"
+    SCHEDULE = "0 22  * * 6"
+    to_check = [("gene_info.gz", 60000000)]
+
+
 
     def get_newest_info(self):
-        res = self.client.sendcmd("MDTM All_Mammalia.ags.gz")
+        res = self.client.sendcmd("MDTM gene_info.gz") # pick one, assuming all other on the same data
         code, remote_lastmodified = res.split()
         self.release = datetime.strptime(remote_lastmodified, '%Y%m%d%H%M%S').strftime("%Y%m%d")
 
@@ -34,15 +37,11 @@ class NcbiGeneDumper(FTPDumper):
             self.logger.debug("No new release found")
             return False
 
-    def create_todump_list(self, force=False, **kwargs):
+    def create_todump_list(self, force=False):
         self.get_newest_info()
-        for fn in ['All_Mammalia.ags.gz']:
+        for fn in ["gene_info.gz","gene2accession.gz","gene2refseq.gz",
+                   "gene2go.gz","gene_history.gz","gene2ensembl.gz"]:
             local_file = os.path.join(self.new_data_folder,fn)
             if force or not os.path.exists(local_file) or self.remote_is_better(fn,local_file) or self.new_release_available():
                 self.to_dump.append({"remote": fn, "local":local_file})
-
-    def post_dump(self, *args, **kwargs):
-        self.logger.info("Extracting Gene Summary Data in %s", self.new_data_folder)
-        os.chdir(self.new_data_folder)
-        os.system('time gunzip -c All_Mammalia.ags.gz |../gene2xml -i stdin -b T | ../xtract -pattern Entrezgene -element Gene-track_geneid,Entrezgene_summary | awk -F "\t" \'length($2)\' | xz -9 --stdout > gene2summary_all.txt.xz')
 

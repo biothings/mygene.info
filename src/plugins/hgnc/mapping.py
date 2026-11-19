@@ -1,5 +1,5 @@
 def get_customized_mapping(cls):
-    # same as `alias` and `symbol` in entrez gene_upload.py
+    # same as `alias` and `symbol` in ncbi_gene/gene_upload.py
     mapping = {
         "prev_symbol": {
             "type": "keyword",

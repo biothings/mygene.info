@@ -2,11 +2,11 @@ from biothings.utils.dataload import dict_convert, tab2dict_iter
 from biothings.utils.common import open_anyfile
 
 try:
-    from ..entrez.parser import EntrezParserBase
+    from ..ncbi_gene.parser import EntrezParserBase
 except (ValueError, ImportError):
     # capture "ValueError: Attempted relative import beyond top-level package"
     # or other ImportError
-    from hub.dataload.sources.entrez.parser import EntrezParserBase
+    from hub.dataload.sources.ncbi_gene.parser import EntrezParserBase
 
 
 class GeneSummaryParser(EntrezParserBase):
@@ -25,7 +25,7 @@ class GeneSummaryParser(EntrezParserBase):
                     geneid_set.add(geneid)
 
         # temporary fix to add in missing human gene summaries
-        with open_anyfile('/opt/mygene-hub/datasources/ncbi_gene/gene2summary_human.txt.xz') as df:
+        with open_anyfile('/opt/mygene-hub/datasources/ncbi_gene_summary/gene2summary_human.txt.xz') as df:
             for line in df:
                 geneid, summary = line.strip().split('\t')
                 if geneid not in geneid_set:

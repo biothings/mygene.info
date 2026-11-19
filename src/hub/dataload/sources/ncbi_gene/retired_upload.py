@@ -1,10 +1,10 @@
 from .parser import Gene2RetiredParser
 import biothings.hub.dataload.uploader as uploader
 
-class EntrezRetiredUploader(uploader.MergerSourceUploader):
+class NcbiGeneRetiredUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_retired"
-    main_source = "entrez"
+    name = "ncbi_gene_retired"
+    main_source = "ncbi_gene"
 
     def load_data(self, data_folder):
         parser = Gene2RetiredParser(data_folder)

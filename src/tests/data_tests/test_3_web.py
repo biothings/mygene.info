@@ -55,14 +55,15 @@ class TestMygeneWeb(BiothingsDataTest):
 
     def test_324_metadata(self):
         sources = [
-            "entrez",
+            "ncbi_gene",
             "cpdb",
             "pharos",
             "homologene",
             "clingen",
             "pharmgkb",
             "ensembl",
-            "entrez_unigene",
+            "unigene",
+            "unii",
             "ensembl_protists",
             "uniprot_ipi",
             "reagent",

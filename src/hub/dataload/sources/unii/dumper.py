@@ -16,12 +16,12 @@ except ImportError:
 
 
 __all__ = [
-    'MyGeneUNIIDumper',
+    'UniiDumper',
 ]
 
 
-class MyGeneUNIIDumper(APIDumper):
-    SRC_NAME = 'mygene_unii'
+class UniiDumper(APIDumper):
+    SRC_NAME = 'unii'
     SRC_ROOT_FOLDER = os.path.join(DATA_ARCHIVE_ROOT, SRC_NAME)
 
     @staticmethod

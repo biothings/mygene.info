@@ -10,10 +10,10 @@ from biothings.utils.dataload import tabfile_feeder
 import biothings.hub.dataload.uploader as uploader
 from biothings.utils.hub_db import get_src_dump
 
-class EntrezGenomicPosUploader(uploader.MergerSourceUploader):
+class NcbiGeneGenomicPosUploader(uploader.MergerSourceUploader):
 
-    name = "entrez_genomic_pos"
-    main_source = "entrez"
+    name = "ncbi_gene_genomic_pos"
+    main_source = "ncbi_gene"
 
     def load_data(self, data_folder):
         """

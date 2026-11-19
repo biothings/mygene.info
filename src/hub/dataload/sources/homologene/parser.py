@@ -3,11 +3,11 @@ from config import TAXONOMY
 from biothings.utils.dataload import tab2dict
 
 try:
-    from ..entrez.parser import EntrezParserBase, get_geneid_d
+    from ..ncbi_gene.parser import EntrezParserBase, get_geneid_d
 except (ValueError, ImportError):
     # capture "ValueError: Attempted relative import beyond top-level package"
     # or other ImportError
-    from hub.dataload.sources.entrez.parser import EntrezParserBase, get_geneid_d
+    from hub.dataload.sources.ncbi_gene.parser import EntrezParserBase, get_geneid_d
 
 
 class HomologeneParser(EntrezParserBase):
@@ -32,9 +32,9 @@ class HomologeneParser(EntrezParserBase):
         '''
         from biothings.utils.hub_db import get_src_dump
         homo_d = tab2dict(self.datafile, (2, 1), 0, header=0)
-        entrez_doc = get_src_dump().find_one({"_id": "entrez"}) or {}
+        entrez_doc = get_src_dump().find_one({"_id": "ncbi_gene"}) or {}
         entrez_dir = entrez_doc.get("download", {}).get("data_folder")
-        assert entrez_dir, "Can't find Entrez data directory"
+        assert entrez_dir, "Can't find ncbi_gene data directory"
         DATAFILE = os.path.join(entrez_dir, 'gene_history.gz')
         assert os.path.exists(DATAFILE), "gene_history.gz is missing (entrez_dir: %s)" % entrez_dir
         retired2gene = tab2dict(

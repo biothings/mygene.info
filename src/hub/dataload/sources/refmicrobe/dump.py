@@ -7,7 +7,7 @@ from biothings.utils.common import dump
 
 class RefMicrobeTaxIDsDumper(LastModifiedHTTPDumper):
     """
-    Builds the list of bacterial taxids the entrez_genomic_pos uploader uses to pick
+    Builds the list of bacterial taxids the ncbi_gene_genomic_pos uploader uses to pick
     which microbial genes get genomic_pos from gene2refseq: the taxids of RefSeq
     "reference genome" assemblies in NCBI's bacterial assembly summary.
     """
@@ -15,7 +15,7 @@ class RefMicrobeTaxIDsDumper(LastModifiedHTTPDumper):
     SRC_NAME = "ref_microbe_taxids"
     SRC_ROOT_FOLDER = os.path.join(config.DATA_ARCHIVE_ROOT, SRC_NAME)
     SRC_URLS = ["https://ftp.ncbi.nlm.nih.gov/genomes/refseq/bacteria/assembly_summary.txt"]
-    SCHEDULE = "0 20 * * 6"  # before entrez's weekly dump, so its uploaders get a fresh list
+    SCHEDULE = "0 20 * * 6"  # before ncbi_gene's weekly dump, so its uploaders get a fresh list
     ARCHIVE = False  # NCBI updates this ~240MB file daily, only keep the latest
     AUTO_UPLOAD = False  # only data is needed
 
@@ -25,7 +25,7 @@ class RefMicrobeTaxIDsDumper(LastModifiedHTTPDumper):
         if not taxids:
             raise DumperException("No reference genome taxids found in '%s'" % summary_file)
         self.logger.info("Found %s reference genome taxids in '%s'" % (len(taxids), summary_file))
-        # loaded by the entrez_genomic_pos uploader
+        # loaded by the ncbi_gene_genomic_pos uploader
         dump(taxids, os.path.join(self.new_data_folder, "ref_microbe_taxids.pyobj"))
 
 
