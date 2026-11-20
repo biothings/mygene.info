@@ -50,6 +50,11 @@ MSEARCH_OPTIONS = (
 NUMBER = re.compile(r"[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?")
 LONG_MAX = 2**63 - 1
 
+# Lucene's longest term, in bytes. Elasticsearch rejects a terms query with a
+# longer value, and so the whole batch, where the per-term multi_match finds
+# nothing for it.
+MAX_TERM_BYTES = 32766
+
 
 def lookup_keys(term, scopes):
     """
@@ -64,6 +69,8 @@ def lookup_keys(term, scopes):
         term = str(term)
     if not isinstance(term, str) or not term.isascii():
         return None  # Python and Lucene lowercase some non-ASCII letters differently
+    if len(term) > MAX_TERM_BYTES:
+        return None  # one byte per ASCII character
     if not isinstance(scopes, (list, tuple)) or not scopes:
         return None
     if not all(isinstance(field, str) and field in ID_FIELD_BOOSTS for field in scopes):
