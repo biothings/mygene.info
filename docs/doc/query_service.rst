@@ -29,12 +29,16 @@ q
 
 fields
 """"""
-    Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v3/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
+    Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v3/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. To leave fields out instead, prefix them with "-", e.g., "fields=-go,-pathway" returns all fields except "go" and "pathway". Default:
     "symbol,name,taxid,entrezgene".
 
 species
 """""""
     Optional, can be used to limit the gene hits from given species. You can use "common names" for nine common species (human, mouse, rat, fruitfly, nematode, zebrafish, thale-cress, frog and pig). All other species, you can provide their taxonomy ids. See `more details here <data.html#species>`_. Multiple species can be passed using comma as a separator. Passing "all" will query against all available species. Default: all.
+
+include_tax_tree
+""""""""""""""""
+    Optional, when passed as "true" or "1", the "**species**" parameter also matches all the taxa under each given species or taxon in the NCBI taxonomy, e.g., "species=9605&include_tax_tree=true" returns hits from every species of the genus *Homo* (taxonomy id 9605), including human. Default: false.
 
 size
 """"
@@ -42,7 +46,7 @@ size
 
 from
 """"
-    Optional, the number of matching gene hits to skip, starting from 0. Default: 0
+    Optional, the number of matching gene hits to skip, starting from 0. "**from**" + "**size**" can be at most 10,000; to get the hits beyond that, use `search_after <#search-after>`__ (GET only). Default: 0
 
 .. Hint:: The combination of "**size**" and "**from**" parameters can be used to get paging for large query:
 
@@ -51,17 +55,21 @@ from
     q=cdk*&size=50                     first 50 hits
     q=cdk*&size=50&from=50             the next 50 hits
 
+search_after
+""""""""""""
+    Optional, used to page through all hits of a query, including beyond the first 10,000 that **size** and **from** can reach.  Pass **search_after** = ``*`` with the first request.  While more hits remain, the response contains a **_search_after** field.  Send the same query again with **search_after** set to that value to get the next page, until a response no longer contains **_search_after**.  Unlike **fetch_all**, the hits can be sorted with the **sort** parameter.  Each page returns **size** hits (1000 by default), and a **_search_after** value expires 1 minute after the page it came with.  It cannot be combined with **from**, **facets**, **fetch_all** or **scroll_id**.  For more information see `examples using search_after here <#paging-with-search-after>`_.
+
 fetch_all
 """""""""
-    Optional, a boolean, which when TRUE, allows fast retrieval of all unsorted query hits.  The return object contains a **_scroll_id** field, which when passed as a parameter to the query endpoint, returns the next 1000 query results.  Setting **fetch_all** = TRUE causes the results to be inherently unsorted, therefore the **sort** parameter is ignored.  For more information see `examples using fetch_all here <#scrolling-queries>`_.  Default: FALSE.
+    Deprecated, use `search_after <#search-after>`__ instead.  Optional, a boolean, which when TRUE, allows fast retrieval of all unsorted query hits.  The return object contains a **_scroll_id** field, which when passed as a parameter to the query endpoint, returns the next 1000 query results.  Setting **fetch_all** = TRUE causes the results to be inherently unsorted, therefore the **sort** parameter is ignored.  For more information see `examples using fetch_all here <#scrolling-queries>`_.  Default: FALSE.
 
 scroll_id
 """""""""
-    Optional, a string containing the **_scroll_id** returned from a query request with **fetch_all** = TRUE.  Supplying a valid **scroll_id** will return the next 1000 unordered results.  If the next results are not obtained within 1 minute of the previous set of results, the **scroll_id** becomes stale, and a new one must be obtained with another query request with **fetch_all** = TRUE.  All other parameters are ignored when the **scroll_id** parameter is supplied.  For more information see `examples using scroll_id here <#scrolling-queries>`_.
+    Deprecated, use `search_after <#search-after>`__ instead.  Optional, a string containing the **_scroll_id** returned from a query request with **fetch_all** = TRUE.  Supplying a valid **scroll_id** will return the next 1000 unordered results.  If the next results are not obtained within 1 minute of the previous set of results, the **scroll_id** becomes stale, and a new one must be obtained with another query request with **fetch_all** = TRUE.  All other parameters are ignored when the **scroll_id** parameter is supplied.  For more information see `examples using scroll_id here <#scrolling-queries>`_.
 
 sort
 """"
-    Optional, the comma-separated fields to sort on. Prefix with "-" for descending order, otherwise in ascending order. Default: sort by matching scores in decending order.
+    Optional, the comma-separated fields to sort on. Prefix with "-" for descending order, otherwise in ascending order. Default: sort by matching scores in descending order.
 
 facets
 """"""
@@ -69,8 +77,7 @@ facets
 
 facet_size
 """"""""""
-    Optional, an integer (1 <= **facet_size** <= 1000) that specifies how many buckets to ret
-urn in a faceted query.
+    Optional, an integer (1 <= **facet_size** <= 1000) that specifies how many buckets to return in a faceted query.
 
 species_facet_filter
 """"""""""""""""""""
@@ -84,17 +91,57 @@ ensemblonly
 """""""""""
     Optional, when passed as "true" or "1", the query returns only the hits with valid Ensembl gene ids. Default: false.
 
-callback
-""""""""
-    Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
+exists
+""""""
+    Optional, a comma-separated list of fields. The query returns only the hits that have all of these fields, e.g., "exists=pathway.kegg" returns only the genes with KEGG pathways.
+
+missing
+"""""""
+    Optional, a comma-separated list of fields. The query returns only the hits that have none of these fields, e.g., "missing=ensembl" returns only the genes without Ensembl gene ids.
+
+filter
+""""""
+    Optional, a query in the Elasticsearch `query string syntax <https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-query-string-query.html#query-string-syntax>`_ that the hits must also match, e.g., "filter=taxid:9606" or "filter=type_of_gene:protein-coding". Unlike adding it to "**q**", it doesn't change the scores of the hits. The facet counts only include the hits that match it. It takes full field names, e.g., "filter=refseq.rna:NM_001798": the shortcuts in `Available fields <#available-fields>`__, like "refseq" and "uniprot", only work in "**q**". Note that "**filter**" used to be an alias for "**fields**"; use "**fields**" for that.
+
+post_filter
+"""""""""""
+    Optional, like "**filter**", but applied after the facets are counted, so it narrows down the hits without changing the facet counts, e.g., "facets=taxid&post_filter=type_of_gene:protein-coding". "`species_facet_filter <#species-facet-filter>`__" does the same for species.
 
 dotfield
 """"""""
     Optional, can be used to control the format of the returned gene object.  If "dotfield" is true, the returned data object is returned flattened (no nested objects) using dotfield notation for key names.  Default: false.
 
-filter
+always_list
+"""""""""""
+    Optional, a comma-separated list of fields to always return as lists, even when a gene has a single value for them, e.g., with "fields=symbol,ensembl.gene&always_list=ensembl", "ensembl" is a list even for a gene with one Ensembl gene.
+
+allow_null
+""""""""""
+    Optional, a comma-separated list of fields to include in every hit, as null when a gene doesn't have them, e.g., "fields=symbol,pharmgkb&allow_null=pharmgkb". A dotted field, like "refseq.rna", is only added to the hits that have its parent, "refseq".
+
+jmespath
+""""""""
+    Optional, transforms a field of each hit with a `JMESPath <https://jmespath.org>`_ expression, passed as ``<field>|<expression>``. For example, ``fields=go.BP&jmespath=go.BP|[?evidence=='IDA'].term`` replaces each gene's "go.BP" with the names of its terms that have IDA evidence.
+
+jmespath_exclude_empty
+""""""""""""""""""""""
+    Optional, when passed as "true" or "1", leaves out the hits whose field is empty after the "**jmespath**" transformation. The total number of hits doesn't change, so a page can have fewer hits than "**size**". Default: false.
+
+format
 """"""
-    Alias for "fields" parameter.
+    Optional, the format of the response: "json", "yaml", "html" (the JSON in a web page) or "msgpack". Default: json.
+
+explain
+"""""""
+    Optional, when passed as "true" or "1", each hit includes an "**_explanation**" field with Elasticsearch's breakdown of its score.
+
+rawquery
+""""""""
+    Optional, when passed as "true" or "1", returns the Elasticsearch query built for your request instead of running it.
+
+raw
+"""
+    Optional, when passed as "true" or "1", returns the Elasticsearch response as is, without formatting the hits.
 
 limit
 """""
@@ -103,10 +150,6 @@ limit
 skip
 """"
     Alias for "from" parameter.
-
-email
-""""""
-    Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.
 
 
 Query syntax
@@ -122,6 +165,7 @@ search for everything::
     q=cdk2                              search for any fields
     q=tumor suppressor                  default as "AND" for all query terms
     q="cyclin-dependent kinase"         search for the phrase
+    q=__all__                           all genes; with "facets" and no "size", only the facet counts
 
 
 
@@ -194,10 +238,15 @@ When we detect your query ("**q**" parameter) contains a genome interval pattern
 
     chrX:151,073,054-151,383,976
 
-we will do the genome interval query for you. Besides above interval string, you also need to specify "*species*" parameter (with the default as human). These are all acceptted queries::
+we will do the genome interval query for you. Pass the "*species*" parameter too: without it, the query returns the genes of every species with a matching chromosome and range. These are all accepted queries::
 
-    q=chrX:151073054-151383976&species:9606
-    q=chrX:151,073,054-151,383,976&species:human
+    q=chrX:151073054-151383976&species=9606
+    q=chrX:151,073,054-151,383,976&species=human
+
+The query uses the current genome assembly of each species. For human and mouse, you can also search the older hg19 and mm9 assemblies by adding "hg19." or "mm9." before the interval::
+
+    q=hg19.chr12:56360553-56366568&species=human
+    q=mm9.chr10:128134995-128142107&species=mouse
 
 
 .. Hint:: As you can see above, the genomic locations can include commas in it.
@@ -215,8 +264,7 @@ Wildcard character "*" or "?" is supported in either simple queries or fielded q
     q=CDK?                              single character wildcard
     q=symbol:CDK?                       single character wildcard within "symbol" field
     q=IL*R                              multiple character wildcard
-
-.. note:: Wildcard character can not be the first character. It will be ignored.
+    q=*DK2                              wildcard as the first character
 
 
 Boolean operators and grouping
@@ -374,7 +422,7 @@ If you need to, you can also pass multiple fields as comma-separated list::
 
 
 Particularly relevant to species facets (i.e., "facets=taxid"), you can pass a
-"`species_facet_filter <#species_facet_filter>`_" parameter to filter the returned hits on a given species, without changing the scope of the facets (i.e. facet counts will not change). This is useful when you need to get the subset of the hits for a given species after the initial faceted query on species.
+"`species_facet_filter <#species-facet-filter>`_" parameter to filter the returned hits on a given species, without changing the scope of the facets (i.e. facet counts will not change). This is useful when you need to get the subset of the hits for a given species after the initial faceted query on species.
 
 You can see the different "hits" are returned in the following queries, while "facets" keeps the same::
 
@@ -386,8 +434,52 @@ v.s.
     http://mygene.info/v3/query?q=cdk?&size=1&facets=taxid&species_facet_filter=mouse
 
 
+Paging with search_after
+------------------------
+If you want to return ALL results of a very large query, including beyond the first 10,000 results that the paging method described `above <#from>`__ can reach, page through them with **search_after**.  To begin, call the query endpoint as you normally would, but with an extra parameter **search_after** = ``*``.  For example, a GET request to::
+
+    http://mygene.info/v3/query?q=brain&fields=symbol,name&size=1000&search_after=*
+
+Returns an object like this:
+
+.. code-block:: json
+    :force:
+
+    {
+      "took": 31,
+      "_search_after": "eyJwaXQiOiI0OFAxQkFFSWJYbG5aVzVsWDJOMWNuSmxiblFX...",
+      "total": 14571,
+      "max_score": null,
+      "hits": [
+        {
+          "_id": "...",
+          "_score": null,
+          "name": "...",
+          "symbol": "..."
+        },
+        .
+        .
+        .
+      ]
+    }
+
+To get the next page, send the same query again, with **search_after** set to the **_search_after** value of the previous response::
+
+    http://mygene.info/v3/query?q=brain&fields=symbol,name&size=1000&search_after=eyJwaXQiOiI0OFAxQkFFSWJYbG5aVzVsWDJOMWNuSmxiblFX...
+
+Repeat this until a response no longer contains **_search_after**, which means it is the last page.  Each request must repeat the parameters of the first one that select and order the hits, like **q**, **sort**, **species** and the filters, otherwise it returns an error.  The **fields** and **size** parameters can change between pages.
+
+Without a **sort** parameter, the hits are returned in index order, the fastest order to page through, and their **_score** is null.  With **sort**, the hits are sorted across all the pages, for example::
+
+    http://mygene.info/v3/query?q=brain&fields=symbol,name&size=1000&sort=symbol&search_after=*
+
+.. Hint:: A **_search_after** value remains valid for 1 minute after the page it came with, and each page starts a new minute.  If it expires before you get the last page, start again with **search_after** = ``*``.
+
+
 Scrolling queries
 -----------------
+.. note:: Scrolling queries are deprecated, use `search_after <#paging-with-search-after>`__ instead, the deep pagination Elasticsearch recommends.  Scrolling still works, and its responses include a **_warning** field recommending **search_after**.
+
 If you want to return ALL results of a very large query (>10,000 results), sometimes the paging method described `above <#from>`_ can take too long.  In these cases, you can use a scrolling query.
 This is a two-step process that turns off database sorting to allow very fast retrieval of all query results.  To begin a scrolling query, you first call the query
 endpoint as you normally would, but with an extra parameter **fetch_all** = TRUE.  For example, a GET request to::
@@ -443,17 +535,18 @@ Query parameters
 
 q
 """
-    Required, multiple query terms seperated by comma (also support "+" or white space), but no wildcard, e.g., 'q=1017,1018' or 'q=CDK2+BTK'.
+    Required, multiple query terms separated by comma (also "+", "|" or white space), but no wildcard, e.g., ``q=1017,1018`` or ``q=CDK2+BTK``. Put a term in double quotes to keep the white space in it, e.g., ``q="cyclin dependent kinase 2",BTK``. "**q**" can also be a JSON list, e.g., ``q=["1017","CDK2"]``, and each query term can be a list of values that match several fields at once, see `compound queries <#compound-queries>`__.
     Note that currently we only take the input query terms up to **5000** maximum. Passing more than 5000 terms returns an HTTP 400 error.
 
 scopes
 """"""
     Optional, specify one or more fields (separated by comma) as the search "scopes", e.g., "scopes=entrezgene",
     "scopes=entrezgene,ensemblgene". The available "fields" can be passed to "**scopes**" parameter are
-    :ref:`listed above <available_fields>`. Default: "scopes=entrezgene,ensemblgene,retired" (either Entrez
-    or Ensembl gene ids). To look up gene symbols, use "scopes=symbol". It also matches former official
+    :ref:`listed above <available_fields>`. Default: "scopes=_id,entrezgene,ensembl.gene,retired" (Entrez
+    or Ensembl gene ids, including retired Entrez gene ids). To look up gene symbols, use "scopes=symbol". It also matches former official
     symbols, such as "PARK2" for "PRKN", ranked the same way as in a GET query. Add "alias" to match other
-    synonyms too.
+    synonyms too. For `compound queries <#compound-queries>`__, pass one field, or a list of fields, for
+    each value of a query term.
 
 species
 """""""
@@ -464,13 +557,25 @@ fields
     Optional, can be a comma-separated fields to limit the fields returned from the matching gene hits. The supported field names can be found from any gene object (e.g. `gene 1017 <http://mygene.info/v3/gene/1017>`_). Note that it supports dot notation as well, e.g., you can pass "refseq.rna". If "fields=all", all available fields will be returned. Default:
     "symbol,name,taxid,entrezgene".
 
+size
+""""
+    Optional, the maximum number of hits to return for each query term (with a cap of 1000). Default: 10. The number of query terms times "**size**" can be at most 100,000; a request asking for more returns an HTTP 400 error.
+
 dotfield
 """"""""""
-    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: false.
+    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dotfield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: false.
 
-email
-""""""
-    Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.
+with_total
+""""""""""
+    Optional, when passed as "true" or "1", the response is an object instead of a list: the hits are in "**hits**", the largest number of hits that any query term matched, counted up to 10,000, is in "**max_total**", and if some query terms matched more hits than "**size**", "**msg**" says how many. See the :ref:`example below <with_total_example>`. Default: false.
+
+analyzer
+""""""""
+    Optional, the name of an Elasticsearch analyzer, such as the `built-in <https://www.elastic.co/guide/en/elasticsearch/reference/current/analysis-analyzers.html>`_ "standard", to analyze the query terms with, instead of the analyzer of each field in "**scopes**". An unknown name returns an error.
+
+Other parameters
+""""""""""""""""
+    POST queries also take these GET parameters: `from <#from>`__, `sort <#sort>`__, `entrezonly <#entrezonly>`__, `ensemblonly <#ensemblonly>`__, `exists <#exists>`__, `missing <#missing>`__, `filter <#filter>`__, `post_filter <#post-filter>`__, `always_list <#always-list>`__, `allow_null <#allow-null>`__, `jmespath <#jmespath>`__, `jmespath_exclude_empty <#jmespath-exclude-empty>`__, `format <#format>`__, `rawquery <#rawquery>`__ and `raw <#raw>`__. "**from**", "**sort**" and the filters apply to the hits of each query term.
 
 Example code
 ------------
@@ -482,6 +587,12 @@ piece of code. Here is a sample python snippet::
     headers = {'content-type': 'application/x-www-form-urlencoded'}
     params = 'q=1017,1018&scopes=entrezgene&fields=name,symbol,taxid,entrezgene'
     res = requests.post('http://mygene.info/v3/query', data=params, headers=headers)
+
+You can also send the parameters as JSON, which returns the same result::
+
+    import requests
+    params = {'q': ['1017', '1018'], 'scopes': 'entrezgene', 'fields': 'name,symbol,taxid,entrezgene'}
+    res = requests.post('http://mygene.info/v3/query', json=params)
 
 
 Returned object
@@ -514,7 +625,7 @@ Returned result (the value of "res.text" variable above) from above example code
 
 
 .. Tip:: "query" field in returned object indicates the matching query term.
-.. Note:: if no "fields" parameter is specified, all available fields will be returned
+.. Note:: if no "fields" parameter is specified, the default fields "symbol,name,taxid,entrezgene" are returned. Pass "fields=all" to get all available fields.
 
 If a query term has no match, it will return with "**notfound**" field as "**true**"::
 
@@ -538,6 +649,8 @@ If a query term has no match, it will return with "**notfound**" field as "**tru
         "notfound": true
       }
     ]
+
+A query term also comes back as "**notfound**" when "**from**" skips all of its hits, or "**jmespath_exclude_empty**" leaves them all out.
 
 If a query term has multiple matches, they will be included with the same "query" field::
 
@@ -574,6 +687,85 @@ If a query term has multiple matches, they will be included with the same "query
         "_id": "1017"
       }
     ]
+
+.. _with_total_example:
+
+With "**with_total**", the hits come in an object that also tells you whether some query terms have more hits than "**size**"::
+
+    params = 'q=cdk2,1017&scopes=symbol,entrezgene&fields=symbol,taxid&size=2&with_total=true'
+    res = requests.post('http://mygene.info/v3/query', data=params, headers=headers)
+
+.. code-block:: json
+
+    {
+      "max_total": 1041,
+      "hits": [
+        {
+          "query": "cdk2",
+          "_id": "1017",
+          "_score": 148.79999,
+          "symbol": "CDK2",
+          "taxid": 9606
+        },
+        {
+          "query": "cdk2",
+          "_id": "12566",
+          "_score": 124.799995,
+          "symbol": "Cdk2",
+          "taxid": 10090
+        },
+        {
+          "query": "1017",
+          "_id": "1017",
+          "_score": 27.462214,
+          "symbol": "CDK2",
+          "taxid": 9606
+        }
+      ],
+      "msg": "1 query terms return > 2 hits, using from=2 to retrieve the remaining hits"
+    }
+
+
+Compound queries
+----------------
+
+A query term can also be a list of values, to match each value against its own scopes, e.g., a gene symbol in one field and a species in another. Pass "**scopes**" as a list with one entry per value, in the same order; an entry can itself be a list of fields. A gene is a hit only if every value matches. This request looks up CDK2 in a different species for each query term::
+
+    import requests
+    params = {
+        'q': [['CDK2', '9606'], ['Cdk2', '10090'], ['cdk2', '7955']],
+        'scopes': ['symbol', 'taxid'],
+        'fields': 'symbol,taxid',
+    }
+    res = requests.post('http://mygene.info/v3/query', json=params)
+
+.. code-block:: json
+
+    [
+      {
+        "query": ["CDK2", "9606"],
+        "_id": "1017",
+        "_score": 150.34999,
+        "symbol": "CDK2",
+        "taxid": 9606
+      },
+      {
+        "query": ["Cdk2", "10090"],
+        "_id": "12566",
+        "_score": 126.1,
+        "symbol": "Cdk2",
+        "taxid": 10090
+      },
+      {
+        "query": ["cdk2", "7955"],
+        "_id": "406715",
+        "_score": 106.700005,
+        "symbol": "cdk2",
+        "taxid": 7955
+      }
+    ]
+
+With a form-encoded body, pass "**q**" as JSON, e.g., ``q=[["CDK2","9606"],["Cdk2","10090"]]&scopes=symbol,taxid``. To give a value a list of fields, e.g., ``"scopes": [["entrezgene", "symbol"], "taxid"]``, send the parameters as JSON.
 
 
 

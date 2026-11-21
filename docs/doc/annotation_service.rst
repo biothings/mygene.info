@@ -28,8 +28,6 @@ Optionally, you can pass a "**fields**" parameter to return only the annotation 
 
 "**fields**" accepts any attributes (a.k.a fields) available from the gene object. Multiple attributes should be seperated by commas. If an attribute is not available for a specific gene object, it will be ignored. Note that the attribute names are case-sensitive.
 
-Just like `gene query service <query_service.html>`_, you can also pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>`_ call.
-
 
 
 Query parameters
@@ -39,21 +37,9 @@ fields
 """"""""
     Optional, can be a comma-separated fields to limit the fields returned from the gene object. If "fields=all", all available fields will be returned. Note that it supports dot notation as well, e.g., you can pass "refseq.rna". Default: "fields=all".
 
-callback
-"""""""""
-    Optional, you can pass a "**callback**" parameter to make a `JSONP <http://ajaxian.com/archives/jsonp-json-with-padding>` call.
-
-filter
-"""""""
-    Alias for "fields" parameter.
-
 dotfield
 """"""""""
-    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: false.
-
-email
-""""""
-    Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.
+    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dotfield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: false.
 
 
 Returned object
@@ -94,7 +80,7 @@ ids
 fields
 """""""
     Optional, can be a comma-separated fields to limit the fields returned from the matching hits.
-    If “fields=all”, all available fields will be returned. Note that it supports dot notation as well, e.g., you can pass "refseq.rna". Default: “symbol,name,taxid,entrezgene”.
+    If “fields=all”, all available fields will be returned. Note that it supports dot notation as well, e.g., you can pass "refseq.rna". Default: "fields=all".
 
 species
 """""""""""
@@ -102,11 +88,7 @@ species
 
 dotfield
 """"""""""
-    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dofield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: false.
-
-email
-""""""
-    Optional, if you are regular users of our services, we encourage you to provide us an email, so that we can better track the usage or follow up with you.
+    Optional, can be used to control the format of the returned fields when passed "fields" parameter contains dot notation, e.g. "fields=refseq.rna". If "dotfield" is true, the returned data object contains a single "refseq.rna" field, otherwise, a single "refseq" field with a sub-field of "rna". Default: false.
 
 Example code
 ------------

@@ -25,17 +25,10 @@ Making your own server-side proxy
 
     Setup proxy in popular server-side applications, like `Apache <http://www.ghidinelli.com/2008/12/27/how-to-bypass-cross-domain-restrictions-when-developing-ajax-applications>`_, `Nginx <http://wiki.nginx.org/NginxHttpProxyModule>`_ and `PHP <http://developer.yahoo.com/javascript/howto-proxy.html>`_, are straightforward.
 
-Making JSONP call
-"""""""""""""""""
-
-    Because our core services are just called as simple GET http requests (though we support POST requests for batch queries too), you can bypass "same-origin" restriction by making JSONP call as well. To read more about JSONP, see `1 <http://en.wikipedia.org/wiki/JSONP#JSONP>`_, `2 <http://remysharp.com/2007/10/08/what-is-jsonp/>`_, or just Google about it. All our services accept an optional "**callback**" parameter, so that you can pass your callback function to make a JSONP call.
-
-    All popular javascript libraries have the support for making JSONP calls, like in `JQuery <http://api.jquery.com/jQuery.getJSON/>`_, `ExtJS <http://docs.sencha.com/extjs/4.2.1/#!/api/Ext.data.proxy.JsonP>`_, `MooTools <http://mootools.net/docs/more/Request/Request.JSONP>`_
-
 Cross-origin http request through CORS
 """"""""""""""""""""""""""""""""""""""
 
-    Cross-Origin Resource Sharing (CORS) specification is a `W3C draft specification <http://www.w3.org/TR/cors/>`_ defining client-side cross-origin requests. It's actually supported by all major browsers by now (Internet Explorer 8+, Firefox 3.5+, Safari 4+, and Chrome. See more on `browser support <http://caniuse.com/cors>`_), but not many people are aware of it. Unlike JSONP, which is limited to GET requests only, you can make cross-domain POST requests as well. Our services supports CORS requests on both GET and POST requests. You can find more information and use case `here <http://blog.timothyfisher.com/?p=285>`__ and `here <http://hacks.mozilla.org/2009/07/cross-site-xmlhttprequest-with-cors/>`__.
+    Cross-Origin Resource Sharing (CORS) specification is a `W3C draft specification <http://www.w3.org/TR/cors/>`_ defining client-side cross-origin requests. It's actually supported by all major browsers by now (Internet Explorer 8+, Firefox 3.5+, Safari 4+, and Chrome. See more on `browser support <http://caniuse.com/cors>`_), but not many people are aware of it. You can make cross-domain POST requests as well. Our services supports CORS requests on both GET and POST requests. You can find more information and use case `here <http://blog.timothyfisher.com/?p=285>`__ and `here <http://hacks.mozilla.org/2009/07/cross-site-xmlhttprequest-with-cors/>`__.
 
     JQuery's native ajax call supports CORS since v1.5.
 
@@ -47,7 +40,7 @@ Demo Applications
 
 In this demo, we want to create a web site to display expression charts from a microarray dataset (Affymetrix MOE430v2 chip). The expression data are indexed by porobeset ids, but we need to allow users to query for any mouse genes using any commonly-used identifiers, and then display expression charts for any selected gene.
 
-We implemented this demo in four ways:
+We implemented this demo in three ways:
 
 
 Example 1: using CGI
@@ -69,23 +62,14 @@ Example 2: using tornado
 
     * `See it in action here <../_static/demo/mygene_info_demo_tornado>`__.
 
-Example 3: using JSONP
-^^^^^^^^^^^^^^^^^^^^^^^^
-
- * `Download sample code here <../_static/demo/mygene_info_demo_jsonp.zip>`__.
-
- * The zip file contains one html file and one javascript file. There is no server-side code at all. To run it, just unzip it and open the html file in any browser. All remote service calls are done at client side (via browsers). Put the files into any web server serving static files will allow you to publish to the world.
-
- * `See it in action here <../_static/demo/mygene_info_demo_jsonp.html>`__.
-
-Example 4: using CORS
+Example 3: using CORS
 ^^^^^^^^^^^^^^^^^^^^^^^
 
  * `Download sample code here <../_static/demo/mygene_info_demo_cors.zip>`__.
 
  * The zip file contains one html file and one javascript file. There is no server-side code at all. To run it, just unzip it and open the html file in any browser. All remote service calls are done at client side (via browsers). Put the files into any web server serving static files will allow you to publish to the world.
 
- * This demo is almost the same as the one using JSONP, except that the actual AJAX call to MyGene.info server is made via CORS.
+ * The AJAX calls to the MyGene.info server are made via CORS.
 
 
  * `See it in action here <../_static/demo/mygene_info_demo_cors.html>`__.
