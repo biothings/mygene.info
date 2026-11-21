@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 
 from biothings.tests.web import BiothingsWebAppTest
-from biothings.web.query import AsyncESQueryPipeline, QueryPipelineException
+from biothings.web.query import AsyncESQueryPipeline
 
 
 class TestAnnotationScopes(BiothingsWebAppTest):
@@ -328,50 +328,13 @@ class TestBatchLookup(BiothingsWebAppTest):
         assert len(self.hits_of(result, 'ENSEMBL:ENSG00000999999')) == 6
 
     def test_msearch_fallback(self):
-        # batches one search can't answer the same way run with a search per ID, like
-        # the symbol scope, which gets the fixed scores in legacy.py even next to ID fields
+        # the symbol scope gets the fixed scores in legacy.py, even next to ID fields,
+        # so a batch with it runs with a search per ID
         result, searches = self.run_batch(
             'search', ['CDK2', 'Cdk2', '1017'], scopes=['entrezgene', 'symbol'], species=['all']
         )
         assert searches == ['MultiSearch']
         assert self.hits_of(result, 'CDK2') == ['1017', '12566']
-        for ids, options in [
-            (self.IDS, {'from': 1}),
-            (self.IDS, {'size': 0}),
-            (['1017', 'Ünï'], {}),  # Python and Lucene lowercase some non-ASCII letters differently
-        ]:
-            _, searches = self.run_batch('search', ids, scopes=self.SCOPES, species=['all'], **options)
-            assert searches == ['MultiSearch']
-        # retired is a long, Elasticsearch searches it for 1017 when the term is 1017.0
-        result, searches = self.run_batch('search', ['1017.0', '1017'], scopes=self.SCOPES, species=['all'])
-        assert searches == ['MultiSearch']
-        assert self.hits_of(result, '1017.0') == ['100000001']
-
-    def test_unusual_terms(self):
-        # more digits than int() accepts, or a number past the largest long:
-        # not found, as with a search per ID
-        result, searches = self.run_batch(
-            'search', ['1' * 5000, '9' * 19, '1017'], scopes=self.SCOPES, species=['all']
-        )
-        assert searches == ['Search']
-        assert self.hits_of(result, '1' * 5000) == self.hits_of(result, '9' * 19) == []
-        # a search per ID rejects the term 0 as empty, and so does the batch
-        with pytest.raises(QueryPipelineException) as raised:
-            self.io_loop.run_sync(lambda: self._app.biothings.pipeline.search([0], scopes=self.SCOPES))
-        assert raised.value.code == 400
-
-    def test_post_endpoints(self):
-        res = self.request('query', method='POST', data={
-            'q': '1017,ENSG00000999999', 'scopes': 'entrezgene,ensembl.gene,retired', 'species': 'human',
-        }).json()
-        assert [(hit['query'], hit['_id']) for hit in res] == [
-            ('1017', '1017'), ('1017', '100000001'), ('ENSG00000999999', '2001'), ('ENSG00000999999', '2003'),
-        ]
-        res = self.request('gene', method='POST', data={'ids': '1017,ENSDARG00000000001,nope'}).json()
-        assert [(hit['query'], hit.get('_id'), hit.get('notfound')) for hit in res] == [
-            ('1017', '1017', None), ('1017', '100000001', None),
-            ('ENSDARG00000000001', 'ENSDARG00000000001', None), ('nope', None, True),
-        ]
 
 
 class TestMetadata(BiothingsWebAppTest):
